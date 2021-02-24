@@ -1,0 +1,90 @@
+* Arbiter is hard
+** Just had to learn how to output more than one stream at a time
+   as it's the only Audio unit I've written that has more than
+   one output.
+** Arbiter processes multiple input key streams and sends 
+   at most one on to key sidetone, IQ, key_out, and ptt_out.
+** I call each input key stream a vox, because each is a voice and
+   each generates a PTT stream like a voice operated relay (VOX).
+** The plural of vox is voces (think voice and voices).
+   Sorry, not sorry, for the pedantry, but each vox is a keyer and
+   the whole system is a keyer, so I needed another word.
+** The voces are defined in config.h as
+*** KYR_VOX_NONE 0	// inactive
+*** KYR_VOX_S_KEY 1	// straight key
+*** KYR_VOX_PAD 2		// paddle
+*** KYR_VOX_WINK 3		// text vox for Winkey protocol
+*** KYR_VOX_KYR 4		// text vox for the keyer    
+** The initial arbiter implementation toggles between KYR_VOX_NONE and KYR_VOX_PAD
+** If no vox is active, activeVox = KYR_VOX_NONE.
+** If a stream becomes active, then activeVox = KYR_VOX_STREAM   
+   and active_ptt_tail = get_param(activeVox, KYR_P_PTT_TAIL)
+   and stream remains active until ptt drops.
+** If a higher priority stream becomes active while a lower priority
+   stream is holding ptt.
+* Generate PTT in ptt_delay  
+**  translate incoming key buffers into run length +mark-space
+   stored into a ring buffer with ptt_head time samples of 0.
+** If the buffer is -AUDIO_BUFFER_SAMPLES   
+   then just send it
+   prepended to key, and ptt_head time samples of on prepended
+   to ptt, length of ptt runs adjusted with ptt_tail time.
+** 
+  immediately and work your way through the queued keying until
+  ptt_tail expires.
+  Needs to know current vox to access correct ptt_head_time, 
+  ptt_tail_time.
+* Arbiter only needs ptt_tail value
+  to count down while waiting for zeros to finish.
+  Needs to know current vox to access correct ptt_tail_time.
+  But it decides what the current vox is, so it can have it.
+* Finish off parameters
+** Parameters communicated via MIDI (or Winkey) as NRPN's
+** MSB of NRPN is bank
+** LSB of NRPN is parameters
+** Bank 0 is the default bank 
+** Banks 1, 2, 3,4,... are VOX banks which can override defaults
+** Some parameters are not set via MIDI, but computed from
+   the parameters set by MIDI settings.
+*** Morse code timing, for instance, where wpm, weight, ratio, comp, farnsworth   
+    get translated into dit_len, ies_len, dah_len, ils_len, and iws_len in samples.
+** So that's how they get set by MIDI (or Winkey) 
+   and then massaged into directly useful values.
+**  How do they get into the modules that need them?
+***  get_param(VOX, NRPN) accesses the VOX specific bank 
+    then falls back to the default bank to fetch a value for a NRPN.
+*** get_param(NRPN) expands to get_param(activeVox,NRPN)
+*** get_param(KYR_VOX_NONE, NRPN) gets the default value.
+*** Each keyer knows which VOX it is.
+    it can fetch the key timing parameters each time they are
+    required, it's fast.
+*** The arbiter knows which VOX is active at the current sample
+    it can fetch the ptt tail each time its required.
+*** everyone else can see the global activeVox as it is updated,
+    which has nothing to do with the state in the sample loop,
+    which is that it changes at some sample index, which happens
+    at a different point in time for each module.
+*** So maybe the arbiter updates activeVox once per buffer?
+    so to switch activeVox arbiter simply writes a global which
+    takes effect immediately for all subsequent stages, which
+    include the oscillator, ramp, ptt_delay, ....
+**** So the override of a vox takes minimum of two buffers,     
+     one to stop the keying of the preempted vox, using its ramp and frequency,
+	that just sends a zero buffer to the key line,
+     then wait for the ramp off time to expire, which may be several buffers,
+     then set the new vox at the beginning of the next buffer,
+     this is going to chop off the start of the pre-empting vox.
+***  But the oscillator and ramp generator and ptt_delay don't know.
+    So the oscillator, ramps, and ptt_delay use the global activeVox
+    to fetch parameters.
+    The ramp can do this when each transition starts.
+    The ptt_delay can do this when a transition starts.
+    The oscillators are free running, if they were started and stopped
+    by the ramp, then they could pick up frequency and sideband then.
+    And when do changes get picked up?
+    Keyers can pick up element lengths when they go to make an element.
+    Ramps can fetch rise and fall times at ramp start.
+    ptt delay can fetch head and tail time.
+    turning the oscillator on and off would save bundles of computation
+    and allow the frequency to adapt
+   

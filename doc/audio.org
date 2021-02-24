@@ -1,0 +1,169 @@
+* Audio library keyer design
+  This keyer will be implemented almost entirely in the audio library.
+  The file audio.png (dia source audio.dia) shows the structure of
+  the graph, which cannot be drawn in the Teensy Audio design editor
+  because in includes custom Audio Library modules.
+  The following sections describe the audio modules in the design
+  in their order of definition to the audio library, which is also
+  their order of execution during each sample buffer evaluation.
+* Audio module instances
+** Inputs
+*** AudioInputUSB usb_in;
+    usb audio from host which may be RX audio for op or IQ stream for line-out.
+*** AudioInputI2S i2s_in;
+    i2s audio from microphone or IQ stream from line-in.
+*** AudioInputSample l_pad, r_pad, s_key, ptt_switch;
+    left paddle input, taken from KYR_L_PAD pin,
+    right paddle input, taken from KYR_R_PAD pin,
+    straight key input, taken from KYR_S_KEY pin,
+    PPT key input, taken from KYR_PTT_SWITCH pin.
+*** AudioInputText wink, kyr;
+    text input from Winkey or other automated keyer,
+    text input from the keyer to the operator.
+*** AudioInputSample tx_enable, st_enable;
+    Indication that transmission is enabled.
+    Indication that sidetone is enabled.
+** Tier 1
+*** AudioEffectKeyer keyer;
+    A keyer that consumes samples from l_pad and r_pad to produce pad_key samples.
+** Tier 2
+*** AudioEffectArbiter arbiter;
+    Receives key sample streams from keyer, s_key, wink, and kyr.
+    Decides which key sample stream is active.
+    Outputs the active keyer identifier to active_vox.
+    Outputs the active key event stream to key.
+    Outputs the active key vox stream to vox, this is the key stream stretched
+    by ptt_hang_time.
+**** Arbitration
+***** If only one key sample stream is sounding, it becomes the active stream.
+***** If an automated stream is the active stream, and a manually keyed stream
+      becomes active, then the automated stream is aborted and the manual stream
+      becomes the active stream.
+***** Otherwise, the currently active stream remains active until its vox line
+      goes low.
+**** Override
+     The wink and kyr inputs should monitor active_vox to detect override
+     and they should abort and flush queued chars when overridden and make
+     plans to resend their message if necessary.
+*** AudioSynthWaveformSine sine_I, sine_Q;
+    In phase and quadrature phase sine waves.
+    Should implement positive and negative frequencies.
+** Tier 3
+*** AudioEffectRamp key_ramp;
+    Combines key, sine_I, and sine_Q to produces I and Q shaped according
+    to a specified ramp function.
+*** AudioEffectLogic and_not_kyr;
+    Combines tx_enable and the active_vox to produce a signal which is true
+    when tx_enable is true and the active_vox is not kyr.
+** Tier 4    
+*** AudioEffectRamp IQ_gate, rx_mute, st_gate;
+*** AudioEffectPTTDelay ptt_delay;
+** Tier 5
+*** AudioMixer4 l_usb_out, r_usb_out, l_i2s_out, r_i2s_out, l_hdw_out, r_hdw_out;
+   a left and right channel mixer for each of usb_out, i2s_out, and hdw_out.
+   usb_out channels contains i2s_in, IQ_gate, st_gate, i2s_in.
+   i2s_out channels contains rx_mute, IQ_gate, st_gate, usb_in.
+   hdw_out channels are the same as i2s_out channels.
+   hdw_out is which ever hardware audio output is available dac, dacs, or mqs.
+** Outputs
+*** AudioOutputUSB usb_out;
+    usb audio output for the host which may be microphone input, line-in input, locally generated IQ, or sidetone.
+*** AudioOutputI2S i2s_out;
+    i2s audio output which may be rx audio from host, IQ from host, locally generated IQ, or sidetone.
+*** AudioOutputHdw hdw_out;
+    audio output to the local hardware on the Teensy.
+*** AudioOutputSample active_vox, key_out, ptt_out;
+    value of 0,1,2,3,4 indicating which keyer is active, an int16_t value.
+    fixed value of 1.0 or 0.0 indicating the state of key for a transceiver, translated to 1 or 0 active low.
+    fixed value of 1.0 or 0.0 indicating the state of ptt for a transceiver, translated to 1 or 0 active low. 
+* Audio module classes
+  Some of these are general purpose audio classes from the Teensy audio library, others are special purpose.
+  I think our special purpose modules pull their parameters from arrays maintained by MIDI, Winkey, or other
+  inputs.  At first I thought they would pull the values from the MIDI NRPN values, but on second thought
+  those should be converted to sample clocks and arrays of samples in the background loop, so there isn't
+  any interpolation necessary in the sample engine, just straight multiply and add.  So the ramp code just
+  counts up the sample transition time and pulls the correct multiplier from the ramp array.
+  There is a particularly sticky point when the arbiter cuts off a automated keyer and switches to a manually
+  keyed signal.  The prior keyer needs to complete its ramp down at its settings before the settings for the
+  manual keyer are installed for the ramp up.  The frequency may change, too.
+** MorseCodeTiming
+    a mixin that implements morse code timing
+***  methods
+    void set_speed(const float wpm)
+    void set_weight(const float weight)
+    void set_ratio(const float ratio)
+    void set_comp(const float comp)
+    void set_hang_time(const float hang)
+** AudioInputUSB
+   see audio library documentation
+** AudioInputI2S
+   see audio library documentation
+** AudioInputSample
+    maintain a buffer of samples which are filled at sample rate.
+    if too many samples are received, overwrite earlier samples
+    and count as overruns.
+    on audio library update, send the buffer to the library, and 
+    allocate a new buffer.
+    if too few samples are received, count as underruns
+*** methods    
+    void send(const int16_t sample)
+    uint32_t overruns(void)
+    uint32_t underruns(void)
+    void overrunReset(void)
+    void underrunReset(void)
+** AudioInputText
+    Accepts text input, by character or string, and converts to
+    a stream of fixed point 1.0 or 0.0 at sample rate.
+    1.0 indicates key down and 0.0 indicates key up.
+    In detail, maintain an ascii character queue 
+    which is converted to a queue of on/off times 
+    which is converted to a stream of fixed point 1.0 or 0.0.
+    aborts and flushes queues if activeVox != none && activeVox != winkVox
+*** methods
+    mixin MorseCodeTiming
+    send(const char *text) - add text to the output queue
+    send(const char text) - add text to the output queue
+    set_table(const char *table) - set the morse code translation table
+** AudioOutputSample
+    maintain a buffer of samples delivered by the audio library and a read pointer.
+    deliver one sample from the buffer on each receive call.
+    if there are too few samples for the number of receive calls, count as overrun.
+    if there are samples that weren't received, count as underrun.
+*** methods    
+    int16_t receive(void)
+    uint32_t overruns(void)
+    uint32_t underruns(void)
+    void overrunReset(void)
+    void underrunReset(void)
+** AudioEffectKeyer
+*** methods
+    mixin MorseCodeTiming
+    clock(const uint8_t dit, uint8_t dah, uint16_t ticks)
+    set_mode(const uint8_t mode)
+    set_swap(const bool swap)
+** AudioEffectArbiter
+** AudioSynthWaveformSine
+   see audio library documentation
+** AudioEffectRamp
+*** methods
+    void set_on_ramp(const uint16_t time, const int16_t *ramp)
+    void set_off_ramp(const uint16_t time, const int16_t *ramp)
+** AudioEffectAndNot
+** AudioEffectPTTDelay
+** AudioMixer4
+   see audio library documentation
+** AudioOutputUSB
+   see audio library documentation
+** AudioOutputI2S
+   see audio library documentation
+** AudioOutputHdw
+   this is a pseudo module that wraps one of AudioOutputDAC, AudioOutputDACS, or AudioOutputMQS.
+   it does nothing by arrange that the mono DAC on the Teensy 3.1/3.2 gets just the left or right
+   channel output.
+** AudioOutputDAC   
+   see audio library documentation
+** AudioOutputDACS
+   see audio library documentation
+** AudioOutputMQS
+   see audio library documentation
+   
