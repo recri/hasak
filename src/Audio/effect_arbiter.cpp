@@ -42,14 +42,14 @@ void AudioEffectArbiter::update(void)
   
   block = receiveReadOnly(1);	// paddle
   if (block) {
+    audio_block_t *ptt = allocate();
+    if (ptt) {
+      memcpy(ptt->data, block->data, sizeof(block->data));
+      transmit(ptt, 1);
+      release(ptt);
+    }
     transmit(block,0);
-    transmit(block,1);
     release(block);
-    block = allocate();
-    active_p = &block->data[0];
-    for (int i = AUDIO_BLOCK_SAMPLES; --i >= 0 ;) *active_p++ = vox[1];
-    transmit(block, 2);
   }
-  if (block) release(block);
 }
 

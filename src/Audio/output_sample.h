@@ -37,33 +37,22 @@ class AudioOutputSample : public AudioStream
 {
 public:
   AudioOutputSample() : AudioStream(1, inputQueueArray) { 
-    block = allocate();
-    if (block) {
-      rptr = &block->data[0];
-      n = AUDIO_BLOCK_SAMPLES;
-    }
+    rptr = wptr = 0;
+    reset();
   }
   int16_t recv(void) {
-    if (block) {
-      if (n > 0) {
-	last = *rptr++;
-	n -= 1;
-      } else
-	underrun += 1;
-    } else
-      underrun += 1;
-    return last;
+    uint16_t value = buffer[rptr++];
+    rptr %= 2*AUDIO_BLOCK_SAMPLES;
+    return value;
   }
   uint16_t overruns() { return overrun; }
   uint16_t underruns() { return underrun; }
-  void overrunsReset() { overrun = 0; }
-  void underrunsReset() { underrun = 0; }
+  void reset() { overrun = underrun = updated = 0; }
   virtual void update(void);
 private:
-  audio_block_t *block;
-  int16_t *rptr, n, last;
+  uint16_t wptr, rptr, buffer[2*AUDIO_BLOCK_SAMPLES];
+  uint16_t overrun, underrun, updated;
   audio_block_t *inputQueueArray[1];
-  uint16_t overrun, underrun;
 };
 
 #endif

@@ -24,34 +24,30 @@
  * THE SOFTWARE.
  */
 
-#include <Arduino.h>
 #include "effect_paddle.h"
 #include "sample_value.h"
 
 void AudioEffectPaddle::update(void)
 {
-  audio_block_t *blocka, *blockb;
-  uint16_t *pa, *pb, *end;
+  audio_block_t *blocka, *blockb, *blockc;
+  uint16_t *pa, *pb, *pc, *end;
 
-  blocka = receiveWritable(0);
+  blocka = receiveReadOnly(0);
+  pa = blocka ? blocka->data : zeros;
   blockb = receiveReadOnly(1);
-  if (!blocka) {
-    if (blockb) release(blockb);
-    return;
+  pb = blockb ? blockb->data : zeros;
+  blockc = allocate();
+  if (blockc) {
+    int sum = 0;
+    pc = blockc->data;
+    end = pc + AUDIO_BLOCK_SAMPLES;
+    while (pc < end)
+      sum += *pc++ = bool2fix(keyer.clock(fix2bool(*pa++), fix2bool(*pb++)));
+    if (sum != 0)
+      transmit(blockc);
+    release(blockc);
   }
-  if (!blockb) {
-    release(blocka);
-    return;
-  }
-  pa = (uint16_t *)(blocka->data);
-  pb = (uint16_t *)(blockb->data);
-  end = pa + AUDIO_BLOCK_SAMPLES;
-  while (pa < end) {
-    *pa = bool2fix(keyer.clock(fix2bool(*pa), fix2bool(*pb++), TICK));
-    pa += 1;
-  }
-  transmit(blocka);
-  release(blocka);
-  release(blockb);
+  if (blocka) release(blocka);
+  if (blockb) release(blockb);
 }
 

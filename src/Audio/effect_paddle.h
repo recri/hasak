@@ -40,15 +40,19 @@
 class AudioEffectPaddle : public AudioStream
 {
 public:
-  AudioEffectPaddle() : AudioStream(2, inputQueueArray) {
+  AudioEffectPaddle(int vox) : AudioStream(2, inputQueueArray), vox(vox) {
+    keyer.setSampleRate(AUDIO_SAMPLE_RATE);
+    // keyer.setTick(1000000.0/AUDIO_SAMPLE_RATE);
+    // keyer.setTick(1000000.0/AUDIO_SAMPLE_RATE);
+    // keyer.set_cw_micros_per_tick(1000000.0/AUDIO_SAMPLE_RATE);
   }
   virtual void update(void);
-private:
-  //iambic_vk6ph keyer;
-  //iambic_ad5dz keyer;
+  iambic_ad5dz keyer;
   //iambic_k1el keyer;
-  static const int TICK = (int)(1000000.0/AUDIO_SAMPLE_RATE+0.5);
-  iambic_nd7pa keyer;
+  //iambic_nd7pa keyer;
+  //iambic_vk6ph keyer;
+private:
+  const int vox;
   audio_block_t *inputQueueArray[2];
 };
 

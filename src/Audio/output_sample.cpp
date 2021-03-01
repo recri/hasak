@@ -29,11 +29,22 @@
 
 void AudioOutputSample::update(void)
 {
-  if (block)
-    release(block);
+  audio_block_t *block;
+  updated += 1;
   block = receiveReadOnly(0);
   if (block) {
-    rptr = &block->data[0];
-    n = AUDIO_BLOCK_SAMPLES;
+    uint16_t *bp = block->data, *end = bp+AUDIO_BLOCK_SAMPLES;
+    wptr = (rptr+1)%(2*AUDIO_BLOCK_SAMPLES);
+    while (bp < end) {
+      buffer[wptr++] = *bp++;
+      wptr %= 2*AUDIO_BLOCK_SAMPLES;
+    }
+    release(block);
+  } else {
+    wptr = (rptr+1)%(2*AUDIO_BLOCK_SAMPLES);
+    for (int i = AUDIO_BLOCK_SAMPLES; --i >= 0; ) {
+      buffer[wptr++] = 0;
+      wptr %= 2*AUDIO_BLOCK_SAMPLES;
+    }
   }
 }

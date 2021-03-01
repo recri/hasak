@@ -24,7 +24,9 @@
  * THE SOFTWARE.
  */
 /* Ramp code derived from Audio Library for Teensy 3.X
-   effect_fade.h and effect_fade.cpp rather than 
+   effect_fade.h and effect_fade.cpp rather than written
+   from scratch.  Should use ramps computed for ramp time
+   to eliminate the interpolation.
 */
 #include <Arduino.h>
 #include "effect_ramp.h"

@@ -35,7 +35,7 @@
 class AudioInputText : public AudioStream
 {
 public:
-  AudioInputText() : AudioStream(0, NULL) {
+  AudioInputText(int vox) : AudioStream(0, NULL), vox(vox) {
     block = allocate();
     if (block) {
       wptr = &block->data[0];
@@ -44,9 +44,11 @@ public:
     element = 0;
     ewptr = erptr = 0;
   }
+
+  // element buffer
   // send abs(value) samples of (value < 0) ? 0 : 1
   // return 0 if the value was successfully queued
-  // 
+  // return -1 if there is no room
   int send(int16_t value) {
     if (can_send()) {
       elements[ewptr] = value;
@@ -64,16 +66,113 @@ public:
     }
     return 0;
   }
-  int can_recv(void) { return erptr != ewptr; }
-  void abort() { ewptr = erptr = 0; }
+  int can_recv(void) { return erptr != ewptr || get_elements(); }
+
+  // text buffer
+  // send the character value
+  // return 0 if the value was successfully queued
+  // return -1 if there is no room
+  int send_text(uint8_t value) {
+    if (can_send_text()) {
+      buffer[bwptr++] = value;
+      bwptr %= BUFFER_SIZE;
+      return 0;
+    }
+    return -1;
+  }
+  int can_send_text() { return (((bwptr+1) % BUFFER_SIZE) != brptr); }
+  int recv_text(void) {
+    if (can_recv_text()) {
+      uint8_t value = buffer[brptr++];
+      erptr %= BUFFER_SIZE;
+      return value;
+    }
+    return -1;
+  }
+  int peek_text(void) {
+    if (can_recv_text()) {
+      uint8_t value = buffer[brptr++];
+      erptr %= BUFFER_SIZE;
+      return buffer[brptr];
+    }
+    return -1;
+  }
+  int can_recv_text(void) { return brptr != bwptr; }
+
+  // pull characters from the text buffer
+  // translate into morse elements
+  // and push them into the element buffer
+  // return 1 if a character was translated
+  // return 0 if no character was available
+  int get_elements() {
+    if (can_recv_text()) {
+      uint8_t value = peek_text();
+      uint8_t prosign = 0;
+      // fetch the timing parameters
+      // ...
+      if (value == ' ') {
+	// send word space
+	// ...
+	// clear the space from the input queue
+	(void)recv_text();
+	// 
+	return 1;
+      }
+      if (value == '\e' || value == '\\') {
+	// prosign together the next two characters
+	prosign += 1;
+	// clear the escape from the input queue
+	(void)recv_text();
+	// peek out the next char
+	value = peek_text();
+      }
+      if (value >='a' && value <= 'z') {
+	// convert to upper case
+	value -= 32;
+      }
+      if (value > 32 && value < 'Z') {
+	uint8_t code = morse[value-33];
+	while (code != 1) {
+	  if (code & 1) {
+	    // send dah
+	    // ...
+	  } else {
+	    // send dit
+	    // ...
+	  }
+	  // send element space
+	  // ...
+	  // shift to the next element
+	  code >>= 1;
+	}
+	if (prosign) {
+	  // skip letter space
+	  // reduce level of prosign
+	  prosign -= 1;
+	} else {
+	  // send letter space
+	}
+      } else {
+	// someone sent us a bad letter
+      }
+    }
+  }
+  void abort() {
+    ewptr = erptr = bwptr = brptr = 0;
+  }
   virtual void update(void);
 private:
   static const int ELEMENT_SIZE = 32;
+  static const int BUFFER_SIZE = 64;
+  static const unsigned char morse[58];
+  const int vox;
   int element;
   audio_block_t *block;
   int16_t *wptr, n, last;
   int16_t elements[ELEMENT_SIZE];
   uint8_t ewptr, erptr;
+  uint8_t buffer[BUFFER_SIZE];
+  uint8_t bwptr, brptr;
 };
 
 #endif

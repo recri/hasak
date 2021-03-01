@@ -29,30 +29,33 @@
 
 void AudioEffectPTTDelay::update(void)
 {
-  audio_block_t *blocka, *blockb, *blockc;
-  uint16_t *pa, *pb, *pc, *end, v;
+  audio_block_t *block_key, *block_ptt, *block_en;
+  // uint16_t *pa, *pb, *pc, *end, v;
 
-  blockc = receiveReadOnly(2);	// enable stream
-  if ( ! blockc) {
+  block_en = receiveReadOnly(2);	// enable stream
+  block_key = receiveReadOnly(0); 	// key stream
+  block_ptt = receiveReadOnly(1);	// ptt stream
+  if ( ! block_en) {
     // no enable
+    if (block_key) release(block_key);
+    if (block_ptt) release(block_ptt);
     return;
   }
-  blocka = receiveReadOnly(0); 	// key stream
-  blockb = receiveReadOnly(1);	// ptt stream
-  if ( ! blocka) {
-    if (blockb) release(blockb);
-    release(blockc);
+  if ( ! block_key) {
+    if (block_ptt) release(block_ptt);
+    release(block_en);
     return;
   }
-  if ( ! blockb) {
-    release(blocka);
-    release(blockc);
+  if ( ! block_ptt) {
+    release(block_key);
+    release(block_en);
     return;
   }
-  transmit(blocka);
-  release(blocka);
-  transmit(blockb);
-  release(blockb);
+  transmit(block_key, 0);
+  release(block_key);
+  transmit(block_ptt, 1);
+  release(block_ptt);
+  release(block_en);
   return;
 }
 

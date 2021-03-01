@@ -1,0 +1,41 @@
+* Todo list as of 2021-03-01
+[ ] get rid of the ramp crunches.
+[ ] Redo the ramp code.
+[ ] Figure out why the buffer allocation goes to 64k
+[ ] Finish up the text_input
+[ ] Install the lorem ipsum test text
+[ ] Make the reusable buffer to run length code
+[ ] Ease in the volume changes, get rid of the pop.
+[ ] Make a keyed oscillator effect.
+	[ ] Can turn the oscillator(s) off when not in use
+	[ ] Poll oscillator and ramp parameters when activated
+	[ ] Use the 1024 point window functions for the ramps.
+	[ ] Continue to interpolate the ramps.
+	[ ] Continue to interpolate the sine.
+	[ ] Unless the fixed point complex rotor works, and with
+	this multiply_32x32_rshift32 instruction, it might.
+	[ ] Would still need the sine/cos interpolation to make
+	the phase increment.
+[ ] Implement the rest of the parameters
+	[ ] Should all be polled at the last moment before they
+	are applied.
+	[ ] keyers poll for dit, dah, ies, ils, iws at the
+	moment the element is to be started.
+	[ ] oscillators poll for frequency and phase when started
+	at the beginning of an element.
+	[ ] ramp poll for ramp type and time length when starting
+	the ramp.
+	[ ] but the codec controls won't be polled, they must be
+	pushed, but no hard volume changes.
+[ ] Implement save/restore parameters to EEPROM
+	[ ] save parameters as the nrpn block and a bitset of
+	which have been set.
+	[ ] restore parameters and bitset and apply those which
+	must be pushed, but no hard volume changes.
+[ ] Implement save/restore parameters as SYSEX
+	[ ] nibblize the nrpn block and send it to the ctrlr
+	which is built for slamming those things around.
+[ ] Figure out floating valued modulators.  I can specify a
+	controller which displays a floating point value, but
+	when I try to scale it to an integer value for transmission
+	it's already been truncated to its integer value.

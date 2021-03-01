@@ -31,40 +31,29 @@
 
 /*
 ** Teensy Audio Library component for sample input
-** samples are stored into successive slots in a sample buffer
-** empty slots at update are filled with the last sample received
 */
 
 class AudioInputSample : public AudioStream
 {
 public:
-  AudioInputSample() : AudioStream(0, NULL) {
+  AudioInputSample(const char *id) : AudioStream(0, NULL), id(id) {
     block = allocate();
-    if (block) {
-      wptr = &block->data[0];
-      n = AUDIO_BLOCK_SAMPLES;
-      nzero = 0;
-    }
-    last = 0;
+    rptr = wptr = 0;
+    reset();
   }
   void send(int16_t value) {
-    last = value;
-    if (block && n > 0) {
-      *wptr++ = last;
-      n -= 1;
-      nzero += last == 0 ? 1 : 0;
-    } else
-      overrun += 1;
+    buffer[wptr++] = value;
+    wptr %= 2*AUDIO_BLOCK_SAMPLES;
   }
   uint16_t overruns() { return overrun; }
   uint16_t underruns() { return underrun; }
-  void overrunsReset() { overrun = 0; }
-  void underrunsReset() { underrun = 0; }
+  void reset() { overrun = underrun = updated = 0; }
   virtual void update(void);
 private:
+  const char *id;
   audio_block_t *block;
-  int16_t *wptr, n, last, nzero;
-  uint16_t overrun, underrun;
+  uint16_t rptr, wptr, buffer[2*AUDIO_BLOCK_SAMPLES];
+  uint16_t overrun, underrun, updated;
 };
 
 #endif

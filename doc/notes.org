@@ -40,16 +40,10 @@
   But it decides what the current vox is, so it can have it.
 * Finish off parameters
 ** Parameters communicated via MIDI (or Winkey) as NRPN's
-** MSB of NRPN is bank
-** LSB of NRPN is parameters
-** Bank 0 is the default bank 
-** Banks 1, 2, 3,4,... are VOX banks which can override defaults
-** Some parameters are not set via MIDI, but computed from
-   the parameters set by MIDI settings.
-*** Morse code timing, for instance, where wpm, weight, ratio, comp, farnsworth   
-    get translated into dit_len, ies_len, dah_len, ils_len, and iws_len in samples.
-** So that's how they get set by MIDI (or Winkey) 
-   and then massaged into directly useful values.
+** First set of NRPN's are globals and defaults for voices.
+** They are stored as an array of MSB LSB values as received.
+*** 16 keyer parameters (32 bytes)
+*** 
 **  How do they get into the modules that need them?
 ***  get_param(VOX, NRPN) accesses the VOX specific bank 
     then falls back to the default bank to fetch a value for a NRPN.
@@ -57,7 +51,8 @@
 *** get_param(KYR_VOX_NONE, NRPN) gets the default value.
 *** Each keyer knows which VOX it is.
     it can fetch the key timing parameters each time they are
-    required, it's fast.
+    required, it's fast, and it won't be interrupted by the
+    audio loop, it is the audio loop.
 *** The arbiter knows which VOX is active at the current sample
     it can fetch the ptt tail each time its required.
 *** everyone else can see the global activeVox as it is updated,
@@ -87,4 +82,38 @@
     ptt delay can fetch head and tail time.
     turning the oscillator on and off would save bundles of computation
     and allow the frequency to adapt
-   
+* sine can be turned off by setting level = 0
+* sine could be turned on by the start of the ramp
+* sine_I, sine_Q, and ramp could be combined.  
+* the pin interrupt is probably running at lower priority than audio library
+  so with audio library consuming 12-25% of cpu we're missing 12-25% of the
+  input and output samples.
+  Found a discussion which put default pin interrupt priority at 128 in
+  Teensy3, along with instructions on how to find the port for a pin and
+  bump its interrupt priority.  Ditto for Teensy4.
+  But then we need to protect from pin interrupts while packaging up the
+  sampled bits in the audio library loop.  Probably double buffer to
+  minimize time with interrupts disabled.
+  Use a circular buffer and only keep the most recent AUDIO_BLOCK_SAMPLES
+  on input, copy them into the output buffer in two chunks, but if you
+  get the timing right it will only be one chunk.
+  Means I'm going back to only handling bit values in a byte.
+  uint8_t buffer[AUDIO_BLOCK_SAMPLES], wptr, n;
+  wptr = n = 0;
+  void send(uint8_t val) { 
+	n += 1;
+	buffer[wptr++] = val;
+	wptr %= AUDIO_BLOCK_SAMPLES;
+  }
+  update() {
+	__disable_irq();
+	uint8_t save_wptr = wptr, save_n = n;
+	bcpy(buffer, block->data, AUDIO_BLOCK_SAMPLES);
+	wptr = n = 0;
+	__enable_irq();
+	// now make things right
+	if (save_n < AUDIO_BLOCK_SAMPLE) underrun += AUDIO_BLOCK_SAMPLE-save_n;
+	else if (n > AUDIO_BLOCK_SAMPLE) overrun += save_n-AUDIO_BLOCK_SAMPLE;
+	// ...
+  }
+  

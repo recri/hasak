@@ -29,24 +29,23 @@
 
 void AudioInputSample::update(void)
 {
-  if (block) {
-    if (nzero == AUDIO_BLOCK_SAMPLES ||
-	nzero+n == AUDIO_BLOCK_SAMPLES) {
-      wptr = &block->data[0];
-      n = AUDIO_BLOCK_SAMPLES;
-      nzero = 0;
-      return;
-    }
-    underrun += n;
-    transmit(block);
-    release(block);
-  } else {
-    underrun += AUDIO_BLOCK_SAMPLES;
-  }
+  audio_block_t *block;
+
+  updated += 1;
   block = allocate();
   if (block) {
-    wptr = &block->data[0];
-    n = AUDIO_BLOCK_SAMPLES;
-    nzero = 0;
+    uint16_t *bp, *end;
+    uint32_t sum;
+    bp = (uint16_t *)block->data;
+    end = bp+AUDIO_BLOCK_SAMPLES;
+    sum = 0;
+    rptr = (wptr+AUDIO_BLOCK_SAMPLES)%(2*AUDIO_BLOCK_SAMPLES);
+    while (bp < end) {
+      sum += *bp++ = buffer[rptr++];
+      rptr %= 2*AUDIO_BLOCK_SAMPLES;
+    }
+    if (sum != 0)
+      transmit(block);
+    release(block);
   }
 }

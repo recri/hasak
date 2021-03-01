@@ -42,7 +42,7 @@
 class AudioEffectRamp : public AudioStream
 {
 public:
-  AudioEffectRamp() : AudioStream(1, inputQueueArray), position(0xFFFFFFFF), updated(false) {
+  AudioEffectRamp() : AudioStream(1, inputQueueArray), position(0xFFFFFFFF) {
     set_ramp_on(5000);
     set_ramp_off(5000);
   }
@@ -50,14 +50,12 @@ public:
     uint32_t rate = 0xFFFFFFFFu / (microseconds * AUDIO_SAMPLE_RATE * 1e-6);
     if (rate != ramp_on_rate) {
       ramp_on_rate = rate;
-      updated = true;
     }
   }
   void set_ramp_off(uint32_t microseconds) {
     uint32_t rate = 0xFFFFFFFFu / (microseconds * AUDIO_SAMPLE_RATE * 1e-6);
     if (rate != ramp_off_rate) {
       ramp_off_rate = rate;
-      updated = true;
     }
   }
   virtual void update(void);
@@ -65,7 +63,6 @@ private:
   uint32_t position; // 0 = off, 0xFFFFFFFF = on
   uint32_t ramp_on_rate, ramp_off_rate;
   uint8_t direction; // 0 = fading out, 1 = fading in
-  bool updated;
   audio_block_t *inputQueueArray[1];
 };
 

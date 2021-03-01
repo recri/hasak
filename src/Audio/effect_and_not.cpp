@@ -37,8 +37,6 @@ void AudioEffectAndNot::update(void)
   if (block) {
     if (not_vox != get_active_vox())
       transmit(block); 		// send the boolean stream onward
-    else
-      ;				// send nothing onward => all zeros
     release(block);
   }
 }

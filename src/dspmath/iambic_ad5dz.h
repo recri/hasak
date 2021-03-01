@@ -19,30 +19,26 @@
 #ifndef IAMBIC_AD5DZ_H
 #define IAMBIC_AD5DZ_H
 
+#include "morse_keyer.h"
+
 /*
 ** A morse code keyer reduced to a simple logic class.
 **
 ** // usage
 **
 ** // to make a keyer
-** iambic_ad5dz k();
+** iambic_ad5dz keyer;
 **
 ** // to specify the current paddle state,
-** // advance the keyer clock by ticks
-** // and receiver the current keyout state.
-** keyout = k.clock(dit, dah, ticks);	
+** // advance the keyer clock by one sample tick,
+** // and receive the keyout state for the tick.
+** keyout = keyer.clock(dit, dah);	
 **
 ** // the timing is specified with
-** k.setTimes(microseconds_per_tick_of_the_clock,
-**	      words_per_minute,
-**            dits_per_word,
-**            dits_per_dit,
-**            dits_per_dah,
-**            dits_per_inter_element_space,
-**	      dits_per_inter_letter_space,
-**            dits_per_inter_word_space
-**        )
+** keyer.setTimes(sample_rate, words_per_minute, weight, ratio, compensation, farnsworth)
 **
+** // or alacarte, as detailed in iambic_keyer.h
+** 
 ** // the mode is specified with
 ** k.setModes(keyer_mode, // 'A' or 'B' or 'S' or 'G' or 'U'
 **            swap_paddles,
@@ -58,8 +54,10 @@
 
 // #include <stdio.h>
 #include "iambic.h"
+#include "morse_keyer.h"
 
-class iambic_ad5dz {
+class iambic_ad5dz : public morse_keyer
+{
 public:
   typedef unsigned char byte;
   typedef enum {
@@ -72,11 +70,6 @@ public:
   char _mode;			// mode B or mode A or ...
   bool _autoIls;		// automatically time space between letters
   bool _autoIws;		// automatically time space between words
-  int _ticksPerDit;		// ticks per feature
-  int _ticksPerDah;
-  int _ticksPerIes;
-  int _ticksPerIls;
-  int _ticksPerIws;
 
   byte _keyOut;			// output key state
   key_t _key;			// input key didah state, swapped
@@ -85,11 +78,10 @@ public:
   int _keyerDuration;		// ticks to next keyer state transition
 
   // initialize a keyer
-  iambic_ad5dz() {
+  iambic_ad5dz() : morse_keyer() {
     _keyOut = IAMBIC_OFF;
     _key = KEY_OFF;
     _memKey = KEY_OFF;
-    setTiming(1, 20, 50, 1, 3, 1, 3, 7);
     setModes('B', false, false, false);
   }
 
@@ -129,13 +121,13 @@ public:
   key_t (*_fix_swapped)(int raw_dit_on, int raw_dit_off) = &_is_not_swapped;
 
   // clock ticks
-  int clock(int raw_dit_on, int raw_dah_on, int ticks) {
+  int clock(int raw_dit_on, int raw_dah_on) {
 
     _key = _fix_swapped(raw_dit_on, raw_dah_on);
 
     _memKey = (key_t)(_memKey | _key);
 
-    if ((_keyerDuration -= ticks) > 0) return _keyOut;
+    if ((_keyerDuration -= 1) > 0) return _keyOut;
 
     switch (_keyerState) {
     case KEYER_OFF: _keyerDuration = 0; _memToOff(); _startDit() || _startDah(); break;
@@ -149,16 +141,6 @@ public:
     return _keyOut;
   }
 
-  // set the timing
-  void setTiming(float tick, float wpm, float word, float ditLen, float dahLen, float iesLen, float ilsLen, float iwsLen) {
-    float microsPerDit = 60000000.0 / (wpm * word);
-    _ticksPerDit = (microsPerDit * ditLen) / tick + 0.5;
-    _ticksPerDah = (microsPerDit * dahLen) / tick + 0.5;
-    _ticksPerIes = (microsPerDit * iesLen) / tick + 0.5;
-    _ticksPerIls = (microsPerDit * ilsLen) / tick + 0.5;
-    _ticksPerIws = (microsPerDit * iwsLen) / tick + 0.5;
-    // fprintf(stderr, "%d/dit %d/dah %d/ies %d/ils %d/iws %f/tick %f wpm %f word\n", _ticksPerDit, _ticksPerDah, _ticksPerIes, _ticksPerIls, _ticksPerIws, tick, wpm, word);
-  }
   // set the modes
   void setModes(char mode, bool swapped, bool autoIls, bool autoIws) {
     _mode = mode;		// set the paddle key mode

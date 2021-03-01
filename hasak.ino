@@ -1,3 +1,4 @@
+/* -*- mode: c++; tab-width: 8 -*- */
 /*
  * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
  * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
@@ -32,7 +33,27 @@ void midi_setup(void);
 void midi_loop(void);
 void winkey_setup(void);
 void winkey_loop(void);
+
 int get_active_vox(void);
+
+/* keyer parameters */
+int get_vox_dit(int vox);
+int get_vox_dah(int vox);
+int get_vox_ies(int vox);
+int get_vox_ils(int vox);
+int get_vox_iws(int vox);
+
+/* keyed tone parameters */
+int get_vox_tone(int vox);
+int get_vox_iqph(int vox);
+int get_vox_rise(int vox);
+int get_vox_rise_ramp(int vox);
+int get_vox_fall(int vox);
+int get_vox_fall_ramp(int vox);
+
+/* ptt parameters */
+int get_vox_ptt_head(int vox);
+int get_vox_ptt_tail(int vox);
 
 /***************************************************************
 ** Audio library modules
@@ -62,17 +83,17 @@ int get_active_vox(void);
 // inputs
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
-AudioInputSample	l_pad;	// left paddle in
-AudioInputSample	r_pad;	// right paddle in
-AudioInputSample	s_key;	// straight key in
-AudioInputText		wink;	// winkey text in
-AudioInputText		kyr;	// kyr text in for op
-AudioInputSample        ptt_sw;	// ptt switch
-AudioInputSample	tx_enable; // transmit enable
-AudioInputSample	st_enable; // side tone enable
+AudioInputSample	l_pad("l_pad");	// left paddle in
+AudioInputSample	r_pad("r_pad");	// right paddle in
+AudioInputSample	s_key("s_key");	// straight key in
+AudioInputText		wink(KYR_VOX_WINK);	// winkey text in
+AudioInputText		kyr(KYR_VOX_KYR);	// kyr text in for op
+AudioInputSample        ptt_sw("ptt_s");	// ptt switch
+AudioInputSample	tx_enable("tx_en"); // transmit enable
+AudioInputSample	st_enable("st_en"); // side tone enable
 
 // keyer logic
-AudioEffectPaddle	paddle;	// 
+AudioEffectPaddle	paddle(KYR_VOX_PAD);	// 
 AudioConnection         patchCord1a(l_pad, 0, paddle, 0);
 AudioConnection         patchCord1b(r_pad, 0, paddle, 1);
 
@@ -93,58 +114,58 @@ int get_active_vox(void) { return arbiter.get_active_vox(); }
 // shaped key waveform
 AudioEffectRamp		key_ramp;
 AudioSynthWaveformSine	sine_I;
-AudioSynthWaveformSine  sine_Q;
+//AudioSynthWaveformSine  sine_Q;
 AudioEffectMultiply	I_ramp;
-AudioEffectMultiply	Q_ramp;
+//AudioEffectMultiply	Q_ramp;
 AudioConnection		patchCord3a(arbiter, 0, key_ramp, 0);
 AudioConnection		patchCord3b(key_ramp, 0, I_ramp, 0);
-AudioConnection		patchCord3c(key_ramp, 0, Q_ramp, 0);
+//AudioConnection		patchCord3c(key_ramp, 0, Q_ramp, 0);
 AudioConnection		patchCord3d(sine_I, 0, I_ramp, 1);
-AudioConnection		patchCord3e(sine_Q, 0, Q_ramp, 1);
+//AudioConnection		patchCord3e(sine_Q, 0, Q_ramp, 1);
 
 // tx enable
 AudioEffectAndNot	and_not_kyr(KYR_VOX_KYR);
 AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if active vox != KYR_VOX_KYR
 
 // microphone mute, disabled when ptt switch is pressed
-AudioEffectMute		mic_mute;
-AudioEffectMultiply	l_mic_mute;
-AudioEffectMultiply	r_mic_mute;
-AudioConnection		patchCord4a(ptt_sw, 0, mic_mute, 0);
-AudioConnection		patchCord4b(mic_mute, 0, l_mic_mute, 0);
-AudioConnection		patchCord4c(mic_mute, 0, r_mic_mute, 0);
-AudioConnection		patchCord4d(i2s_in, 0, l_mic_mute, 1);
-AudioConnection		patchCord4e(i2s_in, 1, r_mic_mute, 1);
+//AudioEffectMute		mic_mute;
+//AudioEffectMultiply	l_mic_mute;
+//AudioEffectMultiply	r_mic_mute;
+//AudioConnection		patchCord4a(ptt_sw, 0, mic_mute, 0);
+//AudioConnection		patchCord4b(mic_mute, 0, l_mic_mute, 0);
+//AudioConnection		patchCord4c(mic_mute, 0, r_mic_mute, 0);
+//AudioConnection		patchCord4d(i2s_in, 0, l_mic_mute, 1);
+//AudioConnection		patchCord4e(i2s_in, 1, r_mic_mute, 1);
 
 // IQ mute, enabled when tx_enable or active_vox is kyr
-AudioEffectMute		IQ_mute;
-AudioEffectMultiply	I_mute;
-AudioEffectMultiply	Q_mute;
-AudioConnection		patchCord5a(and_not_kyr, 0, IQ_mute, 0);
-AudioConnection		patchCord5b(IQ_mute, 0, I_mute, 0);
-AudioConnection		patchCord5c(IQ_mute, 0, Q_mute, 0);
-AudioConnection		patchCord5d(I_ramp, 0, I_mute, 1);
-AudioConnection		patchCord5e(Q_ramp, 0, Q_mute, 1);
+//AudioEffectMute		IQ_mute;
+//AudioEffectMultiply	I_mute;
+//AudioEffectMultiply	Q_mute;
+//AudioConnection		patchCord5a(and_not_kyr, 0, IQ_mute, 0);
+//AudioConnection		patchCord5b(IQ_mute, 0, I_mute, 0);
+//AudioConnection		patchCord5c(IQ_mute, 0, Q_mute, 0);
+//AudioConnection		patchCord5d(I_ramp, 0, I_mute, 1);
+//AudioConnection		patchCord5e(Q_ramp, 0, Q_mute, 1);
 
 // receive mute, enabled when arbiter vox line is active
-AudioEffectMute		rx_mute;
-AudioEffectMultiply	l_rx_mute;
-AudioEffectMultiply	r_rx_mute;
-AudioConnection		patchCord6a(arbiter, 1, rx_mute, 0);
-AudioConnection		patchCord6b(rx_mute, 0, l_rx_mute, 0);
-AudioConnection		patchCord6c(rx_mute, 0, r_rx_mute, 0);
-AudioConnection		patchCord6d(usb_in, 0, l_rx_mute, 1);
-AudioConnection		patchCord6e(usb_in, 1, r_rx_mute, 1);
+//AudioEffectMute		rx_mute;
+//AudioEffectMultiply	l_rx_mute;
+//AudioEffectMultiply	r_rx_mute;
+//AudioConnection		patchCord6a(arbiter, 1, rx_mute, 0);
+//AudioConnection		patchCord6b(rx_mute, 0, l_rx_mute, 0);
+//AudioConnection		patchCord6c(rx_mute, 0, r_rx_mute, 0);
+//AudioConnection		patchCord6d(usb_in, 0, l_rx_mute, 1);
+//AudioConnection		patchCord6e(usb_in, 1, r_rx_mute, 1);
 
 // sidetone mute, enabled when sidetone enabled is true
-AudioEffectMute		st_mute;
-AudioEffectMultiply	l_st_mute;
-AudioEffectMultiply	r_st_mute;
-AudioConnection		patchCord7a(st_enable, 0, st_mute, 0);
-AudioConnection		patchCord7b(st_mute, 0, l_st_mute, 0);
-AudioConnection		patchCord7c(st_mute, 0, r_st_mute, 0);
-AudioConnection		patchCord7d(I_ramp, 0, l_st_mute, 1);
-AudioConnection		patchCord7e(I_ramp, 0, r_st_mute, 1);
+//AudioEffectMute		st_mute;
+//AudioEffectMultiply	l_st_mute;
+//AudioEffectMultiply	r_st_mute;
+//AudioConnection		patchCord7a(st_enable, 0, st_mute, 0);
+//AudioConnection		patchCord7b(st_mute, 0, l_st_mute, 0);
+//AudioConnection		patchCord7c(st_mute, 0, r_st_mute, 0);
+//AudioConnection		patchCord7d(I_ramp, 0, l_st_mute, 1);
+//AudioConnection		patchCord7e(I_ramp, 0, r_st_mute, 1);
 
 // ptt delay, give ptt a head start over key to external transmitter
 AudioEffectPTTDelay	ptt_delay;
@@ -162,14 +183,22 @@ AudioMixer4              l_hdw_out;
 AudioMixer4              r_hdw_out;
 
 // first channel, rx audio and microphone input, op on headset mode
-AudioConnection		patchCord900(l_rx_mute, 0, l_i2s_out, 0);
-AudioConnection		patchCord910(r_rx_mute, 0, r_i2s_out, 0);
-AudioConnection		patchCord920(l_mic_mute, 0, l_usb_out, 0);
-AudioConnection		patchCord930(r_mic_mute, 0, r_usb_out, 0);
-AudioConnection		patchCord940(l_rx_mute, 0, l_hdw_out, 0);
-AudioConnection		patchCord950(r_rx_mute, 0, r_hdw_out, 0);
+// switch codec to use microphone instead of line-in
+//AudioConnection		patchCord900(l_rx_mute, 0, l_i2s_out, 0);
+//AudioConnection		patchCord910(r_rx_mute, 0, r_i2s_out, 0);
+//AudioConnection		patchCord920(l_mic_mute, 0, l_usb_out, 0);
+//AudioConnection		patchCord930(r_mic_mute, 0, r_usb_out, 0);
+//AudioConnection		patchCord940(l_rx_mute, 0, l_hdw_out, 0);
+//AudioConnection		patchCord950(r_rx_mute, 0, r_hdw_out, 0);
+AudioConnection		patchCord900(usb_in, 0, l_i2s_out, 0);
+AudioConnection		patchCord910(usb_in, 1, r_i2s_out, 0);
+AudioConnection		patchCord920(i2s_in, 0, l_usb_out, 0);
+AudioConnection		patchCord930(i2s_in, 1, r_usb_out, 0);
+AudioConnection		patchCord940(usb_in, 0, l_hdw_out, 0);
+AudioConnection		patchCord950(usb_in, 1, r_hdw_out, 0);
 
 // second channel, line-out audio and line-in audio, 2x2 sound card mode
+// switch codec to use line-in instead of microphone
 AudioConnection		patchCord901(usb_in, 0, l_i2s_out, 1);
 AudioConnection		patchCord911(usb_in, 1, r_i2s_out, 1);
 AudioConnection		patchCord921(i2s_in, 0, l_usb_out, 1);
@@ -177,21 +206,32 @@ AudioConnection		patchCord931(i2s_in, 1, r_usb_out, 1);
 AudioConnection		patchCord941(usb_in, 0, l_hdw_out, 1);
 AudioConnection		patchCord951(usb_in, 1, r_hdw_out, 1);
 
-// third channel, sidetone, balance l vs r to localize
-AudioConnection		patchCord902(l_st_mute, 0, l_i2s_out, 2);
-AudioConnection		patchCord912(r_st_mute, 0, r_i2s_out, 2);
-AudioConnection		patchCord922(l_st_mute, 0, l_usb_out, 2);
-AudioConnection		patchCord932(r_st_mute, 0, r_usb_out, 2);
-AudioConnection		patchCord942(l_st_mute, 0, l_hdw_out, 2);
-AudioConnection		patchCord952(r_st_mute, 0, r_hdw_out, 2);
+// third channel, sidetone
+// probably only sent to i2s for headphones/speakers
+// balance l vs r to localize
+// adjust level of sidetone
+//AudioConnection		patchCord902(l_st_mute, 0, l_i2s_out, 2);
+//AudioConnection		patchCord912(r_st_mute, 0, r_i2s_out, 2);
+//AudioConnection		patchCord922(l_st_mute, 0, l_usb_out, 2);
+//AudioConnection		patchCord932(r_st_mute, 0, r_usb_out, 2);
+//AudioConnection		patchCord942(l_st_mute, 0, l_hdw_out, 2);
+//AudioConnection		patchCord952(r_st_mute, 0, r_hdw_out, 2);
+AudioConnection		patchCord902(I_ramp, 0, l_i2s_out, 2);
+AudioConnection		patchCord912(I_ramp, 0, r_i2s_out, 2);
+AudioConnection		patchCord922(I_ramp, 0, l_usb_out, 2);
+AudioConnection		patchCord932(I_ramp, 0, r_usb_out, 2);
+AudioConnection		patchCord942(I_ramp, 0, l_hdw_out, 2);
+AudioConnection		patchCord952(I_ramp, 0, r_hdw_out, 2);
 
-// fourth channel, keyed IQ
-AudioConnection		patchCord903(I_mute, 0, l_i2s_out, 3);
-AudioConnection		patchCord913(Q_mute, 0, r_i2s_out, 3);
-AudioConnection		patchCord923(I_mute, 0, l_usb_out, 3);
-AudioConnection		patchCord933(Q_mute, 0, r_usb_out, 3);
-AudioConnection		patchCord943(I_mute, 0, l_hdw_out, 3);
-AudioConnection		patchCord953(Q_mute, 0, r_hdw_out, 3);
+// fourth channel, keyed IQ, 
+// send to usb_out to provide soundcard IQ TX stream to host sdr
+// send to i2s_out to provide soundcard IQ TX stream to softrock
+//AudioConnection		patchCord903(I_mute, 0, l_i2s_out, 3);
+//AudioConnection		patchCord913(Q_mute, 0, r_i2s_out, 3);
+//AudioConnection		patchCord923(I_mute, 0, l_usb_out, 3);
+//AudioConnection		patchCord933(Q_mute, 0, r_usb_out, 3);
+//AudioConnection		patchCord943(I_mute, 0, l_hdw_out, 3);
+//AudioConnection		patchCord953(Q_mute, 0, r_hdw_out, 3);
 
 
 // outputs
@@ -230,7 +270,7 @@ AudioConnection		patchCord11e(r_hdw_out, 0, hdw_out, 1);
 #endif
 
 // codec control
-AudioControlSGTL5000     sgtl5000_1;
+AudioControlSGTL5000     sgtl5000;
 
 // counter to demonstrate that attachInterrupt to LRCLK
 // actually produced a sample rate interrupt.
@@ -272,174 +312,55 @@ void setup() {
   attachInterrupt(KYR_LRCLK, pollatch, RISING);
   arbiter_setup();
   sine_I.frequency(800);
-  sine_Q.frequency(800);
+  // sine_Q.frequency(800);
   sine_I.amplitude(1.0);
-  sine_Q.amplitude(1.0);
+  // sine_Q.amplitude(1.0);
   sine_I.phase(0);
-  sine_Q.phase(-M_PI/2);
+  // sine_Q.phase(270);
   AudioMemory(40);
-  sgtl5000_1.enable();
-  sgtl5000_1.volume(0.3);
+  sgtl5000.enable();
+  sgtl5000.volume(0.3);
   midi_setup();
   winkey_setup();
 }
 
-void ioreport(const char *tag, int over, int under, int usage, int max) {
-  Serial.print(tag);
-  Serial.print(" overruns: "); Serial.print(over);
-  Serial.print(" underruns "); Serial.print(under);
-  Serial.print(" usage "); Serial.print(usage);
-  Serial.print(" max usage "); Serial.print(max);
-  Serial.println();
-}
-void ireport(const char *tag, AudioInputSample &sample) {
-  ioreport(tag, sample.overruns(), sample.underruns(), sample.processorUsage(), sample.processorUsage());
-}
-
-void ireset(AudioInputSample &sample) {
-  sample.overrunsReset();
-  sample.underrunsReset();
-  sample.processorUsageMaxReset();
-}
-
-void oreport(const char *tag, AudioOutputSample &sample) {
-  ioreport(tag, sample.overruns(), sample.underruns(), sample.processorUsage(), sample.processorUsage());
-}
-
-void oreset(AudioOutputSample &sample) {
-  sample.overrunsReset();
-  sample.underrunsReset();
-  sample.processorUsageMaxReset();
-}
-
-void preport(const char *tag, int16_t *p, int n) {
-  int count = 0;
-  int words = 0;
-  int delay = 1.0/AUDIO_SAMPLE_RATE * 1e6;
-  Serial.printf("%s %dus ", tag, delay);
-  words += 2;
-  for (int i = 0; i < n; i += 1) {
-    if (*p != 0) {
-      if (count >= 0) count += 1;
-      else {
-	Serial.printf("%d", count);
-	count = 1;
-	words += 1;
-      }
-    } else {
-      if (count <= 0) count -= 1;
-      else {
-	Serial.printf("+%d", count);
-	count = -1;
-	words += 1;
-      }
-    }
-    if (words > 10) { Serial.printf("\n"); words = 0; }
-    delayMicroseconds(delay);
-  }
-  if (count > 0) Serial.printf("+%d\n", count);
-  else Serial.printf("%d\n", count);
-}
-
-void mreport(const char *tag, AudioStream &str) {
-  Serial.print(tag);
-  Serial.print(" usage "); Serial.print(str.processorUsage());
-  Serial.print(" max "); Serial.print(str.processorUsageMax());
-  Serial.println();
-}
-
-void mreset(AudioStream &str) {
-  str.processorUsageMaxReset();
-}
-
-// #include "src/dspmath/window.h"
-static const double dtwo_pi = 2*3.14159265358979323846;		/* 2*pi */
-static float cosine_series1(const int size, const int k, const double a0, const double a1) {
-  return a0 - a1 * cos((dtwo_pi * k) / (size-1));
-}    
-static float cosine_series2(const int size, const int k, const double a0, const double a1, const double a2) {
-  return cosine_series1(size, k, a0, a1) + a2 * cos((2 * dtwo_pi * k) / (size-1));
-}
-static float cosine_series3(const int size, const int k, const double a0, const double a1, const double a2, const double a3) {
-  return cosine_series2(size, k, a0, a1, a2) - a3 * cos((3 * dtwo_pi * k) / (size-1));
-}
-
-static float hann(int k, int size) { return cosine_series1(size, k, 0.50, 0.50); }
-static float blackman_harris(int k, int size) { return cosine_series3(size, k, 0.3587500, 0.4882900, 0.1412800, 0.0116800); }
-
-elapsedMicros usecs;
-
-void benchmark_time(const char *name, float (*window)(int, int), int size, float *value) {
-  usecs = 0;
-  for (int i = 0; i < size; i += 1) { value[i] = window(2*size-1, i); }
-  unsigned long t = usecs;
-  Serial.printf("benchmark_time(%s, ..., %d) = %lu microseconds, %f us/element\n", name, size, t, t/((float)size));
-}
-
-void benchmark_windows() {
-  float values[1024];
-  benchmark_time("hann", hann, 1024, values);
-  benchmark_time("blackman-harris", blackman_harris, 1024, values);
-}
+#include "diagnostics.h"
 
 void loop() {
-  if (Serial.available()) {
-    switch (Serial.read()) {
-    case '?': 
-      Serial.println("hasak monitor usage:");
-      Serial.println(" 0 -> audio library resource usage");
-      Serial.println(" 1 -> left paddle resource usage");
-      Serial.println(" 2 -> right paddle resource usage");
-      Serial.println(" 3 -> straight key resource usage");
-      Serial.println(" 4 -> ptt switch resource usage");
-      Serial.println(" 5 -> key out resource usage");
-      Serial.println(" 6 -> ptt out resource usage");
-      Serial.println(" 7 -> iambic keyer resource usage");
-      Serial.println(" 8 -> sidetone sine resource usage");
-      Serial.println(" 9 -> probe1 trace");
-      Serial.println(" a -> probe2 trace");
-      Serial.println(" r -> reset usage counts");
-      Serial.println(" w -> benchmark window computations");
-      break;
-    case '0':
-      Serial.print(" cpu usage "); Serial.print(AudioProcessorUsage()); 
-      Serial.print(" max "); Serial.print(AudioProcessorUsageMax());
-      // Serial.println();
-      Serial.print(" mem usage "); Serial.print(AudioMemoryUsage());
-      Serial.print(" max "); Serial.print(AudioMemoryUsageMax());
-      Serial.println();
-      break;
-    case '1': ireport("left paddle", l_pad); break;
-    case '2': ireport("right paddle", r_pad); break;
-    case '3': ireport("straight key", s_key); break;
-    case '4': ireport("ptt switch", ptt_sw); break;
-    case '5': oreport("key out", key_out); break;
-    case '6': oreport("ptt out", ptt_out); break;
-    case '7': mreport("paddle", paddle); break;
-    case '8': mreport("sidetone", sine_I); break;
-    case '9': preport("probe1", &_probe1, 5*44100); break;
-    case 'a': preport("probe2", &_probe2, 5*44100); break;
-    case 'r':
-      AudioProcessorUsageMaxReset();
-      AudioMemoryUsageMaxReset();
-      ireset(l_pad);
-      ireset(r_pad);
-      ireset(s_key);
-      ireset(ptt_sw);
-      oreset(key_out);
-      oreset(ptt_out);
-      mreset(paddle);
-      mreset(sine_I);
-      break;
-    case 'w':
-      benchmark_windows();
-      break;
-    default:
-      //Serial.print("buttonpolls: "); 
-      //Serial.println(buttonpolls); 
-      break;
-    }
+  diagnostics_loop();
+  // winkey_loop();
+  midi_loop();
+}
+
+/***************************************************************
+** MIDI input handling.
+***************************************************************/
+static void control_keyer_speed(int speed) {
+  AudioNoInterrupts();
+  paddle.keyer.setSpeed(speed);
+  AudioInterrupts();
+}
+static void control_sidetone_frequency(float frequency) {
+  int phase_i = 0, phase_q = -90;
+  if (frequency < 0) {
+    frequency = -frequency;
+    phase_q = -phase_q;
   }
+  AudioNoInterrupts();
+  sine_I.frequency(frequency);
+  sine_I.phase(phase_i);
+  // sine_Q.frequency(frequency);
+  // sine_Q.phase(phase_q);
+  AudioInterrupts();
+}
+static void control_sidetone_amplitude(float amplitude) {
+  AudioNoInterrupts();
+  sine_I.amplitude(amplitude);
+  // sine_Q.amplitude(amplitude);
+  AudioInterrupts();
+}
+static void control_master_volume(float volume) {
+  sgtl5000.volume(volume);
 }
 
 /***************************************************************
@@ -447,71 +368,160 @@ void loop() {
 ***************************************************************/
 uint8_t kyr_channel = KYR_CHANNEL;
 
-static uint8_t cc_nrpn, cc_nrpn_value;
+int16_t kyr_nrpn[KYRP_LAST];
 
-int16_t kyr_nrpn[1+KYR_N_VOX][1+KYRP_LAST_GLOBAL];
+static void nrpn_set(uint16_t nrpn, uint16_t value) {
+  switch (nrpn) {
+  case KYRP_WPM: 
+    Serial.printf("WPM %d\n", value); 
+    kyr_nrpn[nrpn] = value;
+    paddle.keyer.setSpeed(value);
+    break;
+  case KYRP_WEIGHT: 
+    Serial.printf("WEIGHT %d\n", value); 
+    kyr_nrpn[nrpn] = value;
+    paddle.keyer.setWeight(value);
+    break;
+  case KYRP_RATIO: 
+    Serial.printf("RATIO %d\n", value);
+    kyr_nrpn[nrpn] = value;
+    paddle.keyer.setRatio(value);
+    break;
+  case KYRP_COMP: 
+    Serial.printf("COMP %d\n", value);
+    kyr_nrpn[nrpn] = value;
+    paddle.keyer.setCompensation(value);
+    break;
+  case KYRP_FARNS: 
+    Serial.printf("FARNS %d\n", value);
+    kyr_nrpn[nrpn] = value;
+    paddle.keyer.setFarnsworth(value);
+    break;
 
-static void nrpn_adjust(int adjust) {
-}
+  case KYRP_ON_TIME: Serial.printf("ON_TIME %d\n", value); break;
+  case KYRP_OFF_TIME: Serial.printf("OFF_TIME %d\n", value); break;
+  case KYRP_ON_RAMP: Serial.printf("ON_RAMP %d\n", value); break;
+  case KYRP_OFF_RAMP: Serial.printf("OFF_RAMP %d\n", value); break;
+  case KYRP_TONE: Serial.printf("TONE %d\n", value); break;
+  case KYRP_HEAD_TIME: Serial.printf("HEAD_TIME %d\n", value); break;
+  case KYRP_TAIL_TIME: Serial.printf("TAIL_TIME %d\n", value); break;
+  case KYRP_PAD_MODE: Serial.printf("PAD_MODE %d\n", value); break;
+  case KYRP_PAD_SWAP: Serial.printf("PAD_SWAP %d\n", value); break;
+  case KYRP_PAD_ADAPT: Serial.printf("PAD_ADAPT %d\n", value); break;
+  case KYRP_TONE_NEG: Serial.printf("TONE_NEG %d\n", value); break;
+  case KYRP_IQ_ADJUST: Serial.printf("IQ_ADJUST %d\n", value); break;
 
-static void nrpn_set_msb(int msb) {
-  cc_nrpn_value = (msb<<7)|(cc_nrpn_value&127);
-}
+  case KYRP_HEAD_PHONE_VOLUME: Serial.printf("HEAD_PHONE_VOLUME %d\n", value); break;
+  case KYRP_INPUT_SELECT: Serial.printf("INPUT_SELECT %d\n", value); break;
+  case KYRP_MIC_GAIN: Serial.printf("MIC_GAIN %d\n", value); break;
+  case KYRP_MUTE_HEAD_PHONES: Serial.printf("MUTE_HEAD_PHONES %d\n", value); break;
+  case KYRP_MUTE_LINE_OUT: Serial.printf("MUTE_LINE_OUT %d\n", value); break;
+  case KYRP_LINE_IN_LEVEL: Serial.printf("LINE_IN_LEVEL %d\n", value); break;
+  case KYRP_LINE_OUT_LEVEL: Serial.printf("LINE_OUT_LEVEL %d\n", value); break;
 
-static void nrpn_set_lsb(int lsb) {
+  default: Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
+  }
 }
 
 static void myNoteOn(byte channel, byte note, byte velocity) {
-  switch (note) {
-  case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
-    digitalWrite(KYR_L_PAD_PIN, velocity == 0); break;
-  case KYR_R_PAD_NOTE:      /* note used to report raw right paddle switch */
-    digitalWrite(KYR_R_PAD_PIN, velocity == 0); break;
-  case KYR_S_KEY_NOTE:      /* note used to report raw straight key switch */
-    digitalWrite(KYR_S_KEY_PIN, velocity == 0); break;
-  case KYR_PTT_SW_NOTE:      /* note used to report raw ptt switch */
-    digitalWrite(KYR_PTT_SW_PIN, velocity == 0); break;
-  case KYR_KEY_OUT_NOTE:      /* note used to send external key signal */
-    digitalWrite(KYR_KEY_OUT_PIN, velocity == 0); break;
-  case KYR_PTT_OUT_NOTE:      /* note used to send external ptt signal */
-    digitalWrite(KYR_PTT_OUT_PIN, velocity == 0); break;
-  default:
-    break;
+  if (channel == kyr_channel) {
+    switch (note) {
+    case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
+      digitalWrite(KYR_L_PAD_PIN, velocity == 0); break;
+    case KYR_R_PAD_NOTE:      /* note used to report raw right paddle switch */
+      digitalWrite(KYR_R_PAD_PIN, velocity == 0); break;
+    case KYR_S_KEY_NOTE:      /* note used to report raw straight key switch */
+      digitalWrite(KYR_S_KEY_PIN, velocity == 0); break;
+    case KYR_PTT_SW_NOTE:      /* note used to report raw ptt switch */
+      digitalWrite(KYR_PTT_SW_PIN, velocity == 0); break;
+    case KYR_KEY_OUT_NOTE:      /* note used to send external key signal */
+      digitalWrite(KYR_KEY_OUT_PIN, velocity == 0); break;
+    case KYR_PTT_OUT_NOTE:      /* note used to send external ptt signal */
+      digitalWrite(KYR_PTT_OUT_PIN, velocity == 0); break;
+    default:
+      break;
+    }
   }
 }
+
 static void myNoteOff(byte channel, byte note, byte velocity) {
-  switch (note) {
-  case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
-    digitalWrite(KYR_L_PAD_PIN, 1); break;
-  case KYR_R_PAD_NOTE:      /* note used to report raw right paddle switch */
-    digitalWrite(KYR_R_PAD_PIN, 1); break;
-  case KYR_S_KEY_NOTE:      /* note used to report raw straight key switch */
-    digitalWrite(KYR_S_KEY_PIN, 1); break;
-  case KYR_PTT_SW_NOTE:      /* note used to report raw ptt switch */
-    digitalWrite(KYR_PTT_SW_PIN, 1); break;
-  case KYR_KEY_OUT_NOTE:      /* note used to send external key signal */
-    digitalWrite(KYR_KEY_OUT_PIN, 1); break;
-  case KYR_PTT_OUT_NOTE:      /* note used to send external ptt signal */
-    digitalWrite(KYR_PTT_OUT_PIN, 1); break;
-  default:
-    break;
+  if (channel == kyr_channel) {
+    switch (note) {
+    case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
+      digitalWrite(KYR_L_PAD_PIN, 1); break;
+    case KYR_R_PAD_NOTE:      /* note used to report raw right paddle switch */
+      digitalWrite(KYR_R_PAD_PIN, 1); break;
+    case KYR_S_KEY_NOTE:      /* note used to report raw straight key switch */
+      digitalWrite(KYR_S_KEY_PIN, 1); break;
+    case KYR_PTT_SW_NOTE:      /* note used to report raw ptt switch */
+      digitalWrite(KYR_PTT_SW_PIN, 1); break;
+    case KYR_KEY_OUT_NOTE:      /* note used to send external key signal */
+      digitalWrite(KYR_KEY_OUT_PIN, 1); break;
+    case KYR_PTT_OUT_NOTE:      /* note used to send external ptt signal */
+      digitalWrite(KYR_PTT_OUT_PIN, 1); break;
+    default:
+      break;
+    }
   }
 }
+
+/*
+** TeensyUSBAudioMidi legacy defaults
+*/
+#ifndef OPTION_MIDI_CW_NOTE
+#define OPTION_MIDI_CW_NOTE 1
+#endif
+#ifndef OPTION_MIDI_CW_CHANNEL
+#define OPTION_MIDI_CW_CHANNEL 1   // use channel 1 as default
+#endif
+#ifndef OPTION_MIDI_CONTROL_CHANNEL
+#define OPTION_MIDI_CONTROL_CHANNEL 2  // use channel 2 by default
+#endif
+#ifndef OPTION_SIDETONE_VOLUME
+#define OPTION_SIDETONE_VOLUME 0.2
+#endif
+#ifndef OPTION_SIDETONE_FREQ
+#define OPTION_SIDETONE_FREQ  600
+#endif
+
 static void myControlChange(byte channel, byte control, byte value) {
+  /*
+  ** handle TeensyUSBAudioMidi legacy
+  */
+  static uint8_t lsb_data;
+
+  if (channel == OPTION_MIDI_CONTROL_CHANNEL) {
+    switch (control) {
+    case 0 : lsb_data = value; break;
+    case 4 : control_keyer_speed(value); break;
+    case 5 : control_sidetone_amplitude(((value << 7) | lsb_data)/16384.0); break;
+    case 6 : control_sidetone_frequency((value << 7) | lsb_data); break;
+    case 16 : control_master_volume(((value << 7) | lsb_data)/16384.0); break;
+    }
+  }
+
+  /*
+  ** handle NRPN format
+  ** the canned ctrlr format sends MSB, LSB
+  ** for both the NRPN number and the value.
+  */
+  static uint16_t cc_nrpn, cc_value;
+
   if (channel == kyr_channel)
     switch (control) {
     case KYR_CC_MSB:	/* Data Entry (MSB) */
-      cc_nrpn = ((value&127)<<7)|(cc_nrpn&127); cc_nrpn_value = 0; break;
+      cc_value = (value&127)<<7;
+      break;
     case KYR_CC_LSB:	/* Data Entry (LSB) */
-      cc_nrpn = (cc_nrpn&(127<<7))|(value&127); cc_nrpn_value = 0; break;
-    case KYR_CC_UP:	/* Data Button increment */
-      nrpn_adjust(+value); break;
-    case KYR_CC_DOWN:	/* Data Button decrement */
-      nrpn_adjust(-value); break;
-    case KYR_CC_NRPN_LSB:	/* Non-registered Parameter (LSB) */
-      nrpn_set_lsb(value); break;
+      cc_value |= value&127;
+      nrpn_set(cc_nrpn, cc_value); 
+      break;
     case KYR_CC_NRPN_MSB:	/* Non-registered Parameter (MSB) */
-      nrpn_set_msb(value); break;
+      cc_nrpn = (value&127)<<7;
+      break;
+    case KYR_CC_NRPN_LSB:	/* Non-registered Parameter (LSB) */
+      cc_nrpn |= value&127;
+      break;
     default:
       break;
     }
