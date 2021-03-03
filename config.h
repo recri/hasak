@@ -1,3 +1,6 @@
+#ifndef config_h_
+#define config_h_
+
 /* KYR configuration */
 
 /* decide which Teensy we're running on */
@@ -27,15 +30,8 @@
   #error "You're not building for a Teensy?"
 #endif
 
-/* configure hardware variants, not used as yet */
-#define KYR_N_PAD 1		/* number of paddles connected */
-#define KYR_N_S_KEY 1		/* number of straight keys connected */
-#define KYR_N_PTT_SW 1		/* number of PTT switches connected */
-#define KYR_N_KEY_OUT 1		/* number of key out connections */
-#define KYR_N_PTT_OUT 1		/* number of PTT out connections */
+/* keyer voices */
 #define KYR_N_VOX 4		/* number of keyer voices */
-
-/* assign key vox identifiers */
 #define KYR_VOX_NONE	0
 #define KYR_VOX_S_KEY	1	/* Straight Key */
 #define KYR_VOX_PAD	2	/* Paddle */
@@ -132,29 +128,34 @@
 /* nrpn numbers used */
 /* these are NRPN's which apply to keyer voices, some voices do not use all of them */
 #define KYRP_BASE	0
-#define KYRP_WPM	(KYRP_BASE+0)	/* keyer speed control */
+#define KYRP_SPEED	(KYRP_BASE+0)	/* keyer speed control */
 #define KYRP_WEIGHT	(KYRP_BASE+1)	/* keyer weight */
 #define KYRP_RATIO	(KYRP_BASE+2)	/* keyer ratio */
 #define KYRP_COMP	(KYRP_BASE+3)	/* keyer compensation */
 #define KYRP_FARNS	(KYRP_BASE+4)	/* Farnsworth keying factor */
 
-#define KYRP_ON_TIME	(KYRP_BASE+5)	/* key ramp on µs */
-#define KYRP_OFF_TIME	(KYRP_BASE+6)	/* key ramp off µs */
-#define KYRP_ON_RAMP	(KYRP_BASE+7)	/* key ramp on window */
-#define KYRP_OFF_RAMP	(KYRP_BASE+8)	/* key ramp off window */
+#define KYRP_RISE_TIME	(KYRP_BASE+5)	/* key ramp on µs */
+#define KYRP_FALL_TIME	(KYRP_BASE+6)	/* key ramp off µs */
+#define KYRP_RISE_RAMP	(KYRP_BASE+7)	/* key ramp on window */
+#define KYRP_FALL_RAMP	(KYRP_BASE+8)	/* key ramp off window */
 #define KYRP_TONE	(KYRP_BASE+9)	/* oscillator frequency */
 #define KYRP_HEAD_TIME	(KYRP_BASE+10)	/* time us ptt should lead key, key delay */
 #define KYRP_TAIL_TIME	(KYRP_BASE+11)	/* time us ptt should linger after key, hang time */
 #define KYRP_PAD_MODE	(KYRP_BASE+12)	/* paddle iambic keyer mode A/B */
 #define KYRP_PAD_SWAP	(KYRP_BASE+13)	/* swap paddles T/F */
 #define KYRP_PAD_ADAPT	(KYRP_BASE+14)	/* paddle adapter normal/ultimatic/single lever */
-#define KYRP_TONE_NEG	(KYRP_BASE+15)	/* treat frequency as negative, iq LSB vs USB */
+#define KYRP_IQ_ENABLE	(KYRP_BASE+15)	/* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST	(KYRP_BASE+16)	/* adjustment to iq phase */
 
-/* the following are global only parameters, they don't specialize by vox */
+#define KYRP_PER_DIT	(KYRP_BASE+17) /* samples per dit */
+#define KYRP_PER_DAH	(KYRP_BASE+18) /* samples per dah */
+#define KYRP_PER_IES	(KYRP_BASE+19) /* samples per inter element space */
+#define KYRP_PER_ILS	(KYRP_BASE+20) /* samples per inter letter space */
+#define KYRP_PER_IWS	(KYRP_BASE+21) /* samples per inter word space */
 
+/* the following are global only parameters, they don't specialize by vox */
 /* sgtl5000 control */
-#define KYRP_CODEC	(KYRP_IQ_ADJUST+1)	/* relocation base */
+#define KYRP_CODEC	(KYRP_PER_IWS+1)	/* relocation base = 22 */
 #define KYRP_HEAD_PHONE_VOLUME	(KYRP_CODEC+0)	/* sgl5000 output volume */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1)	/* 0..1 input from microphone or line-in */
 #define KYRP_MIC_GAIN		(KYRP_CODEC+2)	/* 0..63 dB */
@@ -162,9 +163,13 @@
 #define KYRP_MUTE_LINE_OUT	(KYRP_CODEC+4) /* 0..1 true or false */
 #define KYRP_LINE_IN_LEVEL	(KYRP_CODEC+5) /* 0..15 default 5 */
 #define KYRP_LINE_OUT_LEVEL	(KYRP_CODEC+6) /* 13..31 default 29 */
+#define KYRP_LINE_IN_LEVEL_L	(KYRP_CODEC+7) /* 0..15 default 5 */
+#define KYRP_LINE_IN_LEVEL_R	(KYRP_CODEC+8) /* 0..15 default 5 */
+#define KYRP_LINE_OUT_LEVEL_L	(KYRP_CODEC+9) /* 13..31 default 29 */
+#define KYRP_LINE_OUT_LEVEL_R	(KYRP_CODEC+10) /* 13..31 default 29 */
 
 /* 24 output mixer levels */
-#define KYRP_MIXER	(KYRP_LINE_OUT_LEVEL+1)	/* relocation base */
+#define KYRP_MIXER	(KYRP_LINE_OUT_LEVEL_R+1)	/* relocation base */
 #define KYRP_MIX_USB_L0	(KYRP_MIXER+0)
 #define KYRP_MIX_USB_L1	(KYRP_MIXER+1)
 #define KYRP_MIX_USB_L2	(KYRP_MIXER+2)
@@ -208,7 +213,7 @@
 
 #define KYRP_LAST KYRP_XTRA	/* end of keyer NRPN */
 
-/* nrpn MSB numbers, bank select */
+/* nrpn MSB numbers, bank select, not quite yet */
 #define KYRP_GLOBAL_OFFSET	0
 #define KYRP_PAD_OFFSET		32
 #define KYRP_S_KEY_OFFSET	64
@@ -217,9 +222,20 @@
 
 /* identified special NRPN values */
 /* slew ramps */
-#define KYRP_RAMP_HANN			0 /* ON_RAMP, OFF_RAMP */
-#define KYRP_RAMP_BLACKMAN_HARRIS	1 /* ON_RAMP, OFF_RAMP */
+#define KYRP_RAMP_HANN			0 /* RISE_RAMP, FALL_RAMP */
+#define KYRP_RAMP_BLACKMAN_HARRIS	1
+#define KYRP_RAMP_LINEAR		2
 /* paddle keyer modes */
 #define KYRP_MODE_A			0 /* PAD_MODE */
 #define KYRP_MODE_B			1 /* PAD_MODE */
 #define KYRP_MODE_S			2 /* PAD_MODE */
+/* paddle adapter modes */
+#define KYRP_ADAPT_NORMAL		0
+#define KYRP_ADAPT_ULTIMATIC		1
+#define KYRP_ADAPT_SINGLE		2
+/* iq enable modes */
+#define KYRP_IQ_NONE			0 /* IQ_ENABLE */
+#define KYRP_IQ_LSB			1
+#define KYRP_IQ_USB			2
+
+#endif

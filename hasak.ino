@@ -25,35 +25,7 @@
 
 #include "config.h"
 #include <Arduino.h>
-
-/*
-** forward references.
-*/
-void midi_setup(void);
-void midi_loop(void);
-void winkey_setup(void);
-void winkey_loop(void);
-
-int get_active_vox(void);
-
-/* keyer parameters */
-int get_vox_dit(int vox);
-int get_vox_dah(int vox);
-int get_vox_ies(int vox);
-int get_vox_ils(int vox);
-int get_vox_iws(int vox);
-
-/* keyed tone parameters */
-int get_vox_tone(int vox);
-int get_vox_iqph(int vox);
-int get_vox_rise(int vox);
-int get_vox_rise_ramp(int vox);
-int get_vox_fall(int vox);
-int get_vox_fall_ramp(int vox);
-
-/* ptt parameters */
-int get_vox_ptt_head(int vox);
-int get_vox_ptt_tail(int vox);
+#include "linkage.h"
 
 /***************************************************************
 ** Audio library modules
@@ -64,7 +36,7 @@ int get_vox_ptt_tail(int vox);
 #include "src/Audio/input_text.h"
 #include "src/Audio/effect_paddle.h"
 #include "src/Audio/effect_arbiter.h"
-#include "src/Audio/effect_ramp.h"
+#include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/effect_mute.h"
 #include "src/Audio/effect_and_not.h"
 #include "src/Audio/effect_ptt_delay.h"
@@ -73,10 +45,6 @@ int get_vox_ptt_tail(int vox);
 #include "src/Audio/sample_value.h"
 
 #include <Wire.h>
-//#include <SPI.h>
-//#include <SD.h>
-//#include <SerialFlash.h>
-
 
 // Audio Library program, written by hand
 
@@ -112,16 +80,8 @@ static void arbiter_setup(void) {
 int get_active_vox(void) { return arbiter.get_active_vox(); }
 
 // shaped key waveform
-AudioEffectRamp		key_ramp;
-AudioSynthWaveformSine	sine_I;
-//AudioSynthWaveformSine  sine_Q;
-AudioEffectMultiply	I_ramp;
-//AudioEffectMultiply	Q_ramp;
+AudioSynthKeyedTone	key_ramp;
 AudioConnection		patchCord3a(arbiter, 0, key_ramp, 0);
-AudioConnection		patchCord3b(key_ramp, 0, I_ramp, 0);
-//AudioConnection		patchCord3c(key_ramp, 0, Q_ramp, 0);
-AudioConnection		patchCord3d(sine_I, 0, I_ramp, 1);
-//AudioConnection		patchCord3e(sine_Q, 0, Q_ramp, 1);
 
 // tx enable
 AudioEffectAndNot	and_not_kyr(KYR_VOX_KYR);
@@ -144,8 +104,8 @@ AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if acti
 //AudioConnection		patchCord5a(and_not_kyr, 0, IQ_mute, 0);
 //AudioConnection		patchCord5b(IQ_mute, 0, I_mute, 0);
 //AudioConnection		patchCord5c(IQ_mute, 0, Q_mute, 0);
-//AudioConnection		patchCord5d(I_ramp, 0, I_mute, 1);
-//AudioConnection		patchCord5e(Q_ramp, 0, Q_mute, 1);
+//AudioConnection		patchCord5d(key_ramp, 0, I_mute, 1);
+//AudioConnection		patchCord5e(key_ramp, 1, Q_mute, 1);
 
 // receive mute, enabled when arbiter vox line is active
 //AudioEffectMute		rx_mute;
@@ -164,8 +124,8 @@ AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if acti
 //AudioConnection		patchCord7a(st_enable, 0, st_mute, 0);
 //AudioConnection		patchCord7b(st_mute, 0, l_st_mute, 0);
 //AudioConnection		patchCord7c(st_mute, 0, r_st_mute, 0);
-//AudioConnection		patchCord7d(I_ramp, 0, l_st_mute, 1);
-//AudioConnection		patchCord7e(I_ramp, 0, r_st_mute, 1);
+//AudioConnection		patchCord7d(key_ramp, 0, l_st_mute, 1);
+//AudioConnection		patchCord7e(key_ramp, 0, r_st_mute, 1);
 
 // ptt delay, give ptt a head start over key to external transmitter
 AudioEffectPTTDelay	ptt_delay;
@@ -216,12 +176,12 @@ AudioConnection		patchCord951(usb_in, 1, r_hdw_out, 1);
 //AudioConnection		patchCord932(r_st_mute, 0, r_usb_out, 2);
 //AudioConnection		patchCord942(l_st_mute, 0, l_hdw_out, 2);
 //AudioConnection		patchCord952(r_st_mute, 0, r_hdw_out, 2);
-AudioConnection		patchCord902(I_ramp, 0, l_i2s_out, 2);
-AudioConnection		patchCord912(I_ramp, 0, r_i2s_out, 2);
-AudioConnection		patchCord922(I_ramp, 0, l_usb_out, 2);
-AudioConnection		patchCord932(I_ramp, 0, r_usb_out, 2);
-AudioConnection		patchCord942(I_ramp, 0, l_hdw_out, 2);
-AudioConnection		patchCord952(I_ramp, 0, r_hdw_out, 2);
+AudioConnection		patchCord902(key_ramp, 0, l_i2s_out, 2);
+AudioConnection		patchCord912(key_ramp, 0, r_i2s_out, 2);
+AudioConnection		patchCord922(key_ramp, 0, l_usb_out, 2);
+AudioConnection		patchCord932(key_ramp, 0, r_usb_out, 2);
+AudioConnection		patchCord942(key_ramp, 0, l_hdw_out, 2);
+AudioConnection		patchCord952(key_ramp, 0, r_hdw_out, 2);
 
 // fourth channel, keyed IQ, 
 // send to usb_out to provide soundcard IQ TX stream to host sdr
@@ -299,6 +259,14 @@ void pollatch() {
   //buttonpolls += 1;
 }     
 
+/*
+** forward references.
+*/
+static void midi_setup(void);
+static void midi_loop(void);
+static void winkey_setup(void);
+static void winkey_loop(void);
+
 void setup() {
   Serial.begin(115200);
   pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
@@ -311,12 +279,21 @@ void setup() {
   digitalWrite(KYR_PTT_OUT_PIN, 0);
   attachInterrupt(KYR_LRCLK, pollatch, RISING);
   arbiter_setup();
-  sine_I.frequency(800);
-  // sine_Q.frequency(800);
-  sine_I.amplitude(1.0);
-  // sine_Q.amplitude(1.0);
-  sine_I.phase(0);
-  // sine_Q.phase(270);
+  nrpn_set(KYRP_SPEED,18);
+  nrpn_set(KYRP_WEIGHT,50);
+  nrpn_set(KYRP_RATIO,50);
+  nrpn_set(KYRP_COMP,0);
+  nrpn_set(KYRP_FARNS,0);
+  nrpn_set(KYRP_TONE,800);
+  nrpn_set(KYRP_RISE_TIME, 50);	// 50 ms/10
+  nrpn_set(KYRP_FALL_TIME, 50);	// 50 ms/10
+  nrpn_set(KYRP_RISE_RAMP, KYRP_RAMP_HANN);
+  nrpn_set(KYRP_FALL_RAMP, KYRP_RAMP_HANN);
+  nrpn_set(KYRP_TAIL_TIME, 50);	// 50 ms/10
+  nrpn_set(KYRP_HEAD_TIME, 50);	// 50 ms/10
+  nrpn_set(KYRP_PAD_MODE, KYRP_MODE_A);
+  nrpn_set(KYRP_PAD_SWAP, 0);
+  nrpn_set(KYRP_PAD_ADAPT, KYRP_ADAPT_NORMAL);
   AudioMemory(40);
   sgtl5000.enable();
   sgtl5000.volume(0.3);
@@ -328,39 +305,8 @@ void setup() {
 
 void loop() {
   diagnostics_loop();
-  // winkey_loop();
+  winkey_loop();
   midi_loop();
-}
-
-/***************************************************************
-** MIDI input handling.
-***************************************************************/
-static void control_keyer_speed(int speed) {
-  AudioNoInterrupts();
-  paddle.keyer.setSpeed(speed);
-  AudioInterrupts();
-}
-static void control_sidetone_frequency(float frequency) {
-  int phase_i = 0, phase_q = -90;
-  if (frequency < 0) {
-    frequency = -frequency;
-    phase_q = -phase_q;
-  }
-  AudioNoInterrupts();
-  sine_I.frequency(frequency);
-  sine_I.phase(phase_i);
-  // sine_Q.frequency(frequency);
-  // sine_Q.phase(phase_q);
-  AudioInterrupts();
-}
-static void control_sidetone_amplitude(float amplitude) {
-  AudioNoInterrupts();
-  sine_I.amplitude(amplitude);
-  // sine_Q.amplitude(amplitude);
-  AudioInterrupts();
-}
-static void control_master_volume(float volume) {
-  sgtl5000.volume(volume);
 }
 
 /***************************************************************
@@ -370,45 +316,92 @@ uint8_t kyr_channel = KYR_CHANNEL;
 
 int16_t kyr_nrpn[KYRP_LAST];
 
+static void nrpn_update_keyer(uint8_t vox) {
+  const float wordDits = 50;
+  const float sampleRate = sampleRate;
+  const float wpm = get_vox_speed(vox);
+  const float weight = get_vox_weight(vox);
+  const float ratio = get_vox_ratio(vox);
+  const float compensation = get_vox_comp(vox);
+  const float farnsworth = get_vox_farns(vox);;
+  const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
+  const float r = (ratio-50)/100.0;
+  const float w = (weight-50)/100.0;
+  const float c = compensation / ms_per_dit; /* ms / ms_per_dit */
+  /* Serial.printf("nrpn_update_keyer sr %f, word %d, wpm %f, weight %d, ratio %d, comp %d, farns %d\n", 
+     sampleRate, wordDits, wpm, weight, ratio, compensation, farnsworth); */
+  /* Serial.printf("morse_keyer r %f, w %f, c %f\n", r, w, c); */
+  /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
+  const unsigned ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
+  const int16_t ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
+  const int16_t ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
+  const int16_t ticksPerIes = (1  -w-c) * ticksPerBaseDit;
+  int16_t ticksPerIls = (3  -w-c) * ticksPerBaseDit;
+  int16_t ticksPerIws = (7  -w-c) * ticksPerBaseDit;
+    
+  //
+  // Farnsworth timing: stretch inter-character and inter-word pauses
+  // to reduce wpm to the specified farnsworth speed.
+  // formula from https://morsecode.world/international/timing.html
+  //
+  if (farnsworth > 5 && farnsworth < wpm) {
+    float f = 50.0/19.0 * wpm / farnsworth - 31.0/19.0;
+    ticksPerIls *= f;		// stretched inter-character pause
+    ticksPerIws *= f;		// stretched inter-word pause
+  }
+  /* Serial.printf("morse_keyer base dit %u, dit %u, dah %u, ies %u, ils %u, iws %u\n", 
+     ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
+  set_vox_dit(vox, ticksPerDit);
+  set_vox_dah(vox, ticksPerDah);
+  set_vox_ies(vox, ticksPerIes);
+  set_vox_ils(vox, ticksPerIls);
+  set_vox_iws(vox, ticksPerIws);
+}
+
 static void nrpn_set(uint16_t nrpn, uint16_t value) {
   switch (nrpn) {
-  case KYRP_WPM: 
-    Serial.printf("WPM %d\n", value); 
+  case KYRP_SPEED: 
+    Serial.printf("SPEED %d\n", value); 
     kyr_nrpn[nrpn] = value;
+    nrpn_update_keyer(KYR_VOX_NONE);
     paddle.keyer.setSpeed(value);
     break;
   case KYRP_WEIGHT: 
     Serial.printf("WEIGHT %d\n", value); 
     kyr_nrpn[nrpn] = value;
+    nrpn_update_keyer(KYR_VOX_NONE);
     paddle.keyer.setWeight(value);
     break;
   case KYRP_RATIO: 
     Serial.printf("RATIO %d\n", value);
     kyr_nrpn[nrpn] = value;
+    nrpn_update_keyer(KYR_VOX_NONE);
     paddle.keyer.setRatio(value);
     break;
   case KYRP_COMP: 
     Serial.printf("COMP %d\n", value);
     kyr_nrpn[nrpn] = value;
+    nrpn_update_keyer(KYR_VOX_NONE);
     paddle.keyer.setCompensation(value);
     break;
   case KYRP_FARNS: 
     Serial.printf("FARNS %d\n", value);
     kyr_nrpn[nrpn] = value;
+    nrpn_update_keyer(KYR_VOX_NONE);
     paddle.keyer.setFarnsworth(value);
     break;
 
-  case KYRP_ON_TIME: Serial.printf("ON_TIME %d\n", value); break;
-  case KYRP_OFF_TIME: Serial.printf("OFF_TIME %d\n", value); break;
-  case KYRP_ON_RAMP: Serial.printf("ON_RAMP %d\n", value); break;
-  case KYRP_OFF_RAMP: Serial.printf("OFF_RAMP %d\n", value); break;
+  case KYRP_RISE_TIME: Serial.printf("RISE_TIME %d\n", value); break;
+  case KYRP_FALL_TIME: Serial.printf("FALL_TIME %d\n", value); break;
+  case KYRP_RISE_RAMP: Serial.printf("RISE_RAMP %d\n", value); break;
+  case KYRP_FALL_RAMP: Serial.printf("FALL_RAMP %d\n", value); break;
   case KYRP_TONE: Serial.printf("TONE %d\n", value); break;
   case KYRP_HEAD_TIME: Serial.printf("HEAD_TIME %d\n", value); break;
   case KYRP_TAIL_TIME: Serial.printf("TAIL_TIME %d\n", value); break;
   case KYRP_PAD_MODE: Serial.printf("PAD_MODE %d\n", value); break;
   case KYRP_PAD_SWAP: Serial.printf("PAD_SWAP %d\n", value); break;
   case KYRP_PAD_ADAPT: Serial.printf("PAD_ADAPT %d\n", value); break;
-  case KYRP_TONE_NEG: Serial.printf("TONE_NEG %d\n", value); break;
+  case KYRP_IQ_ENABLE: Serial.printf("IQ_ENABLE %d\n", value); break;
   case KYRP_IQ_ADJUST: Serial.printf("IQ_ADJUST %d\n", value); break;
 
   case KYRP_HEAD_PHONE_VOLUME: Serial.printf("HEAD_PHONE_VOLUME %d\n", value); break;
@@ -465,41 +458,7 @@ static void myNoteOff(byte channel, byte note, byte velocity) {
   }
 }
 
-/*
-** TeensyUSBAudioMidi legacy defaults
-*/
-#ifndef OPTION_MIDI_CW_NOTE
-#define OPTION_MIDI_CW_NOTE 1
-#endif
-#ifndef OPTION_MIDI_CW_CHANNEL
-#define OPTION_MIDI_CW_CHANNEL 1   // use channel 1 as default
-#endif
-#ifndef OPTION_MIDI_CONTROL_CHANNEL
-#define OPTION_MIDI_CONTROL_CHANNEL 2  // use channel 2 by default
-#endif
-#ifndef OPTION_SIDETONE_VOLUME
-#define OPTION_SIDETONE_VOLUME 0.2
-#endif
-#ifndef OPTION_SIDETONE_FREQ
-#define OPTION_SIDETONE_FREQ  600
-#endif
-
 static void myControlChange(byte channel, byte control, byte value) {
-  /*
-  ** handle TeensyUSBAudioMidi legacy
-  */
-  static uint8_t lsb_data;
-
-  if (channel == OPTION_MIDI_CONTROL_CHANNEL) {
-    switch (control) {
-    case 0 : lsb_data = value; break;
-    case 4 : control_keyer_speed(value); break;
-    case 5 : control_sidetone_amplitude(((value << 7) | lsb_data)/16384.0); break;
-    case 6 : control_sidetone_frequency((value << 7) | lsb_data); break;
-    case 16 : control_master_volume(((value << 7) | lsb_data)/16384.0); break;
-    }
-  }
-
   /*
   ** handle NRPN format
   ** the canned ctrlr format sends MSB, LSB
@@ -545,3 +504,4 @@ void winkey_setup(void) {
 
 void winkey_loop(void) {
 }
+

@@ -38,7 +38,7 @@ void AudioEffectMute::update(void)
 {
   audio_block_t *iblock, *oblock;
   uint32_t i, pos, inc, index, scale;
-  int32_t val1, val2, val, sample;
+  int32_t val1, val2, val;
   uint8_t dir;
 
   pos = position;

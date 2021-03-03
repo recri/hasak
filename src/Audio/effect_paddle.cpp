@@ -30,12 +30,12 @@
 void AudioEffectPaddle::update(void)
 {
   audio_block_t *blocka, *blockb, *blockc;
-  uint16_t *pa, *pb, *pc, *end;
+  int16_t *pa, *pb, *pc, *end;
 
   blocka = receiveReadOnly(0);
-  pa = blocka ? blocka->data : zeros;
+  pa = blocka ? blocka->data : (int16_t *)zeros;
   blockb = receiveReadOnly(1);
-  pb = blockb ? blockb->data : zeros;
+  pb = blockb ? blockb->data : (int16_t *)zeros;
   blockc = allocate();
   if (blockc) {
     int sum = 0;

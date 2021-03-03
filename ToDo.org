@@ -1,5 +1,14 @@
 * Todo list as of 2021-03-01
-[ ] get rid of the ramp crunches.
+[x] add vox to keyer constructors
+[x] declare keyer timing, tone, and ramp getters.
+[x] define keyer timing, tone, ramp getters.
+[x] define nrpn getter.
+[x] add back the perdit, perdah, peries, perils, periws pseudo-nrpns
+[x] figure out if that blackman-harris is right, it is.
+[ ] add ramp pseudo-nrpns
+[ ] get rid of the ramp crunches, 
+	I think I'm passing an overflowed ramp value, I'm hearing the ramp
+	scalar go negative at the peak.
 [ ] Redo the ramp code.
 [ ] Figure out why the buffer allocation goes to 64k
 [ ] Finish up the text_input
