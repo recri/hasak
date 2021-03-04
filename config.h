@@ -30,19 +30,13 @@
   #error "You're not building for a Teensy?"
 #endif
 
-/* keyer voices */
+/* keyer voices in order of priority */
 #define KYR_N_VOX 4		/* number of keyer voices */
 #define KYR_VOX_NONE	0
 #define KYR_VOX_S_KEY	1	/* Straight Key */
 #define KYR_VOX_PAD	2	/* Paddle */
 #define KYR_VOX_WINK	3	/* Winkey Key */
 #define KYR_VOX_KYR	4	/* Kyr Key */
-
-/* key vox priorities, lowest wins */
-#define KYR_PRI_S_KEY	0
-#define KYR_PRI_PAD	1
-#define KYR_PRI_WINK	2
-#define KYR_PRI_KYR	3
 
 /* pins assigned for audio card interface */
 #if defined(TEENSY4)
@@ -125,37 +119,11 @@
 #define KYR_CC_NRPN_LSB	98	/* Non-registered Parameter (LSB) */
 #define KYR_CC_NRPN_MSB	99	/* Non-registered Parameter (MSB) */
 
-/* nrpn numbers used */
-/* these are NRPN's which apply to keyer voices, some voices do not use all of them */
-#define KYRP_BASE	0
-#define KYRP_SPEED	(KYRP_BASE+0)	/* keyer speed control */
-#define KYRP_WEIGHT	(KYRP_BASE+1)	/* keyer weight */
-#define KYRP_RATIO	(KYRP_BASE+2)	/* keyer ratio */
-#define KYRP_COMP	(KYRP_BASE+3)	/* keyer compensation */
-#define KYRP_FARNS	(KYRP_BASE+4)	/* Farnsworth keying factor */
-
-#define KYRP_RISE_TIME	(KYRP_BASE+5)	/* key ramp on µs */
-#define KYRP_FALL_TIME	(KYRP_BASE+6)	/* key ramp off µs */
-#define KYRP_RISE_RAMP	(KYRP_BASE+7)	/* key ramp on window */
-#define KYRP_FALL_RAMP	(KYRP_BASE+8)	/* key ramp off window */
-#define KYRP_TONE	(KYRP_BASE+9)	/* oscillator frequency */
-#define KYRP_HEAD_TIME	(KYRP_BASE+10)	/* time us ptt should lead key, key delay */
-#define KYRP_TAIL_TIME	(KYRP_BASE+11)	/* time us ptt should linger after key, hang time */
-#define KYRP_PAD_MODE	(KYRP_BASE+12)	/* paddle iambic keyer mode A/B */
-#define KYRP_PAD_SWAP	(KYRP_BASE+13)	/* swap paddles T/F */
-#define KYRP_PAD_ADAPT	(KYRP_BASE+14)	/* paddle adapter normal/ultimatic/single lever */
-#define KYRP_IQ_ENABLE	(KYRP_BASE+15)	/* 0,1,2 -> none, LSB, USB */
-#define KYRP_IQ_ADJUST	(KYRP_BASE+16)	/* adjustment to iq phase */
-
-#define KYRP_PER_DIT	(KYRP_BASE+17) /* samples per dit */
-#define KYRP_PER_DAH	(KYRP_BASE+18) /* samples per dah */
-#define KYRP_PER_IES	(KYRP_BASE+19) /* samples per inter element space */
-#define KYRP_PER_ILS	(KYRP_BASE+20) /* samples per inter letter space */
-#define KYRP_PER_IWS	(KYRP_BASE+21) /* samples per inter word space */
-
-/* the following are global only parameters, they don't specialize by vox */
-/* sgtl5000 control */
-#define KYRP_CODEC	(KYRP_PER_IWS+1)	/* relocation base = 22 */
+/* nrpn numbers used, 280 total */
+/* nrpns are organized into four blocks: NRPN_GLOBAL_BLOCK, NRPN_CODEC_BLOCK, NRPN_KEYER_BLOCK, NRPN_VOX_BLOCKS */
+/* NRPN_GLOBAL_BLOCK - parameters controlling the entire keyer */
+#define KYRP_GLOBAL		0
+#define KYRP_CODEC		(KYRP_GLOBAL)	/* relocation base = 0 */
 #define KYRP_HEAD_PHONE_VOLUME	(KYRP_CODEC+0)	/* sgl5000 output volume */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1)	/* 0..1 input from microphone or line-in */
 #define KYRP_MIC_GAIN		(KYRP_CODEC+2)	/* 0..63 dB */
@@ -168,71 +136,124 @@
 #define KYRP_LINE_OUT_LEVEL_L	(KYRP_CODEC+9) /* 13..31 default 29 */
 #define KYRP_LINE_OUT_LEVEL_R	(KYRP_CODEC+10) /* 13..31 default 29 */
 
-/* 24 output mixer levels */
-#define KYRP_MIXER	(KYRP_LINE_OUT_LEVEL_R+1)	/* relocation base */
-#define KYRP_MIX_USB_L0	(KYRP_MIXER+0)
-#define KYRP_MIX_USB_L1	(KYRP_MIXER+1)
-#define KYRP_MIX_USB_L2	(KYRP_MIXER+2)
-#define KYRP_MIX_USB_L3	(KYRP_MIXER+3)
-#define KYRP_MIX_USB_R0	(KYRP_MIXER+4)
-#define KYRP_MIX_USB_R1	(KYRP_MIXER+5)
-#define KYRP_MIX_USB_R2	(KYRP_MIXER+6)
-#define KYRP_MIX_USB_R3	(KYRP_MIXER+7)
-#define KYRP_MIX_I2S_L0	(KYRP_MIXER+8)
-#define KYRP_MIX_I2S_L1	(KYRP_MIXER+9)
-#define KYRP_MIX_I2S_L2	(KYRP_MIXER+10)
-#define KYRP_MIX_I2S_L3	(KYRP_MIXER+11)
-#define KYRP_MIX_I2S_R0	(KYRP_MIXER+12)
-#define KYRP_MIX_I2S_R1	(KYRP_MIXER+13)
-#define KYRP_MIX_I2S_R2	(KYRP_MIXER+14)
-#define KYRP_MIX_I2S_R3	(KYRP_MIXER+15)
-#define KYRP_MIX_MQS_L0	(KYRP_MIXER+16)
-#define KYRP_MIX_MQS_L1	(KYRP_MIXER+17)
-#define KYRP_MIX_MQS_L2	(KYRP_MIXER+18)
-#define KYRP_MIX_MQS_L3	(KYRP_MIXER+19)
-#define KYRP_MIX_MQS_R0	(KYRP_MIXER+20)
-#define KYRP_MIX_MQS_R1	(KYRP_MIXER+21)
-#define KYRP_MIX_MQS_R2	(KYRP_MIXER+22)
-#define KYRP_MIX_MQS_R3	(KYRP_MIXER+23)
-
-
 /* relocation base */
-#define KYRP_XTRA (KYRP_MIX_MQS_R3+1)
+#define KYRP_SOFT		(KYRP_CODEC+16) /* == 16 */
 /* other things that we might control */
-#define KYRP_AUDIO_MODE		/* sound card operation mode */
-/* involves changing codec modes, mixer levels, etc.
- * 2x2 audio card means switch codec to line out and line in 
- * and mix off all channels that aren't tranferring i2s <-> usb
- */
-#define KYRP_ST_PAN		/* pan sidetone left or right */
-#define KYRP_SMIDI_PAD		/* send input paddle key events to midi notes */
-#define KYRP_SMIDI_S_KEY	/* send input straight key events to midi notes */ midi notes as input key events */
-#define KYRP_SMIDI_PTT_SW	/* send input ptt switch events to midi notes */
-#define KYRP_SMIDI_KEY_OUT	/* send key_out as midi note */
-#define KYRP_SMIDI_PTT_OUT	/* send ptt_out as midi note */
+#define KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
+#define KYRP_ST_PAN		(KYRP_SOFT+1) /* pan sidetone left or right */
+#define KYRP_SMIDI_PAD		(KYRP_SOFT+2) /* send input paddle key events to midi notes */
+#define KYRP_SMIDI_S_KEY	(KYRP_SOFT+3) /* send input straight key events to midi notes */
+#define KYRP_SMIDI_PTT_SW	(KYRP_SOFT+4) /* send input ptt switch events to midi notes */
+#define KYRP_SMIDI_KEY_OUT	(KYRP_SOFT+5) /* send key_out as midi note */
+#define KYRP_SMIDI_PTT_OUT	(KYRP_SOFT+6) /* send ptt_out as midi note */
+#define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
+#define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd */
+#define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
+#define KYRP_ST_ENABLE		(KYRP_SOFT+10) /* 0, 1 -> disable, enable  */
 
-#define KYRP_LAST KYRP_XTRA	/* end of keyer NRPN */
+/* 64 morse code translations */
+/* morse table for (7 bit ascii)-33, covers ! through ` */
+#define KYRP_MORSE		(KYRP_SOFT+16) /* == 32 */
+
+/* 24 output mixer levels */
+/* left and right channel mixers for four channels for each of usb_out, i2s_out, and mqs_out */
+/* the incoming channels are usb_in audio raw, usb_in audio muted by sidetone, i2s in audio, sidetone */
+#define KYRP_MIXER		(KYRP_MORSE+64) /* == 96 */
+#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* i2s in raw */
+#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* i2s in unmuted by ptt_sw */
+#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* sidetone */
+#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)
+#define KYRP_MIX_USB_R0		(KYRP_MIXER+4)  /* ditto for right channel */
+#define KYRP_MIX_USB_R1		(KYRP_MIXER+5)
+#define KYRP_MIX_USB_R2		(KYRP_MIXER+6)
+#define KYRP_MIX_USB_R3		(KYRP_MIXER+7)
+#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* usb in raw */
+#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* usb in muted by sidetone vox */
+#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* sidetone */
+#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11)
+#define KYRP_MIX_I2S_R0		(KYRP_MIXER+12) /* ditto for right channel */
+#define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)
+#define KYRP_MIX_I2S_R2		(KYRP_MIXER+14)
+#define KYRP_MIX_I2S_R3		(KYRP_MIXER+15)
+#define KYRP_MIX_MQS_L0		(KYRP_MIXER+16) /* usb in raw */
+#define KYRP_MIX_MQS_L1		(KYRP_MIXER+17) /* usb in muted by sidetone vox */
+#define KYRP_MIX_MQS_L2		(KYRP_MIXER+18) /* sidetone  */
+#define KYRP_MIX_MQS_L3		(KYRP_MIXER+19)
+#define KYRP_MIX_MQS_R0		(KYRP_MIXER+20) /* ditto for right channel */
+#define KYRP_MIX_MQS_R1		(KYRP_MIXER+21)
+#define KYRP_MIX_MQS_R2		(KYRP_MIXER+22)
+#define KYRP_MIX_MQS_R3		(KYRP_MIXER+23)
+
+/* NRPN_KEYER_BLOCK - default keyer parameters *//* these are NRPN's which apply to keyer voices, some voices do not use all of them */
+#define KYRP_KEYER		(KYRP_MIXER+24) /* == 120 */
+/* keyer timing */
+#define KYRP_SPEED		(KYRP_KEYER+0)	/* keyer speed control */
+#define KYRP_WEIGHT		(KYRP_KEYER+1)	/* keyer weight */
+#define KYRP_RATIO		(KYRP_KEYER+2)	/* keyer ratio */
+#define KYRP_COMP		(KYRP_KEYER+3)	/* keyer compensation */
+#define KYRP_FARNS		(KYRP_KEYER+4)	/* Farnsworth keying factor */
+
+/* keyer ramp */
+#define KYRP_RISE_TIME		(KYRP_KEYER+5)	/* key ramp on µs */
+#define KYRP_FALL_TIME		(KYRP_KEYER+6)	/* key ramp off µs */
+#define KYRP_RISE_RAMP		(KYRP_KEYER+7)	/* key ramp on window */
+#define KYRP_FALL_RAMP		(KYRP_KEYER+8)	/* key ramp off window */
+
+/* keyer oscillator */
+#define KYRP_TONE		(KYRP_KEYER+9)	/* oscillator frequency */
+
+/* keyer ptt timing */
+#define KYRP_HEAD_TIME		(KYRP_KEYER+10)	/* time us ptt should lead key, key delay */
+#define KYRP_TAIL_TIME		(KYRP_KEYER+11)	/* time us ptt should linger after key, hang time */
+
+/* keyer modes */
+#define KYRP_PAD_MODE		(KYRP_KEYER+12)	/* paddle iambic keyer mode A/B */
+#define KYRP_PAD_SWAP		(KYRP_KEYER+13)	/* swap paddles T/F */
+#define KYRP_PAD_ADAPT		(KYRP_KEYER+14)	/* paddle adapter normal/ultimatic/single lever */
+#define KYRP_AUTO_ILS		(KYRP_KEYER+15) /* automatic letter space timing */
+#define KYRP_AUTO_IWS		(KYRP_KEYER+16)	/* automatic word space timing */
+
+/* keyer timings in samples - automatically computed */
+#define KYRP_PER_DIT		(KYRP_KEYER+17) /* samples per dit */
+#define KYRP_PER_DAH		(KYRP_KEYER+18) /* samples per dah */
+#define KYRP_PER_IES		(KYRP_KEYER+19) /* samples per inter element space */
+#define KYRP_PER_ILS		(KYRP_KEYER+20) /* samples per inter letter space */
+#define KYRP_PER_IWS		(KYRP_KEYER+21) /* samples per inter word space */
+
+/* four (or more) repetitions of the keyer block for per voice customizations */
+#define KYRP_VOX_1		(KYRP_KEYER+32)	 /* == 152 */
+#define KYRP_VOX_2		(KYRP_KEYER+64)	 /* == 184 */
+#define KYRP_VOX_3		(KYRP_KEYER+96)	 /* == 216 */
+#define KYRP_VOX_4		(KYRP_KEYER+128) /* == 248 */
+
+/* sgtl5000 control */
+#define KYRP_LAST		(KYRP_VOX_4+32)	/* == 280 */
 
 /* nrpn MSB numbers, bank select, not quite yet */
-#define KYRP_GLOBAL_OFFSET	0
-#define KYRP_PAD_OFFSET		32
-#define KYRP_S_KEY_OFFSET	64
-#define KYRP_WIND_OFFSET	96
-#define KYRP_KYR_OFFSET		128
+#define KYRP_GLOBAL_OFFSET	KYRP_KEYER
+#define KYRP_S_KEY_OFFSET	KYRP_VOX_1
+#define KYRP_PAD_OFFSET		KYRP_VOX_2
+#define KYRP_WIND_OFFSET	KYRP_VOX_3
+#define KYRP_KYR_OFFSET		KYRP_VOX_4
 
-/* identified special NRPN values */
+/* Named NRPN values */
+
 /* slew ramps */
 #define KYRP_RAMP_HANN			0 /* RISE_RAMP, FALL_RAMP */
-#define KYRP_RAMP_BLACKMAN_HARRIS	1
-#define KYRP_RAMP_LINEAR		2
+#define KYRP_RAMP_BLACKMAN_HARRIS	1 /* not implemented */
+#define KYRP_RAMP_LINEAR		2 /* not implemented */
+#define KYRP_RAMP_SLINEAR		3 /* smoothed linear */
+
 /* paddle keyer modes */
 #define KYRP_MODE_A			0 /* PAD_MODE */
 #define KYRP_MODE_B			1 /* PAD_MODE */
 #define KYRP_MODE_S			2 /* PAD_MODE */
+
 /* paddle adapter modes */
 #define KYRP_ADAPT_NORMAL		0
 #define KYRP_ADAPT_ULTIMATIC		1
 #define KYRP_ADAPT_SINGLE		2
+
 /* iq enable modes */
 #define KYRP_IQ_NONE			0 /* IQ_ENABLE */
 #define KYRP_IQ_LSB			1

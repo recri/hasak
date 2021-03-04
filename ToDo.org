@@ -5,22 +5,35 @@
 [x] define nrpn getter.
 [x] add back the perdit, perdah, peries, perils, periws pseudo-nrpns
 [x] figure out if that blackman-harris is right, it is.
-[ ] add ramp pseudo-nrpns
+[ ] add ramp pseudo-nrpns, translating 10ths of ms into samples
+	I don't think it's necessary.  It's one multiply.
 [ ] get rid of the ramp crunches, 
 	I think I'm passing an overflowed ramp value, I'm hearing the ramp
 	scalar go negative at the peak.
-[ ] Redo the ramp code.
+[x] Redo the ramp code.
 [ ] Figure out why the buffer allocation goes to 64k
-[ ] Finish up the text_input
-[ ] Install the lorem ipsum test text
-[ ] Make the reusable buffer to run length code
+	It appears to have fixed itself somewhere.
+	But now the cpu consumption is off scale
+[x] Finish up the text_input
+[x] Install the lorem ipsum test text
+[x] Make the reusable buffer to run length code
+	int16_t run_length(audio_buffer_t *block) returns the length of the first
+	run in *block.
+	Not necessary, the paddle is debounced by the keyer, text has no bounces,
+	the straight key is the only signal with bounces, everything else is
+	streams of zeros or ones longer than four 128 sample buffers, so each
+	buffer (except for straight key) is describe by the initial run length.
+[ ] Debounce the straight key.	
+	Each transition in the straight key is stretched to one buffer worth
+	before another transition is considered.
 [ ] Ease in the volume changes, get rid of the pop.
-[ ] Make a keyed oscillator effect.
-	[ ] Can turn the oscillator(s) off when not in use
-	[ ] Poll oscillator and ramp parameters when activated
-	[ ] Use the 1024 point window functions for the ramps.
-	[ ] Continue to interpolate the ramps.
-	[ ] Continue to interpolate the sine.
+[x] Make a keyed oscillator effect.
+	[x] Can turn the oscillator(s) off when not in use
+	[x] Poll oscillator and ramp parameters when activated
+	[-] Use the 1024 point window functions for the ramps.
+		no, only need the first half.
+	[x] Continue to interpolate the ramps.
+	[x] Continue to interpolate the sine.
 	[ ] Unless the fixed point complex rotor works, and with
 	this multiply_32x32_rshift32 instruction, it might.
 	[ ] Would still need the sine/cos interpolation to make
@@ -30,11 +43,11 @@
 	are applied.
 	[ ] keyers poll for dit, dah, ies, ils, iws at the
 	moment the element is to be started.
-	[ ] oscillators poll for frequency and phase when started
+	[x] oscillators poll for frequency and phase when started
 	at the beginning of an element.
-	[ ] ramp poll for ramp type and time length when starting
+	[x] ramp poll for ramp type and time length when starting
 	the ramp.
-	[ ] but the codec controls won't be polled, they must be
+	[x] but the codec controls won't be polled, they must be
 	pushed, but no hard volume changes.
 [ ] Implement save/restore parameters to EEPROM
 	[ ] save parameters as the nrpn block and a bitset of
@@ -44,7 +57,29 @@
 [ ] Implement save/restore parameters as SYSEX
 	[ ] nibblize the nrpn block and send it to the ctrlr
 	which is built for slamming those things around.
-[ ] Figure out floating valued modulators.  I can specify a
+[ ] Implement default parameters from flash.
+[x] Figure out floating valued modulators.  I can specify a
 	controller which displays a floating point value, but
 	when I try to scale it to an integer value for transmission
 	it's already been truncated to its integer value.
+	I don't think they work, none of the example panels uses
+	anything but int values.
+[x] Add a 128 or 256 NRPN block for setting the 14 bit morse key codes 
+	for 7 or 8 bit input characters.  Yeah, just 64 slots from ! to `.
+[ ] Add tab to ctrlr panel for specifying morse key codes for characters.
+[ ] Add tab to ctrlr panel for the mixer matrix, with presets.
+[ ] Add NRPN for mixer matrix presets.
+[ ] Pan sidetone to localize.
+[ ] Add phase shifting filters to localize rx_audio.
+[x] Define NRPN's in 4 blocks, pad each block so there's room for
+	revisions without breaking existing assignments,
+	nrpn[N_SOFT_NRPN+N_CODEC_NRPN+N_VOX_NRPN+(N_VOX*N_VOX_NRPN)
+	[ ] codec NRPN's
+	[ ] global keyer NRPN's
+	[ ] morse code table
+	[ ] mixer matrix
+	[ ] default keyer voice NRPN's
+	[ ] keyer voice specific NRPN's
+[x] Move the IQ_ENABLE and IQ_ADJUST NRPN's to SOFT global block.
+
+	

@@ -59,50 +59,67 @@ void AudioSynthKeyedTone::update(void)
 	*ip++ = 0;
 	*qp++ = 0;
 	continue;
+      } else {
+	// ramp on
+	position = 1;
+	direction = 1;
+	start_rise();
+	/* fall through */
       }
-      // ramp on
-      get_rise_ramp();
-      start_osc();
-      position = 1;
-      direction = 1;
     } else if (position == 0xFFFFFFFF) {
       if (key != 0) {
 	// output is 100%
-	*ip++ = get_sine_value(phase_I);
-	*qp++ = iq_enable ? get_sine_value(phase_Q) : 0;
+	*ip++ = get_sine_value(phase_I) >> 16;
+	*qp++ = (iq_enable != KYRP_IQ_NONE) ? (get_sine_value(phase_Q) >> 16) : 0;
 	phase_I += phase_increment;
 	phase_Q += phase_increment;
 	continue;
+      } else {
+	// ramp off
+	position = 0xFFFFFFFE;
+	direction = 0;
+	start_fall();
+	/* fall through */
       }
-      // ramp off
-      get_fall_ramp();
-      position = 0xFFFFFFFE;
-      direction = 0;
     }
     int32_t magnitude = get_ramp_value(position);
-    *ip++ = (get_sine_value(phase_I) * magnitude) >> 15;
-    *qp++ = iq_enable ? ((get_sine_value(phase_Q) * magnitude) >> 15) : 0;
+#if defined(__ARM_ARCH_7EM__)
+    *ip++ = multiply_32x32_rshift32(get_sine_value(phase_I), magnitude);
+#elif defined(KINETISL)
+    *ip++ = ((get_sine_value(phase_I) >> 16) * magnitude) >> 16;
+#endif
     phase_I += phase_increment;
-    phase_Q += phase_increment;
+    if (iq_enable == KYRP_IQ_NONE) {
+      *qp++ = 0;
+    } else {      
+#if defined(__ARM_ARCH_7EM__)
+      *qp++ = multiply_32x32_rshift32(get_sine_value(phase_Q), magnitude);
+#elif defined(KINETISL)
+      *qp++ = ((get_sine_value(phase_Q) >> 16) * magnitude) >> 16;
+#endif
+      phase_Q += phase_increment;
+    }
     if (direction > 0) {
-	// output is increasing
-	if (rate < 0xFFFFFFFF - position) position += rate;
-	else {
-	  // end of rise
-	  position = 0xFFFFFFFF;
-	}
-      } else {
-	// output is decreasing
-	if (rate < position) position -= rate;
-	else {
-	  // end of fall
-	  stop_osc();
-	  position = 0;
-	}
+      // output is increasing
+      if (rate < 0xFFFFFFFF - position) position += rate; // continue ramp
+      else {
+	// end of rise
+	position = 0xFFFFFFFF;
+	end_rise();
+      }
+    } else {
+      // output is decreasing
+      if (rate < position) position -= rate;
+      else {
+	// end of fall
+	position = 0;
+	end_fall();
+      }
     }
   }
-  transmit(blocki);
-  transmit(blockq);
+  transmit(blocki, 0);
+  if (iq_enable != KYRP_IQ_NONE) transmit(blockq, 1);
   release(blocki);
   release(blockq);
+  if (blockk) release(blockk);
 }

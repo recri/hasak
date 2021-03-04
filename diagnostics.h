@@ -2,12 +2,10 @@
 ** diagnostics
 */
 void ioreport(const char *tag, int usage, int max, int over, int under) {
-  Serial.print(tag);
-  Serial.print(" usage "); Serial.print(usage);
-  Serial.print(" max usage "); Serial.print(max);
-  Serial.print(" overruns: "); Serial.print(over);
-  Serial.print(" underruns "); Serial.print(under);
-  Serial.println();
+  Serial.printf(" %s usage %d max %d", tag, usage, max);
+  if (over != 0) Serial.printf(" overruns %d", over);
+  if (under != 0) Serial.printf(" underruns %d", under);
+  // Serial.printf("\n");
 }
 void ireport(const char *tag, AudioInputSample &sample) {
   ioreport(tag, sample.processorUsage(), sample.processorUsage(), sample.overruns(), sample.underruns());
@@ -57,66 +55,111 @@ void preport(const char *tag, int16_t *p, int n) {
 }
 
 void mreport(const char *tag, AudioStream &str) {
-  Serial.print(tag);
-  Serial.print(" usage "); Serial.print(str.processorUsage());
-  Serial.print(" max "); Serial.print(str.processorUsageMax());
-  Serial.println();
+  Serial.printf(" %s usage %d max %d", tag, str.processorUsage(), str.processorUsageMax());
 }
 
 void mreset(AudioStream &str) {
   str.processorUsageMaxReset();
 }
 
+const char *lorem = 
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+  "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+  "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris "
+  "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "
+  "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
+  "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
+  "culpa qui officia deserunt mollit anim id est laborum.";
 
 void diagnostics_loop() {
   if (Serial.available()) {
-    switch (Serial.read()) {
+    uint8_t c = Serial.read();
+    // Serial.printf("diag read '%c'\n", c);
+    switch (c) {
     case '?': 
-      Serial.println("hasak monitor usage:");
-      Serial.println(" 0 -> audio library resource usage");
-      Serial.println(" 1 -> probe1 trace");
-      Serial.println(" 2 -> probe2 trace");
-      Serial.println(" r -> reset usage counts");
+      Serial.printf("hasak monitor usage:\n"
+		    " 0 -> audio library resource usage\n"
+		    " !... -> send ... up to newline to wink keyer\n"
+		    " @... -> send ... up to newline to kyr keyer\n"
+		    " l -> send lorem ipsum to wink keyer\n"
+		    " 1 -> probe1 trace\n"
+		    " 2 -> probe2 trace\n"
+		    " r -> reset usage counts\n"
+		    );
+      break;
+    case '!':
+      for (int c = Serial.read(); c != '\n'; c = Serial.read())
+	wink.send_text(c);
+      break;
+    case '@':
+      for (int c = Serial.read(); c != '\n'; c = Serial.read())
+	kyr.send_text(c);
+      break;
+    case 'l':
+      wink.send_text(lorem);
       break;
     case '0':
-      Serial.print(" cpu usage "); Serial.print(AudioProcessorUsage()); 
-      Serial.print(" max "); Serial.print(AudioProcessorUsageMax());
-      // Serial.println();
-      Serial.print(" mem usage "); Serial.print(AudioMemoryUsage());
-      Serial.print(" max "); Serial.print(AudioMemoryUsageMax());
+      Serial.printf(" cpu usage %d max %d", AudioProcessorUsage(), AudioProcessorUsageMax());
+      Serial.printf(" mem usage %d max %d", AudioMemoryUsage(), AudioMemoryUsageMax());
+      Serial.println();
+      mreport("i2s_in", i2s_in);
+      mreport("usb_in", usb_in);
+      mreport("i2s_out", i2s_out);
+      mreport("usb_out", usb_out);
       Serial.println();
       ireport("left paddle", l_pad);
       ireport("right paddle", r_pad);
       ireport("straight key", s_key);
       ireport("ptt switch", ptt_sw);
+      Serial.println();
+      mreport("winkey text", wink); 
+      mreport("kyr text", kyr);
       mreport("paddle", paddle);
+      Serial.println();
       mreport("arbiter", arbiter);
       mreport("key_ramp", key_ramp);
-      //mreport("sidetone", sine_I);
-      //mreport("I_ramp", I_ramp);
       mreport("and_not_kyr", and_not_kyr);
       mreport("ptt_delay", ptt_delay);
+      Serial.println();
+      mreport("l_i2s_out", l_i2s_out);
+      mreport("r_i2s_out", r_i2s_out);
+      mreport("l_usb_out", l_usb_out);
+      mreport("r_usb_out", r_usb_out);
+      mreport("l_hdw_out", l_hdw_out);
+      mreport("r_hdw_out", r_hdw_out);
+      Serial.println();
       oreport("key out", key_out); 
       oreport("ptt out", ptt_out);
+      Serial.println();
       break;
     case '1': preport("probe1", &_probe1, 5*44100); break;
     case '2': preport("probe2", &_probe2, 5*44100); break;
     case 'r':
       AudioProcessorUsageMaxReset();
       AudioMemoryUsageMaxReset();
+      mreset(i2s_in);
+      mreset(usb_in);
       ireset(l_pad);
       ireset(r_pad);
       ireset(s_key);
       ireset(ptt_sw);
+      mreset(wink);
+      mreset(kyr);
       mreset(paddle);
       mreset(arbiter);
       mreset(key_ramp);
-      //mreset(sine_I);
-      //mreset(I_ramp);
       mreset(and_not_kyr);
       mreset(ptt_delay);
+      mreset(l_i2s_out);
+      mreset(r_i2s_out);
+      mreset(l_usb_out);
+      mreset(r_usb_out);
+      mreset(l_hdw_out);
+      mreset(r_hdw_out);
       oreset(key_out);
       oreset(ptt_out);
+      mreset(i2s_out);
+      mreset(usb_out);
       break;
     default:
       //Serial.print("buttonpolls: "); 

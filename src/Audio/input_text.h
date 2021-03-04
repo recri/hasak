@@ -42,7 +42,7 @@
 #include "AudioStream.h"
 
 extern "C" {
-  extern unsigned char morse[58];
+  extern unsigned char morse[64];
 }
 
 /*
@@ -95,7 +95,7 @@ public:
     return (value >='a' && value <= 'z') ||
       value == ' ' || value == '\t' || value == '\n' ||
       value == '\e' ||
-      (value-33 >= 0 && value-33 < 58 && morse[value-33] != 1);
+      (value-33 >= 0 && value-33 < 64 && morse[value-33] != 1);
   }
   // send_text queues a character for sending
   // return 0 if the value was successfully queued
@@ -114,6 +114,10 @@ public:
       return 0;
     }
     return -1;
+  }
+  const char *send_text(const char *p) {
+    while (*p != '\0' && can_send_text()) send_text(*p++);
+    return *p == '\0' ? NULL : p;
   }
   // return true if there is room to queue a character
   int can_send_text() { return (((bwptr+1) % BUFFER_SIZE) != brptr); }
@@ -141,14 +145,14 @@ private:
   int get_elements() {
     if (code > 1) {
       send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
-      send(get_vox_ies(vox));
+      send(-get_vox_ies(vox));
       code >>= 1;
       return 1;
     }
     if (code == 1) {
       // end of code decoding
       if ( ! prosign) {
-	send(get_vox_ils(vox)-get_vox_ies(vox));
+	send(-(get_vox_ils(vox)-get_vox_ies(vox)));
 	code = 0;
 	return 1;
       }
@@ -160,7 +164,7 @@ private:
     uint8_t value = recv_text();
     if (value == ' ') {
       // send word space
-      send(get_vox_iws(vox));
+      send(-get_vox_iws(vox));
       // clear the space from the input queue
       return 1;
     }
@@ -174,7 +178,7 @@ private:
     }
     code = morse[value-33];
     send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
-    send(get_vox_ies(vox));
+    send(-get_vox_ies(vox));
     code >>= 1;
     return 1;
   }
@@ -188,7 +192,7 @@ public:
   virtual void update(void);
 private:
   static const int ELEMENT_SIZE = 8;
-  static const int BUFFER_SIZE = 64;
+  static const int BUFFER_SIZE = 1024;
   const int vox;
   int element;
   uint8_t prosign, code;

@@ -23,15 +23,16 @@
  * THE SOFTWARE.
  */
 
-#include "config.h"
+#include "config.h"		// configuration
 #include <Arduino.h>
 #include "linkage.h"
 
 /***************************************************************
-** Audio library modules
+** Audio library
 ***************************************************************/
-#include <Audio.h>
 
+#include <Audio.h>
+// custom audio modules
 #include "src/Audio/input_sample.h"
 #include "src/Audio/input_text.h"
 #include "src/Audio/effect_paddle.h"
@@ -41,7 +42,7 @@
 #include "src/Audio/effect_and_not.h"
 #include "src/Audio/effect_ptt_delay.h"
 #include "src/Audio/output_sample.h"
-
+// audio sample values
 #include "src/Audio/sample_value.h"
 
 #include <Wire.h>
@@ -72,10 +73,12 @@ AudioConnection		patchCord2a(paddle, 0, arbiter, 1);
 AudioConnection		patchCord2c(wink, 0, arbiter, 2);
 AudioConnection		patchCord2d(kyr, 0, arbiter, 3);
 static void arbiter_setup(void) {
-  arbiter.define_vox(0, KYR_VOX_S_KEY, KYR_PRI_S_KEY);
-  arbiter.define_vox(1, KYR_VOX_PAD, KYR_PRI_PAD);
-  arbiter.define_vox(2, KYR_VOX_WINK, KYR_PRI_WINK);
-  arbiter.define_vox(3, KYR_VOX_KYR, KYR_PRI_KYR);
+  // define the voices the arbiter sees on input channels
+  // changing to let their identity be their priority
+  arbiter.define_vox(0, KYR_VOX_S_KEY, KYR_VOX_S_KEY);
+  arbiter.define_vox(1, KYR_VOX_PAD, KYR_VOX_PAD);
+  arbiter.define_vox(2, KYR_VOX_WINK, KYR_VOX_WINK);
+  arbiter.define_vox(3, KYR_VOX_KYR, KYR_VOX_KYR);
 }
 int get_active_vox(void) { return arbiter.get_active_vox(); }
 
@@ -97,7 +100,7 @@ AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if acti
 //AudioConnection		patchCord4d(i2s_in, 0, l_mic_mute, 1);
 //AudioConnection		patchCord4e(i2s_in, 1, r_mic_mute, 1);
 
-// IQ mute, enabled when tx_enable or active_vox is kyr
+// IQ mute, disabled when tx_enable and active_vox is not kyr
 //AudioEffectMute		IQ_mute;
 //AudioEffectMultiply	I_mute;
 //AudioEffectMultiply	Q_mute;
@@ -117,7 +120,7 @@ AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if acti
 //AudioConnection		patchCord6d(usb_in, 0, l_rx_mute, 1);
 //AudioConnection		patchCord6e(usb_in, 1, r_rx_mute, 1);
 
-// sidetone mute, enabled when sidetone enabled is true
+// sidetone mute, disabled when sidetone enabled is true
 //AudioEffectMute		st_mute;
 //AudioEffectMultiply	l_st_mute;
 //AudioEffectMultiply	r_st_mute;
@@ -234,7 +237,7 @@ AudioControlSGTL5000     sgtl5000;
 
 // counter to demonstrate that attachInterrupt to LRCLK
 // actually produced a sample rate interrupt.
-//unsigned long buttonpolls = 0;
+// unsigned long buttonpolls = 0;
 //
 // poll inputs at sample rate
 // latch outputs at sample rate
@@ -243,7 +246,7 @@ AudioControlSGTL5000     sgtl5000;
 uint8_t _tx_enable, _st_enable;
 int16_t _probe1, _probe2;
 
-void pollatch() {
+static void pollatch() {
   l_pad.send(bool2fix(digitalRead(KYR_L_PAD_PIN)^1));
   r_pad.send(bool2fix(digitalRead(KYR_R_PAD_PIN)^1));
   s_key.send(bool2fix(digitalRead(KYR_S_KEY_PIN)^1));
@@ -267,18 +270,7 @@ static void midi_loop(void);
 static void winkey_setup(void);
 static void winkey_loop(void);
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
-  pinMode(KYR_R_PAD_PIN, INPUT_PULLUP);
-  pinMode(KYR_S_KEY_PIN, INPUT_PULLUP);
-  pinMode(KYR_PTT_SW_PIN, INPUT_PULLUP);
-  pinMode(KYR_KEY_OUT_PIN, OUTPUT);
-  pinMode(KYR_PTT_OUT_PIN, OUTPUT);
-  digitalWrite(KYR_KEY_OUT_PIN, 0);
-  digitalWrite(KYR_PTT_OUT_PIN, 0);
-  attachInterrupt(KYR_LRCLK, pollatch, RISING);
-  arbiter_setup();
+static void nrpn_setup(void) {
   nrpn_set(KYRP_SPEED,18);
   nrpn_set(KYRP_WEIGHT,50);
   nrpn_set(KYRP_RATIO,50);
@@ -294,16 +286,29 @@ void setup() {
   nrpn_set(KYRP_PAD_MODE, KYRP_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRP_ADAPT_NORMAL);
+}
+
+void setup(void) {
+  Serial.begin(115200);
+  pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
+  pinMode(KYR_R_PAD_PIN, INPUT_PULLUP);
+  pinMode(KYR_S_KEY_PIN, INPUT_PULLUP);
+  pinMode(KYR_PTT_SW_PIN, INPUT_PULLUP);
+  pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
+  pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
+  arbiter_setup();
+  nrpn_setup();
   AudioMemory(40);
+  attachInterrupt(KYR_LRCLK, pollatch, RISING);
   sgtl5000.enable();
-  sgtl5000.volume(0.3);
+  sgtl5000.volume(0.3);		// needs to be automated to remove pop
   midi_setup();
   winkey_setup();
 }
 
 #include "diagnostics.h"
 
-void loop() {
+void loop(void) {
   diagnostics_loop();
   winkey_loop();
   midi_loop();
@@ -318,7 +323,7 @@ int16_t kyr_nrpn[KYRP_LAST];
 
 static void nrpn_update_keyer(uint8_t vox) {
   const float wordDits = 50;
-  const float sampleRate = sampleRate;
+  const float sampleRate = AUDIO_SAMPLE_RATE;
   const float wpm = get_vox_speed(vox);
   const float weight = get_vox_weight(vox);
   const float ratio = get_vox_ratio(vox);
@@ -327,7 +332,7 @@ static void nrpn_update_keyer(uint8_t vox) {
   const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
-  const float c = compensation / ms_per_dit; /* ms / ms_per_dit */
+  const float c = compensation / 10.0 / ms_per_dit; /* ms/10 / ms_per_dit */
   /* Serial.printf("nrpn_update_keyer sr %f, word %d, wpm %f, weight %d, ratio %d, comp %d, farns %d\n", 
      sampleRate, wordDits, wpm, weight, ratio, compensation, farnsworth); */
   /* Serial.printf("morse_keyer r %f, w %f, c %f\n", r, w, c); */
@@ -360,58 +365,64 @@ static void nrpn_update_keyer(uint8_t vox) {
 
 static void nrpn_set(uint16_t nrpn, uint16_t value) {
   switch (nrpn) {
-  case KYRP_SPEED: 
-    Serial.printf("SPEED %d\n", value); 
-    kyr_nrpn[nrpn] = value;
-    nrpn_update_keyer(KYR_VOX_NONE);
-    paddle.keyer.setSpeed(value);
-    break;
-  case KYRP_WEIGHT: 
-    Serial.printf("WEIGHT %d\n", value); 
-    kyr_nrpn[nrpn] = value;
-    nrpn_update_keyer(KYR_VOX_NONE);
-    paddle.keyer.setWeight(value);
-    break;
-  case KYRP_RATIO: 
-    Serial.printf("RATIO %d\n", value);
-    kyr_nrpn[nrpn] = value;
-    nrpn_update_keyer(KYR_VOX_NONE);
-    paddle.keyer.setRatio(value);
-    break;
-  case KYRP_COMP: 
-    Serial.printf("COMP %d\n", value);
-    kyr_nrpn[nrpn] = value;
-    nrpn_update_keyer(KYR_VOX_NONE);
-    paddle.keyer.setCompensation(value);
-    break;
-  case KYRP_FARNS: 
-    Serial.printf("FARNS %d\n", value);
-    kyr_nrpn[nrpn] = value;
-    nrpn_update_keyer(KYR_VOX_NONE);
-    paddle.keyer.setFarnsworth(value);
-    break;
+  case KYRP_SPEED: // Serial.printf("SPEED %d\n", value); 
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
+  case KYRP_WEIGHT: // Serial.printf("WEIGHT %d\n", value); 
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
+  case KYRP_RATIO: // Serial.printf("RATIO %d\n", value);
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
+  case KYRP_COMP: // Serial.printf("COMP %d\n", value);
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
+  case KYRP_FARNS: // Serial.printf("FARNS %d\n", value);
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
 
-  case KYRP_RISE_TIME: Serial.printf("RISE_TIME %d\n", value); break;
-  case KYRP_FALL_TIME: Serial.printf("FALL_TIME %d\n", value); break;
-  case KYRP_RISE_RAMP: Serial.printf("RISE_RAMP %d\n", value); break;
-  case KYRP_FALL_RAMP: Serial.printf("FALL_RAMP %d\n", value); break;
-  case KYRP_TONE: Serial.printf("TONE %d\n", value); break;
-  case KYRP_HEAD_TIME: Serial.printf("HEAD_TIME %d\n", value); break;
-  case KYRP_TAIL_TIME: Serial.printf("TAIL_TIME %d\n", value); break;
-  case KYRP_PAD_MODE: Serial.printf("PAD_MODE %d\n", value); break;
-  case KYRP_PAD_SWAP: Serial.printf("PAD_SWAP %d\n", value); break;
-  case KYRP_PAD_ADAPT: Serial.printf("PAD_ADAPT %d\n", value); break;
-  case KYRP_IQ_ENABLE: Serial.printf("IQ_ENABLE %d\n", value); break;
-  case KYRP_IQ_ADJUST: Serial.printf("IQ_ADJUST %d\n", value); break;
+  case KYRP_RISE_TIME: // Serial.printf("RISE_TIME %d\n", value); 
+    kyr_nrpn[nrpn] = value; break;
+  case KYRP_FALL_TIME: // Serial.printf("FALL_TIME %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_RISE_RAMP: // Serial.printf("RISE_RAMP %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_FALL_RAMP: // Serial.printf("FALL_RAMP %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_TONE: // Serial.printf("TONE %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_HEAD_TIME: // Serial.printf("HEAD_TIME %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_TAIL_TIME: // Serial.printf("TAIL_TIME %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_PAD_MODE: // Serial.printf("PAD_MODE %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_PAD_SWAP: // Serial.printf("PAD_SWAP %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_PAD_ADAPT: // Serial.printf("PAD_ADAPT %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_IQ_ENABLE: // Serial.printf("IQ_ENABLE %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_IQ_ADJUST: // Serial.printf("IQ_ADJUST %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
 
-  case KYRP_HEAD_PHONE_VOLUME: Serial.printf("HEAD_PHONE_VOLUME %d\n", value); break;
-  case KYRP_INPUT_SELECT: Serial.printf("INPUT_SELECT %d\n", value); break;
-  case KYRP_MIC_GAIN: Serial.printf("MIC_GAIN %d\n", value); break;
-  case KYRP_MUTE_HEAD_PHONES: Serial.printf("MUTE_HEAD_PHONES %d\n", value); break;
-  case KYRP_MUTE_LINE_OUT: Serial.printf("MUTE_LINE_OUT %d\n", value); break;
-  case KYRP_LINE_IN_LEVEL: Serial.printf("LINE_IN_LEVEL %d\n", value); break;
-  case KYRP_LINE_OUT_LEVEL: Serial.printf("LINE_OUT_LEVEL %d\n", value); break;
-
+  case KYRP_HEAD_PHONE_VOLUME: Serial.printf("HEAD_PHONE_VOLUME %d\n", value); 
+    sgtl5000.volume(value/32763.0);
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_INPUT_SELECT: Serial.printf("INPUT_SELECT %d\n", value);  
+    sgtl5000.inputSelect(value);
+    kyr_nrpn[nrpn] = value; break;
+  case KYRP_MIC_GAIN: Serial.printf("MIC_GAIN %d\n", value);  
+    sgtl5000.micGain(value);
+    kyr_nrpn[nrpn] = value; break;
+  case KYRP_MUTE_HEAD_PHONES: Serial.printf("MUTE_HEAD_PHONES %d\n", value); 
+    if (value) sgtl5000.muteHeadphone(); else sgtl5000.unmuteHeadphone();    
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_MUTE_LINE_OUT: Serial.printf("MUTE_LINE_OUT %d\n", value); 
+    if (value) sgtl5000.muteLineout(); else sgtl5000.unmuteLineout();
+    kyr_nrpn[nrpn] = value; break;
+  case KYRP_LINE_IN_LEVEL: Serial.printf("LINE_IN_LEVEL %d\n", value); 
+    sgtl5000.lineInLevel(value);
+    kyr_nrpn[nrpn] = value; break;
+  case KYRP_LINE_OUT_LEVEL: Serial.printf("LINE_OUT_LEVEL %d\n", value); 
+    sgtl5000.lineOutLevel(value);
+    kyr_nrpn[nrpn] = value; break;
+    
   default: Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
   }
 }

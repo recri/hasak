@@ -46,45 +46,59 @@ class AudioSynthKeyedTone : public AudioStream
 {
 public:
   AudioSynthKeyedTone() : AudioStream(1, inputQueueArray), position(0) { }
-  // fetch the current parameters for the rise ramp
-  void get_rise_ramp() {
+  // fetch the current parameters for the rise ramp and oscillator
+  void start_rise() {
     uint8_t vox = get_active_vox();		// current vox in the arbiter
-    get_either_ramp(vox, get_vox_rise_time(vox), get_vox_rise_ramp(vox));
+    int16_t time = get_vox_rise_time(vox);
+    int16_t ramp = get_vox_rise_ramp(vox);
+    get_either_ramp(vox, time, ramp);
+    int16_t tone = get_vox_tone(vox);
+    iq_enable = get_iq_enable();
+    // int16_t iq_adjust = get_iq_adjust();
+    phase_increment = tone * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+    phase_I = 90.0 * (4294967296.0 / 360.0);
+    // don't know what the units of iqph are, yet, 
+    // needs to be positive or negative offset from exact 90 phase
+    // not sure that USB and LSB aren't actually the other way around
+    // there should be a level balance here, too.
+    switch (iq_enable) {
+    default:
+    case KYRP_IQ_NONE: 
+    case KYRP_IQ_USB: phase_Q = 0.0 * (4294967296.0 / 360.0); break;
+    case KYRP_IQ_LSB: phase_Q = 180.0 * (4294967296.0 / 360.0); break;
+    }
+    /* Serial.printf("start_rise vox %d, time %d, rate %d, ramp %d", 
+       vox, time, rate, ramp);
+       Serial.printf(" tone %d, iq_enable %d, phase_increment %d\n",
+       tone, iq_enable, phase_increment); */
   }
   // fetch the current parameters for the fall ramp
-  void get_fall_ramp() {
+  void start_fall() {
     uint8_t vox = get_active_vox();		// current vox in the arbiter
-    get_either_ramp(vox, get_vox_fall_time(vox), get_vox_fall_ramp(vox));
+    int16_t time = get_vox_fall_time(vox);
+    int16_t ramp = get_vox_fall_ramp(vox);
+    get_either_ramp(vox, time, ramp);
+    /* Serial.printf("start_fall vox %d, time %d, rate %d, ramp %d\n", 
+       vox, time, rate, ramp); */
   }
   // finish off the current ramp parameters
-  void get_either_ramp(uint8_t vox, int16_t ms, int16_t ramp) {
-    rate = 0xFFFFFFFFu / (ms * AUDIO_SAMPLE_RATE * 1e-3);
+  void get_either_ramp(uint8_t vox, int16_t ms10ths, int16_t ramp) {
+    rate = 0xFFFFFFFFu / (ms10ths * 1e-4 * AUDIO_SAMPLE_RATE);
     switch (ramp) {
     default:
     case KYRP_RAMP_HANN: table = fader_table; break;
     case KYRP_RAMP_BLACKMAN_HARRIS: table = fader_table; break;
+    case KYRP_RAMP_LINEAR: table = fader_table; break;
+    case KYRP_RAMP_SLINEAR: table = fader_table; break;
     }
   }
-  // start the oscillators
-  void start_osc() {
-    uint8_t vox = get_active_vox();
-    int16_t tone = get_vox_tone(vox);
-    iq_enable = get_vox_iq_enable(vox); // not really vox specific
-    // int16_t iqph = get_vox_iq_adjust(vox); // not really vox specific
-    phase_increment = tone * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
-    phase_I = 90 * (4294967296.0 / 360.0);
-    // don't know what the units of iqph are, yet, 
-    // needs to be positive or negative offset from exact 90 phase
-    // not sure that USB and LSB aren't actually the other way around
-    switch (iq_enable) {
-    default:
-    case KYRP_IQ_NONE: 
-    case KYRP_IQ_USB: phase_Q = 0 * (4294967296.0 / 360.0); break;
-    case KYRP_IQ_LSB: phase_Q = 180 * (4294967296.0 / 360.0); break;
-    }
+  // end of rise ramp
+  void end_rise(void) {
+    // Serial.printf("end_rise position %d\n", position);
   }
-  // stop the oscillators
-  void stop_osc() {
+  // end of fall ramp
+  void end_fall(void) {
+    // Serial.printf("end_fall position %d\n", position);
   }
   // get the interpolated ramp value at pos
   int32_t get_ramp_value(uint32_t pos) {

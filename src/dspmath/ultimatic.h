@@ -29,6 +29,76 @@
        http://fermi.la.asu.edu/w9cf/articles/ultimatic/ultimatic.html
        with the addition of the Single-paddle emulation mode
 */ 
+/*
+** so, if we leave out all the packing and unpacking of bits
+** this is simply a multidimensional array, 144 bytes
+** where the last 3 bytes specify the result left, right, and state
+** the first index specifies {not-swap, swap} as {0,1},
+** the second index specifies {normal, ultimatic, single-lever} as {0,1,2}
+** the third index is the left paddle { low, high } as {0,1}
+** the fourth index is the right paddle { low, high } as {0,1}
+** the fifth index is the state variable { low, high } as {0,1}
+** and the last index picks {left', right', state'} as {0,1}
+** x=0 -> paddles not swapped
+** x=1 -> paddles swapped
+** a=0 -> adapter normal
+** a=1 -> adapter ultimatic
+** a=2 -> adapter single lever
+** l=0, r=0, s=0 -> left paddle, right paddle, state variable false
+** l=1, r=1, s=1 -> left paddle, right paddle, state variable true
+** the three numbers on each row are the output l, r, and s.
+*/
+/*              a  x  s  l  r -> [s' l' r'] */
+uint8_t adapter[3][2][2][2][2][3] = {
+  { /* a=0 */ { /* x=0 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* normal { 0, R, L, LR } */
+					          { /* r=1 */ 0, 0, 1 } },
+			              { /* l=1 */ { /* r=0 */ 0, 1, 0 }, 
+				                  { /* r=1 */ 0, 1, 1 } } },
+		          { /* s=1 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 }, 
+					          { /* r=1 */ 0, 0, 1 } },
+			              { /* l=1 */ { /* r=0 */ 0, 1, 0 }, 
+					          { /* r=1 */ 0, 1, 1 } } } },
+              { /* x=1 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* normal swapped { 0, L, R, LR } */
+					          { /* r=1 */ 0, 1, 0 } },
+			              { /* l=1 */ { /* r=0 */ 0, 0, 1 }, 
+					          { /* r=1 */ 0, 1, 1 } } },
+			  { /* s=1 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 }, 
+					          { /* r=1 */ 0, 1, 0 } },
+			              { /* l=1 */ { /* r=0 */ 0, 0, 1 }, 
+					          { /* r=1 */ 0, 1, 1 } } } } },
+  { /* a=1 */ { /* x=0 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* ultimatic { 0, R, SL, L, 0, R, SL, SR } */
+					          { /* r=1 */ 0, 0, 1 } },
+			              { /* l=1 */ { /* r=0 */ 1, 1, 0 }, 
+					          { /* r=1 */ 0, 1, 0 } } },
+		          { /* s=1 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 }, 
+					          { /* r=1 */ 0, 0, 1 } },
+			              { /* l=1 */ { /* r=0 */ 1, 1, 0 }, 
+					          { /* r=1 */ 1, 0, 1 } } } },
+              { /* x=1 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* ultimatic swapped { 0, L, SR, R, 0, L, SR, SL }*/
+					          { /* r=1 */ 0, 1, 0 } },
+			              { /* l=1 */ { /* r=0 */ 1, 0, 1 }, 
+					          { /* r=1 */ 0, 0, 1 } } },
+		          { /* s=1 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 }, 
+					          { /* r=1 */ 0, 1, 0 } },
+			              { /* l=1 */ { /* r=0 */ 1, 0, 1 }, 
+					          { /* r=1 */ 1, 1, 0 } } } } },
+  { /* a=2 */ { /* x=0 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* single lever { 0, R, SL, R, 0, R, SL, SL } */
+					          { /* r=1 */ 0, 0, 1 } },
+			              { /* l=1 */ { /* r=0 */ 1, 1, 0 }, 
+					          { /* r=1 */ 0, 0, 1 } } },
+		          { /* s=1 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 }, 
+					          { /* r=1 */ 0, 0, 1 } },
+			              { /* l=1 */ { /* r=0 */ 1, 1, 0 }, 
+					          { /* r=1 */ 1, 1, 0 } } } },
+              { /* x=1 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* single lever swapped { 0, L, SR, L, 0, L, SR, SR } */
+					          { /* r=1 */ 0, 1, 0 } },
+			              { /* l=1 */ { /* r=0 */ 1, 0, 1 }, 
+					          { /* r=1 */ 0, 1, 0 } } },
+		          { /* s=1 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 }, 
+					          { /* r=1 */ 0, 1, 0 } },
+			              { /* l=1 */ { /* r=0 */ 1, 0, 1 }, 
+					          { /* r=1 */ 1, 0, 1 } } } } } } 
+  ;
 
 #ifndef ULTIMATIC_H
 #define ULTIMATIC_H

@@ -26,7 +26,7 @@
 //   return code;
 // }
 //
-const unsigned char morse[58] = {
+const unsigned char morse[64] = {
    0x01,     //33 !    not in ITU-R M.1677-1
    0x52,     //34 "    .-..-.
    0x01,     //35 #    not in ITU-R M.1677-1
@@ -84,5 +84,11 @@ const unsigned char morse[58] = {
    0x0e,     //87 W    .--
    0x19,     //88 X    -..-
    0x1d,     //89 Y    -.--
-   0x13      //90 Z    --..
+   0x13,     //90 Z    --..
+   0x01,     //91 [    not in ITU-R M.1677-1
+   0x01,     //92 \    not in ITU-R M.1677-1
+   0x01,     //93 ]    not in ITU-R M.1677-1
+   0x01,     //94 ^    not in ITU-R M.1677-1
+   0x01,     //95 _    not in ITU-R M.1677-1
+   0x01      //96 `    not in ITU-R M.1677-1
 };

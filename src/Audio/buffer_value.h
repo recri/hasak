@@ -1,5 +1,5 @@
-#ifndef buffer_values_h_
-#define buffer_values_h_
+#ifndef buffer_value_h_
+#define buffer_value_h_
 
 /*
 ** convert buffer values to run lengths
@@ -31,7 +31,7 @@
 */
 #include <Arduino.h>
 #include <AudioStream.h>
-#include "sample_values.h
+#include "sample_value.h"
 
 // return the number of runs in the buffer
 // maintain statistics of the distribution
@@ -49,7 +49,7 @@ int count_run_lengths(audio_block_t *block) {
       runs[r] = +1;
     else
       return 0;
-    bp += 1
+    bp += 1;
     while (bp < end) {
       if (*bp == zero)
 	if (runs[r] < 0) runs[r] -= 1;
@@ -63,5 +63,21 @@ int count_run_lengths(audio_block_t *block) {
     }
   }
   return ++r;
+}
+
+int16_t run_length(audio_block_t *block) {
+  if ( ! block)
+    return -AUDIO_BLOCK_SAMPLES;
+  int16_t *bp = block->data, *end = bp+AUDIO_BLOCK_SAMPLES;
+  if (*bp++ == 0) {
+    while (bp < end)
+      if (*bp++ != 0)
+	return -((bp-1) - block->data);
+    return -AUDIO_BLOCK_SAMPLES;
+  }
+  while (bp < end)
+    if (*bp++ == 0)
+      return (bp-1) - block->data;
+  return AUDIO_BLOCK_SAMPLES;
 }
 #endif
