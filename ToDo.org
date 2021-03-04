@@ -5,11 +5,12 @@
 [x] define nrpn getter.
 [x] add back the perdit, perdah, peries, perils, periws pseudo-nrpns
 [x] figure out if that blackman-harris is right, it is.
-[ ] add ramp pseudo-nrpns, translating 10ths of ms into samples
+[-] add ramp pseudo-nrpns, translating 10ths of ms into samples
 	I don't think it's necessary.  It's one multiply.
 [ ] get rid of the ramp crunches, 
 	I think I'm passing an overflowed ramp value, I'm hearing the ramp
-	scalar go negative at the peak.
+	scalar go negative at the peak.  Much less than earlier, but still
+	a click that I can hear.
 [x] Redo the ramp code.
 [ ] Figure out why the buffer allocation goes to 64k
 	It appears to have fixed itself somewhere.
@@ -36,12 +37,12 @@
 	[x] Continue to interpolate the sine.
 	[ ] Unless the fixed point complex rotor works, and with
 	this multiply_32x32_rshift32 instruction, it might.
-	[ ] Would still need the sine/cos interpolation to make
+	[ ] Would still need the sine/cos interpolation to compute
 	the phase increment.
-[ ] Implement the rest of the parameters
-	[ ] Should all be polled at the last moment before they
+[x] Implement the rest of the parameters, for some value of rest:
+	[x] Should all be polled at the last moment before they
 	are applied.
-	[ ] keyers poll for dit, dah, ies, ils, iws at the
+	[x] keyers poll for dit, dah, ies, ils, iws at the
 	moment the element is to be started.
 	[x] oscillators poll for frequency and phase when started
 	at the beginning of an element.
@@ -71,15 +72,17 @@
 [ ] Add NRPN for mixer matrix presets.
 [ ] Pan sidetone to localize.
 [ ] Add phase shifting filters to localize rx_audio.
+[ ] implement KYRP_IQ_PHASE excess 1<<13 tweak to iq phase, units tbd, +/- 8k
+[ ] implement KYRP_IQ_BALANCE excess 1<<13 tweak to iq levels, units tbd, +/- 8k
 [x] Define NRPN's in 4 blocks, pad each block so there's room for
 	revisions without breaking existing assignments,
 	nrpn[N_SOFT_NRPN+N_CODEC_NRPN+N_VOX_NRPN+(N_VOX*N_VOX_NRPN)
-	[ ] codec NRPN's
-	[ ] global keyer NRPN's
-	[ ] morse code table
-	[ ] mixer matrix
-	[ ] default keyer voice NRPN's
-	[ ] keyer voice specific NRPN's
+	[x] codec NRPN's
+	[x] global keyer NRPN's
+	[x] morse code table
+	[x] mixer matrix
+	[x] default keyer voice NRPN's
+	[x] keyer voice specific NRPN's
 [x] Move the IQ_ENABLE and IQ_ADJUST NRPN's to SOFT global block.
 
 	
