@@ -67,4 +67,8 @@ static inline int get_vox_ptt_tail(int vox) { return get_vox_nrpn(vox, KYRP_TAIL
 
 static inline int get_iq_enable(void) { return get_nrpn(KYRP_IQ_ENABLE); }
 static inline int get_iq_adjust(void) { return get_nrpn(KYRP_IQ_ADJUST); }
+static inline int get_tx_enable(void) { return get_nrpn(KYRP_TX_ENABLE); }
+static inline int get_st_enable(void) { return get_nrpn(KYRP_ST_ENABLE); }
+static inline int get_send_midi(void) { return get_nrpn(KYRP_SEND_MIDI); }
+static inline int get_recv_midi(void) { return get_nrpn(KYRP_RECV_MIDI); }
 #endif

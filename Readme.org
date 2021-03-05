@@ -1,0 +1,49 @@
+* Ham and Swiss Army Knife (hasak) keyer
+**  This is a morse code keyer built for the Hermes Lite 
+   low latency keyer project.  The goal is to allow
+   the operator to hear keyed code with low latency
+   while listening to and keying a possibly remote
+   transceiver.
+** It currently runs on a Teensy 3.1 with Teensy Audio 
+   Adapter board, but the final target is a Teensy 4
+   with Teensy Audio Adapter and it should be tested on
+   that hardware soon.  I suspect it works with limits
+   on a plain Teensy 3 or 4.
+** Hardware set up is straight forward.
+   Most of this can be found in ./config.h.
+   Pin 0 is the left paddle key in.
+   Pin 1 is the right paddle key in.
+   Pin 2 is the straight key in.
+   Pin 3 is PTT out.
+   Pin 4 is Key out.
+   For headphone out you can just use the jack on the    
+    Audio Adapter.
+   Line in, line out, and microphone haven't been tested
+   There is ouput passed to the hardware DAC.
+	 On a Teensy 3.1/3.2, this is the pin labelled DAC/A14.
+	 On a Teensy 3.5/3.6, the pins are labelled   A21/A22.
+	 On a Teensy 4.0, the pins are labelled 10/12.
+* To build the keyer
+** You need the Arduino IDE with the Teensyduino extensions.  
+   Consult pjrc.com for details.
+** Build the keyer with the proper board entry.
+** Specify the  proper board in the Tools > Board > Teensyduino menu
+** Specify USB Type to be Serial+MIDI+Audio
+** Compile and download.
+* The keyer should start operating immediately.
+  It will use the default settings that were compiled.
+  It should produce sidetone for straight key and iambic
+  mode A at 18 WPM for the paddle.
+* Parameters can be changed with MIDI.   
+** The file ctrlr/hasak.panel is a panel definition for Ctrlr,
+   a MIDI control panel program.  
+** You can download Ctrlr from https://ctrlr.org/nightly/?C=M;O=D,
+   I only use the 5.3.201 release, later versions have issues.
+*** If you run Ctrlr on linux, be sure to vist Edit> Preferences
+    and uncheck "Use OS native file open/save dialogs ..."
+** Run Ctrlr with the panel definition as its only argument.
+** The panel lays out the parameters that can be changed
+   while the keyer is running.
+** Several issues have yet to be resolved,
+   the current list can be found in doc/ToDo.org
+   

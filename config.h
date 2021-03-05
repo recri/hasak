@@ -123,6 +123,8 @@
 /* nrpns are organized into four blocks: NRPN_GLOBAL_BLOCK, NRPN_CODEC_BLOCK, NRPN_KEYER_BLOCK, NRPN_VOX_BLOCKS */
 /* NRPN_GLOBAL_BLOCK - parameters controlling the entire keyer */
 #define KYRP_GLOBAL		0
+
+/* relocation base */
 #define KYRP_CODEC		(KYRP_GLOBAL)	/* relocation base = 0 */
 #define KYRP_HEAD_PHONE_VOLUME	(KYRP_CODEC+0)	/* sgl5000 output volume */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1)	/* 0..1 input from microphone or line-in */
@@ -141,11 +143,8 @@
 /* other things that we might control */
 #define KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
 #define KYRP_ST_PAN		(KYRP_SOFT+1) /* pan sidetone left or right */
-#define KYRP_SMIDI_PAD		(KYRP_SOFT+2) /* send input paddle key events to midi notes */
-#define KYRP_SMIDI_S_KEY	(KYRP_SOFT+3) /* send input straight key events to midi notes */
-#define KYRP_SMIDI_PTT_SW	(KYRP_SOFT+4) /* send input ptt switch events to midi notes */
-#define KYRP_SMIDI_KEY_OUT	(KYRP_SOFT+5) /* send key_out as midi note */
-#define KYRP_SMIDI_PTT_OUT	(KYRP_SOFT+6) /* send ptt_out as midi note */
+#define KYRP_SEND_MIDI		(KYRP_SOFT+2) /* send input paddle key events to midi notes */
+#define KYRP_RECV_MIDI		(KYRP_SOFT+3) /* send input straight key events to midi notes */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
@@ -153,12 +152,15 @@
 
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
+/* relocation base */
 #define KYRP_MORSE		(KYRP_SOFT+16) /* == 32 */
 
 /* 24 output mixer levels */
 /* left and right channel mixers for four channels for each of usb_out, i2s_out, and mqs_out */
 /* the incoming channels are usb_in audio raw, usb_in audio muted by sidetone, i2s in audio, sidetone */
+/* relocation base */
 #define KYRP_MIXER		(KYRP_MORSE+64) /* == 96 */
+
 #define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* i2s in raw */
 #define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* i2s in unmuted by ptt_sw */
 #define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* sidetone */
@@ -185,7 +187,9 @@
 #define KYRP_MIX_MQS_R3		(KYRP_MIXER+23)
 
 /* NRPN_KEYER_BLOCK - default keyer parameters *//* these are NRPN's which apply to keyer voices, some voices do not use all of them */
+/* relocation base */
 #define KYRP_KEYER		(KYRP_MIXER+24) /* == 120 */
+
 /* keyer timing */
 #define KYRP_SPEED		(KYRP_KEYER+0)	/* keyer speed control */
 #define KYRP_WEIGHT		(KYRP_KEYER+1)	/* keyer weight */

@@ -251,8 +251,8 @@ static void pollatch() {
   r_pad.send(bool2fix(digitalRead(KYR_R_PAD_PIN)^1));
   s_key.send(bool2fix(digitalRead(KYR_S_KEY_PIN)^1));
   ptt_sw.send(bool2fix(digitalRead(KYR_PTT_SW_PIN)^1));
-  st_enable.send(bool2fix(_st_enable));
-  tx_enable.send(bool2fix(_tx_enable));
+  st_enable.send(bool2fix(get_st_enable()));
+  tx_enable.send(bool2fix(get_tx_enable()));
   digitalWrite(KYR_KEY_OUT_PIN,fix2bool(key_out.recv()));
   digitalWrite(KYR_PTT_OUT_PIN,fix2bool(ptt_out.recv()));
   _probe1 = probe1.recv();
@@ -390,38 +390,39 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
     kyr_nrpn[nrpn] = value;  break;
   case KYRP_TAIL_TIME: // Serial.printf("TAIL_TIME %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
+
   case KYRP_PAD_MODE: // Serial.printf("PAD_MODE %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
   case KYRP_PAD_SWAP: // Serial.printf("PAD_SWAP %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
   case KYRP_PAD_ADAPT: // Serial.printf("PAD_ADAPT %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
+
   case KYRP_IQ_ENABLE: // Serial.printf("IQ_ENABLE %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
   case KYRP_IQ_ADJUST: // Serial.printf("IQ_ADJUST %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
-
-  case KYRP_HEAD_PHONE_VOLUME: Serial.printf("HEAD_PHONE_VOLUME %d\n", value); 
-    sgtl5000.volume(value/32763.0);
+  case KYRP_ST_ENABLE: // Serial.printf("ST_ENABLE %d\n", value); 
     kyr_nrpn[nrpn] = value;  break;
-  case KYRP_INPUT_SELECT: Serial.printf("INPUT_SELECT %d\n", value);  
-    sgtl5000.inputSelect(value);
-    kyr_nrpn[nrpn] = value; break;
-  case KYRP_MIC_GAIN: Serial.printf("MIC_GAIN %d\n", value);  
-    sgtl5000.micGain(value);
-    kyr_nrpn[nrpn] = value; break;
-  case KYRP_MUTE_HEAD_PHONES: Serial.printf("MUTE_HEAD_PHONES %d\n", value); 
+  case KYRP_TX_ENABLE: // Serial.printf("ST_ENABLE %d\n", value); 
+    kyr_nrpn[nrpn] = value;  break;
+
+  case KYRP_HEAD_PHONE_VOLUME: // Serial.printf("HEAD_PHONE_VOLUME %d\n", value); 
+    sgtl5000.volume(value/32763.0); kyr_nrpn[nrpn] = value;  break;
+  case KYRP_INPUT_SELECT: // Serial.printf("INPUT_SELECT %d\n", value);  
+    sgtl5000.inputSelect(value); kyr_nrpn[nrpn] = value; break;
+  case KYRP_MIC_GAIN: // Serial.printf("MIC_GAIN %d\n", value);  
+    sgtl5000.micGain(value); kyr_nrpn[nrpn] = value; break;
+  case KYRP_MUTE_HEAD_PHONES: // Serial.printf("MUTE_HEAD_PHONES %d\n", value); 
     if (value) sgtl5000.muteHeadphone(); else sgtl5000.unmuteHeadphone();    
     kyr_nrpn[nrpn] = value;  break;
-  case KYRP_MUTE_LINE_OUT: Serial.printf("MUTE_LINE_OUT %d\n", value); 
+  case KYRP_MUTE_LINE_OUT: // Serial.printf("MUTE_LINE_OUT %d\n", value); 
     if (value) sgtl5000.muteLineout(); else sgtl5000.unmuteLineout();
     kyr_nrpn[nrpn] = value; break;
-  case KYRP_LINE_IN_LEVEL: Serial.printf("LINE_IN_LEVEL %d\n", value); 
-    sgtl5000.lineInLevel(value);
-    kyr_nrpn[nrpn] = value; break;
-  case KYRP_LINE_OUT_LEVEL: Serial.printf("LINE_OUT_LEVEL %d\n", value); 
-    sgtl5000.lineOutLevel(value);
-    kyr_nrpn[nrpn] = value; break;
+  case KYRP_LINE_IN_LEVEL: // Serial.printf("LINE_IN_LEVEL %d\n", value); 
+    sgtl5000.lineInLevel(value); kyr_nrpn[nrpn] = value; break;
+  case KYRP_LINE_OUT_LEVEL: // Serial.printf("LINE_OUT_LEVEL %d\n", value); 
+    sgtl5000.lineOutLevel(value); kyr_nrpn[nrpn] = value; break;
     
   default: Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
   }
