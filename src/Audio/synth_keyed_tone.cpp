@@ -69,8 +69,8 @@ void AudioSynthKeyedTone::update(void)
     } else if (position == 0xFFFFFFFF) {
       if (key != 0) {
 	// output is 100%
-	*ip++ = get_sine_value(phase_I) >> 16;
-	*qp++ = (iq_enable != KYRP_IQ_NONE) ? (get_sine_value(phase_Q) >> 16) : 0;
+	*ip++ = get_sine_value(phase_I) >> 17;
+	*qp++ = (iq_enable != KYRP_IQ_NONE) ? (get_sine_value(phase_Q) >> 17) : 0;
 	phase_I += phase_increment;
 	phase_Q += phase_increment;
 	continue;

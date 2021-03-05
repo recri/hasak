@@ -46,12 +46,19 @@ class AudioSynthKeyedTone : public AudioStream
 {
 public:
   AudioSynthKeyedTone() : AudioStream(1, inputQueueArray), position(0) { }
-  // fetch the current parameters for the rise ramp and oscillator
+  // fetch the current parameters for the rise ramp, fall ramp, and oscillator
   void start_rise() {
     uint8_t vox = get_active_vox();		// current vox in the arbiter
-    int16_t time = get_vox_rise_time(vox);
-    int16_t ramp = get_vox_rise_ramp(vox);
-    get_either_ramp(vox, time, ramp);
+    int16_t rise_time = get_vox_rise_time(vox);
+    int16_t rise_ramp = get_vox_rise_ramp(vox);
+    int16_t fall_time = get_vox_fall_time(vox);
+    int16_t fall_ramp = get_vox_fall_ramp(vox);
+    rise_rate = 0xFFFFFFFFu / (rise_time * 1e-4 * AUDIO_SAMPLE_RATE);
+    fall_rate = 0xFFFFFFFFu / (fall_time * 1e-4 * AUDIO_SAMPLE_RATE);
+    rise_table = get_table(rise_ramp);
+    fall_table = get_table(fall_ramp);
+    rate = rise_rate;
+    table = rise_table;
     int16_t tone = get_vox_tone(vox);
     iq_enable = get_iq_enable();
     // int16_t iq_adjust = get_iq_adjust();
@@ -74,23 +81,8 @@ public:
   }
   // fetch the current parameters for the fall ramp
   void start_fall() {
-    uint8_t vox = get_active_vox();		// current vox in the arbiter
-    int16_t time = get_vox_fall_time(vox);
-    int16_t ramp = get_vox_fall_ramp(vox);
-    get_either_ramp(vox, time, ramp);
-    /* Serial.printf("start_fall vox %d, time %d, rate %d, ramp %d\n", 
-       vox, time, rate, ramp); */
-  }
-  // finish off the current ramp parameters
-  void get_either_ramp(uint8_t vox, int16_t ms10ths, int16_t ramp) {
-    rate = 0xFFFFFFFFu / (ms10ths * 1e-4 * AUDIO_SAMPLE_RATE);
-    switch (ramp) {
-    default:
-    case KYRP_RAMP_HANN: table = fader_table; break;
-    case KYRP_RAMP_BLACKMAN_HARRIS: table = fader_table; break;
-    case KYRP_RAMP_LINEAR: table = fader_table; break;
-    case KYRP_RAMP_SLINEAR: table = fader_table; break;
-    }
+    rate = fall_rate;
+    table = fall_table;
   }
   // end of rise ramp
   void end_rise(void) {
@@ -99,6 +91,17 @@ public:
   // end of fall ramp
   void end_fall(void) {
     // Serial.printf("end_fall position %d\n", position);
+  }
+  // get the precalculated table for the specified ramp
+  // yes, they're all the same table right now, fix.me
+  const int16_t *get_table(int16_t ramp) {
+    switch (ramp) {
+    default:
+    case KYRP_RAMP_HANN: return fader_table;
+    case KYRP_RAMP_BLACKMAN_HARRIS: return fader_table;
+    case KYRP_RAMP_LINEAR: return fader_table;
+    case KYRP_RAMP_SLINEAR: return fader_table;
+    }
   }
   // get the interpolated ramp value at pos
   int32_t get_ramp_value(uint32_t pos) {
@@ -125,9 +128,9 @@ public:
   virtual void update(void);
 private:
   uint32_t position; // 0 = off, 0xFFFFFFFF = on
-  uint32_t rate;
+  uint32_t rise_rate, fall_rate, rate;
   uint8_t direction;
-  const int16_t *table;
+  const int16_t *rise_table, *fall_table, *table;
   uint8_t iq_enable;
   uint32_t phase_I, phase_Q, phase_increment;
   audio_block_t *inputQueueArray[1];

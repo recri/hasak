@@ -1,11 +1,15 @@
 * Todo list as of 2020-03-04
-[ ] get rid of the ramp crunches, 
+[x] get rid of the ramp crunches, 
 	I think I'm passing an overflowed ramp value, I'm hearing the ramp
 	scalar go negative at the peak.  Much less than earlier, but still
 	a click that I can hear.
-[ ] Figure out why the buffer allocation goes to 64k
+[?] Figure out why the buffer allocation goes to 64k
 	It appears to have fixed itself somewhere.
-[ ] Figure out why cpu consumption is off scale
+[x] Figure out why total audio cpu usage is now off scale while audio component
+	cpu usages are very low and reasonable.  Very dicey percentage computation
+[ ] Implement arbiter.
+[ ] Rewrite effect_mute and put them back into the graph.
+[ ] Implement ptt_delay.
 [ ] Debounce the straight key.	
 	Each transition in the straight key is stretched to one buffer worth
 	before another transition is considered.
@@ -33,6 +37,10 @@
 [ ] implement receive midi under get_recv_midi()
 [ ] clean up linkage, it doesn't need the set_*() functions.
 [ ] clean up linkage, get* should be in order of config.h
+[x] key ramp should fetch rise and fall ramp parameters at start of ramp on,
+	then if the arbiter pre-empts the voice it will stop with its own
+	voice parameters, the new active voice will take effect at the next 
+	on ramp.
 * Todo list as of 2021-03-01
 [x] add vox to keyer constructors
 [x] declare keyer timing, tone, and ramp getters.
