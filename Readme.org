@@ -23,6 +23,15 @@
 	 On a Teensy 3.1/3.2, this is the pin labelled DAC/A14.
 	 On a Teensy 3.5/3.6, the pins are labelled   A21/A22.
 	 On a Teensy 4.0, the pins are labelled 10/12.
+*** The Teensy 4 is picky about pin interrupts
+    It doesn't allow pin change interrupts on output pins, in the
+    sense that it ignores them.
+    On the Teensy 4 jumper pin 20 to pin 22.  Pin 22 is setup as
+    an input pin and I attachInterrupt(22, RISING) to get a per
+    sample interrupt.  These are listed as KYR_LRCLK and KYR_DUP_LRCLK
+    in config.h.
+    No jumper is needed on the Teensy 3, it interrupts on an output
+    pin rising edge just fine.
 * To build the keyer
 ** You need the Arduino IDE with the Teensyduino extensions.  
    Consult pjrc.com for details.

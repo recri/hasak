@@ -46,6 +46,7 @@
 #define KYR_MCLK	23
 #define KYR_BCLK	21
 #define KYR_LRCLK	20
+#define KYR_DUP_LRCLK	22	/* wire 20 to 22 and see if I get an LRCLK interrupt on the Teensy 4 w/out AudioAdapter */
 /* I2C 18, 19 */
 #define KYR_SCL		19
 #define KYR_SDA		18
@@ -61,6 +62,8 @@
 #define KYR_MCLK	11
 #define KYR_BCLK	9
 #define KYR_LRCLK	23
+// this doesn't appear to be necessary on the Teensy 3, but I still need to test
+//#define KYR_DUP_LRCLK	21	/* wire 20 to 22 and see if I get an LRCLK interrupt on the Teensy 3 w/out AudioAdapter */
 /* I2C 18, 19 */
 #define KYR_SCL		19
 #define KYR_SDA		18

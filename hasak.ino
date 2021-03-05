@@ -224,12 +224,12 @@ AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);
 #elif defined(TEENSY35) || defined(TEENSY36)
 AudioOutputAnalogStereo	hdw_out;
 AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);
-AudioConnection		patchCord11e(r_hdw_out, 0, hdw_out, 1);
+AudioConnection		patchCord11f(r_hdw_out, 0, hdw_out, 1);
 
 #elif defined(TEENSY40) || defined(TEENSY41)
 AudioOutputMQS		hdw_out;
 AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);
-AudioConnection		patchCord11e(r_hdw_out, 0, hdw_out, 1);
+AudioConnection		patchCord11f(r_hdw_out, 0, hdw_out, 1);
 #endif
 
 // codec control
@@ -239,11 +239,9 @@ AudioControlSGTL5000     sgtl5000;
 // actually produced a sample rate interrupt.
 // unsigned long buttonpolls = 0;
 //
-// poll inputs at sample rate
-// latch outputs at sample rate
-// could also poll/latch arbitrary memory locations
-// like these three.
-uint8_t _tx_enable, _st_enable;
+// poll input pins at sample rate
+// latch output pins at sample rate
+// also poll/latch arbitrary memory locations
 int16_t _probe1, _probe2;
 
 static void pollatch() {
@@ -296,12 +294,19 @@ void setup(void) {
   pinMode(KYR_PTT_SW_PIN, INPUT_PULLUP);
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
+#ifdef KYR_DUP_LRCLK
+  pinMode(KYR_DUP_LRCLK, INPUT);
+#endif
   arbiter_setup();
   nrpn_setup();
   AudioMemory(40);
+#ifdef KYR_DUP_LRCLK
+  attachInterrupt(KYR_DUP_LRCLK, pollatch, RISING);
+#else
   attachInterrupt(KYR_LRCLK, pollatch, RISING);
+#endif
   sgtl5000.enable();
-  sgtl5000.volume(0.3);		// needs to be automated to remove pop
+  sgtl5000.volume(0.3);		// fix.me -- needs to be automated to remove pop
   midi_setup();
   winkey_setup();
 }
