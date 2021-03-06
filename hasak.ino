@@ -144,7 +144,17 @@ AudioMixer4              l_usb_out;
 AudioMixer4              r_usb_out;
 AudioMixer4              l_hdw_out;
 AudioMixer4              r_hdw_out;
-
+static void mixer_setup(void) {
+  float gain = 1.0;
+  for (int i = 0; i < 4; i += 1) {
+    l_i2s_out.gain(i, gain);
+    r_i2s_out.gain(i, gain);
+    l_usb_out.gain(i, gain);
+    r_usb_out.gain(i, gain);
+    l_hdw_out.gain(i, gain);
+    r_hdw_out.gain(i, gain);
+  }
+}
 // first channel, rx audio and microphone input, op on headset mode
 // switch codec to use microphone instead of line-in
 //AudioConnection		patchCord900(l_rx_mute, 0, l_i2s_out, 0);
@@ -298,6 +308,7 @@ void setup(void) {
   pinMode(KYR_DUP_LRCLK, INPUT);
 #endif
   arbiter_setup();
+  mixer_setup();
   nrpn_setup();
   AudioMemory(40);
 #ifdef KYR_DUP_LRCLK
