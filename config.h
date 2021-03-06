@@ -79,8 +79,8 @@
 #endif
 
 /* pin assignments for input switches and output latches */
-#define KYR_L_PAD_PIN	0
-#define KYR_R_PAD_PIN	1
+#define KYR_L_PAD_PIN	1
+#define KYR_R_PAD_PIN	0
 #define KYR_S_KEY_PIN	2
 #define KYR_PTT_SW_PIN	3
 #define KYR_KEY_OUT_PIN	4
