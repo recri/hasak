@@ -30,7 +30,7 @@
   #error "You're not building for a Teensy?"
 #endif
 
-/* keyer voices in order of priority */
+/* keyer voices in order of highest priority */
 #define KYR_N_VOX 4		/* number of keyer voices */
 #define KYR_VOX_NONE	0
 #define KYR_VOX_S_KEY	1	/* Straight Key */
@@ -131,7 +131,7 @@
 #define KYRP_CODEC		(KYRP_GLOBAL)	/* relocation base = 0 */
 #define KYRP_HEAD_PHONE_VOLUME	(KYRP_CODEC+0)	/* sgl5000 output volume */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1)	/* 0..1 input from microphone or line-in */
-#define KYRP_MIC_GAIN		(KYRP_CODEC+2)	/* 0..63 dB */
+#define KYRP_MIC_PREAMP_GAIN	(KYRP_CODEC+2)	/* 0-3 -> 0, 20, 30, 40 dB */
 #define KYRP_MUTE_HEAD_PHONES	(KYRP_CODEC+3)	/* 0..1 true or false */
 #define KYRP_MUTE_LINE_OUT	(KYRP_CODEC+4) /* 0..1 true or false */
 #define KYRP_LINE_IN_LEVEL	(KYRP_CODEC+5) /* 0..15 default 5 */
@@ -140,6 +140,8 @@
 #define KYRP_LINE_IN_LEVEL_R	(KYRP_CODEC+8) /* 0..15 default 5 */
 #define KYRP_LINE_OUT_LEVEL_L	(KYRP_CODEC+9) /* 13..31 default 29 */
 #define KYRP_LINE_OUT_LEVEL_R	(KYRP_CODEC+10) /* 13..31 default 29 */
+#define KYRP_MIC_BIAS		(KYRP_CODEC+11) /* 0..7, 1.25 .. 3.00 V by 0.250 V steps */
+#define KYRP_MIC_IMPEDANCE	(KYRP_CODEC+12)	/* 0..3, 0 off, else 2^n kilohm */
 
 /* relocation base */
 #define KYRP_SOFT		(KYRP_CODEC+16) /* == 16 */
@@ -149,10 +151,10 @@
 #define KYRP_SEND_MIDI		(KYRP_SOFT+2) /* send input paddle key events to midi notes */
 #define KYRP_RECV_MIDI		(KYRP_SOFT+3) /* send input straight key events to midi notes */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
-#define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd */
+#define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd, excess 8096 */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
 #define KYRP_ST_ENABLE		(KYRP_SOFT+10) /* 0, 1 -> disable, enable  */
-
+#define KYRP_IQ_BALANCE		(KYRP_SOFT+11) /*  adjustment to iq balance, +/- units tbd, excess 8096 */
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
 /* relocation base */
@@ -228,6 +230,7 @@
 #define KYRP_PER_IWS		(KYRP_KEYER+21) /* samples per inter word space */
 
 /* four (or more) repetitions of the keyer block for per voice customizations */
+#define KYRP_VOX_0		(KYRP_KEYER+0)	 /* == 120 */
 #define KYRP_VOX_1		(KYRP_KEYER+32)	 /* == 152 */
 #define KYRP_VOX_2		(KYRP_KEYER+64)	 /* == 184 */
 #define KYRP_VOX_3		(KYRP_KEYER+96)	 /* == 216 */
@@ -244,6 +247,9 @@
 #define KYRP_KYR_OFFSET		KYRP_VOX_4
 
 /* Named NRPN values */
+
+/* the unset value */
+#define KYRP_NOT_SET			-1
 
 /* slew ramps */
 #define KYRP_RAMP_HANN			0 /* RISE_RAMP, FALL_RAMP */
