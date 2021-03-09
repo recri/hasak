@@ -1,12 +1,6 @@
-* Todo list as of 2020-03-04
-[x] get rid of the ramp crunches, 
-	I think I'm passing an overflowed ramp value, I'm hearing the ramp
-	scalar go negative at the peak.  Much less than earlier, but still
-	a click that I can hear.
-[?] Figure out why the buffer allocation goes to 64k
-	It appears to have fixed itself somewhere.
-[x] Figure out why total audio cpu usage is now off scale while audio component
-	cpu usages are very low and reasonable.  Very dicey percentage computation
+* Todo list as of 2020-03-09
+[ ] Test the 48kHz sample rate.
+[ ] Figure out how to detect the headset switches.
 [ ] Implement arbiter.
 [ ] Rewrite effect_mute and put them back into the graph.
 [ ] Implement ptt_delay.
@@ -28,15 +22,26 @@
 [ ] Implement default parameters from flash.
 [ ] Add tab to ctrlr panel for specifying morse key codes for characters.
 [ ] Add tab to ctrlr panel for the mixer matrix, with presets.
-[ ] Add NRPN for mixer matrix presets.
 [ ] Pan sidetone to localize.
-[ ] Add phase shifting filters to localize rx_audio.
+[?] Add phase shifting filters to localize rx_audio.
 [ ] implement KYRP_IQ_PHASE excess 1<<13 tweak to iq phase, units tbd, +/- 8k
 [ ] implement KYRP_IQ_BALANCE excess 1<<13 tweak to iq levels, units tbd, +/- 8k
 [ ] implement send midi under get_send_midi()
 [ ] implement receive midi under get_recv_midi()
 [ ] clean up linkage, it doesn't need the set_*() functions.
 [ ] clean up linkage, get* should be in order of config.h
+* Todo list as of 2020-03-04
+[x] implement headset microphone.
+[x] get rid of the ramp crunches, 
+	I think I'm passing an overflowed ramp value, I'm hearing the ramp
+	scalar go negative at the peak.  Much less than earlier, but still
+	a click that I can hear.
+[?] Figure out why the buffer allocation goes to 64k
+	It appears to have fixed itself somewhere.
+[x] Figure out why total audio cpu usage is now off scale while audio component
+	cpu usages are very low and reasonable.  Very dicey percentage computation
+[x] Add NRPN for mixer matrix presets.
+	in principle, 24 NRPN's allocated, but 
 [x] key ramp should fetch rise and fall ramp parameters at start of ramp on,
 	then if the arbiter pre-empts the voice it will stop with its own
 	voice parameters, the new active voice will take effect at the next 
