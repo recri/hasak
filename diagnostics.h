@@ -98,6 +98,29 @@ void diagnostics_loop() {
     case 'l':
       wink.send_text(lorem);
       break;
+    case 'D': // default mixers
+      for (int i = 0; i < 4; i += 1) {
+	l_usb_out.gain(i,1.0);
+	r_usb_out.gain(i,1.0);
+      }
+      r_usb_out.gain(3,0.0);	/* turn off adc */
+      break;
+    case 'L': // latency test
+      for (int i = 0; i < 4; i += 1) {
+	l_usb_out.gain(i,0.0);
+	r_usb_out.gain(i,0.0);
+      }
+      l_usb_out.gain(0,1.0);
+      r_usb_out.gain(2,1.0);
+      break;
+    case 'A': // ADC input visualization
+      for (int i = 0; i < 4; i += 1) {
+	l_usb_out.gain(i,0.0);
+	r_usb_out.gain(i,0.0);
+      }
+      l_usb_out.gain(2,1.0);
+      r_usb_out.gain(3,1.0);
+      break;
     case '0':
       Serial.printf(" cpu usage %d max %d", AudioProcessorUsage(), AudioProcessorUsageMax());
       Serial.printf(" mem usage %d max %d", AudioMemoryUsage(), AudioMemoryUsageMax());

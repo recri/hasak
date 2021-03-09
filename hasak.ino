@@ -57,7 +57,7 @@
 // inputs
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
-AudioInputADC		adc_in;	// headset switch detect
+AudioInputAnalog	adc_in;	// headset switch detect
 AudioInputSample	l_pad("l_pad");	// left paddle in
 AudioInputSample	r_pad("r_pad");	// right paddle in
 AudioInputSample	s_key("s_key");	// straight key in
@@ -177,7 +177,8 @@ AudioConnection		patchCord940(usb_in, 0, l_hdw_out, 0);
 AudioConnection		patchCord950(usb_in, 1, r_hdw_out, 0);
 
 // second channel, line-out audio and line-in audio, 2x2 sound card mode
-// switch codec to use line-in instead of microphone
+// switch codec to use line-in instead of microphone and line-out instead
+// of headphones, can still use keyer on MQS output.
 AudioConnection		patchCord901(usb_in, 0, l_i2s_out, 1);
 AudioConnection		patchCord911(usb_in, 1, r_i2s_out, 1);
 AudioConnection		patchCord921(i2s_in, 0, l_usb_out, 1);
@@ -212,6 +213,8 @@ AudioConnection		patchCord952(key_ramp, 0, r_hdw_out, 2);
 //AudioConnection		patchCord943(I_mute, 0, l_hdw_out, 3);
 //AudioConnection		patchCord953(Q_mute, 0, r_hdw_out, 3);
 
+// temporary diagnostic connection, adc input to r_usb_out
+AudioConnection		patchCord999(adc_in, 0, r_usb_out, 3);
 
 // outputs
 AudioOutputSample	key_out;
