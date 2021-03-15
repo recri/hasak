@@ -1,0 +1,68 @@
+* Teensy 4
+  | GND     | GND | o------------o |  5V | VIN       |
+  | R_PAD   |   0 | o------------o | GND | GND       |
+  | L_PAD   |   1 | o------------o | 3V3 | 3V3       |
+  | S_KEY   |   2 | o------------o |  23 | MCLK      |
+  | PTT_SW  |   3 | o------------o |  22 | DUP_LRCLK |
+  | KEY_OUT |   4 | o------------o |  21 | BCLK      |
+  | PTT_OUT |   5 | o------------o |  20 | LRCLK     |
+  | o       |   6 | o------------o |  19 | SCL       |
+  | DIN     |   7 | o------------o |  18 | SDA       |
+  | DOUT    |   8 | o------------o |  17 | o         |
+  | o       |   9 | o------------o |  16 | HEAD_SW   |
+  | MQSR    |  10 | o------------o |  15 | o         |
+  | o       |  11 | o------------o |  14 | o         |
+  | MQSL    |  12 | o------------o |  13 | o         |
+* Teensy 3
+  | GND     | GND | o------------o |  5V | VIN      |
+  | R_PAD   |   0 | o------------o | GND | GND      |
+  | L_PAD   |   1 | o------------o | 3V3 | 3V3      |
+  | S_KEY   |   2 | o------------o |  23 | LRCLK    |
+  | PTT_SW  |   3 | o------------o |  22 | DIN      |
+  | KEY_OUT |   4 | o------------o |  21 | o        |
+  | PTT_OUT |   5 | o------------o |  20 | o        |
+  | o       |   6 | o------------o |  19 | SCL      |
+  | o       |   7 | o------------o |  18 | SDA      |
+  | o       |   8 | o------------o |  17 | o        |
+  | BCLK    |   9 | o------------o |  16 | HEAD_SW  |
+  | o       |  10 | o------------o |  15 | o        |
+  | MCLK    |  11 | o------------o |  14 | o        |
+  | o       |  12 | o------------o |  13 | DOUT     |
+  |         |     |                | A14 | 3.2/aDAC |
+  |         |     |                | A21 | 3.6/DAC0 |
+  |         |     |                | A22 | 3.6/DAC1 |
+** Pins from the audio adapter
+*** Headset
+**** Headphone L and R from the headphone jack pads
+     or the pads next to the headphone jack.
+**** MIC and GND from the USB connector edge of the
+   the audio adapter.
+*** Line In and Line Out
+   Line in and line out and associated grounds from
+   the rectangular cluster on the opposite edge from
+   the headphone jack.
+** Hardware audio out
+*** Teensy 3.1/3.2 use A14/DAC on the short edge
+    of the board.  May not be useful without an amp.
+*** Teensy 3.5/3.6 use A21/DAC0 and A22/DAC1.
+    May not be useful without an amp.
+*** Teensy 4.0/4.1 use MQSR/10 and MQSR/12.
+    Can be used without an amp, but needs filtering.
+** Default connectors
+   These are all optional, though you won't be able to do
+   anything with none of them connected.
+*** Paddle [L_PAD, R_PAD, GND] TRS
+*** Straight Key [S_KEY, GND] TS
+*** PTT Switch [PTT_SW, GND] TS
+*** Key Out [KEY_OUT,  PTT_OUT, GND] TRS
+*** Headset [L_HP, R_HP, MIC_GND, MIC] TRRS
+*** Headset2 [L_HDW, R_HDW, GND, ADC2] TRRS
+*** LineIn [LINE_IN_L, LINE_IN_R,   LINE_IN_GND] TRS
+*** LineOut [LINE_OUT_L, LINE_OUT_R, LINE_OUT_GND] TRS    
+**  7/10 primary pins unassigned in base T4/T3 design
+   Not counting pads on the Teensy edge or bottom or
+   beyond the common core on the T3.5, T3.6, or T4.1.
+   | add paddle        | 2 pins |
+   | add straight key  | 1 pin  |
+   | add switch/button | 1 pin  |
+   | add potentiometer | 1 pin  |

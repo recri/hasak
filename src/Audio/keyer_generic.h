@@ -1,9 +1,8 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
- *
- * Development of this audio library was funded by PJRC.COM, LLC by sales of
- * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
- * open source software by purchasing Teensy or other PJRC products.
+/* -*- mode: c++; tab-width: 8 -*- */
+/*
+ * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
+ * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * ad5dz, rec@elf.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef keyer_generic_h_
+#define keyer_generic_h_
 
-#ifndef effect_merge_h_
-#define effect_merge_h_
-#include "Arduino.h"
-#include "AudioStream.h"
-
-class AudioEffectMerge : public AudioStream
-{
-public:
-	AudioEffectMerge() : AudioStream(2, inputQueueArray) { }
-	virtual void update(void);
-private:
-	audio_block_t *inputQueueArray[2];
+class KeyerGeneric {
+ public:
+ KeyerGeneric(const int vox) : vox(vox) { }
+  void init(void) { }
+  virtual int clock(int dit, int dah, int ticks) { return 0; }
+  int pad_mode(void) { return get_vox_pad_mode(vox); }
+  int dit(void) { return get_vox_dit(vox); }
+  int dah(void) { return get_vox_dah(vox); }
+  int ies(void) { return get_vox_ies(vox); }
+  int ils(void) { return get_vox_ils(vox); }
+  int iws(void) { return get_vox_iws(vox); }
+  int auto_ils(void) { return get_vox_auto_ils(vox); }
+  int auto_iws(void) { return get_vox_auto_iws(vox); }
+  
+ private:
+  const int vox;
 };
 
 #endif

@@ -1,3 +1,27 @@
+/* -*- mode: c++; tab-width: 8 -*- */
+/*
+ * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
+ * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * ad5dz, rec@elf.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice, development funding notice, and this permission
+ * notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 #ifndef config_h_
 #define config_h_
 
@@ -32,7 +56,7 @@
 
 /* keyer voices in order of highest priority */
 #define KYR_N_VOX 4		/* number of keyer voices */
-#define KYR_VOX_NONE	0
+#define KYR_VOX_NONE	0	/* no active voice */
 #define KYR_VOX_S_KEY	1	/* Straight Key */
 #define KYR_VOX_PAD	2	/* Paddle */
 #define KYR_VOX_WINK	3	/* Winkey Key */
@@ -90,7 +114,8 @@
 
 /* MIDI usage */
 /* midi channel usage */
-#define KYR_CHANNEL	1	/* default channel used for keyer */
+#define KYR_IN_CHANNEL	1	/* default input channel used for keyer */
+#define KYR_OUT_CHANNEL 1	/* default output channel used for keyer */
 
 /* midi note usage, undefine to not send */
 #define KYR_L_PAD_NOTE		0      /* note used to report raw left paddle switch */
@@ -229,6 +254,8 @@
 #define KYRP_PER_ILS		(KYRP_KEYER+20) /* samples per inter letter space */
 #define KYRP_PER_IWS		(KYRP_KEYER+21) /* samples per inter word space */
 
+#define KYRP_PAD_KEYER		(KYRP_KEYER+22) /* paddle keyer implementation */
+
 /* four (or more) repetitions of the keyer block for per voice customizations */
 #define KYRP_VOX_0		(KYRP_KEYER+0)	 /* == 120 */
 #define KYRP_VOX_1		(KYRP_KEYER+32)	 /* == 152 */
@@ -240,6 +267,7 @@
 #define KYRP_LAST		(KYRP_VOX_4+32)	/* == 280 */
 
 /* nrpn MSB numbers, bank select, not quite yet */
+#define KYRP_VOX_OFFSET		32
 #define KYRP_GLOBAL_OFFSET	KYRP_KEYER
 #define KYRP_S_KEY_OFFSET	KYRP_VOX_1
 #define KYRP_PAD_OFFSET		KYRP_VOX_2
@@ -266,6 +294,12 @@
 #define KYRP_ADAPT_NORMAL		0
 #define KYRP_ADAPT_ULTIMATIC		1
 #define KYRP_ADAPT_SINGLE		2
+
+/* paddle keyers */
+#define KYRP_KEYER_AD5DZ		0
+#define KYRP_KEYER_K1EL			1
+#define KYRP_KEYER_ND7PA		2
+#define KYRP_KEYER_VK6PH		3
 
 /* iq enable modes */
 #define KYRP_IQ_NONE			0 /* IQ_ENABLE */

@@ -1,16 +1,40 @@
 * Todo list as of 2020-03-09
-[ ] Test the 48kHz sample rate.
+[x] make tone setting update frequency.
+[x] debug tone setting update.
+[x] rationalize usage reports
+[x] find normalization for cpu_cycle usage.
+[x] Test the 48kHz sample rate.
+[x] Implement other iambic keyers.
+[x] Add KYRP_AUTO_ILS and KYRP_AUTO_IWS to nrpn_set().
+[x] figure out why the text keyer makes a long dah for space.
+	did not figure it out, but it went away.
+[x] Add the vox specific NRPNs to nrpn_set().
+[x] Add the vox specific NRPNs to get_vox_nrpn().
+[x] Make ctrlr for iambic keyer selection.
+[x] Implement iambic keyer selection.
 [ ] Figure out how to detect the headset switches.
-[ ] Implement arbiter.
-[ ] Rewrite effect_mute and put them back into the graph.
-[ ] Implement ptt_delay.
+	They're just voltage changes.
+[x] Implement arbiter.
+[x] Debug arbiter implementation.
+[x] k1el keyer has the hiccups.
+[ ] Test ptt_head.
+[x] Test ptt_tail.
+[ ] ptt_head breaks key and ptt.
+[ ] Rewrite effect_mute and put some of them back into the graph.
+[ ] Allow line-in to route through filters to headphone-out.
+[ ] Allow line-in to route through sdr and filters to headphone-out.
+[x] Implement ptt_delay.
+[x] Debug ptt_delay as incorporated into arbiter
+[ ] Test ptt_delay.
 [ ] Debounce the straight key.	
 	Each transition in the straight key is stretched to one buffer worth
 	before another transition is considered.
 [ ] Ease in the volume changes, get rid of the pop.
-[ ] Try the fixed point complex rotor, both for sincos and ramp,
+[ ] Apply headphone volume to hdw_out mixer.
+[?] Try the fixed point complex rotor, both for sincos and ramp,
 	and with multiply_32x32_rshift32 instruction, it might.
-[ ] Would still need to call sin/cos to compute the phase increment.
+[?] Would still need to call sin/cos to compute the phase increment.
+[ ] Echo parameter set to MIDI to update Ctrlr.
 [ ] Implement save/restore parameters to EEPROM
 	[ ] save parameters as the nrpn block and a bitset of
 	which have been set.
@@ -20,6 +44,8 @@
 	[ ] nibblize the nrpn block and send it to the ctrlr
 	which is built for slamming those things around.
 [ ] Implement default parameters from flash.
+[ ] Implement a reverse snapshot, sending CC NRPN's for all parameters
+	to Ctrlr.
 [ ] Add tab to ctrlr panel for specifying morse key codes for characters.
 [ ] Add tab to ctrlr panel for the mixer matrix, with presets.
 [ ] Pan sidetone to localize.
@@ -28,7 +54,7 @@
 [ ] implement KYRP_IQ_BALANCE excess 1<<13 tweak to iq levels, units tbd, +/- 8k
 [ ] implement send midi under get_send_midi()
 [ ] implement receive midi under get_recv_midi()
-[ ] clean up linkage, it doesn't need the set_*() functions.
+[x] clean up linkage, it doesn't need the set_*() functions.
 [ ] clean up linkage, get* should be in order of config.h
 * Todo list as of 2020-03-04
 [x] implement headset microphone.
@@ -46,6 +72,9 @@
 	then if the arbiter pre-empts the voice it will stop with its own
 	voice parameters, the new active voice will take effect at the next 
 	on ramp.
+[x] reimplement hann and blackman harris ramps.
+[x] add linear ramp.
+[x] reimplement sine table.
 * Todo list as of 2021-03-01
 [x] add vox to keyer constructors
 [x] declare keyer timing, tone, and ramp getters.

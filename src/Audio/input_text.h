@@ -41,10 +41,6 @@
 #include "../../linkage.h"
 #include "AudioStream.h"
 
-extern "C" {
-  extern unsigned char morse[64];
-}
-
 /*
 ** Teensy Audio Library component for morse code text input
 */
@@ -89,19 +85,29 @@ private:
 
 public:
   // text buffer
+  // valid vox returns true if we can send
+  int valid_vox() {
+    uint8_t active = get_active_vox();
+    return active == KYR_VOX_NONE || active == vox;
+  }
   // valid_text identifies acceptable characters
   int valid_text(uint8_t value) {
     // convert to upper case
     return (value >='a' && value <= 'z') ||
       value == ' ' || value == '\t' || value == '\n' ||
       value == '\e' ||
-      (value-33 >= 0 && value-33 < 64 && morse[value-33] != 1);
+      (value-33 >= 0 && value-33 < 64 && get_nrpn(KYRP_MORSE+value-33) != 1);
   }
   // send_text queues a character for sending
   // return 0 if the value was successfully queued
   // return -1 if there is no room or the character
   // was rejected by valid_text
   int send_text(uint8_t value) {
+    // only if we're allowed
+    if ( ! valid_vox()) {
+      abort();
+      return -1;
+    }
     // reject false characters
     if ( ! valid_text(value)) return -1;
     // convert to upper case
@@ -116,13 +122,23 @@ public:
     return -1;
   }
   const char *send_text(const char *p) {
-    while (*p != '\0' && can_send_text()) send_text(*p++);
+    while (*p != '\0' && can_send_text()) {
+      if ( ! valid_vox()) {
+	abort();
+	return p;
+      }
+      send_text(*p++);
+    }
     return *p == '\0' ? NULL : p;
   }
   // return true if there is room to queue a character
-  int can_send_text() { return (((bwptr+1) % BUFFER_SIZE) != brptr); }
+  int can_send_text() { return valid_vox() && (((bwptr+1) % BUFFER_SIZE) != brptr); }
 private:
   int recv_text(void) {
+    if ( ! valid_vox()) {
+      abort();
+      return -1;
+    }
     if (can_recv_text()) {
       uint8_t value = buffer[brptr++];
       erptr %= BUFFER_SIZE;
@@ -131,6 +147,10 @@ private:
     return -1;
   }
   int peek_text(void) {
+    if ( ! valid_vox()) {
+      abort();
+      return -1;
+    }
     if (can_recv_text())
       return buffer[brptr];
     return -1;
@@ -143,6 +163,10 @@ private:
   // return 1 if a character was translated
   // return 0 if no character was available
   int get_elements() {
+    if ( ! valid_vox()) {
+      abort();
+      return 0;
+    }
     if (code > 1) {
       send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
       send(-get_vox_ies(vox));
@@ -176,7 +200,7 @@ private:
       // get the next char
       value = recv_text();
     }
-    code = morse[value-33];
+    code = get_nrpn(KYRP_MORSE+value-33);
     send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
     send(-get_vox_ies(vox));
     code >>= 1;

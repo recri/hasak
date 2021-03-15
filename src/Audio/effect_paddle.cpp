@@ -60,7 +60,7 @@
 ** the three numbers on each row are the output l, r, and s.
 */
 /*                                            a  x  s  l  r -> [s' l' r'] */
-static const uint8_t AudioEffectPaddle::adapt[3][2][2][2][2][3] = {
+const uint8_t AudioEffectPaddle::adapt[3][2][2][2][2][3] = {
   { /* a=0 */ { /* x=0 */ { /* s=0 */ { /* l=0 */ { /* r=0 */ 0, 0, 0 },	/* normal { 0, R, L, LR } */
 					          { /* r=1 */ 0, 0, 1 } },
 			              { /* l=1 */ { /* r=0 */ 0, 1, 0 }, 
@@ -116,6 +116,12 @@ void AudioEffectPaddle::update(void)
   audio_block_t *blocka, *blockb, *blockc;
   int16_t *pa, *pb, *pc, *end;
 
+  switch (get_vox_pad_keyer(vox)) {
+  case KYRP_KEYER_AD5DZ: keyer = &ad5dz; break;
+  case KYRP_KEYER_K1EL: keyer = &k1el; break;
+  case KYRP_KEYER_ND7PA: keyer = &nd7pa; break;
+  case KYRP_KEYER_VK6PH: keyer = &vk6ph; break;
+  }
   blocka = receiveReadOnly(0);
   pa = blocka ? blocka->data : (int16_t *)zeros;
   blockb = receiveReadOnly(1);
@@ -133,7 +139,7 @@ void AudioEffectPaddle::update(void)
       state = map[0];
       left = map[1];
       right = map[2];
-      sum += *pc++ = bool2fix(clock(left, right, 1));
+      sum += *pc++ = bool2fix(keyer->clock(left, right, 1));
     }
     if (sum != 0)
       transmit(blockc);

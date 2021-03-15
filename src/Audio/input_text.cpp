@@ -6,21 +6,20 @@
 void AudioInputText::update(void)
 {
   if (block) {
-    if (element == 0)
-      element = recv();
-    while (n > 0 && element != 0) {
-      while (n > 0 && element < 0) {
+    while (n > 0) {
+      if (element < 0) {
 	*wptr++ = bool2fix(0);
 	n -= 1;
 	element += 1;
-      }
-      while (n > 0 && element > 0) {
+      } else if (element > 0) {
 	*wptr++ = bool2fix(1);
 	n -= 1;
 	element -= 1;
-      }
-      if (element == 0)
+      } else {
 	element = recv();
+	if (element == 0)
+	  break;
+      }
     }
     if (wptr == &block->data[0]) {
       // empty block, nothing to put into it
@@ -37,21 +36,20 @@ void AudioInputText::update(void)
   if (block) {
     wptr = &block->data[0];
     n = AUDIO_BLOCK_SAMPLES;
-    if (element == 0) 
-      element = recv();
-    while (n > 0 && element != 0) {
-      while (n > 0 && element < 0) {
+    while (n > 0) {
+      if (element < 0) {
 	*wptr++ = bool2fix(0);
 	n -= 1;
 	element += 1;
-      }
-      while (n > 0 && element > 0) {
+      } else if (element > 0) {
 	*wptr++ = bool2fix(1);
 	n -= 1;
 	element -= 1;
-      }
-      if (element == 0)
+      } else {
 	element = recv();
+	if (element == 0)
+	  break;
+      }
     }
   }
 }

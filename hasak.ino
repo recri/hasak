@@ -43,8 +43,6 @@
 #include "src/Audio/effect_arbiter.h"
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/effect_mute.h"
-#include "src/Audio/effect_and_not.h"
-#include "src/Audio/effect_ptt_delay.h"
 #include "src/Audio/output_sample.h"
 #include "src/Audio/my_control_sgtl5000.h"
 // audio sample values
@@ -64,10 +62,10 @@ AudioInputSample	s_key("s_key");	// straight key in
 AudioInputText		wink(KYR_VOX_WINK);	// winkey text in
 AudioInputText		kyr(KYR_VOX_KYR);	// kyr text in for op
 AudioInputSample        ptt_sw("ptt_s");	// ptt switch
-AudioInputSample	tx_enable("tx_en"); // transmit enable
-AudioInputSample	st_enable("st_en"); // side tone enable
+//AudioInputSample	tx_enable("tx_en"); // transmit enable
+//AudioInputSample	st_enable("st_en"); // side tone enable
 
-// keyer logic
+// paddle keyer logic
 AudioEffectPaddle	paddle(KYR_VOX_PAD);	// 
 AudioConnection         patchCord1a(l_pad, 0, paddle, 0);
 AudioConnection         patchCord1b(r_pad, 0, paddle, 1);
@@ -89,12 +87,10 @@ static void arbiter_setup(void) {
 int get_active_vox(void) { return arbiter.get_active_vox(); }
 
 // shaped key waveform
-AudioSynthKeyedTone	key_ramp;
-AudioConnection		patchCord3a(arbiter, 0, key_ramp, 0);
-
-// tx enable
-AudioEffectAndNot	and_not_kyr(KYR_VOX_KYR);
-AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if active vox != KYR_VOX_KYR
+AudioSynthKeyedTone	tone_ramp(1);
+AudioSynthKeyedTone	key_ramp(2);
+AudioConnection		patchCord3a(arbiter, 0, tone_ramp, 0);
+AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);
 
 // microphone mute, disabled when ptt switch is pressed
 //AudioEffectMute		mic_mute;
@@ -106,16 +102,6 @@ AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if acti
 //AudioConnection		patchCord4d(i2s_in, 0, l_mic_mute, 1);
 //AudioConnection		patchCord4e(i2s_in, 1, r_mic_mute, 1);
 
-// IQ mute, disabled when tx_enable and active_vox is not kyr
-//AudioEffectMute		IQ_mute;
-//AudioEffectMultiply	I_mute;
-//AudioEffectMultiply	Q_mute;
-//AudioConnection		patchCord5a(and_not_kyr, 0, IQ_mute, 0);
-//AudioConnection		patchCord5b(IQ_mute, 0, I_mute, 0);
-//AudioConnection		patchCord5c(IQ_mute, 0, Q_mute, 0);
-//AudioConnection		patchCord5d(key_ramp, 0, I_mute, 1);
-//AudioConnection		patchCord5e(key_ramp, 1, Q_mute, 1);
-
 // receive mute, enabled when arbiter vox line is active
 //AudioEffectMute		rx_mute;
 //AudioEffectMultiply	l_rx_mute;
@@ -126,22 +112,6 @@ AudioConnection		patchCord3f(tx_enable, 0, and_not_kyr, 0); // tx enable if acti
 //AudioConnection		patchCord6d(usb_in, 0, l_rx_mute, 1);
 //AudioConnection		patchCord6e(usb_in, 1, r_rx_mute, 1);
 
-// sidetone mute, disabled when sidetone enabled is true
-//AudioEffectMute		st_mute;
-//AudioEffectMultiply	l_st_mute;
-//AudioEffectMultiply	r_st_mute;
-//AudioConnection		patchCord7a(st_enable, 0, st_mute, 0);
-//AudioConnection		patchCord7b(st_mute, 0, l_st_mute, 0);
-//AudioConnection		patchCord7c(st_mute, 0, r_st_mute, 0);
-//AudioConnection		patchCord7d(key_ramp, 0, l_st_mute, 1);
-//AudioConnection		patchCord7e(key_ramp, 0, r_st_mute, 1);
-
-// ptt delay, give ptt a head start over key to external transmitter
-AudioEffectPTTDelay	ptt_delay;
-AudioConnection		patchCord8a(arbiter, 0, ptt_delay, 0); // arbiter key -> ptt_delay 0
-AudioConnection		patchCord8b(arbiter, 1, ptt_delay, 1); // arbiter vox -> ptt_delay 1
-AudioConnection		patchCord8c(and_not_kyr, 0, ptt_delay, 2); // tx really enabled to ptt_delay 2
-
 // 
 // output mixers
 AudioMixer4              l_i2s_out;
@@ -150,8 +120,7 @@ AudioMixer4              l_usb_out;
 AudioMixer4              r_usb_out;
 AudioMixer4              l_hdw_out;
 AudioMixer4              r_hdw_out;
-static void mixer_setup(void) {
-  float gain = 1.0;
+static void mixer_setup(float gain=1.0) {
   for (int i = 0; i < 4; i += 1) {
     l_i2s_out.gain(i, gain);
     r_i2s_out.gain(i, gain);
@@ -161,6 +130,7 @@ static void mixer_setup(void) {
     r_hdw_out.gain(i, gain);
   }
 }
+
 // first channel, rx audio and microphone input, op on headset mode
 // switch codec to use microphone instead of line-in
 //AudioConnection		patchCord900(l_rx_mute, 0, l_i2s_out, 0);
@@ -190,46 +160,49 @@ AudioConnection		patchCord951(usb_in, 1, r_hdw_out, 1);
 // probably only sent to i2s for headphones/speakers
 // balance l vs r to localize
 // adjust level of sidetone
-//AudioConnection		patchCord902(l_st_mute, 0, l_i2s_out, 2);
-//AudioConnection		patchCord912(r_st_mute, 0, r_i2s_out, 2);
-//AudioConnection		patchCord922(l_st_mute, 0, l_usb_out, 2);
-//AudioConnection		patchCord932(r_st_mute, 0, r_usb_out, 2);
-//AudioConnection		patchCord942(l_st_mute, 0, l_hdw_out, 2);
-//AudioConnection		patchCord952(r_st_mute, 0, r_hdw_out, 2);
-AudioConnection		patchCord902(key_ramp, 0, l_i2s_out, 2);
-AudioConnection		patchCord912(key_ramp, 0, r_i2s_out, 2);
-AudioConnection		patchCord922(key_ramp, 0, l_usb_out, 2);
-AudioConnection		patchCord932(key_ramp, 0, r_usb_out, 2);
-AudioConnection		patchCord942(key_ramp, 0, l_hdw_out, 2);
-AudioConnection		patchCord952(key_ramp, 0, r_hdw_out, 2);
+AudioConnection		patchCord902(tone_ramp, 0, l_i2s_out, 2);
+AudioConnection		patchCord912(tone_ramp, 0, r_i2s_out, 2);
+AudioConnection		patchCord922(tone_ramp, 0, l_usb_out, 2);
+AudioConnection		patchCord932(tone_ramp, 0, r_usb_out, 2);
+AudioConnection		patchCord942(tone_ramp, 0, l_hdw_out, 2);
+AudioConnection		patchCord952(tone_ramp, 0, r_hdw_out, 2);
 
 // fourth channel, keyed IQ, 
 // send to usb_out to provide soundcard IQ TX stream to host sdr
 // send to i2s_out to provide soundcard IQ TX stream to softrock
-//AudioConnection		patchCord903(I_mute, 0, l_i2s_out, 3);
-//AudioConnection		patchCord913(Q_mute, 0, r_i2s_out, 3);
-//AudioConnection		patchCord923(I_mute, 0, l_usb_out, 3);
-//AudioConnection		patchCord933(Q_mute, 0, r_usb_out, 3);
-//AudioConnection		patchCord943(I_mute, 0, l_hdw_out, 3);
-//AudioConnection		patchCord953(Q_mute, 0, r_hdw_out, 3);
+// also used for diagnostics when iq is disabled
+AudioConnection		patchCord903(key_ramp, 0, l_i2s_out, 3);
+AudioConnection		patchCord913(key_ramp, 1, r_i2s_out, 3);
+AudioConnection		patchCord923(key_ramp, 0, l_usb_out, 3);
+AudioConnection		patchCord933(key_ramp, 1, r_usb_out, 3);
+AudioConnection		patchCord943(key_ramp, 0, l_hdw_out, 3);
+AudioConnection		patchCord953(key_ramp, 1, r_hdw_out, 3);
 
-// temporary diagnostic connection, adc input to r_usb_out
+// temporary diagnostic connection, adc input to usb_out
+AudioConnection		patchCord998(adc_in, 0, l_usb_out, 3);
 AudioConnection		patchCord999(adc_in, 0, r_usb_out, 3);
+// temporary diagnostic connection, l_pad input to usb_out
+//AudioConnection		patchCord998(l_pad, 0, l_usb_out, 3);
+//AudioConnection		patchCord999(l_pad, 0, r_usb_out, 3);
+// temporary diagnostic connection, paddle and arbiter to usb_out
+//AudioConnection		patchCord998(paddle, 0, l_usb_out, 3);
+//AudioConnection		patchCord999(arbiter, 0, r_usb_out, 3);
+// temporary diagnostic connection, arbiter sidetone and key to usb_out
+//AudioConnection		patchCord998(arbiter, 0, l_usb_out, 3);
+//AudioConnection		patchCord999(arbiter, 1, r_usb_out, 3);
+// temporary diagnostic connection, arbiter key and ptt to usb_out
+//AudioConnection		patchCord998(arbiter, 1, l_usb_out, 3);
+//AudioConnection		patchCord999(arbiter, 2, r_usb_out, 3);
 
 // outputs
 AudioOutputSample	key_out;
 AudioOutputSample	ptt_out;
 
-AudioConnection		patchCord10a(ptt_delay, 0, key_out, 0);
-AudioConnection		patchCord10b(ptt_delay, 1, ptt_out, 0);
+AudioConnection		patchCord10a(arbiter, 1, key_out, 0);
+AudioConnection		patchCord10b(arbiter, 2, ptt_out, 0);
 
 AudioOutputSample	adc_out;
 AudioConnection		patchCord10c(adc_in, 0, adc_out, 0);
-
-AudioOutputSample	probe1;
-AudioOutputSample	probe2;
-AudioConnection		patchCord10d(paddle, 0, probe1, 0);
-AudioConnection		patchCord10e(arbiter, 0, probe2, 0);
 
 AudioOutputUSB          usb_out;
 AudioConnection		patchCord11a(l_usb_out, 0, usb_out, 0);
@@ -265,20 +238,17 @@ MyAudioControlSGTL5000     sgtl5000;
 // latch output pins at sample rate
 // also poll/latch arbitrary memory locations
 int16_t _adc_out;
-int16_t _probe1, _probe2;
 
 static void pollatch() {
   l_pad.send(bool2fix(digitalRead(KYR_L_PAD_PIN)^1));
   r_pad.send(bool2fix(digitalRead(KYR_R_PAD_PIN)^1));
   s_key.send(bool2fix(digitalRead(KYR_S_KEY_PIN)^1));
   ptt_sw.send(bool2fix(digitalRead(KYR_PTT_SW_PIN)^1));
-  st_enable.send(bool2fix(get_st_enable()));
-  tx_enable.send(bool2fix(get_tx_enable()));
+  //st_enable.send(bool2fix(get_st_enable()));
+  //tx_enable.send(bool2fix(get_tx_enable()));
   digitalWrite(KYR_KEY_OUT_PIN,fix2bool(key_out.recv()));
   digitalWrite(KYR_PTT_OUT_PIN,fix2bool(ptt_out.recv()));
   _adc_out = adc_out.recv();
-  _probe1 = probe1.recv();
-  _probe2 = probe2.recv();
   // use arbiter.get_active_vox() to find active vox
   // _active_vox = active_vox.recv(); // no conversion, int value
   //buttonpolls += 1;
@@ -420,6 +390,8 @@ static void nrpn_update_keyer(uint8_t vox) {
 ** these are set to match what the controller starts with
 ** synchronizing will be an issue.
 */
+#include "morse_table.c"
+
 static void nrpn_setup(void) {
 
   /* codec setup */
@@ -432,8 +404,10 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_LINE_IN_LEVEL, 5);
   nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
-  for (int i = 0; i <= 80; i += 1)
+  for (int i = 0; i <= 80; i += 1) {
+    delay(1);
     nrpn_set(KYRP_HEAD_PHONE_VOLUME, i);
+  }
 
   /* soft controls */
   // KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
@@ -446,7 +420,6 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_ST_ENABLE, 1);
 
   /* morse code table */
-  // extern const unsigned char morse[64];
   for (int i = 0; i < 64; i += 1) kyr_nrpn[KYRP_MORSE+i] = morse[i];
 
   /* mixer matrix */
@@ -482,106 +455,127 @@ static void nrpn_setup(void) {
 */
 static void nrpn_set(uint16_t nrpn, uint16_t value) {
   switch (nrpn) {
-  case KYRP_HEAD_PHONE_VOLUME: // Serial.printf("HEAD_PHONE_VOLUME %d\n", value); 
+  case KYRP_HEAD_PHONE_VOLUME:
     // inspecting the sgtl5000 source finds only 7-8bits of precision for this.
     sgtl5000.volume(value/255.0); kyr_nrpn[nrpn] = value;  break; // fix.me - automate
-  case KYRP_INPUT_SELECT:  Serial.printf("INPUT_SELECT %d\n", value);  
+  case KYRP_INPUT_SELECT:
     sgtl5000.inputSelect(value); kyr_nrpn[nrpn] = value; break;
-  case KYRP_MUTE_HEAD_PHONES: // Serial.printf("MUTE_HEAD_PHONES %d\n", value); 
+  case KYRP_MUTE_HEAD_PHONES:
     if (value) sgtl5000.muteHeadphone(); else sgtl5000.unmuteHeadphone();    
     kyr_nrpn[nrpn] = value;  break;
-  case KYRP_MUTE_LINE_OUT: // Serial.printf("MUTE_LINE_OUT %d\n", value); 
+  case KYRP_MUTE_LINE_OUT:
     if (value) sgtl5000.muteLineout(); else sgtl5000.unmuteLineout();
     kyr_nrpn[nrpn] = value; break;
-  case KYRP_LINE_OUT_LEVEL: // Serial.printf("LINE_IN_LEVEL %d\n", value); 
+  case KYRP_LINE_OUT_LEVEL:
     kyr_nrpn[KYRP_LINE_OUT_LEVEL_L] = kyr_nrpn[KYRP_LINE_OUT_LEVEL_R] = value;
     sgtl5000.lineOutLevel(kyr_nrpn[KYRP_LINE_OUT_LEVEL_L],kyr_nrpn[KYRP_LINE_OUT_LEVEL_R]); break;
-  case KYRP_LINE_OUT_LEVEL_L: // Serial.printf("LINE_OUT_LEVEL_L %d\n", value); 
+  case KYRP_LINE_OUT_LEVEL_L:
     kyr_nrpn[KYRP_LINE_OUT_LEVEL_L] = value;
     sgtl5000.lineOutLevel(kyr_nrpn[KYRP_LINE_OUT_LEVEL_L],kyr_nrpn[KYRP_LINE_OUT_LEVEL_R]); break;
-  case KYRP_LINE_OUT_LEVEL_R: // Serial.printf("LINE_OUT_LEVEL_R %d\n", value); 
+  case KYRP_LINE_OUT_LEVEL_R:
     kyr_nrpn[KYRP_LINE_OUT_LEVEL_R] = value;
     sgtl5000.lineOutLevel(kyr_nrpn[KYRP_LINE_OUT_LEVEL_L],kyr_nrpn[KYRP_LINE_OUT_LEVEL_R]); break;
-  case KYRP_LINE_IN_LEVEL: // Serial.printf("LINE_OUT_LEVEL %d\n", value); 
+  case KYRP_LINE_IN_LEVEL:
     kyr_nrpn[KYRP_LINE_IN_LEVEL_L] = kyr_nrpn[KYRP_LINE_IN_LEVEL_R] = value;
     sgtl5000.lineInLevel(kyr_nrpn[KYRP_LINE_IN_LEVEL_L],kyr_nrpn[KYRP_LINE_IN_LEVEL_R]); break;
-  case KYRP_LINE_IN_LEVEL_L: // Serial.printf("LINE_IN_LEVEL_L %d\n", value); 
+  case KYRP_LINE_IN_LEVEL_L:
     kyr_nrpn[KYRP_LINE_IN_LEVEL_L] = value;
     sgtl5000.lineInLevel(kyr_nrpn[KYRP_LINE_IN_LEVEL_L],kyr_nrpn[KYRP_LINE_IN_LEVEL_R]); break;
-  case KYRP_LINE_IN_LEVEL_R: // Serial.printf("LINE_IN_LEVEL_R %d\n", value); 
+  case KYRP_LINE_IN_LEVEL_R:
     kyr_nrpn[KYRP_LINE_IN_LEVEL_R] = value;
     sgtl5000.lineInLevel(kyr_nrpn[KYRP_LINE_IN_LEVEL_L],kyr_nrpn[KYRP_LINE_IN_LEVEL_R]); break;
-  case KYRP_MIC_PREAMP_GAIN: Serial.printf("MIC_PREAMP_GAIN %d\n", value);  
+  case KYRP_MIC_PREAMP_GAIN:
     sgtl5000.micPreampGain(value);
     kyr_nrpn[nrpn] = value; break;
-  case KYRP_MIC_BIAS: Serial.printf("MIC_BIAS %d\n", value);  
+  case KYRP_MIC_BIAS:
     sgtl5000.micBias(value);
     kyr_nrpn[nrpn] = value; break;
-  case KYRP_MIC_IMPEDANCE: Serial.printf("MIC_IMPEDANCE %d\n", value);  
+  case KYRP_MIC_IMPEDANCE:
     sgtl5000.micImpedance(value);
     kyr_nrpn[nrpn] = value; break;
 
     //case KYRP_AUDIO_MODE:
     //case KYRP_ST_PAN:
-  case KYRP_SEND_MIDI:
-    kyr_nrpn[nrpn] = value; break;
+  case KYRP_SEND_MIDI: 
   case KYRP_RECV_MIDI:
-    kyr_nrpn[nrpn] = value; break;
-  case KYRP_IQ_ENABLE:  Serial.printf("IQ_ENABLE %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_IQ_ADJUST: // Serial.printf("IQ_ADJUST %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_TX_ENABLE: // Serial.printf("ST_ENABLE %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_ST_ENABLE: // Serial.printf("ST_ENABLE %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_IQ_BALANCE: // Serial.printf("IQ_BALANCE %d\n", value); 
+  case KYRP_IQ_ENABLE:
+  case KYRP_IQ_ADJUST:
+  case KYRP_TX_ENABLE:
+  case KYRP_ST_ENABLE:
+  case KYRP_IQ_BALANCE:
     kyr_nrpn[nrpn] = value;  break;
     
     // case KYRP_MORSE+(0..63):
     
     // case KYRP_MIXER+(0..23):
-    
-  case KYRP_TONE: // Serial.printf("TONE %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_HEAD_TIME: // Serial.printf("HEAD_TIME %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_TAIL_TIME: // Serial.printf("TAIL_TIME %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_RISE_TIME: // Serial.printf("RISE_TIME %d\n", value); 
+
+    // default keyer params
+#define VOX KYR_VOX_NONE
+#define VOXP KYRP_VOX_0-KYRP_VOX_0
+  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
+  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
+  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
+  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER:
     kyr_nrpn[nrpn] = value; break;
-  case KYRP_FALL_TIME: // Serial.printf("FALL_TIME %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_RISE_RAMP: Serial.printf("RISE_RAMP %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_FALL_RAMP: Serial.printf("FALL_RAMP %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
+  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
+#undef VOX
+#undef VOXP
 
-  case KYRP_SPEED: // Serial.printf("SPEED %d\n", value); 
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
-  case KYRP_WEIGHT: // Serial.printf("WEIGHT %d\n", value); 
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
-  case KYRP_RATIO: // Serial.printf("RATIO %d\n", value);
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
-  case KYRP_COMP: // Serial.printf("COMP %d\n", value);
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
-  case KYRP_FARNS: // Serial.printf("FARNS %d\n", value);
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(KYR_VOX_NONE); break;
+    // straight key keyer params
+#define VOX KYR_VOX_S_KEY
+#define VOXP KYRP_VOX_1-KYRP_VOX_0
+  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
+  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
+  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
+  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER:
+    kyr_nrpn[nrpn] = value; break;
+  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
+#undef VOX
+#undef VOXP
 
-  case KYRP_PAD_MODE: Serial.printf("PAD_MODE %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_PAD_SWAP: // Serial.printf("PAD_SWAP %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
-  case KYRP_PAD_ADAPT: Serial.printf("PAD_ADAPT %d\n", value); 
-    kyr_nrpn[nrpn] = value;  break;
+    // paddle keyer params
+#define VOX KYR_VOX_PAD
+#define VOXP KYRP_VOX_2-KYRP_VOX_0
+  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
+  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
+  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
+  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER:
+    kyr_nrpn[nrpn] = value; break;
+  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
+#undef VOX
+#undef VOXP
 
-  case KYRP_PER_DIT:
-  case KYRP_PER_DAH:
-  case KYRP_PER_IES:
-  case KYRP_PER_ILS:
-  case KYRP_PER_IWS: kyr_nrpn[nrpn] = value; break;
+    // winkey text keyer
+#define VOX KYR_VOX_WINK
+#define VOXP KYRP_VOX_3-KYRP_VOX_0
+  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
+  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
+  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
+  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER:
+    kyr_nrpn[nrpn] = value; break;
+  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
+#undef VOX
+#undef VOXP
 
-  default: Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
+    // kyr text keyer
+#define VOX KYR_VOX_KYR
+#define VOXP KYRP_VOX_4-KYRP_VOX_0
+  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
+  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
+  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
+  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER:
+    kyr_nrpn[nrpn] = value; break;
+  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
+#undef VOX
+#undef VOXP
+
+  default: 
+    Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
 
   }
 }
@@ -594,15 +588,15 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 ** could be pretty fierce.  it could also be split into different
 ** channels for receive and send.
 */
-static uint8_t kyr_channel = KYR_CHANNEL;
-
+static uint8_t kyr_in_channel = KYR_IN_CHANNEL;
+static uint8_t kyr_out_channel = KYR_OUT_CHANNEL;
 
 /*
 ** receive a note on event and do something with it.
 ** only if KYRP_RECV_MIDI is enabled and it's on our channel.
 */
 static void myNoteOn(byte channel, byte note, byte velocity) {
-  if (get_recv_midi() && (channel == kyr_channel)) {
+  if (get_recv_midi() && (channel == kyr_in_channel)) {
     switch (note) {
     case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
       digitalWrite(KYR_L_PAD_PIN, velocity == 0); break;
@@ -623,7 +617,7 @@ static void myNoteOn(byte channel, byte note, byte velocity) {
 }
 
 static void myNoteOff(byte channel, byte note, byte velocity) {
-  if (get_recv_midi() && (channel == kyr_channel)) {
+  if (get_recv_midi() && (channel == kyr_in_channel)) {
     switch (note) {
     case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
       digitalWrite(KYR_L_PAD_PIN, 1); break;
@@ -651,7 +645,7 @@ static void myControlChange(byte channel, byte control, byte value) {
   */
   static uint16_t cc_nrpn, cc_value;
 
-  if (channel == kyr_channel)
+  if (channel == kyr_in_channel)
     switch (control) {
     case KYR_CC_MSB:	/* Data Entry (MSB) */
       cc_value = (value&127)<<7;
@@ -680,7 +674,7 @@ static void midi_setup(void) {
 static uint8_t midi_send_toggle(uint8_t pin, uint8_t note) {
   // if the pin was high, then it went low, and is now active, so send velocity 1
   // if the pin was low, then it went high, and is now off, so send velocity 0
-  usbMIDI.sendNoteOn(note, pin, kyr_channel);
+  usbMIDI.sendNoteOn(note, pin, kyr_out_channel);
   usbMIDI.send_now();		// send it now
   return pin ^ 1;		// invert the pin
 }

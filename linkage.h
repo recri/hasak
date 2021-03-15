@@ -1,3 +1,27 @@
+/* -*- mode: c++; tab-width: 8 -*- */
+/*
+ * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
+ * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * ad5dz, rec@elf.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice, development funding notice, and this permission
+ * notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 #ifndef linkage_h_
 #define linkage_h_
 
@@ -11,7 +35,8 @@ static inline int get_nrpn(int nrpn) {
 }
 /* fetch a vox specialized nrpn, not yet implemented */
 static inline int get_vox_nrpn(int vox, int nrpn) {
-  return get_nrpn(nrpn);
+  int value = get_nrpn(KYRP_KEYER+vox*KYRP_VOX_OFFSET+(nrpn-KYRP_KEYER));
+  return (value >= 0) ? value : get_nrpn(nrpn);
 }
 /***************************************************************
 ** Parameter fetching
@@ -24,6 +49,7 @@ static inline int get_vox_pad_swap(int vox) { return get_vox_nrpn(vox, KYRP_PAD_
 static inline int get_vox_pad_adapt(int vox) { return get_vox_nrpn(vox, KYRP_PAD_ADAPT); }
 static inline int get_vox_auto_ils(int vox) { return get_vox_nrpn(vox, KYRP_AUTO_ILS); }
 static inline int get_vox_auto_iws(int vox) { return get_vox_nrpn(vox, KYRP_AUTO_IWS); }
+static inline int get_vox_pad_keyer(int vox) { return get_vox_nrpn(vox, KYRP_PAD_KEYER); }
 
 /* keyer timing */
 static inline int get_vox_dit(int vox) { return get_vox_nrpn(vox, KYRP_PER_DIT); }
@@ -45,6 +71,7 @@ static inline int get_vox_rise_time(int vox) { return get_vox_nrpn(vox, KYRP_RIS
 static inline int get_vox_rise_ramp(int vox) { return get_vox_nrpn(vox, KYRP_RISE_RAMP); }
 static inline int get_vox_fall_time(int vox) { return get_vox_nrpn(vox, KYRP_FALL_TIME); }
 static inline int get_vox_fall_ramp(int vox) { return get_vox_nrpn(vox, KYRP_FALL_RAMP); }
+static inline int time_to_samples(int time) { return ((int)AUDIO_SAMPLE_RATE) * time / 10000; }
 
 /* keyer ptt parameters */
 static inline int get_vox_ptt_head(int vox) { return get_vox_nrpn(vox, KYRP_HEAD_TIME); }

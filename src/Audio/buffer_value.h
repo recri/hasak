@@ -65,6 +65,7 @@ int count_run_lengths(audio_block_t *block) {
   return ++r;
 }
 
+/* initial run length in the audio block, + for 1, - for 0 */
 int16_t run_length(audio_block_t *block) {
   if ( ! block)
     return -AUDIO_BLOCK_SAMPLES;

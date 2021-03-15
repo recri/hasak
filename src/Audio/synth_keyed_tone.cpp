@@ -35,44 +35,66 @@
 void AudioSynthKeyedTone::update(void)
 {
   audio_block_t *blockk, *blocki, *blockq;
-  int16_t *bp, *end, *ip, *qp;
+  int16_t *bp, *pend, *ip, *qp;
 
   blockk = receiveReadOnly();
-  blocki = allocate();
-  blockq = allocate();
-  if ( ! blocki || ! blockq) {
+  if (channels == 1) {
+    blocki = allocate();
+    blockq = NULL;
+    if ( ! blocki) {
+      if (blockk) release(blockk);
+      return;
+    }
+  } else if (channels == 2) {
+    if (iq_enable != KYRP_IQ_NONE) {
+      blocki = allocate();
+      blockq = allocate();
+      if ( ! blocki || ! blockq) {
+	if (blockk) release(blockk);
+	if (blocki) release(blocki);
+	if (blockq) release(blockq);
+	return;
+      }
+    } else {
+      if (blockk) release(blockk);
+      return;
+    }
+  } else {
+    /* throw an exception? */
     if (blockk) release(blockk);
-    if (blocki) release(blocki);
-    if (blockq) release(blockq);
     return;
   }
   if (blockk) bp = blockk->data;
   else bp = (int16_t *)zeros;
-  end = bp+AUDIO_BLOCK_SAMPLES;
+  pend = bp+AUDIO_BLOCK_SAMPLES;
   ip = blocki->data;
-  qp = blockq->data;
-  while (bp < end) {
+  if (channels == 2) qp = blockq->data;
+  while (bp < pend) {
     int32_t key = *bp++;
+    uint32_t phase_inc = phase_increment();
     if (position == 0) {
       if (key == 0) {
 	// output is silent
 	*ip++ = 0;
-	*qp++ = 0;
+	if (channels == 2) *qp++ = 0;
 	continue;
       } else {
 	// ramp on
 	position = 1;
 	direction = 1;
 	start_rise();
+
 	/* fall through */
       }
     } else if (position == 0xFFFFFFFF) {
       if (key != 0) {
 	// output is 100%
 	*ip++ = get_sine_value(phase_I) >> 17;
-	*qp++ = (iq_enable != KYRP_IQ_NONE) ? (get_sine_value(phase_Q) >> 17) : 0;
-	phase_I += phase_increment;
-	phase_Q += phase_increment;
+	phase_I += phase_inc;
+	if (channels == 2) {
+	  *qp++ = (iq_enable != KYRP_IQ_NONE) ? (get_sine_value(phase_Q) >> 17) : 0;
+	  phase_Q += phase_inc;
+	}
 	continue;
       } else {
 	// ramp off
@@ -88,16 +110,18 @@ void AudioSynthKeyedTone::update(void)
 #elif defined(KINETISL)
     *ip++ = ((get_sine_value(phase_I) >> 16) * magnitude) >> 16;
 #endif
-    phase_I += phase_increment;
-    if (iq_enable == KYRP_IQ_NONE) {
-      *qp++ = 0;
-    } else {      
+    phase_I += phase_inc;
+    if (channels == 2) {
+      if (iq_enable == KYRP_IQ_NONE) {
+	*qp++ = 0;
+      } else {      
 #if defined(__ARM_ARCH_7EM__)
-      *qp++ = multiply_32x32_rshift32(get_sine_value(phase_Q), magnitude);
+	*qp++ = multiply_32x32_rshift32(get_sine_value(phase_Q), magnitude);
 #elif defined(KINETISL)
-      *qp++ = ((get_sine_value(phase_Q) >> 16) * magnitude) >> 16;
+	*qp++ = ((get_sine_value(phase_Q) >> 16) * magnitude) >> 16;
 #endif
-      phase_Q += phase_increment;
+	phase_Q += phase_inc;
+      }
     }
     if (direction > 0) {
       // output is increasing
@@ -118,8 +142,10 @@ void AudioSynthKeyedTone::update(void)
     }
   }
   transmit(blocki, 0);
-  if (iq_enable != KYRP_IQ_NONE) transmit(blockq, 1);
   release(blocki);
-  release(blockq);
+  if (channels == 2 && iq_enable != KYRP_IQ_NONE) {
+    transmit(blockq, 1);
+    release(blockq);
+  }
   if (blockk) release(blockk);
 }
