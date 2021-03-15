@@ -1,4 +1,5 @@
 # generate ramps for hasak
+# julia fader.jl > ../src/Audio/data_table.c
 # ramps are 257 point arrays which are interpolated
 cosine_series1(size, k, a0,  a1) = a0 - a1 * cos((2π * k) / (size-1))
 cosine_series2( size, k, a0, a1, a2) = cosine_series1(size, k, a0, a1) + a2 * cos((2 * 2π * k) / (size-1))
@@ -14,6 +15,7 @@ sine(k, size) = Integer(round(32767 * sin(2π * k / size)))
 # format tables
 using Printf
 format_table(t) = join([@sprintf("%s%6d", i>1 && (i%8)==1 ? "\n" : "", t[i]) for i in 1:length(t)], ",")
+@printf("#include \"data_table.h\"\n")
 @printf("const int16_t hann_ramp[257] = {\n%s\n};\n", format_table([hann(k,512) for k in 0:256]))
 @printf("const int16_t blackman_harris_ramp[257] = {\n%s\n};\n", format_table([blackman_harris(k,512) for k in 0:256]))
 @printf("const int16_t linear_ramp[257] = {\n%s\n};\n", format_table([triangular(k,512) for k in 0:256]))
