@@ -64,7 +64,9 @@
 class AudioSynthKeyedTone : public AudioStream
 {
 public:
-  AudioSynthKeyedTone(int channels=1) : AudioStream(1, inputQueueArray), position(0), channels(channels) { }
+  AudioSynthKeyedTone(int channels=1) : AudioStream(1, inputQueueArray), channels(channels) {
+    position = 0;
+  }
   // fetch the current parameters for the rise ramp, and fall ramp
   // oscillatar may vary
   void start_rise() {
@@ -73,16 +75,16 @@ public:
     fall_rate = 0xFFFFFFFFu / (get_vox_fall_time(vox) * 1e-4 * AUDIO_SAMPLE_RATE);
     table = get_table(get_vox_rise_ramp(vox));
     fall_table = get_table(get_vox_fall_ramp(vox));
-    iq_enable = get_iq_enable();
     // int16_t iq_adjust = get_iq_adjust();
     // phase_increment = get_vox_tone(vox) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
     phase_I = 90.0 * (4294967296.0 / 360.0);
     // don't know what the units of iqph are, yet, 
-    // needs to be positive or negative offset from exact 90 phase
+    // needs to be positive or negative offset from exact 90 phase.
+    // have 14bits, so 13bits and sign, thats +/-8192
     // not sure that USB and LSB aren't actually the other way around
     // there should be a level balance here, too.
-    // seems like IQ might need its own frequency, too
-    switch (iq_enable) {
+    // IQ might need its own frequency, too.
+    switch (get_iq_enable()) {
     default:
     case KYRP_IQ_NONE: 
     case KYRP_IQ_USB: phase_Q = 0.0 * (4294967296.0 / 360.0); break;
@@ -146,7 +148,6 @@ private:
   uint32_t fall_rate, rate;
   uint8_t direction;
   const int16_t *fall_table, *table;
-  uint8_t iq_enable;
   uint32_t phase_I, phase_Q;
   // uint31_t phase_increment; converted to method to allow live tuning
   audio_block_t *inputQueueArray[1];

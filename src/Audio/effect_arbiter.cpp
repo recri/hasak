@@ -98,14 +98,16 @@ void AudioEffectArbiter::update(void)
     }
 
     /* deal with sidetone key stream first */
-    if (block[active_stream])
+    if (block[active_stream] && get_st_enable())
       transmit(block[active_stream], 0);
+
+    /* deal with undelayed voices */
     if (ptt_head == 0) {
       /* immediate send, no ptt delay */
       int16_t *pkeyin = block[active_stream] ? block[active_stream]->data : (int16_t *)zeros;
       int16_t *pend = pkeyin+AUDIO_BLOCK_SAMPLES;
       audio_block_t *pttout = allocate();
-      if (block[active_stream]) transmit(block[active_stream],1);
+      if (block[active_stream] && get_tx_enable() && is_not_local()) transmit(block[active_stream],1);
       if (pttout) {
 	int16_t *pptt = pttout->data;
 	while (pkeyin < pend) {
@@ -123,7 +125,7 @@ void AudioEffectArbiter::update(void)
 	    *pptt++ = bool2fix(1);
 	  }
 	}
-	transmit(pttout, 2);
+	if (get_tx_enable() && is_not_local()) transmit(pttout, 2);
 	release(pttout);
       }
     } else {
@@ -131,6 +133,7 @@ void AudioEffectArbiter::update(void)
       /* queue key in and ptt */
       int16_t *pkeyin = block[active_stream] ? block[active_stream]->data : (int16_t *)zeros;
       int16_t *pend = pkeyin+AUDIO_BLOCK_SAMPLES;
+      int delay_queued = active_tail > 0;
       while (pkeyin < pend) {
 	if (*pkeyin++ == 0) {
 	  /* zero keyed, count down active_tail */
@@ -143,10 +146,12 @@ void AudioEffectArbiter::update(void)
 	  }
 	} else {
 	  /* one keyed, reset active_tail */
-	  active_tail = ptt_head+ptt_tail;
-	  /* push delay onto empty queue */
-	  /* oh, this is wrong, the head goes in front of the first keyed 1 */
-	  if (queue_is_empty()) queue_runs(+ptt_head, -ptt_head);
+	  active_tail = ptt_tail;
+	  /* push delay if necessary */
+	  if ( ! delay_queued) {
+	    queue_runs(+ptt_head, -ptt_head);
+	    delay_queued = 1;
+	  }
 	  /* queue key and ptt */
 	  ended = 0;
 	  queue_runs(+1, +1);
@@ -174,7 +179,7 @@ void AudioEffectArbiter::update(void)
 	      *pp++ = bool2fix(0);
 	    }
 	  }
-	  if (get_tx_enable() && get_active_vox() != KYR_VOX_KYR) {
+	  if (get_tx_enable() && is_not_local()) {
 	    if (sumk != 0) transmit(keyout, 1); // send key out stream
 	    if (sump != 0) transmit(pttout, 2); // send ptt out stream
 	  }

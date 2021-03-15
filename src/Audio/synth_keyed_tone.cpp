@@ -39,6 +39,10 @@ void AudioSynthKeyedTone::update(void)
 
   blockk = receiveReadOnly();
   if (channels == 1) {
+    if (! get_st_enable()) {
+      if (blockk) release(blockk);
+      return;
+    }
     blocki = allocate();
     blockq = NULL;
     if ( ! blocki) {
@@ -46,17 +50,16 @@ void AudioSynthKeyedTone::update(void)
       return;
     }
   } else if (channels == 2) {
-    if (iq_enable != KYRP_IQ_NONE) {
-      blocki = allocate();
-      blockq = allocate();
-      if ( ! blocki || ! blockq) {
-	if (blockk) release(blockk);
-	if (blocki) release(blocki);
-	if (blockq) release(blockq);
-	return;
-      }
-    } else {
+    if (get_iq_enable() == KYRP_IQ_NONE) {
       if (blockk) release(blockk);
+      return;
+    }
+    blocki = allocate();
+    blockq = allocate();
+    if ( ! blocki || ! blockq) {
+      if (blockk) release(blockk);
+      if (blocki) release(blocki);
+      if (blockq) release(blockq);
       return;
     }
   } else {
@@ -78,31 +81,28 @@ void AudioSynthKeyedTone::update(void)
 	*ip++ = 0;
 	if (channels == 2) *qp++ = 0;
 	continue;
-      } else {
-	// ramp on
-	position = 1;
-	direction = 1;
-	start_rise();
-
-	/* fall through */
       }
+      // ramp on
+      position = 1;
+      direction = 1;
+      start_rise();
+      /* fall through */
     } else if (position == 0xFFFFFFFF) {
       if (key != 0) {
 	// output is 100%
 	*ip++ = get_sine_value(phase_I) >> 17;
 	phase_I += phase_inc;
 	if (channels == 2) {
-	  *qp++ = (iq_enable != KYRP_IQ_NONE) ? (get_sine_value(phase_Q) >> 17) : 0;
+	  *qp++ = get_sine_value(phase_Q) >> 17;
 	  phase_Q += phase_inc;
 	}
 	continue;
-      } else {
-	// ramp off
-	position = 0xFFFFFFFE;
-	direction = 0;
-	start_fall();
-	/* fall through */
       }
+      // ramp off
+      position = 0xFFFFFFFE;
+      direction = 0;
+      start_fall();
+      /* fall through */
     }
     int32_t magnitude = get_ramp_value(position);
 #if defined(__ARM_ARCH_7EM__)
@@ -112,29 +112,27 @@ void AudioSynthKeyedTone::update(void)
 #endif
     phase_I += phase_inc;
     if (channels == 2) {
-      if (iq_enable == KYRP_IQ_NONE) {
-	*qp++ = 0;
-      } else {      
 #if defined(__ARM_ARCH_7EM__)
-	*qp++ = multiply_32x32_rshift32(get_sine_value(phase_Q), magnitude);
+      *qp++ = multiply_32x32_rshift32(get_sine_value(phase_Q), magnitude);
 #elif defined(KINETISL)
-	*qp++ = ((get_sine_value(phase_Q) >> 16) * magnitude) >> 16;
+      *qp++ = ((get_sine_value(phase_Q) >> 16) * magnitude) >> 16;
 #endif
-	phase_Q += phase_inc;
-      }
+      phase_Q += phase_inc;
     }
     if (direction > 0) {
       // output is increasing
-      if (rate < 0xFFFFFFFF - position) position += rate; // continue ramp
-      else {
+      if (rate < 0xFFFFFFFF - position) {
+	position += rate; // continue ramp
+      } else {
 	// end of rise
 	position = 0xFFFFFFFF;
 	end_rise();
       }
     } else {
       // output is decreasing
-      if (rate < position) position -= rate;
-      else {
+      if (rate < position) {
+	position -= rate;
+      } else {
 	// end of fall
 	position = 0;
 	end_fall();
@@ -143,7 +141,7 @@ void AudioSynthKeyedTone::update(void)
   }
   transmit(blocki, 0);
   release(blocki);
-  if (channels == 2 && iq_enable != KYRP_IQ_NONE) {
+  if (channels == 2) {
     transmit(blockq, 1);
     release(blockq);
   }

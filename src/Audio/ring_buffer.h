@@ -1,9 +1,8 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
- *
- * Development of this audio library was funded by PJRC.COM, LLC by sales of
- * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
- * open source software by purchasing Teensy or other PJRC products.
+/* -*- mode: c++; tab-width: 8 -*- */
+/*
+ * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
+ * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * ad5dz, rec@elf.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,28 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef ring_buffer_h_
+#define ring_buffer_h_
 
 #include <Arduino.h>
-#include "output_sample.h"
 
-void AudioOutputSample::update(void)
-{
-  audio_block_t *block;
-  updated += 1;
-  block = receiveReadOnly(0);
-  if (block) {
-    int16_t *bp = block->data, *end = bp+AUDIO_BLOCK_SAMPLES;
-    wptr = (rptr+1)%(2*AUDIO_BLOCK_SAMPLES);
-    while (bp < end) {
-      buffer[wptr++] = *bp++;
-      wptr %= 2*AUDIO_BLOCK_SAMPLES;
-    }
-    release(block);
-  } else {
-    wptr = (rptr+1)%(2*AUDIO_BLOCK_SAMPLES);
-    for (int i = AUDIO_BLOCK_SAMPLES; --i >= 0; ) {
-      buffer[wptr++] = 0;
-      wptr %= 2*AUDIO_BLOCK_SAMPLES;
-    }
-  }
-}
+/* circular buffer of int16_t for run lengths */
+class RingBuffer {
+public:
+  RingBuffer(void) { }
+  void reset(void) { wptr = rptr = 0; }
+  bool can_get(void) { return rptr!=wptr; }
+  bool can_put(void) { return (wptr+1)%SIZE != rptr; }
+  int16_t peek(void) { return buff[rptr]; }
+  int16_t get(void) { int16_t val = buff[rptr++]; rptr %= SIZE; return val; }
+  void put(int16_t val) { buff[wptr++] = val; wptr %= SIZE; }
+  unsigned items(void) { return ((unsigned)(wptr-rptr))%SIZE; }
+  static const unsigned SIZE = 128u;
+private:
+  uint16_t wptr = 0, rptr = 0;
+  int16_t buff[SIZE];
+};
+#endif

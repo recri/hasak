@@ -41,7 +41,7 @@ public:
     reset();
   }
   int16_t recv(void) {
-    uint16_t value = buffer[rptr++];
+    int16_t value = buffer[rptr++];
     rptr %= 2*AUDIO_BLOCK_SAMPLES;
     return value;
   }
@@ -50,7 +50,8 @@ public:
   void reset() { overrun = underrun = updated = 0; }
   virtual void update(void);
 private:
-  uint16_t wptr, rptr, buffer[2*AUDIO_BLOCK_SAMPLES];
+  uint16_t wptr, rptr;
+  int16_t buffer[2*AUDIO_BLOCK_SAMPLES];
   uint16_t overrun, underrun, updated;
   audio_block_t *inputQueueArray[1];
 };

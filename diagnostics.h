@@ -62,7 +62,7 @@ static void mreport(const char *tag, AudioStream &str) {
 static void sreport(void) {
   float total = 100*(float)AudioStream::cpu_cycles_total/(float)cpuCyclesPerAudioBuffer;
   float totalMax =  100*(float)AudioStream::cpu_cycles_total_max/(float)cpuCyclesPerAudioBufferMax;
-  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d\n", "total", total, totalMax, AudioMemoryUsage(), AudioMemoryUsageMax(), get_active_vox());
+  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d adc %d\n", "total", total, totalMax, AudioMemoryUsage(), AudioMemoryUsageMax(), get_active_vox(), _adc_out);
 }
 
 static void Sreport(void) {
@@ -160,7 +160,7 @@ const char *lorem =
 
 char *read_line() {
   static char buff[128];
-  int i = 0;
+  unsigned i = 0;
   for (int c = Serial.read(); c != '\n'; c = Serial.read())
     if (i < sizeof(buff)-1) buff[i++] = c;
   buff[i] = 0;

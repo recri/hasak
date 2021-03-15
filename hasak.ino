@@ -79,18 +79,18 @@ AudioConnection		patchCord2d(kyr, 0, arbiter, 3);
 static void arbiter_setup(void) {
   // define the voices the arbiter sees on input channels
   // changing to let their identity be their priority
-  arbiter.define_vox(0, KYR_VOX_S_KEY, KYR_VOX_S_KEY);
-  arbiter.define_vox(1, KYR_VOX_PAD, KYR_VOX_PAD);
-  arbiter.define_vox(2, KYR_VOX_WINK, KYR_VOX_WINK);
-  arbiter.define_vox(3, KYR_VOX_KYR, KYR_VOX_KYR);
+  arbiter.define_vox(0, KYR_VOX_S_KEY, KYR_VOX_S_KEY, 0);
+  arbiter.define_vox(1, KYR_VOX_PAD, KYR_VOX_PAD, 0);
+  arbiter.define_vox(2, KYR_VOX_WINK, KYR_VOX_WINK, 0);
+  arbiter.define_vox(3, KYR_VOX_KYR, KYR_VOX_KYR, 1);
 }
 int get_active_vox(void) { return arbiter.get_active_vox(); }
 
 // shaped key waveform
 AudioSynthKeyedTone	tone_ramp(1);
 AudioSynthKeyedTone	key_ramp(2);
-AudioConnection		patchCord3a(arbiter, 0, tone_ramp, 0);
-AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);
+AudioConnection		patchCord3a(arbiter, 0, tone_ramp, 0); // sidetone key line
+AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);  // transmit key line
 
 // microphone mute, disabled when ptt switch is pressed
 //AudioEffectMute		mic_mute;
@@ -114,6 +114,8 @@ AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);
 
 // 
 // output mixers
+// channel 0 rx_input from usb_in or mic_input from i2s_in
+// 
 AudioMixer4              l_i2s_out;
 AudioMixer4              r_i2s_out;
 AudioMixer4              l_usb_out;
@@ -121,14 +123,25 @@ AudioMixer4              r_usb_out;
 AudioMixer4              l_hdw_out;
 AudioMixer4              r_hdw_out;
 static void mixer_setup(float gain=1.0) {
+  // set everything off
   for (int i = 0; i < 4; i += 1) {
+    l_i2s_out.gain(i, 0);
+    r_i2s_out.gain(i, 0);
+    l_usb_out.gain(i, 0);
+    r_usb_out.gain(i, 0);
+    l_hdw_out.gain(i, 0);
+    r_hdw_out.gain(i, 0);
+  }
+  // mix rx_in and sidetone to headphones
+  for (int i = 0; i <= 2; i += 2) {
     l_i2s_out.gain(i, gain);
     r_i2s_out.gain(i, gain);
-    l_usb_out.gain(i, gain);
-    r_usb_out.gain(i, gain);
     l_hdw_out.gain(i, gain);
     r_hdw_out.gain(i, gain);
   }
+  // keyed IQ to usb_out
+  l_usb_out.gain(3, gain);
+  r_usb_out.gain(3, gain);
 }
 
 // first channel, rx audio and microphone input, op on headset mode
@@ -179,8 +192,8 @@ AudioConnection		patchCord943(key_ramp, 0, l_hdw_out, 3);
 AudioConnection		patchCord953(key_ramp, 1, r_hdw_out, 3);
 
 // temporary diagnostic connection, adc input to usb_out
-AudioConnection		patchCord998(adc_in, 0, l_usb_out, 3);
-AudioConnection		patchCord999(adc_in, 0, r_usb_out, 3);
+//AudioConnection		patchCord998(adc_in, 0, l_usb_out, 3);
+//AudioConnection		patchCord999(adc_in, 0, r_usb_out, 3);
 // temporary diagnostic connection, l_pad input to usb_out
 //AudioConnection		patchCord998(l_pad, 0, l_usb_out, 3);
 //AudioConnection		patchCord999(l_pad, 0, r_usb_out, 3);
@@ -276,7 +289,6 @@ void setup(void) {
 #endif
   arbiter_setup();
   mixer_setup();
-  sgtl5000.enable();
   AudioMemory(40);
   nrpn_setup();
 #ifdef KYR_DUP_LRCLK
@@ -394,8 +406,15 @@ static void nrpn_update_keyer(uint8_t vox) {
 
 static void nrpn_setup(void) {
 
-  /* codec setup */
+  /* enable codec */
+  /* this causes a loud pop with cap coupled head phone outputs */
+  sgtl5000.enable();
+
+  /* mute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
+  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 0);
+
+  /* codec setup */
   nrpn_set(KYRP_INPUT_SELECT, 0);
   nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
   kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
@@ -403,11 +422,10 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_MUTE_LINE_OUT, 1);
   nrpn_set(KYRP_LINE_IN_LEVEL, 5);
   nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
+
+  /* unmute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
-  for (int i = 0; i <= 80; i += 1) {
-    delay(1);
-    nrpn_set(KYRP_HEAD_PHONE_VOLUME, i);
-  }
+  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 40);
 
   /* soft controls */
   // KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
@@ -440,6 +458,7 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_PAD_MODE, KYRP_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRP_ADAPT_NORMAL);
+  nrpn_set(KYRP_PAD_KEYER, KYRP_KEYER_ND7PA);
   
   /* voice specializations */
   for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRP_NOT_SET;
@@ -457,7 +476,7 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   switch (nrpn) {
   case KYRP_HEAD_PHONE_VOLUME:
     // inspecting the sgtl5000 source finds only 7-8bits of precision for this.
-    sgtl5000.volume(value/255.0); kyr_nrpn[nrpn] = value;  break; // fix.me - automate
+    sgtl5000.volume(value/127.0); kyr_nrpn[nrpn] = value;  break; // fix.me - automate
   case KYRP_INPUT_SELECT:
     sgtl5000.inputSelect(value); kyr_nrpn[nrpn] = value; break;
   case KYRP_MUTE_HEAD_PHONES:
