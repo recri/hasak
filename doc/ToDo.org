@@ -1,7 +1,6 @@
 * Todo list as of 2020-03-16
 [ ] Figure out how to detect the headset switches.
-	They're just voltage changes.
-[ ] send midi sending many key_out and ptt_out note ons.
+	They're just voltage level changes.
 [ ] ptt_head breaks key and ptt.
 [ ] Test ptt_delay.
 [ ] Debounce the straight key.	
@@ -23,6 +22,7 @@
 [ ] Add tab to ctrlr panel for specifying morse key codes for characters.
 [ ] Add tab to ctrlr panel for the mixer matrix, or mixer presets.
 [ ] Implement local control of keyer.
+	k3ng immediate mode should work, most if it is covered.
 [ ] Implement winkey control of keyer.
 [ ] Pan sidetone to localize.
 [ ] Allow line-in to route through filters to headphone-out.
@@ -37,6 +37,9 @@
 [?] implement KYRP_IQ_BALANCE excess 1<<13 tweak to iq levels, units tbd, +/- 8k
 	only needed for RX
 * Todo list as of 2020-03-09
+[x] send midi sending many key_out and ptt_out note ons.
+	it was miswritten, but it didn't work anyway because key_out and ptt_out
+	are output pins, can't read them.  So store to memory and read from there.
 [-] Ease in the volume changes, get rid of the pop.
 [-] get rid of power on POP! in headphones
 	happens in the PJRC sgtl5000.enable() code, decline to rewrite.

@@ -26,7 +26,7 @@
 //   return code;
 // }
 //
-const unsigned char morse[64] = {
+static const unsigned char morse[64] = {
    0x01,     //33 !    not in ITU-R M.1677-1
    0x52,     //34 "    .-..-.
    0x01,     //35 #    not in ITU-R M.1677-1
