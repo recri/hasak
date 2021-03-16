@@ -703,10 +703,10 @@ static void midi_loop(void) {
     static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
     if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYR_L_PAD_NOTE);
     if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYR_R_PAD_NOTE);
-    if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(r_pad, KYR_S_KEY_NOTE);
-    if (digitalRead(KYR_PTT_SW_PIN) != ptt_sw) ptt_sw = midi_send_toggle(r_pad, KYR_PTT_SW_NOTE);
-    if (digitalRead(KYR_KEY_OUT_PIN) != key_out) key_out = midi_send_toggle(r_pad, KYR_KEY_OUT_NOTE);
-    if (digitalRead(KYR_PTT_OUT_PIN) != ptt_out) ptt_out = midi_send_toggle(r_pad, KYR_PTT_OUT_NOTE);
+    if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYR_S_KEY_NOTE);
+    if (digitalRead(KYR_PTT_SW_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYR_PTT_SW_NOTE);
+    if (digitalRead(KYR_KEY_OUT_PIN) != key_out) key_out = midi_send_toggle(key_out, KYR_KEY_OUT_NOTE);
+    if (digitalRead(KYR_PTT_OUT_PIN) != ptt_out) ptt_out = midi_send_toggle(key_out, KYR_PTT_OUT_NOTE);
   }
 }
 
