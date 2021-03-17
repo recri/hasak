@@ -62,7 +62,13 @@ static void mreport(const char *tag, AudioStream &str) {
 static void sreport(void) {
   float total = 100*(float)AudioStream::cpu_cycles_total/(float)cpuCyclesPerAudioBuffer;
   float totalMax =  100*(float)AudioStream::cpu_cycles_total_max/(float)cpuCyclesPerAudioBufferMax;
-  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d adc %d\n", "total", total, totalMax, AudioMemoryUsage(), AudioMemoryUsageMax(), get_active_vox(), _adc_out);
+  float msPerIes = 1000.0f*get_vox_ies(get_active_vox())/AUDIO_SAMPLE_RATE;
+  float msPerIls = 1000.0f*get_vox_ils(get_active_vox())/AUDIO_SAMPLE_RATE;
+  float msPerIws = 1000.0f*get_vox_iws(get_active_vox())/AUDIO_SAMPLE_RATE;
+  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d ies/ils/iws %.1f/%.1f/%.1f ms adc %d\n", "total", 
+		total, totalMax, AudioMemoryUsage(), AudioMemoryUsageMax(), get_active_vox(), 
+		msPerIes, msPerIls, msPerIws,
+		_adc_out);
 }
 
 static void Sreport(void) {
@@ -140,15 +146,6 @@ static void Sreset(void) {
   mreset(usb_out);
 }
 
-static void usb_out_mix(int l, int r) {
-  for (int i = 0; i < 4; i += 1) {
-    l_usb_out.gain(i,0.0);
-    r_usb_out.gain(i,0.0);
-  }
-  l_usb_out.gain(l,1.0); 	/* left channel */
-  r_usb_out.gain(r,1.0);	/* right channel */
-}
-
 const char *lorem = 
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
   "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
@@ -159,12 +156,47 @@ const char *lorem =
   "culpa qui officia deserunt mollit anim id est laborum.";
 
 char *read_line() {
-  static char buff[128];
+  static char buff[256];
   unsigned i = 0;
   for (int c = Serial.read(); c != '\n'; c = Serial.read())
-    if (i < sizeof(buff)-1) buff[i++] = c;
+    if (i < sizeof(buff)-1)
+      buff[i++] = c;
   buff[i] = 0;
   return buff;
+}
+
+static void mixer_set(const char *p) {
+  AudioMixer4& left = l_usb_out;
+  AudioMixer4& right = r_usb_out;
+  const char *dev = "unk";
+  switch (p[0]) {
+  case 'u': dev = "usb"; left = l_usb_out; right = r_usb_out; break;
+  case 'i': dev = "i2s"; left = l_i2s_out; right = r_i2s_out; break;
+  case 'h': dev = "hdw"; left = l_hdw_out; right = r_hdw_out; break;
+  default: Serial.printf("unrecognized mixer string %s\n", p); return;
+  }
+  p += 1;
+  switch (p[0]) {
+  case 'l': /* left mixers */
+    for (int i = 0; i < 4; i += 1) {
+      Serial.printf("l_%s_out.gain(%d,%c)\n", dev, i, p[1+i]);
+      left.gain(i,p[1+i]=='1'?1.0: 0.0);
+    }
+    break;
+  case 'r': /* right mixers */
+    for (int i = 0; i < 4; i += 1) {
+      Serial.printf("r_%s_out.gain(%d,%c)\n", dev, i, p[1+i]);
+      right.gain(i,p[1+i]=='1'?1.0: 0.0);
+    }
+    break;
+  case '0': case '1': /* both mixers */
+    for (int i = 0; i < 4; i += 1) {
+      Serial.printf("*_%s_out.gain(%d,%c)\n", dev, i, p[i]);
+      left.gain(i,p[i]=='1'?1.0: 0.0);
+      right.gain(i,p[i]=='1'?1.0: 0.0);
+    }
+    break;
+  }
 }
 
 void diagnostics_loop() {
@@ -178,9 +210,9 @@ void diagnostics_loop() {
   }
 
   if (Serial.available()) {
-    uint8_t c = Serial.read();
-    // Serial.printf("diag read '%c'\n", c);
-    switch (c) {
+    char *p = read_line();
+    Serial.printf("diag read '%s'\n", p);
+    switch (*p) {
     default: break;
     case '?': 
       Serial.printf("hasak monitor usage:\n"
@@ -190,33 +222,26 @@ void diagnostics_loop() {
 		    " R -> reset detailed usage counts\n"
 		    " w... -> send ... up to newline to wink keyer\n"
 		    " k... -> send ... up to newline to kyr keyer\n"
-		    " a -> usb_out shows microphone and sidetone\n"
-		    " b -> usb_out shows microphone and test stream\n"
-		    " c -> usb_out shows test stream and sidetone\n"
-		    " d -> usb_out shows channel 3\n"
+		    " W -> send lorem ipsum to wink keyer\n"
+		    " k -> send lorem ipsum to kyr keyer\n"
 		    " e -> default mixers\n"
-		    " t -> send lorem ipsum to wink keyer\n"
-		    " u -> send lorem ipsum to wink keyer\n"
+		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
+		    " i#### | il#### | ir#### -> set (both | left | right) i2s out mixers, # is 0|1\n"
+		    " u#### | ul#### | ur#### -> set (both | left | right) usb out mixers, # is 0|1\n"
 		    );
       break;
     case 's': sreport(); /* short summary */; break;
-    case 'r': sreset(); /* short reset */; break;
     case 'S': Sreport(); /* long summary */ break;
+    case 'r': sreset(); /* short reset */ break;
     case 'R': Sreset(); /* long reset */ break;
-    case 'w': wink.send_text(read_line()); break;
-    case 'k': kyr.send_text(read_line()); break;
-    case 't': wink.send_text(lorem); break;
-    case 'u': wink.send_text(lorem); break;
-    case 'a': usb_out_mix(0, 2); /* microphone, sidetone */ break;
-    case 'b': usb_out_mix(0, 3); /* microphone, test */ break;
-    case 'c': usb_out_mix(3, 2); /* test, sidetone */ break;
-    case 'd': usb_out_mix(3,3);	/* test1, test2 */ break;
-    case 'e': // default mixers
-      for (int i = 0; i < 4; i += 1) {
-	l_usb_out.gain(i,1.0);
-	r_usb_out.gain(i,1.0);
-      }
-      break;
+    case 'w': wink.send_text(p+1); break;
+    case 'k': kyr.send_text(p+1); break;
+    case 'W': wink.send_text(lorem); break;
+    case 'K': kyr.send_text(lorem); break;
+    case 'e': mixer_setup(); /* default mixers */ break;
+    case 'u': 
+    case 'i': 
+    case 'h': mixer_set(p); break;
     }
   }
 }  

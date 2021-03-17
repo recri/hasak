@@ -59,11 +59,11 @@ static void nrpn_update_keyer(uint8_t vox) {
   /* Serial.printf("morse_keyer r %f, w %f, c %f\n", r, w, c); */
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
   const unsigned ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
-  const int16_t ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
-  const int16_t ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
-  const int16_t ticksPerIes = (1  -w-c) * ticksPerBaseDit;
-  int16_t ticksPerIls = (3  -w-c) * ticksPerBaseDit;
-  int16_t ticksPerIws = (7  -w-c) * ticksPerBaseDit;
+  int ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
+  int ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
+  int ticksPerIes = (1  -w-c) * ticksPerBaseDit;
+  int ticksPerIls = (3  -w-c) * ticksPerBaseDit;
+  int ticksPerIws = (7  -w-c) * ticksPerBaseDit;
     
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
@@ -75,6 +75,8 @@ static void nrpn_update_keyer(uint8_t vox) {
     ticksPerIls *= f;		// stretched inter-character pause
     ticksPerIws *= f;		// stretched inter-word pause
   }
+  /* test for overflow */
+  ticksPerIws = min(ticksPerIws, 0x7fff);
   /* Serial.printf("morse_keyer base dit %u, dit %u, dah %u, ies %u, ils %u, iws %u\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   AudioNoInterrupts();

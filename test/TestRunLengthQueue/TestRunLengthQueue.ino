@@ -73,9 +73,26 @@ void ring_buffer_test(void) {
 
 }
 
-void in_and_out(int n) {
-  for (int i = 0; i < n; i += 1) r.put_run(1);
-  for (int i = 0; i < n; i += 1) if (r.get_bit() < 0) Serial.printf("! not getting out.\n");
+void in_and_out(int n, int ns[]) {
+  for (int i = 0; i < n; i += 1) 
+    r.put_run(ns[i]);
+  for (int i = 0; i < n; i += 1)
+    if (ns[i] > 0)
+      for (int j = 0; j < ns[i]; j  += 1) {
+	int k = r.get_bit();
+	if (k < 0) 
+	  Serial.printf("! not getting out.\n");
+	else if (k == 0)
+	  Serial.printf("! getting 0 instead of 1.\n");
+      }
+    else if (ns[i] < 0)
+      for (int j = 0; j > ns[i]; j -= 1) {
+	int k = r.get_bit();
+	if (k < 0) 
+	  Serial.printf("! not getting out.\n");
+	else if (k != 0)
+	  Serial.printf("! getting 1 instead of 0.\n");
+      }
 }
 
 void setup(void) {
@@ -83,12 +100,12 @@ void setup(void) {
   while ( ! Serial);
   Serial.printf("Testing run length queue.\n");
   ring_buffer_test();
-  Serial.printf("In and out 10.\n");
-  in_and_out(10);
-  Serial.printf("In and out 100.\n");
-  in_and_out(100);
-  Serial.printf("In and out 1000.\n");
-  in_and_out(1000);
+  Serial.printf("In and out {128}\n");
+  { int t[] = {128}; in_and_out(1, t); }
+  Serial.printf("In and out {128,-128}.\n");
+  { int t[] = {128,-128}; in_and_out(2, t); }
+  Serial.printf("In and out {128,-128,0,1}.\n");
+  { int t[] = {128,-128,0,1}; in_and_out(4,t); }
   Serial.printf("Testing complete.\n");
 }
 

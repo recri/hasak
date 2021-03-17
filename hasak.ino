@@ -148,7 +148,7 @@ static void mixer_setup(float gain=1.0) {
   // l_usb_out.gain(3, 0);
 }
 
-// first channel, rx audio and microphone input, op on headset mode
+// first channel, rx audio and microphone/line-in input, op on headset mode
 // switch codec to use microphone instead of line-in
 //AudioConnection		patchCord900(l_rx_mute, 0, l_i2s_out, 0);
 //AudioConnection		patchCord910(r_rx_mute, 0, r_i2s_out, 0);
@@ -166,6 +166,7 @@ AudioConnection		patchCord950(usb_in, 1, r_hdw_out, 0);
 // second channel, line-out audio and line-in audio, 2x2 sound card mode
 // switch codec to use line-in instead of microphone and line-out instead
 // of headphones, can still use keyer on MQS output.
+// same as the first, should be dropped
 AudioConnection		patchCord901(usb_in, 0, l_i2s_out, 1);
 AudioConnection		patchCord911(usb_in, 1, r_i2s_out, 1);
 AudioConnection		patchCord921(i2s_in, 0, l_usb_out, 1);
@@ -194,22 +195,6 @@ AudioConnection		patchCord923(key_ramp, 0, l_usb_out, 3);
 AudioConnection		patchCord933(key_ramp, 1, r_usb_out, 3);
 AudioConnection		patchCord943(key_ramp, 0, l_hdw_out, 3);
 AudioConnection		patchCord953(key_ramp, 1, r_hdw_out, 3);
-
-// temporary diagnostic connection, adc input to usb_out
-//AudioConnection		patchCord998(adc_in, 0, l_usb_out, 3);
-//AudioConnection		patchCord999(adc_in, 0, r_usb_out, 3);
-// temporary diagnostic connection, l_pad input to usb_out
-//AudioConnection		patchCord998(l_pad, 0, l_usb_out, 3);
-//AudioConnection		patchCord999(l_pad, 0, r_usb_out, 3);
-// temporary diagnostic connection, paddle and arbiter to usb_out
-//AudioConnection		patchCord998(paddle, 0, l_usb_out, 3);
-//AudioConnection		patchCord999(arbiter, 0, r_usb_out, 3);
-// temporary diagnostic connection, arbiter sidetone and key to usb_out
-//AudioConnection		patchCord998(arbiter, 0, l_usb_out, 3);
-//AudioConnection		patchCord999(arbiter, 1, r_usb_out, 3);
-// temporary diagnostic connection, arbiter key and ptt to usb_out
-//AudioConnection		patchCord998(arbiter, 1, l_usb_out, 3);
-//AudioConnection		patchCord999(arbiter, 2, r_usb_out, 3);
 
 // outputs
 AudioOutputSample	key_out;

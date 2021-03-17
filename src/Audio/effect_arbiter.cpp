@@ -149,7 +149,7 @@ void AudioEffectArbiter::update(void)
 	  active_tail = ptt_tail;
 	  /* push delay if necessary */
 	  if ( ! delay_queued) {
-	    queue_runs(+ptt_head, -ptt_head);
+	    queue_runs(-ptt_head, +ptt_head);
 	    delay_queued = 1;
 	  }
 	  /* queue key and ptt */
