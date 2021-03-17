@@ -54,7 +54,14 @@
   #error "You're not building for a Teensy?"
 #endif
 
-/* keyer voices in order of highest priority */
+/*
+** keyer voices
+** A keyer vox is a key or paddle or text input that produces a sidetone
+** and possibly a transmit output.
+** Four (or five) default voices.
+** Voices can have priority, lowest wins, and can be local, never transmitted,
+** and can have their own keyer properties.
+*/
 #define KYR_N_VOX 4		/* number of keyer voices */
 #define KYR_VOX_NONE	0	/* no active voice */
 #define KYR_VOX_S_KEY	1	/* Straight Key */
@@ -62,7 +69,13 @@
 #define KYR_VOX_WINK	3	/* Winkey Key */
 #define KYR_VOX_KYR	4	/* Kyr Key */
 
-/* pins assigned for audio card interface */
+/*
+** Pin budgeting.
+** Pins assigned for audio card interface,
+** for I2C communication,
+** for hardware audio output,
+** and for microphone input or headset switch detection.
+*/
 #if defined(TEENSY4)
 /* I2S 7, 8, 20, 21, 23 */
 #define KYR_DIN		7
@@ -102,7 +115,9 @@
 #define KYR_HEAD_SW	16	/* A2 */
 #endif
 
-/* pin assignments for input switches and output latches */
+/* 
+** pin assignments for standard input switches and output latches
+*/
 #define KYR_R_PAD_PIN	0
 #define KYR_L_PAD_PIN	1
 #define KYR_S_KEY_PIN	2
@@ -110,14 +125,19 @@
 #define KYR_KEY_OUT_PIN	4
 #define KYR_PTT_OUT_PIN	5
 
-/* iambic keyer selection, not used */
-
-/* MIDI usage */
+/* 
+** MIDI usage
+*/
 /* midi channel usage */
 #define KYR_IN_CHANNEL	1	/* default input channel used for keyer */
 #define KYR_OUT_CHANNEL 1	/* default output channel used for keyer */
 
-/* midi note usage, undefine to not send */
+/*
+** midi note usage
+** KYRP_SEND_MIDI controls whether any notes are sent at all.
+** by default we send notes for the following input keys
+** and transmit key events.
+*/
 #define KYR_L_PAD_NOTE		0      /* note used to report raw left paddle switch */
 #define KYR_R_PAD_NOTE		1      /* note used to report raw right paddle switch */
 #define KYR_S_KEY_NOTE		2      /* note used to report raw straight key switch */
@@ -126,11 +146,12 @@
 #define KYR_PTT_OUT_NOTE	5      /* note used to send external ptt signal */
 
 /*
-** midi control change usage,
-** rather than overloading assigned control change messages, which gets out
-** of hand quickly, use NRPN's for all controls.  NRPN's are Non-Registered
+** midi control change usage.
+**
+** rather than overloading pre-assigned control change messages, which gets out
+** of hand quickly, we use NRPN's for all controls.  NRPN's are Non-Registered
 ** Parameter Numbers, so they are specific to particular hardware and don't
-** need to match up to anybody else's list.  We will have a lot of parameters.
+** need to match up to anybody else's list.
 **
 ** Use them like this
 **  1) select NRPN with control change 99 (NRPN_MSB) and 98 (NRPN_LSB)
@@ -142,13 +163,20 @@
 /* control change messages used */
 #define KYR_CC_MSB	6	/* Data Entry (MSB) */
 #define KYR_CC_LSB	38	/* Data Entry (LSB) */
-//#define KYR_CC_UP	96	/* Data Button increment */
-//#define KYR_CC_DOWN	97	/* Data Button decrement */
 #define KYR_CC_NRPN_LSB	98	/* Non-registered Parameter (LSB) */
 #define KYR_CC_NRPN_MSB	99	/* Non-registered Parameter (MSB) */
 
-/* nrpn numbers used, 280 total */
-/* nrpns are organized into four blocks: NRPN_GLOBAL_BLOCK, NRPN_CODEC_BLOCK, NRPN_KEYER_BLOCK, NRPN_VOX_BLOCKS */
+/*
+** nrpn assigments
+** nrpns are organized into blocks: 
+** KYRP_CODEC - global codec controls
+** KYRP_SOFT  - soft global controls
+** KYRP_MORSE - the 64 character morse code table
+** KYRP_MIXER - the 24 output mixer levels
+** KYRP_KEYER - the default keyer parameters
+** KYRP_VOX_* - the voice specific keyer parameters
+*/
+
 /* NRPN_GLOBAL_BLOCK - parameters controlling the entire keyer */
 #define KYRP_GLOBAL		0
 
@@ -180,8 +208,10 @@
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
 #define KYRP_ST_ENABLE		(KYRP_SOFT+10) /* 0, 1 -> disable, enable  */
 #define KYRP_IQ_BALANCE		(KYRP_SOFT+11) /*  adjustment to iq balance, +/- units tbd, excess 8096 */
+
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
+/* lower case alpha are mapped to upper case on input */
 /* relocation base */
 #define KYRP_MORSE		(KYRP_SOFT+16) /* == 32 */
 
@@ -216,7 +246,8 @@
 #define KYRP_MIX_MQS_R2		(KYRP_MIXER+22)
 #define KYRP_MIX_MQS_R3		(KYRP_MIXER+23)
 
-/* NRPN_KEYER_BLOCK - default keyer parameters *//* these are NRPN's which apply to keyer voices, some voices do not use all of them */
+/* NRPN_KEYER_BLOCK - default keyer parameters */
+/* these are NRPN's which apply to keyer voices, some voices do not use all of them */
 /* relocation base */
 #define KYRP_KEYER		(KYRP_MIXER+24) /* == 120 */
 
@@ -274,36 +305,38 @@
 #define KYRP_WIND_OFFSET	KYRP_VOX_3
 #define KYRP_KYR_OFFSET		KYRP_VOX_4
 
-/* Named NRPN values */
+/* 
+** these are named NRPN values
+** should be refactored to be named KYRV_* instead of KYRP_*
+*/
 
 /* the unset value */
 #define KYRP_NOT_SET			-1
 
-/* slew ramps */
-#define KYRP_RAMP_HANN			0 /* RISE_RAMP, FALL_RAMP */
-#define KYRP_RAMP_BLACKMAN_HARRIS	1 /* not implemented */
-#define KYRP_RAMP_LINEAR		2 /* not implemented */
-#define KYRP_RAMP_SLINEAR		3 /* smoothed linear */
+/* slew ramps, values of KYRP_RISE_RAMP and KYRP_FALL_RAMP */
+#define KYRP_RAMP_HANN			0 /* ramp from Hann window, raised cosine */
+#define KYRP_RAMP_BLACKMAN_HARRIS	1 /* ramp from Blackman Harris window */
+#define KYRP_RAMP_LINEAR		2 /* linear ramp, for comparison */
 
-/* paddle keyer modes */
-#define KYRP_MODE_A			0 /* PAD_MODE */
-#define KYRP_MODE_B			1 /* PAD_MODE */
+/* paddle keyer modes, values of KYRP_PAD_MODE */
+#define KYRP_MODE_A			0 /* iambic mode A */
+#define KYRP_MODE_B			1 /* iambic mode  */
 #define KYRP_MODE_S			2 /* PAD_MODE */
 
-/* paddle adapter modes */
-#define KYRP_ADAPT_NORMAL		0
-#define KYRP_ADAPT_ULTIMATIC		1
-#define KYRP_ADAPT_SINGLE		2
+/* paddle adapter modes, values of KYRP_PAD_ADAPT */
+#define KYRP_ADAPT_NORMAL		0 /* unmodified input paddles */
+#define KYRP_ADAPT_ULTIMATIC		1 /* modified to produce ultimatic */
+#define KYRP_ADAPT_SINGLE		2 /* modified to simulate single lever paddle */
 
-/* paddle keyers */
-#define KYRP_KEYER_AD5DZ		0
-#define KYRP_KEYER_K1EL			1
-#define KYRP_KEYER_ND7PA		2
-#define KYRP_KEYER_VK6PH		3
+/* paddle keyers, values of KYRP_PAD_KEYER */
+#define KYRP_KEYER_AD5DZ		0 /* iambic keyer by ad5dz */
+#define KYRP_KEYER_K1EL			1 /* iambic keyer by k1el */
+#define KYRP_KEYER_ND7PA		2 /* iambic keyer by nd7pa */
+#define KYRP_KEYER_VK6PH		3 /* iambic keyer by vk6ph */
 
-/* iq enable modes */
-#define KYRP_IQ_NONE			0 /* IQ_ENABLE */
-#define KYRP_IQ_LSB			1
-#define KYRP_IQ_USB			2
+/* iq enable modes, values of KYRP_IQ_ENABLE */
+#define KYRP_IQ_NONE			0 /* no IQ */
+#define KYRP_IQ_LSB			1 /* IQ for lower sideband */
+#define KYRP_IQ_USB			2 /* IQ for upper sideband */
 
 #endif

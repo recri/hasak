@@ -1,5 +1,12 @@
 * Todo list as of 2020-03-16
+[x] Change Ctrlr ptt_tail and ptt_head to ms units.
+[ ] Change ptt_tail and ptt_head to ms units in hasak.
+[ ] KYRP_PTT_TAIL, if set to IWS, will overflow at 10WPM
+	even as ms/10.  Change PTT_* to ms.
 [ ] KYRP_PER_IWS overflows int16_t nrpn[] at 10WPM.
+	Set minimum speed to 10WPM, store element lengths at
+	ms/10, scale to samples on fetch.  Or keep element
+	lengths at ms.
 [ ] Figure out how to detect the headset switches.
 	They're just voltage level changes.
 [ ] ptt_head breaks key and ptt.
