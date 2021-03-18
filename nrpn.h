@@ -79,12 +79,14 @@ static void nrpn_update_keyer(uint8_t vox) {
   ticksPerIws = min(ticksPerIws, 0x7fff);
   /* Serial.printf("morse_keyer base dit %u, dit %u, dah %u, ies %u, ils %u, iws %u\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
+  /* storing msPerElement, because ticks gets too large */
   AudioNoInterrupts();
-  set_vox_nrpn(vox, KYRP_PER_DIT, ticksPerDit);
-  set_vox_nrpn(vox, KYRP_PER_DAH, ticksPerDah);
-  set_vox_nrpn(vox, KYRP_PER_IES, ticksPerIes);
-  set_vox_nrpn(vox, KYRP_PER_ILS, ticksPerIls);
-  set_vox_nrpn(vox, KYRP_PER_IWS, ticksPerIws);
+  
+  set_vox_nrpn(vox, KYRP_PER_DIT, ticksPerDit/(AUDIO_SAMPLE_RATE/1000));
+  set_vox_nrpn(vox, KYRP_PER_DAH, ticksPerDah/(AUDIO_SAMPLE_RATE/1000));
+  set_vox_nrpn(vox, KYRP_PER_IES, ticksPerIes/(AUDIO_SAMPLE_RATE/1000));
+  set_vox_nrpn(vox, KYRP_PER_ILS, ticksPerIls/(AUDIO_SAMPLE_RATE/1000));
+  set_vox_nrpn(vox, KYRP_PER_IWS, ticksPerIws/(AUDIO_SAMPLE_RATE/1000));
   AudioInterrupts();
 }
 

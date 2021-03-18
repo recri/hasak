@@ -52,11 +52,11 @@ static inline int get_vox_auto_iws(int vox) { return get_vox_nrpn(vox, KYRP_AUTO
 static inline int get_vox_pad_keyer(int vox) { return get_vox_nrpn(vox, KYRP_PAD_KEYER); }
 
 /* keyer timing */
-static inline int get_vox_dit(int vox) { return get_vox_nrpn(vox, KYRP_PER_DIT); }
-static inline int get_vox_dah(int vox) { return get_vox_nrpn(vox, KYRP_PER_DAH); }
-static inline int get_vox_ies(int vox) { return get_vox_nrpn(vox, KYRP_PER_IES); }
-static inline int get_vox_ils(int vox) { return get_vox_nrpn(vox, KYRP_PER_ILS); }
-static inline int get_vox_iws(int vox) { return get_vox_nrpn(vox, KYRP_PER_IWS); }
+static inline int get_vox_dit(int vox) { return get_vox_nrpn(vox, KYRP_PER_DIT)*(AUDIO_SAMPLE_RATE/1000); }
+static inline int get_vox_dah(int vox) { return get_vox_nrpn(vox, KYRP_PER_DAH)*(AUDIO_SAMPLE_RATE/1000); }
+static inline int get_vox_ies(int vox) { return get_vox_nrpn(vox, KYRP_PER_IES)*(AUDIO_SAMPLE_RATE/1000); }
+static inline int get_vox_ils(int vox) { return get_vox_nrpn(vox, KYRP_PER_ILS)*(AUDIO_SAMPLE_RATE/1000); }
+static inline int get_vox_iws(int vox) { return get_vox_nrpn(vox, KYRP_PER_IWS)*(AUDIO_SAMPLE_RATE/1000); }
 
 /* raw key timing */
 static inline int get_vox_speed(int vox) { return get_vox_nrpn(vox, KYRP_SPEED); }
@@ -71,7 +71,7 @@ static inline int get_vox_rise_time(int vox) { return get_vox_nrpn(vox, KYRP_RIS
 static inline int get_vox_rise_ramp(int vox) { return get_vox_nrpn(vox, KYRP_RISE_RAMP); }
 static inline int get_vox_fall_time(int vox) { return get_vox_nrpn(vox, KYRP_FALL_TIME); }
 static inline int get_vox_fall_ramp(int vox) { return get_vox_nrpn(vox, KYRP_FALL_RAMP); }
-static inline int time_to_samples(int time) { return ((int)AUDIO_SAMPLE_RATE) * time / 10000; }
+static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE/1000.0); }
 
 /* keyer ptt parameters */
 static inline int get_vox_ptt_head(int vox) { return get_vox_nrpn(vox, KYRP_HEAD_TIME); }

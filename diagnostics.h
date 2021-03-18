@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 /*
-** diagnostics
+** diagnostics / command line interface
 */
 
 /*
@@ -45,16 +45,23 @@ static void report(const char *tag, int use, int umax, int mem, int mmax, int ov
   Serial.printf("\n");
 }
 /* report input/output module usage */
-static void ireport(const char *tag, AudioInputSample &sample) {
+static void ireport(const char *tag, AudioInputSample& sample) {
   report(tag, sample.cpu_cycles, sample.cpu_cycles_max, 0, 0, sample.overruns(), sample.underruns());
 }
 
-static void oreport(const char *tag, AudioOutputSample &sample) {
+static void oreport(const char *tag, AudioOutputSample& sample) {
   report(tag, sample.cpu_cycles, sample.cpu_cycles_max, 0, 0, sample.overruns(), sample.underruns());
+}
+
+/* button report */
+static void breport(const char *tag, AudioEffectButton& but) {
+  Serial.printf("%16s %5d %5d", tag, but.cpu_cycles, but.cpu_cycles_max);
+  for (int i = 0; i < but.N_BUTTONS; i += 1) Serial.printf(" [#%d @%5d]", i, but.centers[i]);
+  Serial.printf("\n");
 }
 
 /* generic audio module report and reset */
-static void mreport(const char *tag, AudioStream &str) {
+static void mreport(const char *tag, AudioStream& str) {
   report(tag, str.cpu_cycles, str.cpu_cycles_max, 0, 0, 0, 0);
 }
 
@@ -65,10 +72,9 @@ static void sreport(void) {
   float msPerIes = 1000.0f*get_vox_ies(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIls = 1000.0f*get_vox_ils(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIws = 1000.0f*get_vox_iws(get_active_vox())/AUDIO_SAMPLE_RATE;
-  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d ies/ils/iws %.1f/%.1f/%.1f ms adc %d\n", "total", 
+  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d ies/ils/iws %.1f/%.1f/%.1f ms\n", "total", 
 		total, totalMax, AudioMemoryUsage(), AudioMemoryUsageMax(), get_active_vox(), 
-		msPerIes, msPerIls, msPerIws,
-		_adc_out);
+		msPerIes, msPerIls, msPerIws);
 }
 
 static void Sreport(void) {
@@ -85,7 +91,9 @@ static void Sreport(void) {
   ireport("ptt sw", ptt_sw);
   mreport("winkey", wink); 
   mreport("kyr", kyr);
+  mreport("adc", adc_in);
   mreport("paddle", paddle);
+  breport("button", button);
   mreport("arbiter", arbiter);
   mreport("tone_ramp", tone_ramp);
   mreport("key_ramp", key_ramp);
@@ -97,6 +105,8 @@ static void Sreport(void) {
   mreport("r_hdw_out", r_hdw_out);
   oreport("key_out", key_out); 
   oreport("ptt out", ptt_out);
+  oreport("up out", up_out);
+  oreport("down out", down_out);
 }
 
 /* summary reset */

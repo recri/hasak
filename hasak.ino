@@ -40,6 +40,7 @@
 #include "src/Audio/input_sample.h"
 #include "src/Audio/input_text.h"
 #include "src/Audio/effect_paddle.h"
+#include "src/Audio/effect_button.h"
 #include "src/Audio/effect_arbiter.h"
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/effect_mute.h"
@@ -70,12 +71,18 @@ AudioEffectPaddle	paddle(KYR_VOX_PAD);	//
 AudioConnection         patchCord1a(l_pad, 0, paddle, 0);
 AudioConnection         patchCord1b(r_pad, 0, paddle, 1);
 
+// button discriminator
+AudioEffectButton	button;
+AudioConnection		patchCord1c(adc_in, 0, button, 0);
+
 // arbitration
 AudioEffectArbiter	arbiter;
 AudioConnection		patchCord2b(s_key, 0, arbiter, 0);
 AudioConnection		patchCord2a(paddle, 0, arbiter, 1);
 AudioConnection		patchCord2c(wink, 0, arbiter, 2);
 AudioConnection		patchCord2d(kyr, 0, arbiter, 3);
+AudioConnection		patchCord2e(button, 0, arbiter, 4);
+
 static void arbiter_setup(void) {
   // define the voices the arbiter sees on input channels
   // changing to let their identity be their priority
@@ -83,34 +90,16 @@ static void arbiter_setup(void) {
   arbiter.define_vox(1, KYR_VOX_PAD, KYR_VOX_PAD, 0);
   arbiter.define_vox(2, KYR_VOX_WINK, KYR_VOX_WINK, 0);
   arbiter.define_vox(3, KYR_VOX_KYR, KYR_VOX_KYR, 1);
+  arbiter.define_vox(4, KYR_VOX_BUT, KYR_VOX_BUT, 1);
 }
+
 int get_active_vox(void) { return arbiter.get_active_vox(); }
 
 // shaped key waveform
-AudioSynthKeyedTone	tone_ramp(1);
-AudioSynthKeyedTone	key_ramp(2);
+AudioSynthKeyedTone	tone_ramp(1); // one channel sidetone ramp
+AudioSynthKeyedTone	key_ramp(2);  // two channel IQ tone ramp
 AudioConnection		patchCord3a(arbiter, 0, tone_ramp, 0); // sidetone key line
 AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);  // transmit key line
-
-// microphone mute, disabled when ptt switch is pressed
-//AudioEffectMute		mic_mute;
-//AudioEffectMultiply	l_mic_mute;
-//AudioEffectMultiply	r_mic_mute;
-//AudioConnection		patchCord4a(ptt_sw, 0, mic_mute, 0);
-//AudioConnection		patchCord4b(mic_mute, 0, l_mic_mute, 0);
-//AudioConnection		patchCord4c(mic_mute, 0, r_mic_mute, 0);
-//AudioConnection		patchCord4d(i2s_in, 0, l_mic_mute, 1);
-//AudioConnection		patchCord4e(i2s_in, 1, r_mic_mute, 1);
-
-// receive mute, enabled when arbiter vox line is active
-//AudioEffectMute		rx_mute;
-//AudioEffectMultiply	l_rx_mute;
-//AudioEffectMultiply	r_rx_mute;
-//AudioConnection		patchCord6a(arbiter, 1, rx_mute, 0);
-//AudioConnection		patchCord6b(rx_mute, 0, l_rx_mute, 0);
-//AudioConnection		patchCord6c(rx_mute, 0, r_rx_mute, 0);
-//AudioConnection		patchCord6d(usb_in, 0, l_rx_mute, 1);
-//AudioConnection		patchCord6e(usb_in, 1, r_rx_mute, 1);
 
 // 
 // output mixers
@@ -133,15 +122,15 @@ static void mixer_setup(float gain=1.0) {
     r_hdw_out.gain(i, 0);
   }
   // mix rx_in and sidetone to headphones
-  for (int i = 0; i <= 2; i += 2) {
+  for (int i = 0; i < 2; i += 1) {
     l_i2s_out.gain(i, gain);
     r_i2s_out.gain(i, gain);
     l_hdw_out.gain(i, gain);
     r_hdw_out.gain(i, gain);
   }
   // keyed IQ to usb_out
-  l_usb_out.gain(3, gain);
-  r_usb_out.gain(3, gain);
+  l_usb_out.gain(2, gain);
+  r_usb_out.gain(2, gain);
   // temporary test: sidetone on l_usb_out, iq on r_usb_out, to see ppt_head.
   // l_usb_out should lead r_usb_out by head_time, but doesn't
   // l_usb_out.gain(2, gain);
@@ -150,12 +139,6 @@ static void mixer_setup(float gain=1.0) {
 
 // first channel, rx audio and microphone/line-in input, op on headset mode
 // switch codec to use microphone instead of line-in
-//AudioConnection		patchCord900(l_rx_mute, 0, l_i2s_out, 0);
-//AudioConnection		patchCord910(r_rx_mute, 0, r_i2s_out, 0);
-//AudioConnection		patchCord920(l_mic_mute, 0, l_usb_out, 0);
-//AudioConnection		patchCord930(r_mic_mute, 0, r_usb_out, 0);
-//AudioConnection		patchCord940(l_rx_mute, 0, l_hdw_out, 0);
-//AudioConnection		patchCord950(r_rx_mute, 0, r_hdw_out, 0);
 AudioConnection		patchCord900(usb_in, 0, l_i2s_out, 0);
 AudioConnection		patchCord910(usb_in, 1, r_i2s_out, 0);
 AudioConnection		patchCord920(i2s_in, 0, l_usb_out, 0);
@@ -163,38 +146,34 @@ AudioConnection		patchCord930(i2s_in, 1, r_usb_out, 0);
 AudioConnection		patchCord940(usb_in, 0, l_hdw_out, 0);
 AudioConnection		patchCord950(usb_in, 1, r_hdw_out, 0);
 
-// second channel, line-out audio and line-in audio, 2x2 sound card mode
-// switch codec to use line-in instead of microphone and line-out instead
-// of headphones, can still use keyer on MQS output.
-// same as the first, should be dropped
-AudioConnection		patchCord901(usb_in, 0, l_i2s_out, 1);
-AudioConnection		patchCord911(usb_in, 1, r_i2s_out, 1);
-AudioConnection		patchCord921(i2s_in, 0, l_usb_out, 1);
-AudioConnection		patchCord931(i2s_in, 1, r_usb_out, 1);
-AudioConnection		patchCord941(usb_in, 0, l_hdw_out, 1);
-AudioConnection		patchCord951(usb_in, 1, r_hdw_out, 1);
-
-// third channel, sidetone
+// second channel, keyed sidetone
 // probably only sent to i2s for headphones/speakers
 // balance l vs r to localize
 // adjust level of sidetone
-AudioConnection		patchCord902(tone_ramp, 0, l_i2s_out, 2);
-AudioConnection		patchCord912(tone_ramp, 0, r_i2s_out, 2);
-AudioConnection		patchCord922(tone_ramp, 0, l_usb_out, 2);
-AudioConnection		patchCord932(tone_ramp, 0, r_usb_out, 2);
-AudioConnection		patchCord942(tone_ramp, 0, l_hdw_out, 2);
-AudioConnection		patchCord952(tone_ramp, 0, r_hdw_out, 2);
+AudioConnection		patchCord901(tone_ramp, 0, l_i2s_out, 1);
+AudioConnection		patchCord911(tone_ramp, 0, r_i2s_out, 1);
+AudioConnection		patchCord921(tone_ramp, 0, l_usb_out, 1);
+AudioConnection		patchCord931(tone_ramp, 0, r_usb_out, 1);
+AudioConnection		patchCord941(tone_ramp, 0, l_hdw_out, 1);
+AudioConnection		patchCord951(tone_ramp, 0, r_hdw_out, 1);
 
-// fourth channel, keyed IQ, 
+// third channel, keyed IQ oscillator, 
 // send to usb_out to provide soundcard IQ TX stream to host sdr
 // send to i2s_out to provide soundcard IQ TX stream to softrock
 // also used for diagnostics when iq is disabled
-AudioConnection		patchCord903(key_ramp, 0, l_i2s_out, 3);
-AudioConnection		patchCord913(key_ramp, 1, r_i2s_out, 3);
-AudioConnection		patchCord923(key_ramp, 0, l_usb_out, 3);
-AudioConnection		patchCord933(key_ramp, 1, r_usb_out, 3);
-AudioConnection		patchCord943(key_ramp, 0, l_hdw_out, 3);
-AudioConnection		patchCord953(key_ramp, 1, r_hdw_out, 3);
+AudioConnection		patchCord902(key_ramp, 0, l_i2s_out, 2);
+AudioConnection		patchCord912(key_ramp, 1, r_i2s_out, 2);
+AudioConnection		patchCord922(key_ramp, 0, l_usb_out, 2);
+AudioConnection		patchCord932(key_ramp, 1, r_usb_out, 2);
+AudioConnection		patchCord942(key_ramp, 0, l_hdw_out, 2);
+AudioConnection		patchCord952(key_ramp, 1, r_hdw_out, 2);
+
+// fourth channel, unassigned
+// send test signals to usb_out for display on host
+// process audio or IQ from i2s_in and send to i2s_out
+// arbiter key_out and ptt_out to l/r_usb_out
+AudioConnection		patchCord923(arbiter, 1, l_usb_out, 3);
+AudioConnection		patchCord933(arbiter, 2, r_usb_out, 3);
 
 // outputs
 AudioOutputSample	key_out;
@@ -203,8 +182,14 @@ AudioOutputSample	ptt_out;
 AudioConnection		patchCord10a(arbiter, 1, key_out, 0);
 AudioConnection		patchCord10b(arbiter, 2, ptt_out, 0);
 
-AudioOutputSample	adc_out;
-AudioConnection		patchCord10c(adc_in, 0, adc_out, 0);
+//AudioOutputSample	adc_out;
+//AudioConnection		patchCord10c(adc_in, 0, adc_out, 0);
+
+AudioOutputSample	up_out;
+AudioOutputSample	down_out;
+
+AudioConnection		patchCord10d(button, 1, up_out, 0);
+AudioConnection		patchCord10e(button, 2, down_out, 0);
 
 AudioOutputUSB          usb_out;
 AudioConnection		patchCord11a(l_usb_out, 0, usb_out, 0);
@@ -245,8 +230,8 @@ MyAudioControlSGTL5000     sgtl5000;
 // loop which runs at lower priority than this
 // interrupt handler.
 //
-int16_t _adc_out;
 uint8_t _key_out, _ptt_out;
+uint8_t _up_out, _down_out;
 
 static void pollatch() {
   l_pad.send(bool2fix(digitalRead(KYR_L_PAD_PIN)^1));
@@ -255,7 +240,8 @@ static void pollatch() {
   ptt_sw.send(bool2fix(digitalRead(KYR_PTT_SW_PIN)^1));
   digitalWrite(KYR_KEY_OUT_PIN,_key_out=fix2bool(key_out.recv()));
   digitalWrite(KYR_PTT_OUT_PIN,_ptt_out=fix2bool(ptt_out.recv()));
-  _adc_out = adc_out.recv();
+  _up_out = fix2bool(up_out.recv());
+  _down_out = fix2bool(down_out.recv());
 }
 
 /*

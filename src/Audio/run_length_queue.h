@@ -46,17 +46,29 @@ public:
   int can_put_run(void) { return items()<SIZE; }
     
   /* append the run onto the queue */
-  int put_run(int16_t run) { 
+  int put_run(int run) { 
     if (in == 0) {
       in = run;
     } else if ((in < 0) == (run < 0)) {
       in += run;
-    } else if (can_put()) {
-      put(in);
-      in = run;
     } else {
-      overrun += 1;
-      return -1;
+      while (can_put())
+	if (in > 0x7fff) {
+	  put(0x7fff);
+	  in -= 0x7fff;
+	} else if (in < -0x7fff) {
+	  put(-0x7fff);
+	  in += 0x7fff;
+	} else {
+	  put(in);
+	  in -= in;
+	  break;
+	}
+      if (in != 0) {
+	overrun += 1;
+	return -1;
+      }
+      in = run;
     }
     maxusage = max(maxusage, items());
     return 0;
@@ -95,6 +107,6 @@ public:
   int overrun, underrun, maxusage;
 
 private:
-  int16_t in, out;
+  int in, out;
 };
 #endif

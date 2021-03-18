@@ -112,7 +112,6 @@ public:
     case KYRP_RAMP_HANN: return hann_ramp;
     case KYRP_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
     case KYRP_RAMP_LINEAR: return linear_ramp;
-    case KYRP_RAMP_SLINEAR: return linear_ramp;
     }
   }
   // get the interpolated ramp value at pos

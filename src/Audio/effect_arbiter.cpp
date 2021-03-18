@@ -82,8 +82,8 @@ void AudioEffectArbiter::update(void)
   /* send says we found something to send in the input stream */
   if (send) {
     /* fetch ptt parameters */
-    int16_t ptt_head = time_to_samples(get_vox_ptt_head(get_active_vox()));
-    int16_t ptt_tail = time_to_samples(get_vox_ptt_tail(get_active_vox()));
+    int ptt_head = ms_to_samples(get_vox_ptt_head(get_active_vox()));
+    int ptt_tail = ms_to_samples(get_vox_ptt_tail(get_active_vox()));
 
     /* change over means there must be one zero sample to trigger ramp off for previous vox */
     if (change_over && block[active_stream] && block[active_stream]->data[0] != bool2fix(0)) {

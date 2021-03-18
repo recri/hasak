@@ -62,12 +62,13 @@
 ** Voices can have priority, lowest wins, and can be local, never transmitted,
 ** and can have their own keyer properties.
 */
-#define KYR_N_VOX 4		/* number of keyer voices */
+#define KYR_N_VOX 5		/* number of keyer voices */
 #define KYR_VOX_NONE	0	/* no active voice */
 #define KYR_VOX_S_KEY	1	/* Straight Key */
 #define KYR_VOX_PAD	2	/* Paddle */
 #define KYR_VOX_WINK	3	/* Winkey Key */
 #define KYR_VOX_KYR	4	/* Kyr Key */
+#define KYR_VOX_BUT	5	/* headset button */
 
 /*
 ** Pin budgeting.
@@ -288,11 +289,12 @@
 #define KYRP_PAD_KEYER		(KYRP_KEYER+22) /* paddle keyer implementation */
 
 /* four (or more) repetitions of the keyer block for per voice customizations */
-#define KYRP_VOX_0		(KYRP_KEYER+0)	 /* == 120 */
-#define KYRP_VOX_1		(KYRP_KEYER+32)	 /* == 152 */
-#define KYRP_VOX_2		(KYRP_KEYER+64)	 /* == 184 */
-#define KYRP_VOX_3		(KYRP_KEYER+96)	 /* == 216 */
-#define KYRP_VOX_4		(KYRP_KEYER+128) /* == 248 */
+#define KYRP_VOX_0		(KYRP_KEYER+0)	 /* == 120 default */
+#define KYRP_VOX_1		(KYRP_KEYER+32)	 /* == 152 straight key */
+#define KYRP_VOX_2		(KYRP_KEYER+64)	 /* == 184 paddle */
+#define KYRP_VOX_3		(KYRP_KEYER+96)	 /* == 216 text from winkey */
+#define KYRP_VOX_4		(KYRP_KEYER+128) /* == 248 text from keyer */
+#define KYRP_VOX_5		(KYRP_KEYER+160) /* == 280 headset button */
 
 /* sgtl5000 control */
 #define KYRP_LAST		(KYRP_VOX_4+32)	/* == 280 */
@@ -304,6 +306,7 @@
 #define KYRP_PAD_OFFSET		KYRP_VOX_2
 #define KYRP_WIND_OFFSET	KYRP_VOX_3
 #define KYRP_KYR_OFFSET		KYRP_VOX_4
+#define KYRP_BUT_OFFSET		KYRP_VOX_5
 
 /* 
 ** these are named NRPN values

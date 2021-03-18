@@ -22,56 +22,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+/*
+** Translate adc readings from the headset button
+** into button presses.
+*/
+#ifndef effect_button_h_
+#define effect_button_h_
 
-#ifndef effect_arbiter_h_
-#define effect_arbiter_h_
 #include "../../config.h"
-#include "Arduino.h"
+#include <Arduino.h>
+#include <AudioStream.h>
+#include "sample_value.h"
 #include "../../linkage.h"
-#include "AudioStream.h"
 
-#include "run_length_queue.h"
-
-class AudioEffectArbiter : public AudioStream {
+class AudioEffectButton : public AudioStream
+{
 public:
-  AudioEffectArbiter() : AudioStream(KYR_N_VOX, inputQueueArray) {
-    active_stream = -1;
+  AudioEffectButton() : AudioStream(1, inputQueueArray) {
+    /*
+      these are the levels on my Teensy with my headset.
+      except for 'hey google' which is a guess.
+    */
+    centers[0] = 6800;		/* off */
+    centers[1] = -2700;		/* center */
+    centers[2] = -1800;		/* up */
+    centers[3] = -500;		/* down */
+    centers[4] = -2250;		/* hey google */
+    initial_skip = 24000/AUDIO_BLOCK_SAMPLES;
+    last_best[0] = last_best[1] = 0;
   }
-
   virtual void update(void);
-
-  void define_vox(int index, int _vox, int _priority, int _local=0) {
-    if (index >= 0 && index < KYR_N_VOX) {
-      vox[index] = _vox;
-      priority[index] = _priority;
-      local[index] = _local;
-    }
-  }
-
-  uint8_t get_active_vox(void) { return active_stream < 0 ? KYR_VOX_NONE : vox[active_stream]; }
-
-  void queue_reset(void) {
-    keyq.reset();
-    pttq.reset();
-  }
-
-  bool queue_is_empty(void) { return pttq.emptyp(); }
-
-  bool is_not_local(void) { return active_stream >= 0 && ! local[active_stream]; }
-  
-  void queue_runs(int key_run, int ptt_run) {
-    keyq.put_run(key_run);	// ignore error
-    pttq.put_run(ptt_run);	// ignore error
-  }
-
-  int16_t get_key(void) { return keyq.get_bit(); }
-  int16_t get_ptt(void) { return pttq.get_bit(); }
-    
+  static const int N_BUTTONS = 5;
+  int16_t centers[N_BUTTONS];
+  int initial_skip;
+  uint8_t last_best[2];
 private:
-  int16_t active_stream, active_tail, change_over;
-  uint8_t vox[KYR_N_VOX], priority[KYR_N_VOX], local[KYR_N_VOX];
-  RunLengthQueue keyq, pttq;
-  audio_block_t *inputQueueArray[KYR_N_VOX];
+  audio_block_t *inputQueueArray[1];
 };
 
 #endif
