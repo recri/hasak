@@ -44,22 +44,12 @@ static void report(const char *tag, int use, int umax, int mem, int mmax, int ov
   }
   Serial.printf("\n");
 }
-/* report input/output module usage */
-static void ireport(const char *tag, AudioInputSample& sample) {
-  report(tag, sample.cpu_cycles, sample.cpu_cycles_max, 0, 0, sample.overruns(), sample.underruns());
-}
-
-static void oreport(const char *tag, AudioOutputSample& sample) {
-  report(tag, sample.cpu_cycles, sample.cpu_cycles_max, 0, 0, sample.overruns(), sample.underruns());
-}
-
 /* button report */
 static void breport(const char *tag, AudioEffectButton& but) {
   Serial.printf("%16s %5d %5d", tag, but.cpu_cycles, but.cpu_cycles_max);
   for (int i = 0; i < but.N_BUTTONS; i += 1) Serial.printf(" [#%d @%5d]", i, but.centers[i]);
   Serial.printf("\n");
 }
-
 /* generic audio module report and reset */
 static void mreport(const char *tag, AudioStream& str) {
   report(tag, str.cpu_cycles, str.cpu_cycles_max, 0, 0, 0, 0);
@@ -77,18 +67,20 @@ static void sreport(void) {
 		msPerIes, msPerIls, msPerIws);
 }
 
+/* long report */
 static void Sreport(void) {
   // report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max, AudioMemoryUsage(), AudioMemoryUsageMax(), 0, 0);
   // report("denom", cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax, 0, 0, 0, 0);
   sreport();
   mreport("i2s_in", i2s_in);
   mreport("usb_in", usb_in);
+  mreport("adc_in", adc_in);
   mreport("i2s_out", i2s_out);
   mreport("usb_out", usb_out);
-  ireport("l_pad", l_pad);
-  ireport("r_pad", r_pad);
-  ireport("s_key", s_key);
-  ireport("ptt sw", ptt_sw);
+  mreport("l_pad", l_pad);
+  mreport("r_pad", r_pad);
+  mreport("s_key", s_key);
+  mreport("ptt sw", ptt_sw);
   mreport("winkey", wink); 
   mreport("kyr", kyr);
   mreport("adc", adc_in);
@@ -103,23 +95,13 @@ static void Sreport(void) {
   mreport("r_usb_out", r_usb_out);
   mreport("l_hdw_out", l_hdw_out);
   mreport("r_hdw_out", r_hdw_out);
-  oreport("key_out", key_out); 
-  oreport("ptt out", ptt_out);
-  oreport("up out", up_out);
-  oreport("down out", down_out);
+  mreport("key_out", key_out); 
+  mreport("ptt out", ptt_out);
+  mreport("up out", up_out);
+  mreport("down out", down_out);
 }
 
 /* summary reset */
-static void ireset(AudioInputSample &sample) {
-  sample.reset();
-  sample.processorUsageMaxReset();
-}
-
-static void oreset(AudioOutputSample &sample) {
-  sample.reset();
-  sample.processorUsageMaxReset();
-}
-
 static void mreset(AudioStream &str) {
   str.processorUsageMaxReset();
 }
@@ -134,10 +116,11 @@ static void Sreset(void) {
   sreset();
   mreset(i2s_in);
   mreset(usb_in);
-  ireset(l_pad);
-  ireset(r_pad);
-  ireset(s_key);
-  ireset(ptt_sw);
+  mreset(adc_in);
+  mreset(l_pad);
+  mreset(r_pad);
+  mreset(s_key);
+  mreset(ptt_sw);
   mreset(wink);
   mreset(kyr);
   mreset(paddle);
@@ -150,10 +133,21 @@ static void Sreset(void) {
   mreset(r_usb_out);
   mreset(l_hdw_out);
   mreset(r_hdw_out);
-  oreset(key_out);
-  oreset(ptt_out);
+  mreset(key_out);
+  mreset(ptt_out);
+  mreset(up_out);
+  mreset(down_out);
   mreset(i2s_out);
   mreset(usb_out);
+}
+
+/* arbiter details */
+static void areport(void) {
+  Serial.printf("arbiter vox %d, stream %d, tail %d, head %d, delay %d\n",
+		get_active_vox(), arbiter.active_stream, arbiter.active_tail, 
+		arbiter.active_head, arbiter.active_delay);
+  Serial.printf("keyq in %d items %d out %d\n", arbiter.keyq.in, arbiter.keyq.items(), arbiter.keyq.out);
+  Serial.printf("pttq in %d items %d out %d\n", arbiter.pttq.in, arbiter.pttq.items(), arbiter.pttq.out);
 }
 
 const char *lorem = 
@@ -230,6 +224,7 @@ void diagnostics_loop() {
 		    " S -> detailed audio library resource usage\n"
 		    " r -> reset usage counts\n"
 		    " R -> reset detailed usage counts\n"
+		    " a -> arbiter diagnostics\n"
 		    " w... -> send ... up to newline to wink keyer\n"
 		    " k... -> send ... up to newline to kyr keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
@@ -244,6 +239,7 @@ void diagnostics_loop() {
     case 'S': Sreport(); /* long summary */ break;
     case 'r': sreset(); /* short reset */ break;
     case 'R': Sreset(); /* long reset */ break;
+    case 'a': areport(); /* arbiter stats */ break;
     case 'w': wink.send_text(p+1); break;
     case 'k': kyr.send_text(p+1); break;
     case 'W': wink.send_text(lorem); break;

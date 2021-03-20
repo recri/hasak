@@ -12,13 +12,32 @@
 	They're just voltage level changes.
 	Need to skip first transient values.
 	Need to debounce
-[ ] ptt_head breaks key and ptt.
-[ ] Test ptt_delay.
+[ ] Move headset switch adc readings into NRPN values
+[x] Convert some input_sample/output_sample to input_byte/output_byte.
+[x] Remove updated, overruns, underruns, reset, id from input/output_sample/byte.
+[x] Unroll 8 samples in sample loops in input/output_sample/byte.
+[x] remove KYRP_RECV_MIDI, because I cannot do it simply.
+[x] compile at 150MHz clock to cut power consumption from 100ma to 50ma.
+[ ] add Snooze library, hibernate on inactivity, wake on paddles.
+	Teensy 4.0 resets on wake.
+	Power consumption about 6ma in hibernate.
+	Currently conflicts with EEPROM write.
+[ ] decode sidetone out, sort into timestamped queues by vox.
+	convert sidetone key line to run lengths
+[ ] implement a command mode based on headset button morse.
+	k3ng commands, 
+	using up/down buttons for adjustment.
+	with X transitioning into paddle control.
+[ ] implement a command line mode over serial monitor.
+	k3ng commands,
+[x] ptt_head breaks key and ptt.
+[x] Test ptt_delay.
+[x] Delay line is producing streams of zeros without dropping active_stream.
+	hard time getting it unsorted, the result is sort of ugly
 [ ] Debounce the straight key.	
-	Each transition in the straight key is stretched to one buffer worth
-	before another transition is considered.
 [ ] Apply headphone volume to hdw_out mixer.
-[ ] Echo parameter set to MIDI to update Ctrlr.
+[ ] Echo parameter set to MIDI to synchronize Ctrlr.
+	A program dump.
 [ ] Implement save/restore parameters to EEPROM
 	[ ] save parameters as the nrpn block and a bitset of
 	which have been set.
@@ -36,8 +55,9 @@
 	k3ng immediate mode should work, most if it is covered.
 [ ] Implement winkey control of keyer.
 [ ] Pan sidetone to localize.
-[ ] Allow line-in to route through filters to headphone-out.
-[ ] Allow line-in to route through sdr and filters to headphone-out.
+[ ] Allow line-in audio to route through filters to headphone-out.
+[ ] Allow line-in IQ to route through sdr and filters to headphone-out.
+[ ] Allow IQ to route to line-out to key a softrock.
 [?] Rewrite effect_mute and put some of them back into the graph.
 [?] Try the fixed point complex rotor, both for sincos and ramp,
 	and with multiply_32x32_rshift32 instruction, it might.

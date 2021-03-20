@@ -71,11 +71,11 @@ static inline int get_vox_rise_time(int vox) { return get_vox_nrpn(vox, KYRP_RIS
 static inline int get_vox_rise_ramp(int vox) { return get_vox_nrpn(vox, KYRP_RISE_RAMP); }
 static inline int get_vox_fall_time(int vox) { return get_vox_nrpn(vox, KYRP_FALL_TIME); }
 static inline int get_vox_fall_ramp(int vox) { return get_vox_nrpn(vox, KYRP_FALL_RAMP); }
-static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE/1000.0); }
 
 /* keyer ptt parameters */
 static inline int get_vox_ptt_head(int vox) { return get_vox_nrpn(vox, KYRP_HEAD_TIME); }
 static inline int get_vox_ptt_tail(int vox) { return get_vox_nrpn(vox, KYRP_TAIL_TIME); }
+static inline int get_vox_ptt_hang(int vox) { return get_vox_nrpn(vox, KYRP_HANG_TIME); }
 
 /* global parameters for keyers */
 static inline int get_iq_enable(void) { return get_nrpn(KYRP_IQ_ENABLE); }
@@ -83,5 +83,11 @@ static inline int get_iq_adjust(void) { return get_nrpn(KYRP_IQ_ADJUST); }
 static inline int get_tx_enable(void) { return get_nrpn(KYRP_TX_ENABLE); }
 static inline int get_st_enable(void) { return get_nrpn(KYRP_ST_ENABLE); }
 static inline int get_send_midi(void) { return get_nrpn(KYRP_SEND_MIDI); }
+#ifdef KYRP_RECV_MIDI
 static inline int get_recv_midi(void) { return get_nrpn(KYRP_RECV_MIDI); }
+#endif
+
+/* unit conversions */
+static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE/1000.0); }
+
 #endif

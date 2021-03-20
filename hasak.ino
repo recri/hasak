@@ -37,14 +37,16 @@
 
 #include <Audio.h>
 // custom audio modules
-#include "src/Audio/input_sample.h"
+//#include "src/Audio/input_sample.h"
+#include "src/Audio/input_byte.h"
 #include "src/Audio/input_text.h"
 #include "src/Audio/effect_paddle.h"
 #include "src/Audio/effect_button.h"
 #include "src/Audio/effect_arbiter.h"
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/effect_mute.h"
-#include "src/Audio/output_sample.h"
+//#include "src/Audio/output_sample.h"
+#include "src/Audio/output_byte.h"
 #include "src/Audio/my_control_sgtl5000.h"
 // audio sample values
 #include "src/Audio/sample_value.h"
@@ -57,14 +59,12 @@
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
 AudioInputAnalog	adc_in;	// headset switch detect
-AudioInputSample	l_pad("l_pad");	// left paddle in
-AudioInputSample	r_pad("r_pad");	// right paddle in
-AudioInputSample	s_key("s_key");	// straight key in
+AudioInputByte		s_key;	// straight key in
+AudioInputByte		l_pad;	// left paddle in
+AudioInputByte		r_pad;	// right paddle in
+AudioInputByte		ptt_sw;	// ptt switch
 AudioInputText		wink(KYR_VOX_WINK);	// winkey text in
 AudioInputText		kyr(KYR_VOX_KYR);	// kyr text in for op
-AudioInputSample        ptt_sw("ptt_s");	// ptt switch
-//AudioInputSample	tx_enable("tx_en"); // transmit enable
-//AudioInputSample	st_enable("st_en"); // side tone enable
 
 // paddle keyer logic
 AudioEffectPaddle	paddle(KYR_VOX_PAD);	// 
@@ -176,17 +176,14 @@ AudioConnection		patchCord923(arbiter, 1, l_usb_out, 3);
 AudioConnection		patchCord933(arbiter, 2, r_usb_out, 3);
 
 // outputs
-AudioOutputSample	key_out;
-AudioOutputSample	ptt_out;
+AudioOutputByte		key_out;
+AudioOutputByte		ptt_out;
 
 AudioConnection		patchCord10a(arbiter, 1, key_out, 0);
 AudioConnection		patchCord10b(arbiter, 2, ptt_out, 0);
 
-//AudioOutputSample	adc_out;
-//AudioConnection		patchCord10c(adc_in, 0, adc_out, 0);
-
-AudioOutputSample	up_out;
-AudioOutputSample	down_out;
+AudioOutputByte		up_out;
+AudioOutputByte		down_out;
 
 AudioConnection		patchCord10d(button, 1, up_out, 0);
 AudioConnection		patchCord10e(button, 2, down_out, 0);
@@ -234,14 +231,14 @@ uint8_t _key_out, _ptt_out;
 uint8_t _up_out, _down_out;
 
 static void pollatch() {
-  l_pad.send(bool2fix(digitalRead(KYR_L_PAD_PIN)^1));
-  r_pad.send(bool2fix(digitalRead(KYR_R_PAD_PIN)^1));
-  s_key.send(bool2fix(digitalRead(KYR_S_KEY_PIN)^1));
-  ptt_sw.send(bool2fix(digitalRead(KYR_PTT_SW_PIN)^1));
-  digitalWrite(KYR_KEY_OUT_PIN,_key_out=fix2bool(key_out.recv()));
-  digitalWrite(KYR_PTT_OUT_PIN,_ptt_out=fix2bool(ptt_out.recv()));
-  _up_out = fix2bool(up_out.recv());
-  _down_out = fix2bool(down_out.recv());
+  l_pad.send(digitalRead(KYR_L_PAD_PIN)^1);
+  r_pad.send(digitalRead(KYR_R_PAD_PIN)^1);
+  s_key.send(digitalRead(KYR_S_KEY_PIN)^1);
+  ptt_sw.send(digitalRead(KYR_PTT_SW_PIN)^1);
+  digitalWrite(KYR_KEY_OUT_PIN,_key_out=key_out.recv());
+  digitalWrite(KYR_PTT_OUT_PIN,_ptt_out=ptt_out.recv());
+  _up_out = up_out.recv();
+  _down_out = down_out.recv();
 }
 
 /*

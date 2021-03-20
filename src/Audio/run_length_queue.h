@@ -35,9 +35,9 @@
 ** negative runs indicate sequences of 0's
 ** a zero run indicates empty
 */
-class RunLengthQueue : public RingBuffer {
+class RunLengthQueue : public RingBuffer<int> {
 public:
-  RunLengthQueue(void) : RingBuffer() {
+  RunLengthQueue() : RingBuffer<int>() {
     in = out = 0;
     overrun = underrun = maxusage = 0;
   }
@@ -51,24 +51,12 @@ public:
       in = run;
     } else if ((in < 0) == (run < 0)) {
       in += run;
-    } else {
-      while (can_put())
-	if (in > 0x7fff) {
-	  put(0x7fff);
-	  in -= 0x7fff;
-	} else if (in < -0x7fff) {
-	  put(-0x7fff);
-	  in += 0x7fff;
-	} else {
-	  put(in);
-	  in -= in;
-	  break;
-	}
-      if (in != 0) {
-	overrun += 1;
-	return -1;
-      }
+    } else if (can_put()) {
+      put(in);
       in = run;
+    } else {
+      overrun += 1;
+      return -1;
     }
     maxusage = max(maxusage, items());
     return 0;
@@ -87,6 +75,10 @@ public:
 	return -1;
       }
     }
+    if (out == 0) {
+      underrun += 1;
+      return -1;
+    }
     if (out < 0) { 
       out += 1; 
       return 0;
@@ -95,18 +87,28 @@ public:
     return 1;
   }
 
-  bool emptyp(void) { 
-    return ! (out != 0 || can_get());
-  }
+  bool is_empty(void) { return out == 0 && in == 0 && ! can_get(); }
   
+  bool is_all_zeros(void) { 
+    if (out <= 0) {
+      while (can_get() && peek() <= 0) out += get();
+      if (can_get()) 
+	return false;
+      if (in <= 0) {
+	out += in;
+	in = 0;
+      }
+    }
+    return out < 0;
+  }
+
   void reset(void) {
     RingBuffer::reset();
     in = out = 0;
   }
 
   int overrun, underrun, maxusage;
-
-private:
   int in, out;
+private:
 };
 #endif

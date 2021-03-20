@@ -4,12 +4,35 @@
    the operator to hear keyed code with low latency
    while listening to and keying a possibly remote
    transceiver.
+
    This implementation of the keyer consumes around 4%
    of the Teensy4's cpu cycles in the audio library loop.
    "Sketch uses 68548 bytes (3%) of program storage space. 
    Maximum is 2031616 bytes. Global variables use 88544 bytes
    (16%) of dynamic memory, leaving 435744 bytes for local 
-   variables. Maximum is 524288 bytes."
+   variables. Maximum is 524288 bytes."  Running with the
+   clock set to the default 600MHz the keyer consumes 100mA.
+   Slowing the clock to 150MHz reduces consumtion to 50mA.
+
+   The keyer implements five voices: a straight key, a
+   dual paddle, a text keyer for logging control, a local
+   text keyer for conversing with keyer itself, and a local
+   straight key using the primary headset button.
+   
+   The keyer parameters are set using MIDI. Each parameter
+   is assigned a NRPN (non-registered parameter number) in
+   config.h.  A Ctrlr panel, ctrlr/hasak.panel, provides
+   controls for setting some parameters, but there are 
+   really too many parameters to make a neat panel.
+
+   Ctrlr also provides a "Programs > Send Snapshot" menu
+   entry for sending all panel settings to the keyer, and
+   "Programs > Program Snapshot" for making a copy of all
+   panel settings.  The copies are available from the
+   "Panel > MIDI Library". Snapshots saved in the MIDI
+   Library may be copied and pasted into the running Ctrlr
+   panel to restore the saved settings.
+
 ** It currently runs on a Teensy 4.0 with Teensy Audio 
    Adapter board, but it has also run on a Teensy 3.1
    with Teensy Audio Adapter.  I suspect it will work

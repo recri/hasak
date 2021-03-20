@@ -22,28 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef input_sample_h_
-#define input_sample_h_
-#include "Arduino.h"
-#include "AudioStream.h"
+#include <Arduino.h>
+#include "input_byte.h"
 
-/*
-** Teensy Audio Library component for sample input
-*/
-
-class AudioInputSample : public AudioStream
+void AudioInputByte::update(void)
 {
-public:
-  AudioInputSample() : AudioStream(0, NULL) {
-    rptr = wptr = 0;
-  }
-  void send(int16_t value) {
-    buffer[wptr++] = value;
-    wptr %= 2*AUDIO_BLOCK_SAMPLES;
-  }
-  virtual void update(void);
-private:
-  uint16_t rptr, wptr, buffer[2*AUDIO_BLOCK_SAMPLES];
-};
+  audio_block_t *block;
 
-#endif
+  block = allocate();
+  if (block) {
+    uint16_t *bp, *end;
+    uint32_t sum;
+    bp = (uint16_t *)block->data;
+    end = bp+AUDIO_BLOCK_SAMPLES;
+    sum = 0;
+    rptr = (wptr+AUDIO_BLOCK_SAMPLES)%(2*AUDIO_BLOCK_SAMPLES);
+    while (bp < end) {
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+    }
+    if (sum != 0) transmit(block);
+    release(block);
+  }
+}

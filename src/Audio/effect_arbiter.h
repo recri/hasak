@@ -36,6 +36,9 @@ class AudioEffectArbiter : public AudioStream {
 public:
   AudioEffectArbiter() : AudioStream(KYR_N_VOX, inputQueueArray) {
     active_stream = -1;
+    active_tail = 0;
+    active_head = 0;
+    active_delay = 0;
   }
 
   virtual void update(void);
@@ -50,14 +53,19 @@ public:
 
   uint8_t get_active_vox(void) { return active_stream < 0 ? KYR_VOX_NONE : vox[active_stream]; }
 
+  bool is_not_local(void) { return active_stream >= 0 && ! local[active_stream]; }
+  
+  bool is_local(void) { return active_stream >= 0 && local[active_stream]; }
+  
   void queue_reset(void) {
     keyq.reset();
     pttq.reset();
   }
 
-  bool queue_is_empty(void) { return pttq.emptyp(); }
-
-  bool is_not_local(void) { return active_stream >= 0 && ! local[active_stream]; }
+  bool queue_is_all_zeros(void) { 
+    return (keyq.is_empty() || keyq.is_all_zeros()) && 
+      (pttq.is_empty() || pttq.is_all_zeros());
+  }
   
   void queue_runs(int key_run, int ptt_run) {
     keyq.put_run(key_run);	// ignore error
@@ -67,10 +75,10 @@ public:
   int16_t get_key(void) { return keyq.get_bit(); }
   int16_t get_ptt(void) { return pttq.get_bit(); }
     
-private:
-  int16_t active_stream, active_tail, change_over;
-  uint8_t vox[KYR_N_VOX], priority[KYR_N_VOX], local[KYR_N_VOX];
+  int16_t active_stream, active_tail, active_head, active_delay;
   RunLengthQueue keyq, pttq;
+private:
+  uint8_t vox[KYR_N_VOX], priority[KYR_N_VOX], local[KYR_N_VOX];
   audio_block_t *inputQueueArray[KYR_N_VOX];
 };
 

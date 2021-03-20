@@ -151,7 +151,7 @@
     </luaManagerMethods>
   </luaManager>
   <panelResources/>
-  <uiPanelEditor uiPanelCanvasRectangle="0 0 502 604" uiPanelSnapSize="8" uiPanelBackgroundColour="0xffffffff"
+  <uiPanelEditor uiPanelCanvasRectangle="0 0 502 622" uiPanelSnapSize="8" uiPanelBackgroundColour="0xffffffff"
                  uiPanelBackgroundColour1="0xffffffff" uiPanelBackgroundColour2="0xffffffff"
                  uiPanelBackgroundGradientType="1" uiPanelImageResource="-- None"
                  uiPanelEditMode="0" uiPanelLock="1" uiPanelDisabledOnEdit="0"
@@ -163,8 +163,8 @@
                  uiPanelInvisibleComponentAlpha="0.5" uiPanelTooltipBackgroundColour="0xffeeeebb"
                  uiPanelTooltipOutlineColour="0xff000000" uiPanelTooltipColour="0xff000000"
                  uiPanelTooltipCornerRound="1" uiPanelTooltipPlacement="2" uiPanelTooltipFont="&lt;Sans-Serif&gt;;15;1;0;0;0;1;3"
-                 uiPanelZoom="1" uiPanelDisableCombosOnEdit="1" uiPanelPropertiesSize="101"
-                 uiPanelViewPortSize="398">
+                 uiPanelZoom="1" uiPanelViewPortSize="399" uiPanelPropertiesSize="99"
+                 uiPanelDisableCombosOnEdit="1">
     <uiPanelCanvasLayer uiPanelCanvasLayerName="New layer" uiPanelCanvasLayerUid="3cb7e26c330000000000000000000000"
                         uiPanelCanvasLayerColour="0x000000" uiPanelCanvasLayerVisibility="1"
                         uiPanelCanvasLayerIndex="0"/>
@@ -209,8 +209,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="112 232 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="112 232 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="100" vstIndex="2" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -222,7 +222,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="18"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="speed" modulatorMin="5" modulatorValue="18">
+             name="speed" modulatorMin="5" modulatorValue="20">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="120" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -252,8 +252,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="112 16 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="112 16 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="66" vstIndex="3" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -295,8 +295,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="112 336 96 96"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="112 336 96 96" uiType="uiSlider"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="15000" vstIndex="4" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -338,8 +338,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="112 448 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="112 448 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="100" vstIndex="5" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -381,8 +381,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="112 128 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="112 128 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="200" vstIndex="6" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -424,8 +424,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="16 336 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="16 336 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="200" vstIndex="7" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -467,8 +467,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="16 448 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="16 448 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2" vstIndex="8" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -505,8 +505,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 504 128 32" uiType="uiCombo"/>
+               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 504 128 32"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2" vstIndex="9" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -543,8 +543,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 472 128 32"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 472 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2500" vstIndex="10" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -586,8 +586,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="16 16 96 96"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="16 16 96 96" uiType="uiSlider"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1000" vstIndex="11" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -629,8 +629,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="16 232 96 96"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="16 232 96 96" uiType="uiSlider"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2000" vstIndex="12" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -672,8 +672,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="16 128 96 96"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="16 128 96 96" uiType="uiSlider"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2" vstIndex="13" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -710,8 +710,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 408 128 32" uiType="uiCombo"/>
+               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 408 128 32"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2" vstIndex="14" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -748,8 +748,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 440 128 32"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 440 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="15" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -779,8 +779,7 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="paddle swap"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 328 130 34" componentLayerUid="3cb7e26c330000000000000000000000"
-               uiType="uiToggleButton"/>
+               componentRectangle="336 328 130 34" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="127" vstIndex="16" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -822,8 +821,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="208 16 96 96"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="208 16 96 96" uiType="uiSlider"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="18" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -860,8 +859,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 200 128 32"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 200 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="19" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -891,7 +890,8 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="line out mute"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 40 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="336 40 128 32" componentLayerUid="3cb7e26c330000000000000000000000"
+               uiType="uiToggleButton"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="20" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -921,7 +921,8 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="headphone mute"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 16 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="336 16 128 32" componentLayerUid="3cb7e26c330000000000000000000000"
+               uiType="uiToggleButton"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="15" vstIndex="21" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -963,8 +964,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="208 128 96 96" uiType="uiSlider"/>
+               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="208 128 96 96"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="31" vstIndex="22" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1006,8 +1007,8 @@
                uiSliderVelocitySensitivity="1" uiSliderVelocityThreshold="1"
                uiSliderVelocityOffset="0" uiSliderVelocityMode="0" uiSliderVelocityModeKeyTrigger="1"
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
-               uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="208 232 96 96"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiSliderPopupBubble="0" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="208 232 96 96" uiType="uiSlider"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="23" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1037,8 +1038,8 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="paddle swap"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="1056 128 130 34" uiType="uiToggleButton"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="1056 128 130 34" componentLayerUid="3cb7e26c330000000000000000000000"
+               uiType="uiToggleButton"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="24" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1068,7 +1069,8 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="auto letter space"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 352 130 34" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="336 352 130 34" componentLayerUid="3cb7e26c330000000000000000000000"
+               uiType="uiToggleButton"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="25" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1098,8 +1100,7 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="auto word space"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 376 130 34" componentLayerUid="3cb7e26c330000000000000000000000"
-               uiType="uiToggleButton"/>
+               componentRectangle="336 376 130 34" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="27" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1129,7 +1130,8 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="transmit enable"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 64 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="336 64 128 32" componentLayerUid="3cb7e26c330000000000000000000000"
+               uiType="uiToggleButton"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="28" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1159,7 +1161,8 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="sidetone enable"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 88 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="336 88 128 32" componentLayerUid="3cb7e26c330000000000000000000000"
+               uiType="uiToggleButton"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="2" vstIndex="29" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1171,7 +1174,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="input-1" modulatorMin="0" modulatorValue="0">
+             name="input-1" modulatorMin="0" modulatorValue="1">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="23" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1196,8 +1199,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 168 128 32" uiType="uiCombo"/>
+               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 168 128 32"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="30" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1227,38 +1230,7 @@
                componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
                uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="send midi notes"
                uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 112 128 32" componentLayerUid="3cb7e26c330000000000000000000000"
-               uiType="uiToggleButton"/>
-  </modulator>
-  <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="31" modulatorIsStatic="0"
-             modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
-             modulatorExcludeFromSnapshot="0" modulatorValueExpression="modulatorValue"
-             modulatorValueExpressionReverse="midiValue" modulatorControllerExpression="value"
-             luaModulatorGetValueForMIDI="-- None" luaModulatorGetValueFromMIDI="-- None"
-             modulatorLinkedToPanelProperty="-- None" modulatorLinkedToModulatorProperty="-- None"
-             modulatorLinkedToModulator="-- None" modulatorLinkedToModulatorSource="1"
-             modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
-             modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
-             modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="recv-midi" modulatorMin="0" modulatorValue="0">
-    <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
-          midiMessageCtrlrNumber="19" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
-          midiMessageSysExFormula=""/>
-    <component componentLabelPosition="top" componentLabelJustification="centred"
-               componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"
-               componentLabelAlwaysOnTop="1" componentSentBack="0" componentLabelColour="0xff000000"
-               componentLabelFont="&lt;Sans-Serif&gt;;12;0;0;0;0;1;3" componentVisibleName=" "
-               componentMouseCursor="2" componentGroupName="" componentGroupped="0"
-               componentSnapSize="0" componentIsLocked="0" componentDisabled="0"
-               componentRadioGroupId="0" componentRadioGroupNotifyMidi="1" componentVisibility="1"
-               componentEffect="0" componentEffectRadius="1" componentEffectColour="0xff000000"
-               componentEffectOffsetX="0" componentEffectOffsetY="0" componentExcludedFromLabelDisplay="0"
-               componentValueDecimalPlaces="0" componentLuaMouseMoved="-- None"
-               componentLuaMouseDown="-- None" componentLuaMouseDrag="-- None"
-               componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
-               uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="receive midi notes"
-               uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 136 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
+               componentRectangle="336 112 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="7" vstIndex="32" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1295,8 +1267,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 272 128 32" uiType="uiCombo"/>
+               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 272 128 32"
+               componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="33" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1333,8 +1305,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 304 128 32"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 304 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="34" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1371,8 +1343,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 232 128 32"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 232 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="35" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1409,7 +1381,45 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 536 128 32"
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 536 128 32" uiType="uiCombo"/>
+  </modulator>
+  <modulator modulatorVstExported="1" modulatorMax="10" vstIndex="36" modulatorIsStatic="0"
+             modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
+             modulatorExcludeFromSnapshot="0" modulatorValueExpression="modulatorValue"
+             modulatorValueExpressionReverse="midiValue" modulatorControllerExpression="value"
+             luaModulatorGetValueForMIDI="-- None" luaModulatorGetValueFromMIDI="-- None"
+             modulatorLinkedToPanelProperty="-- None" modulatorLinkedToModulatorProperty="-- None"
+             modulatorLinkedToModulator="-- None" modulatorLinkedToModulatorSource="1"
+             modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
+             modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
+             modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
+             name="ptt-hang-time" modulatorMin="0" modulatorValue="-1">
+    <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
+          midiMessageCtrlrNumber="143" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
+          midiMessageSysExFormula=""/>
+    <component componentLabelPosition="bottom" componentLabelJustification="centred"
+               componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"
+               componentLabelAlwaysOnTop="1" componentSentBack="0" componentLabelColour="0xff000000"
+               componentLabelFont="&lt;Sans-Serif&gt;;12;0;0;0;0;1;3" componentVisibleName="ptt hang time"
+               componentMouseCursor="2" componentGroupName="" componentGroupped="0"
+               componentSnapSize="0" componentIsLocked="0" componentDisabled="0"
+               componentRadioGroupId="0" componentRadioGroupNotifyMidi="1" componentVisibility="1"
+               componentEffect="0" componentEffectRadius="1" componentEffectColour="0xff000000"
+               componentEffectOffsetX="0" componentEffectOffsetY="0" componentExcludedFromLabelDisplay="0"
+               componentValueDecimalPlaces="0" componentLuaMouseMoved="-- None"
+               componentLuaMouseDown="-- None" componentLuaMouseDrag="-- None"
+               componentLuaMouseDoubleClick="-- None" uiComboArrowColour="0xff0000ff"
+               uiComboOutlineColour="0xff0000ff" uiComboTextColour="0xff000000"
+               uiComboTextJustification="centred" uiComboFont="&lt;Sans-Serif&gt;;14;0;0;0;0;1;3"
+               uiComboMenuFont="&lt;Sans-Serif&gt;;16;0;0;0;0;1;3" uiComboButtonColour="0xff0000ff"
+               uiComboBgColour="0xffffffff" uiComboMenuBackgroundColour="0xfff0f0f0"
+               uiComboMenuFontColour="0xff000000" uiComboMenuHighlightColour="ffadd8e6"
+               uiComboMenuFontHighlightedColour="0xff232323" uiComboContent="0 dit&#10;1 dit&#10;2 dits&#10;3 dits&#10;4 dits&#10;5 dits&#10;6 dits&#10;7 dits&#10;8 dits&#10;9 dits&#10;10 dits"
+               uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
+               uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
+               uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
+               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 568 128 32"
                componentLayerUid="3cb7e26c330000000000000000000000"/>
   </modulator>
   <panelCustomData/>

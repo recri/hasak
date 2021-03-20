@@ -22,28 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef input_sample_h_
-#define input_sample_h_
+#ifndef output_byte_h_
+#define output_byte_h_
 #include "Arduino.h"
 #include "AudioStream.h"
+#include "sample_value.h"
 
 /*
-** Teensy Audio Library component for sample input
+** Teensy Audio Library component for accessing output samples
 */
 
-class AudioInputSample : public AudioStream
+class AudioOutputByte : public AudioStream
 {
 public:
-  AudioInputSample() : AudioStream(0, NULL) {
+  AudioOutputByte() : AudioStream(1, inputQueueArray) { 
     rptr = wptr = 0;
   }
-  void send(int16_t value) {
-    buffer[wptr++] = value;
-    wptr %= 2*AUDIO_BLOCK_SAMPLES;
+  uint8_t recv(void) {
+    uint8_t value = buffer[rptr++];
+    rptr %= 2*AUDIO_BLOCK_SAMPLES;
+    return value;
   }
   virtual void update(void);
 private:
-  uint16_t rptr, wptr, buffer[2*AUDIO_BLOCK_SAMPLES];
+  uint16_t wptr, rptr;
+  uint8_t buffer[2*AUDIO_BLOCK_SAMPLES];
+  audio_block_t *inputQueueArray[1];
 };
 
 #endif

@@ -55,22 +55,6 @@
 #endif
 
 /*
-** keyer voices
-** A keyer vox is a key or paddle or text input that produces a sidetone
-** and possibly a transmit output.
-** Four (or five) default voices.
-** Voices can have priority, lowest wins, and can be local, never transmitted,
-** and can have their own keyer properties.
-*/
-#define KYR_N_VOX 5		/* number of keyer voices */
-#define KYR_VOX_NONE	0	/* no active voice */
-#define KYR_VOX_S_KEY	1	/* Straight Key */
-#define KYR_VOX_PAD	2	/* Paddle */
-#define KYR_VOX_WINK	3	/* Winkey Key */
-#define KYR_VOX_KYR	4	/* Kyr Key */
-#define KYR_VOX_BUT	5	/* headset button */
-
-/*
 ** Pin budgeting.
 ** Pins assigned for audio card interface,
 ** for I2C communication,
@@ -117,7 +101,7 @@
 #endif
 
 /* 
-** pin assignments for standard input switches and output latches
+** pin allocations for standard input switches and output latches
 */
 #define KYR_R_PAD_PIN	0
 #define KYR_L_PAD_PIN	1
@@ -125,6 +109,22 @@
 #define KYR_PTT_SW_PIN	3
 #define KYR_KEY_OUT_PIN	4
 #define KYR_PTT_OUT_PIN	5
+
+/*
+** keyer voices
+** A keyer vox is a key or paddle or text input that can produce
+** a sidetone and a transmit output.
+** Four (or five) default voices.
+** Voices can have priority, lowest wins, and can be local, never transmitted,
+** and can have their own keyer properties.
+*/
+#define KYR_N_VOX 5		/* number of keyer voices */
+#define KYR_VOX_NONE	0	/* no active voice */
+#define KYR_VOX_S_KEY	1	/* Straight Key */
+#define KYR_VOX_PAD	2	/* Paddle */
+#define KYR_VOX_WINK	3	/* Winkey Key */
+#define KYR_VOX_KYR	4	/* Kyr Key */
+#define KYR_VOX_BUT	5	/* headset button */
 
 /* 
 ** MIDI usage
@@ -203,7 +203,7 @@
 #define KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
 #define KYRP_ST_PAN		(KYRP_SOFT+1) /* pan sidetone left or right */
 #define KYRP_SEND_MIDI		(KYRP_SOFT+2) /* send input paddle key events to midi notes */
-#define KYRP_RECV_MIDI		(KYRP_SOFT+3) /* send input straight key events to midi notes */
+//#define KYRP_RECV_MIDI		(KYRP_SOFT+3) /* send input straight key events to midi notes */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd, excess 8096 */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
@@ -269,8 +269,8 @@
 #define KYRP_TONE		(KYRP_KEYER+9)	/* oscillator frequency */
 
 /* keyer ptt timing */
-#define KYRP_HEAD_TIME		(KYRP_KEYER+10)	/* time us ptt should lead key, key delay */
-#define KYRP_TAIL_TIME		(KYRP_KEYER+11)	/* time us ptt should linger after key, hang time */
+#define KYRP_HEAD_TIME		(KYRP_KEYER+10)	/* time ms ptt should lead key, key delay */
+#define KYRP_TAIL_TIME		(KYRP_KEYER+11)	/* time ms ptt should linger after key */
 
 /* keyer modes */
 #define KYRP_PAD_MODE		(KYRP_KEYER+12)	/* paddle iambic keyer mode A/B */
@@ -287,6 +287,7 @@
 #define KYRP_PER_IWS		(KYRP_KEYER+21) /* samples per inter word space */
 
 #define KYRP_PAD_KEYER		(KYRP_KEYER+22) /* paddle keyer implementation */
+#define KYRP_HANG_TIME		(KYRP_KEYER+23) /* time in dits ptt should linger after key */
 
 /* four (or more) repetitions of the keyer block for per voice customizations */
 #define KYRP_VOX_0		(KYRP_KEYER+0)	 /* == 120 default */

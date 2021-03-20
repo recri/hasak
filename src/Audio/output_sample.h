@@ -1,9 +1,8 @@
-/* Audio Library for Teensy 3.X
- * Copyright (c) 2014, Paul Stoffregen, paul@pjrc.com
- *
- * Development of this audio library was funded by PJRC.COM, LLC by sales of
- * Teensy and Audio Adaptor boards.  Please support PJRC's efforts to develop
- * open source software by purchasing Teensy or other PJRC products.
+/* -*- mode: c++; tab-width: 8 -*- */
+/*
+ * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
+ * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * ad5dz, rec@elf.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +22,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 #ifndef output_sample_h_
 #define output_sample_h_
 #include "Arduino.h"
@@ -38,21 +36,16 @@ class AudioOutputSample : public AudioStream
 public:
   AudioOutputSample() : AudioStream(1, inputQueueArray) { 
     rptr = wptr = 0;
-    reset();
   }
   int16_t recv(void) {
     int16_t value = buffer[rptr++];
     rptr %= 2*AUDIO_BLOCK_SAMPLES;
     return value;
   }
-  uint16_t overruns() { return overrun; }
-  uint16_t underruns() { return underrun; }
-  void reset() { overrun = underrun = updated = 0; }
   virtual void update(void);
 private:
   uint16_t wptr, rptr;
   int16_t buffer[2*AUDIO_BLOCK_SAMPLES];
-  uint16_t overrun, underrun, updated;
   audio_block_t *inputQueueArray[1];
 };
 

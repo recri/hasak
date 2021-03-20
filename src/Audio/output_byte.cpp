@@ -22,28 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef input_sample_h_
-#define input_sample_h_
-#include "Arduino.h"
-#include "AudioStream.h"
+#include <Arduino.h>
+#include "output_byte.h"
 
-/*
-** Teensy Audio Library component for sample input
-*/
-
-class AudioInputSample : public AudioStream
+void AudioOutputByte::update(void)
 {
-public:
-  AudioInputSample() : AudioStream(0, NULL) {
-    rptr = wptr = 0;
+  audio_block_t *block;
+  block = receiveReadOnly(0);
+  if (block) {
+    int16_t *bp = block->data, *end = bp+AUDIO_BLOCK_SAMPLES;
+    wptr = (rptr+1)%(2*AUDIO_BLOCK_SAMPLES);
+    while (bp < end) {
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+      buffer[wptr++] = fix2bool(*bp++); wptr %= 2*AUDIO_BLOCK_SAMPLES;
+    }
+    release(block);
+  } else {
+    wptr = (rptr+1)%(2*AUDIO_BLOCK_SAMPLES);
+    for (int i = AUDIO_BLOCK_SAMPLES; --i >= 0; ) {
+      buffer[wptr++] = 0; wptr %= 2*AUDIO_BLOCK_SAMPLES;
+    }
   }
-  void send(int16_t value) {
-    buffer[wptr++] = value;
-    wptr %= 2*AUDIO_BLOCK_SAMPLES;
-  }
-  virtual void update(void);
-private:
-  uint16_t rptr, wptr, buffer[2*AUDIO_BLOCK_SAMPLES];
-};
-
-#endif
+}

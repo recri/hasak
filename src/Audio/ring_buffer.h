@@ -27,20 +27,23 @@
 
 #include <Arduino.h>
 
-/* circular buffer of int16_t for run lengths */
+/* circular buffer of int for run lengths */
+/* a negative int represents abs(int) zeros */
+/* a positive int represents abs(int) ones */
+template <class T>
 class RingBuffer {
 public:
-  RingBuffer(void) { }
+  RingBuffer() { }
   void reset(void) { wptr = rptr = 0; }
   bool can_get(void) { return rptr!=wptr; }
-  bool can_put(void) { return (wptr+1)%SIZE != rptr; }
-  int16_t peek(void) { return buff[rptr]; }
-  int16_t get(void) { int16_t val = buff[rptr++]; rptr %= SIZE; return val; }
-  void put(int16_t val) { buff[wptr++] = val; wptr %= SIZE; }
-  unsigned items(void) { return ((unsigned)(wptr-rptr))%SIZE; }
-  static const unsigned SIZE = 128u;
+  bool can_put(void) { return (wptr+1) != rptr; }
+  T peek(void) { return buff[rptr%SIZE]; }
+  T get(void) { return buff[rptr++%SIZE]; }
+  void put(T val) { buff[wptr++%SIZE] = val; }
+  int items(void) { return wptr-rptr; }
+  static const int SIZE = 128;
 private:
-  uint16_t wptr = 0, rptr = 0;
-  int16_t buff[SIZE];
+  unsigned wptr = 0, rptr = 0;
+  T buff[SIZE];
 };
 #endif

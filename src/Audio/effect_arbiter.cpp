@@ -49,8 +49,10 @@ void AudioEffectArbiter::update(void)
     }
   }
 
+  /* the result of the scan is combined with active_stream */
   if (active_stream < 0) {
     /* there is no currently active stream */
+    /* any lingering active_tail has been cleared */
     if (n_active == 0) {
       /* there is no new voice keying */
       /* send nothing */
@@ -71,7 +73,7 @@ void AudioEffectArbiter::update(void)
       /* pre-empt active stream */
       change_over = 1;
       /* abort keyed stream for current active stream */
-      queue_reset();
+      active_delay = -1;
       /* set the new active stream */
       active_stream = ibest;
       /* start the new active stream */
@@ -79,11 +81,9 @@ void AudioEffectArbiter::update(void)
     }
   }
 
-  /* send says we found something to send in the input stream */
+  /* send says we found something to send in the input stream,
+     or the active stream has not yet finished  */
   if (send) {
-    /* fetch ptt parameters */
-    int ptt_head = ms_to_samples(get_vox_ptt_head(get_active_vox()));
-    int ptt_tail = ms_to_samples(get_vox_ptt_tail(get_active_vox()));
 
     /* change over means there must be one zero sample to trigger ramp off for previous vox */
     if (change_over && block[active_stream] && block[active_stream]->data[0] != bool2fix(0)) {
@@ -98,100 +98,83 @@ void AudioEffectArbiter::update(void)
     }
 
     /* deal with sidetone key stream first */
-    if (block[active_stream] && get_st_enable())
+    if (block[active_stream] && (get_st_enable() || local[active_stream]))
       transmit(block[active_stream], 0);
 
-    /* deal with undelayed voices */
-    if (ptt_head == 0) {
-      /* immediate send, no ptt delay */
-      int16_t *pkeyin = block[active_stream] ? block[active_stream]->data : (int16_t *)zeros;
-      int16_t *pend = pkeyin+AUDIO_BLOCK_SAMPLES;
-      audio_block_t *pttout = allocate();
-      if (block[active_stream] && get_tx_enable() && is_not_local()) transmit(block[active_stream],1);
-      if (pttout) {
-	int16_t *pptt = pttout->data;
-	while (pkeyin < pend) {
-	  if (*pkeyin++ == 0) {
-	    if (active_tail > 0) {
-	      active_tail -= 1;
-	      *pptt++ = bool2fix(1);
-	    } else {
-	      ended = 1;
-	      *pptt++ = bool2fix(0);
-	    }
-	  } else {
-	    active_tail = ptt_head+ptt_tail;
-	    ended = 0;
-	    *pptt++ = bool2fix(1);
-	  }
-	}
-	if (get_tx_enable() && is_not_local()) transmit(pttout, 2);
-	release(pttout);
-      }
-    } else {
-      /* ptt_head delay on key line */
-      /* queue key in and ptt */
-      int16_t *pkeyin = block[active_stream] ? block[active_stream]->data : (int16_t *)zeros;
-      int16_t *pend = pkeyin+AUDIO_BLOCK_SAMPLES;
-      int delay_queued = active_tail > 0;
-      while (pkeyin < pend) {
-	if (*pkeyin++ == 0) {
-	  /* zero keyed, count down active_tail */
-	  if (active_tail > 0) {
-	    active_tail -= 1;
-	    queue_runs(-1, +1);
-	  } else {
-	    ended = 1;
-	    queue_runs(-1, -1);
-	  }
+    /* fetch current ptt parameters */
+    int vox = get_active_vox();
+    int ptt_head = ms_to_samples(get_vox_ptt_head(vox));
+    int ptt_tail = max(ms_to_samples(get_vox_ptt_tail(vox)), get_vox_ptt_hang(vox)*get_vox_dit(vox));
+
+    /* deal with actual change in active_delay, or a mismatch triggered by change_over */
+    if (ptt_head != active_delay) {
+      queue_reset();		// discard previous queue
+      active_head = 0;		// no active ptt_head to fill
+      active_tail = 0;		// no active ptt_tail to fill
+      active_delay = ptt_head;	// new delay
+      if (ptt_head) keyq.put_run(-ptt_head); // put the delay into the key queue
+    }
+
+    /* check for end of active stream */
+    if ( ! block[active_stream] && active_head == 0 && active_tail == 0 && queue_is_all_zeros())
+      active_stream = -1;
+
+    /* queue key in and ptt_head */
+    int16_t *pkeyin = (active_stream != -1 && block[active_stream]) ? block[active_stream]->data : (int16_t *)zeros;
+    int16_t *pend = pkeyin+AUDIO_BLOCK_SAMPLES;
+
+    /* read the incoming key stream */
+    while (pkeyin < pend) {
+      if (*pkeyin++ == 0) {
+	/* zero keyed, count down active_head */
+	if (active_head > 0) {
+	  active_head -= 1;
+	  queue_runs(-1, +1);
 	} else {
-	  /* one keyed, reset active_tail */
-	  active_tail = ptt_tail;
-	  /* push delay if necessary */
-	  if ( ! delay_queued) {
-	    queue_runs(-ptt_head, +ptt_head);
-	    delay_queued = 1;
-	  }
-	  /* queue key and ptt */
-	  ended = 0;
-	  queue_runs(+1, +1);
+	  queue_runs(-1, -1);
 	}
-      }
-      /* fill output buffers with queued output */
-      if ( ! queue_is_empty()) {
-	/* process the queue */
-	audio_block_t *keyout = allocate(), *pttout = allocate();
-	if (keyout && pttout) {
-	  int16_t *pk, *pp, *pend;
-	  int sumk = 0, sump = 0;
-	  pk = keyout->data;
-	  pp = pttout->data;
-	  pend = pk+AUDIO_BLOCK_SAMPLES;
-	  while (pk < pend && ! queue_is_empty()) {
-	    sumk += *pk++ = bool2fix(get_key());
-	    sump += *pp++ = bool2fix(get_ptt());
-	  }
-	  /* queue has drained, reset active_stream and fill buffer with zeros */
-	  if (pk < pend) {
-	    ended = 1;
-	    while (pk < pend) {
-	      *pk++ = bool2fix(0);
-	      *pp++ = bool2fix(0);
-	    }
-	  }
-	  if (get_tx_enable() && is_not_local()) {
-	    if (sumk != 0) transmit(keyout, 1); // send key out stream
-	    if (sump != 0) transmit(pttout, 2); // send ptt out stream
-	  }
-	} else {
-	  /* could drain the queue of a block worth anyway */
-	}
-	if (keyout) release(keyout);
-	if (pttout) release(pttout);
+      } else {
+	/* one keyed, reset active_head */
+	active_head = ptt_head;
+	/* queue key and ptt */
+	queue_runs(+1, +1);
+	if (active_head > 0) active_head -= 1;
       }
     }
+
+    /* okay, if active_head is zero, active_tail is zero, and both queues are
+    /* fill output buffers with queued output and apply ptt_tail */
+    audio_block_t *keyout = allocate(), *pttout = allocate();
+    if (keyout && pttout) {
+      int16_t *pk, *pp, *pend, key, ptt;
+      int sumk = 0, sump = 0;
+      pk = keyout->data;
+      pp = pttout->data;
+      pend = pk+AUDIO_BLOCK_SAMPLES;
+      while (pk < pend) {
+	/* fetch from queue */
+	key = get_key();
+	ptt = get_ptt();
+	if (key) {		// key active, reset tail
+	  active_tail = ptt_tail;
+	  ptt = 1;
+	} else if (active_tail > 0) { // tail active, set ptt
+	  active_tail -= 1;
+	  ptt = 1;
+	}
+	/* store to output */
+	sumk += *pk++ = bool2fix(key);
+	sump += *pp++ = bool2fix(ptt);
+      }
+      if (active_stream >= 0 && get_tx_enable() && ! local[active_stream]) {
+	if (sumk != 0) transmit(keyout, 1); // send key out stream
+	if (sump != 0) transmit(pttout, 2); // send ptt out stream
+      }
+    }
+    if (keyout) release(keyout);
+    if (pttout) release(pttout);
   }
-  if (ended) active_stream = -1;
+
   for (i = 0; i < KYR_N_VOX; i += 1) 
     if (block[i]) release(block[i]);
 }

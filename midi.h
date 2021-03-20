@@ -9,6 +9,10 @@
 static uint8_t kyr_in_channel = KYR_IN_CHANNEL;
 static uint8_t kyr_out_channel = KYR_OUT_CHANNEL;
 
+#ifdef KYRP_RECV_MIDI
+/*
+** As written this doesn't work, and it complicated to make it work.
+*/
 /*
 ** receive a note on event and do something with it.
 ** only if KYRP_RECV_MIDI is enabled and it's on our channel.
@@ -54,6 +58,7 @@ static void myNoteOff(byte channel, byte note, byte velocity) {
     }
   }
 }
+#endif
 
 static void myControlChange(byte channel, byte control, byte value) {
   /*
@@ -84,8 +89,10 @@ static void myControlChange(byte channel, byte control, byte value) {
 }
 
 static void midi_setup(void) {
+#ifdef KYRP_RECV_MIDI
   usbMIDI.setHandleNoteOn(myNoteOn);
   usbMIDI.setHandleNoteOff(myNoteOff);
+#endif
   usbMIDI.setHandleControlChange(myControlChange);
 }
 
@@ -96,6 +103,7 @@ static uint8_t midi_send_toggle(uint8_t pin, uint8_t note) {
   usbMIDI.send_now();		// send it now
   return pin ^ 1;		// invert the pin
 }
+
 static void midi_loop(void) {
   while (usbMIDI.read());
   if (get_send_midi()) {
