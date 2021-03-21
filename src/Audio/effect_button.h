@@ -39,21 +39,11 @@ class AudioEffectButton : public AudioStream
 {
 public:
   AudioEffectButton() : AudioStream(1, inputQueueArray) {
-    /*
-      these are the levels on my Teensy with my headset.
-      except for 'hey google' which is a guess.
-    */
-    centers[0] = 6800;		/* off */
-    centers[1] = -2700;		/* center */
-    centers[2] = -1800;		/* up */
-    centers[3] = -500;		/* down */
-    centers[4] = -2250;		/* hey google */
     initial_skip = 24000/AUDIO_BLOCK_SAMPLES;
     last_best[0] = last_best[1] = 0;
   }
   virtual void update(void);
   static const int N_BUTTONS = 5;
-  int16_t centers[N_BUTTONS];
   int initial_skip;
   uint8_t last_best[2];
 private:

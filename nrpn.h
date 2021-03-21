@@ -141,17 +141,20 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
     sgtl5000.micImpedance(value);
     kyr_nrpn[nrpn] = value; break;
 
-    //case KYRP_AUDIO_MODE:
-    //case KYRP_ST_PAN:
-  case KYRP_SEND_MIDI: 
-#ifdef KYRP_RECV_MIDI
+  case KYRP_BUTTON_0:
+  case KYRP_BUTTON_1:
+  case KYRP_BUTTON_2:
+  case KYRP_BUTTON_3:
+  case KYRP_BUTTON_4:
+  case KYRP_SEND_MIDI:
   case KYRP_RECV_MIDI:
-#endif
   case KYRP_IQ_ENABLE:
   case KYRP_IQ_ADJUST:
   case KYRP_TX_ENABLE:
   case KYRP_ST_ENABLE:
   case KYRP_IQ_BALANCE:
+  case KYRP_ST_AUDIO_MODE:
+  case KYRP_ST_PAN:
     kyr_nrpn[nrpn] = value;  break;
     
     // case KYRP_MORSE+(0..63):
@@ -237,6 +240,10 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 #undef VOXP
 
   default: 
+    if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) ||
+	(nrpn >= KYRP_MIXER && nrpn < KYRP_MIXER+24)) {
+      kyr_nrpn[nrpn] = value; break;
+    }
     Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
 
   }
@@ -273,16 +280,20 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_HEAD_PHONE_VOLUME, 40);
 
   /* soft controls */
-  // KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
-  // KYRP_ST_PAN		(KYRP_SOFT+1) /* pan sidetone left or right */
+  nrpn_set(KYRP_BUTTON_0, 6800);  /* off */
+  nrpn_set(KYRP_BUTTON_1, -2700); /* center */
+  nrpn_set(KYRP_BUTTON_2, -1800); /* up */
+  nrpn_set(KYRP_BUTTON_3, -500);  /* down */
+  nrpn_set(KYRP_BUTTON_4, -2250); /* hey google */
   nrpn_set(KYRP_SEND_MIDI, 1);
-#ifdef KYRP_RECV_MIDI
   nrpn_set(KYRP_RECV_MIDI, 0);
-#endif
   nrpn_set(KYRP_IQ_ENABLE, 0);
   nrpn_set(KYRP_IQ_ADJUST, 8096);
   nrpn_set(KYRP_TX_ENABLE, 0);
   nrpn_set(KYRP_ST_ENABLE, 1);
+  nrpn_set( KYRP_IQ_BALANCE, 8096);
+  nrpn_set(KYRP_ST_AUDIO_MODE, 0);
+  nrpn_set(KYRP_ST_PAN, 8096);
 
   /* morse code table */
   for (int i = 0; i < 64; i += 1) kyr_nrpn[KYRP_MORSE+i] = morse[i];

@@ -55,12 +55,11 @@ void AudioEffectButton::update(void)
     int avg = sum / AUDIO_BLOCK_SAMPLES;
     int dist[N_BUTTONS], ibest = 0;    
     for (int i = 0; i < N_BUTTONS; i += 1) {
-      dist[i] = abs(avg-centers[i]);
+      dist[i] = abs(avg-get_button(i));
       if (dist[i] < dist[ibest])
 	ibest = i;
     }
     if (last_best[0] == ibest && last_best[1] == ibest) {
-      centers[ibest] = (centers[ibest]+avg)/2;
       if (ibest != 0) {
 	bp = block->data;
 	endp = bp+AUDIO_BLOCK_SAMPLES;

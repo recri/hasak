@@ -37,7 +37,7 @@
        ctrlrMenuBarBackgroundColour1="fff7f7f7" ctrlrMenuBarBackgroundColour2="ffcccccc"
        ctrlrMenuBarTextColour="ff000000" ctrlrMenuBarHighlightedTextColour="ffffffff"
        ctrlrMenuBarHighlightColour="ff4364ff" ctrlrMenuBarFont="&lt;Sans-Serif&gt;;18;0;0;0;0;1;3"
-       ctrlrUseEditorWrapper="0" panelIndex="0">
+       ctrlrUseEditorWrapper="0" panelIndex="0" uiPanelModulatorListViewTree="0">
   <uiWindowManager>
     <uiChildWindow uiChildWindowName="MIDISettings" uiChildWindowState="368 219 800 500">
       <uiChildWindowContentState/>
@@ -46,6 +46,9 @@
       <uiChildWindowContentState/>
     </uiChildWindow>
     <uiChildWindow uiChildWindowName="MIDILibrary" uiChildWindowState="368 256 800 500">
+      <uiChildWindowContentState/>
+    </uiChildWindow>
+    <uiChildWindow uiChildWindowName="ModulatorList" uiChildWindowState="339 122 800 718">
       <uiChildWindowContentState/>
     </uiChildWindow>
   </uiWindowManager>
@@ -163,7 +166,7 @@
                  uiPanelInvisibleComponentAlpha="0.5" uiPanelTooltipBackgroundColour="0xffeeeebb"
                  uiPanelTooltipOutlineColour="0xff000000" uiPanelTooltipColour="0xff000000"
                  uiPanelTooltipCornerRound="1" uiPanelTooltipPlacement="2" uiPanelTooltipFont="&lt;Sans-Serif&gt;;15;1;0;0;0;1;3"
-                 uiPanelZoom="1" uiPanelViewPortSize="399" uiPanelPropertiesSize="99"
+                 uiPanelZoom="1" uiPanelViewPortSize="398" uiPanelPropertiesSize="100"
                  uiPanelDisableCombosOnEdit="1">
     <uiPanelCanvasLayer uiPanelCanvasLayerName="New layer" uiPanelCanvasLayerUid="3cb7e26c330000000000000000000000"
                         uiPanelCanvasLayerColour="0x000000" uiPanelCanvasLayerVisibility="1"
@@ -1214,7 +1217,7 @@
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
              name="send-midi" modulatorMin="0" modulatorValue="1">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
-          midiMessageCtrlrNumber="18" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
+          midiMessageCtrlrNumber="21" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
     <component componentLabelPosition="top" componentLabelJustification="centred"
                componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"

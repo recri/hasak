@@ -200,16 +200,20 @@
 /* relocation base */
 #define KYRP_SOFT		(KYRP_CODEC+16) /* == 16 */
 /* other things that we might control */
-#define KYRP_AUDIO_MODE		(KYRP_SOFT+0) /* sound card operation mode */
-#define KYRP_ST_PAN		(KYRP_SOFT+1) /* pan sidetone left or right */
-#define KYRP_SEND_MIDI		(KYRP_SOFT+2) /* send input paddle key events to midi notes */
-//#define KYRP_RECV_MIDI		(KYRP_SOFT+3) /* send input straight key events to midi notes */
+#define KYRP_BUTTON_0		(KYRP_SOFT+0) /* headset button 0 - none pressed */
+#define KYRP_BUTTON_1		(KYRP_SOFT+1) /* headset button 1 - center or only pressed */
+#define KYRP_BUTTON_2		(KYRP_SOFT+2) /* headset button 2 - up pressed */
+#define KYRP_BUTTON_3		(KYRP_SOFT+3) /* headset button 3 - down pressed */
+#define KYRP_BUTTON_4		(KYRP_SOFT+4) /* headset button 4 - hey pressed */
+#define KYRP_SEND_MIDI		(KYRP_SOFT+5) /* send input paddle key events to midi notes */
+#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* send input paddle key events to midi notes */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd, excess 8096 */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
 #define KYRP_ST_ENABLE		(KYRP_SOFT+10) /* 0, 1 -> disable, enable  */
 #define KYRP_IQ_BALANCE		(KYRP_SOFT+11) /*  adjustment to iq balance, +/- units tbd, excess 8096 */
-
+#define KYRP_ST_AUDIO_MODE	(KYRP_SOFT+12) /* sound card operation mode */
+#define KYRP_ST_PAN		(KYRP_SOFT+13) /* pan sidetone left or right */
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
 /* lower case alpha are mapped to upper case on input */
@@ -298,7 +302,7 @@
 #define KYRP_VOX_5		(KYRP_KEYER+160) /* == 280 headset button */
 
 /* sgtl5000 control */
-#define KYRP_LAST		(KYRP_VOX_4+32)	/* == 280 */
+#define KYRP_LAST		(KYRP_VOX_5+32)	/* == 312 */
 
 /* nrpn MSB numbers, bank select, not quite yet */
 #define KYRP_VOX_OFFSET		32

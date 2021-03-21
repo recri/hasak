@@ -43,6 +43,9 @@ static inline int get_vox_nrpn(int vox, int nrpn) {
 ** keyers, oscillators, ramps, and ptt fetch parameters as required
 ** which allows them to vary as you twiddle the ctrlr dials
 ***************************************************************/
+/* button voltages */
+static inline int get_button(int button) { return (((int16_t)get_nrpn(KYRP_BUTTON_0+button))<<2)>>2; } // sign extended 14 bit value
+
 /* paddle modes */
 static inline int get_vox_pad_mode(int vox) { return get_vox_nrpn(vox, KYRP_PAD_MODE); }
 static inline int get_vox_pad_swap(int vox) { return get_vox_nrpn(vox, KYRP_PAD_SWAP); }

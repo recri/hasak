@@ -35,24 +35,13 @@ elapsedMicros perAudioBuffer;
 uint32_t cpuCyclesRaw, cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax;
 
 /* usage report line */
-static void report(const char *tag, int use, int umax, int mem, int mmax, int over, int under) {
+static void report(const char *tag, int use, int umax) {
   Serial.printf("%16s %5d %5d", tag, use, umax);
-  if (mem || mmax || over || under) {
-    Serial.printf(" %2d %2d", mem, mmax);
-    if (over || under)
-      Serial.printf(" ++%-5d --%-5d", over, under);
-  }
-  Serial.printf("\n");
-}
-/* button report */
-static void breport(const char *tag, AudioEffectButton& but) {
-  Serial.printf("%16s %5d %5d", tag, but.cpu_cycles, but.cpu_cycles_max);
-  for (int i = 0; i < but.N_BUTTONS; i += 1) Serial.printf(" [#%d @%5d]", i, but.centers[i]);
-  Serial.printf("\n");
+  // Serial.printf("\n");
 }
 /* generic audio module report and reset */
 static void mreport(const char *tag, AudioStream& str) {
-  report(tag, str.cpu_cycles, str.cpu_cycles_max, 0, 0, 0, 0);
+  report(tag, str.cpu_cycles, str.cpu_cycles_max);
 }
 
 /* summary report */
@@ -72,33 +61,17 @@ static void Sreport(void) {
   // report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max, AudioMemoryUsage(), AudioMemoryUsageMax(), 0, 0);
   // report("denom", cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax, 0, 0, 0, 0);
   sreport();
-  mreport("i2s_in", i2s_in);
-  mreport("usb_in", usb_in);
-  mreport("adc_in", adc_in);
-  mreport("i2s_out", i2s_out);
-  mreport("usb_out", usb_out);
-  mreport("l_pad", l_pad);
-  mreport("r_pad", r_pad);
-  mreport("s_key", s_key);
-  mreport("ptt sw", ptt_sw);
-  mreport("winkey", wink); 
-  mreport("kyr", kyr);
-  mreport("adc", adc_in);
-  mreport("paddle", paddle);
-  breport("button", button);
-  mreport("arbiter", arbiter);
-  mreport("tone_ramp", tone_ramp);
-  mreport("key_ramp", key_ramp);
-  mreport("l_i2s_out", l_i2s_out);
-  mreport("r_i2s_out", r_i2s_out);
-  mreport("l_usb_out", l_usb_out);
-  mreport("r_usb_out", r_usb_out);
-  mreport("l_hdw_out", l_hdw_out);
-  mreport("r_hdw_out", r_hdw_out);
-  mreport("key_out", key_out); 
-  mreport("ptt out", ptt_out);
-  mreport("up out", up_out);
-  mreport("down out", down_out);
+  mreport("i2s_in", i2s_in);       mreport("usb_in", usb_in);       mreport("adc_in", adc_in);   Serial.println();
+  mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);     mreport("hdw_out", hdw_out); Serial.println();
+  mreport("l_pad", l_pad);         mreport("r_pad", r_pad);         mreport("s_key", s_key);     Serial.println();
+  mreport("ptt sw", ptt_sw);       mreport("winkey", wink);         mreport("kyr", kyr);         Serial.println();
+  mreport("paddle", paddle);       mreport("button", button);       mreport("arbiter", arbiter); Serial.println();
+  mreport("tone_ramp", tone_ramp); mreport("key_ramp", key_ramp);   Serial.println();
+  mreport("l_i2s_out", l_i2s_out); mreport("r_i2s_out", r_i2s_out); Serial.println();
+  mreport("l_usb_out", l_usb_out); mreport("r_usb_out", r_usb_out); Serial.println();
+  mreport("l_hdw_out", l_hdw_out); mreport("r_hdw_out", r_hdw_out); Serial.println();
+  mreport("key_out", key_out);     mreport("ptt out", ptt_out);     Serial.println();
+  mreport("up out", up_out);      mreport("down out", down_out);    Serial.println();
 }
 
 /* summary reset */
