@@ -37,15 +37,12 @@
 
 #include <Audio.h>
 // custom audio modules
-//#include "src/Audio/input_sample.h"
 #include "src/Audio/input_byte.h"
 #include "src/Audio/input_text.h"
 #include "src/Audio/effect_paddle.h"
 #include "src/Audio/effect_button.h"
 #include "src/Audio/effect_arbiter.h"
 #include "src/Audio/synth_keyed_tone.h"
-#include "src/Audio/effect_mute.h"
-//#include "src/Audio/output_sample.h"
 #include "src/Audio/output_byte.h"
 #include "src/Audio/my_control_sgtl5000.h"
 // audio sample values

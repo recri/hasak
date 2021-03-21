@@ -25,27 +25,72 @@
 #include <Arduino.h>
 #include "input_byte.h"
 
+audio_block_t *AudioInputByte::ones = NULL;
 void AudioInputByte::update(void)
 {
-  audio_block_t *block;
-
-  block = allocate();
+  int32_t write_position = tell();
+  /* 
+  ** if we have debounce greater or equal to block length
+  ** just send a block of last and be done with it.
+  */
+  if (debounce >= AUDIO_BLOCK_SAMPLES) {
+    debounce -= AUDIO_BLOCK_SAMPLES;
+    seek(write_position);
+    if (last) transmit(block_of_ones());
+    return;
+  }
+  /*
+  ** debounce is less than block length, possibly zero.
+  ** construct a block from the inputs.
+  */
+  audio_block_t *block = allocate();
   if (block) {
-    uint16_t *bp, *end;
+    uint16_t *bp, *endp;
     uint32_t sum;
     bp = (uint16_t *)block->data;
-    end = bp+AUDIO_BLOCK_SAMPLES;
+    endp = bp+AUDIO_BLOCK_SAMPLES;
     sum = 0;
-    rptr = (wptr+AUDIO_BLOCK_SAMPLES)%(2*AUDIO_BLOCK_SAMPLES);
-    while (bp < end) {
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
-      sum += *bp++ = bool2fix(buffer[rptr++]); rptr %= 2*AUDIO_BLOCK_SAMPLES;
+    seek(write_position-AUDIO_BLOCK_SAMPLES);
+    while (bp < endp) {
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+      sum += *bp++ = bool2fix(get());
+    }
+    /* we are in the last partial block of debounce or free running */
+    if (last == bool2fix(0) && sum == 0) {
+      debounce = 0;
+      release(block);
+      /* transmit(block_of_zeros()) by transmitting nothing */
+      return;
+    }
+    if (last == bool2fix(1) && sum == (int)(bool2fix(1)*AUDIO_BLOCK_SAMPLES)) {
+      debounce = 0;
+      release(block);
+      transmit(block_of_ones());
+      return;
+    }
+    /* 
+    ** the block is not pure last
+    ** apply debounce and transition detection
+    */
+    bp = (uint16_t *)block->data;
+    endp = bp+AUDIO_BLOCK_SAMPLES;
+    sum = 0;
+    while (bp < endp) {
+      if (debounce > 0) {
+	debounce -= 1;
+	sum += *bp++ = last;
+      } else if (*bp != last) {
+	sum += last = *bp++;
+	debounce = get_debounce();
+      } else {
+	sum += *bp++;
+      }
     }
     if (sum != 0) transmit(block);
     release(block);

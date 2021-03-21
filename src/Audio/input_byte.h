@@ -26,26 +26,47 @@
 
 #ifndef input_byte_h_
 #define input_byte_h_
+#include "../../config.h"
 #include "Arduino.h"
+#include "../../linkage.h"
 #include "AudioStream.h"
+
 #include "sample_value.h"
 /*
 ** Teensy Audio Library component for sample input
 */
+
 
 class AudioInputByte : public AudioStream
 {
 public:
   AudioInputByte() : AudioStream(0, NULL) {
     rptr = wptr = 0;
+    last = bool2fix(0);
+    debounce = 0;
   }
-  void send(uint8_t value) {
-    buffer[wptr++] = value;
-    wptr %= 2*AUDIO_BLOCK_SAMPLES;
+  void send(uint8_t value) { buffer[wptr++%(2*AUDIO_BLOCK_SAMPLES)] = value; }
+  int16_t get(void) { return buffer[rptr++%(2*AUDIO_BLOCK_SAMPLES)]; }
+  uint32_t tell(void) { return wptr; }
+  void seek(uint32_t to_rptr) { rptr = to_rptr; }
+  /* should be safe as only called from within update */
+  audio_block_t *block_of_ones(void) {
+    if ( ! ones) {
+      ones = allocate();
+      if (ones) {
+	int16_t *bp, *endp;
+	bp = ones->data;
+	endp = bp+AUDIO_BLOCK_SAMPLES;
+	while (bp < endp) *bp++ = bool2fix(1);
+      }
+    }
+    return ones;
   }
   virtual void update(void);
 private:
-  uint16_t rptr, wptr;
+  static audio_block_t *ones;
+  int16_t last;
+  uint32_t rptr, wptr, debounce;
   uint8_t buffer[2*AUDIO_BLOCK_SAMPLES];
 };
 

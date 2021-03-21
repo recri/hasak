@@ -100,12 +100,11 @@ static uint8_t midi_send_toggle(uint8_t pin, uint8_t note) {
   // if the pin was high, then it went low, and is now active, so send velocity 1
   // if the pin was low, then it went high, and is now off, so send velocity 0
   usbMIDI.sendNoteOn(note, pin, kyr_out_channel);
-  usbMIDI.send_now();		// send it now
+  // usbMIDI.send_now();		// send it now
   return pin ^ 1;		// invert the pin
 }
 
 static void midi_loop(void) {
-  while (usbMIDI.read());
   if (get_send_midi()) {
     static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
     if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYR_L_PAD_NOTE);
@@ -115,5 +114,6 @@ static void midi_loop(void) {
     if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYR_KEY_OUT_NOTE);
     if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYR_PTT_OUT_NOTE);
   }
+  while (usbMIDI.read());
 }
 

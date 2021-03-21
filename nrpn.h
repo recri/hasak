@@ -147,7 +147,9 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   case KYRP_BUTTON_3:
   case KYRP_BUTTON_4:
   case KYRP_SEND_MIDI:
+#if defined(KYRP_RECV_MIDI)
   case KYRP_RECV_MIDI:
+#endif
   case KYRP_IQ_ENABLE:
   case KYRP_IQ_ADJUST:
   case KYRP_TX_ENABLE:
@@ -286,7 +288,9 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_BUTTON_3, -500);  /* down */
   nrpn_set(KYRP_BUTTON_4, -2250); /* hey google */
   nrpn_set(KYRP_SEND_MIDI, 1);
+#if defined(KYRP_RECV_MIDI)
   nrpn_set(KYRP_RECV_MIDI, 0);
+#endif
   nrpn_set(KYRP_IQ_ENABLE, 0);
   nrpn_set(KYRP_IQ_ADJUST, 8096);
   nrpn_set(KYRP_TX_ENABLE, 0);

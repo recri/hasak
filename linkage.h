@@ -46,6 +46,9 @@ static inline int get_vox_nrpn(int vox, int nrpn) {
 /* button voltages */
 static inline int get_button(int button) { return (((int16_t)get_nrpn(KYRP_BUTTON_0+button))<<2)>>2; } // sign extended 14 bit value
 
+/* debounce interval */
+static inline int get_debounce(void) { return get_nrpn(KYRP_DEBOUNCE); }
+
 /* paddle modes */
 static inline int get_vox_pad_mode(int vox) { return get_vox_nrpn(vox, KYRP_PAD_MODE); }
 static inline int get_vox_pad_swap(int vox) { return get_vox_nrpn(vox, KYRP_PAD_SWAP); }
@@ -92,5 +95,6 @@ static inline int get_recv_midi(void) { return get_nrpn(KYRP_RECV_MIDI); }
 
 /* unit conversions */
 static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE/1000.0); }
+static inline int tenth_ms_to_samples(int tenthms) { return tenthms * (AUDIO_SAMPLE_RATE/10000.0); }
 
 #endif

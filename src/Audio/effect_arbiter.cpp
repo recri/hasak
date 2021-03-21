@@ -35,7 +35,7 @@
 void AudioEffectArbiter::update(void)
 {
   audio_block_t *block[KYR_N_VOX];
-  int16_t i, n_active = 0, ibest = -1, send = 0, ended = 0, change_over = 0;
+  int16_t i, n_active = 0, ibest = -1, send = 0, change_over = 0;
 
   /* scan incoming streams for activity */
   /* find highest priority stream among those */

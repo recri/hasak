@@ -12,7 +12,7 @@
 	They're just voltage level changes.
 	Need to skip first transient values.
 	Need to debounce
-[ ] Move headset switch adc readings into NRPN values
+[x] Move headset switch adc readings into NRPN values
 [x] Convert some input_sample/output_sample to input_byte/output_byte.
 [x] Remove updated, overruns, underruns, reset, id from input/output_sample/byte.
 [x] Unroll 8 samples in sample loops in input/output_sample/byte.
@@ -34,10 +34,9 @@
 [x] Test ptt_delay.
 [x] Delay line is producing streams of zeros without dropping active_stream.
 	hard time getting it unsorted, the result is sort of ugly
-[ ] Debounce the straight key.	
+[x] Debounce all the key inputs.
 [ ] Apply headphone volume to hdw_out mixer.
-[ ] Echo parameter set to MIDI to synchronize Ctrlr.
-	A program dump.
+[ ] Give the output mixers a master out level
 [ ] Implement save/restore parameters to EEPROM
 	[ ] save parameters as the nrpn block and a bitset of
 	which have been set.
@@ -47,6 +46,8 @@
 	[ ] nibblize the nrpn block and send it to the ctrlr
 	which is built for slamming those things around.
 [ ] Implement default parameters from flash.
+[ ] Echo parameter set to MIDI to synchronize Ctrlr.
+	A program dump.
 [ ] Implement a reverse snapshot, sending CC NRPN's for all parameters
 	to Ctrlr.
 [ ] Add tab to ctrlr panel for specifying morse key codes for characters.
@@ -58,6 +59,15 @@
 [ ] Allow line-in audio to route through filters to headphone-out.
 [ ] Allow line-in IQ to route through sdr and filters to headphone-out.
 [ ] Allow IQ to route to line-out to key a softrock.
+[x] Strange interaction between sending midi events and receiving bad
+	audio.  Observed while keying http://github.com/recri/keyer in
+	jack with midi notes sent by Teensy and listening to the result
+	in Teensy.  Crackles, pops, overruns, and lockups at 48k, warbling
+	at 44100.  Not present if jack listening through the laptop audio,
+	not present if keyboard keys are used to key the keyer when listening
+	through the Teensy audio.  Is it usbMIDI.sendNow() disrupting the
+	usbAudio streaming?  No, that changed the effect but did not fix it.
+	Fixed with debouncing key switch input.
 [?] Rewrite effect_mute and put some of them back into the graph.
 [?] Try the fixed point complex rotor, both for sincos and ramp,
 	and with multiply_32x32_rshift32 instruction, it might.

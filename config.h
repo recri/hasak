@@ -206,7 +206,7 @@
 #define KYRP_BUTTON_3		(KYRP_SOFT+3) /* headset button 3 - down pressed */
 #define KYRP_BUTTON_4		(KYRP_SOFT+4) /* headset button 4 - hey pressed */
 #define KYRP_SEND_MIDI		(KYRP_SOFT+5) /* send input paddle key events to midi notes */
-#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* send input paddle key events to midi notes */
+//#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* send input paddle key events to midi notes */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd, excess 8096 */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
@@ -214,6 +214,8 @@
 #define KYRP_IQ_BALANCE		(KYRP_SOFT+11) /*  adjustment to iq balance, +/- units tbd, excess 8096 */
 #define KYRP_ST_AUDIO_MODE	(KYRP_SOFT+12) /* sound card operation mode */
 #define KYRP_ST_PAN		(KYRP_SOFT+13) /* pan sidetone left or right */
+#define KYRP_DEBOUNCE		(KYRP_SOFT+14) /* debounce period in ms/10 */
+
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
 /* lower case alpha are mapped to upper case on input */
