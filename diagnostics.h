@@ -25,35 +25,27 @@
 /*
 ** diagnostics / command line interface
 */
-
-/*
-** keep track of cycles during each sample buffer time
-** used to normalize the cycle usage from the audio library
-*/
-uint32_t microsPerAudioBuffer = AUDIO_BLOCK_SAMPLES / AUDIO_SAMPLE_RATE * 1000000;
-elapsedMicros perAudioBuffer;
-uint32_t cpuCyclesRaw, cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax;
-
 /* usage report line */
-static void report(const char *tag, int use, int umax) {
-  Serial.printf("%16s %5d %5d", tag, use, umax);
+static void report(const char *tag, uint32_t use, uint32_t umax) {
+  Serial.printf("%16s %5.3f%% %5.3f%%", tag, timing_percent(use), timing_percent_max(umax));
   // Serial.printf("\n");
-}
-/* generic audio module report and reset */
-static void mreport(const char *tag, AudioStream& str) {
-  report(tag, str.cpu_cycles, str.cpu_cycles_max);
 }
 
 /* summary report */
 static void sreport(void) {
-  float total = 100*(float)AudioStream::cpu_cycles_total/(float)cpuCyclesPerAudioBuffer;
-  float totalMax =  100*(float)AudioStream::cpu_cycles_total_max/(float)cpuCyclesPerAudioBufferMax;
   float msPerIes = 1000.0f*get_vox_ies(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIls = 1000.0f*get_vox_ils(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIws = 1000.0f*get_vox_iws(get_active_vox())/AUDIO_SAMPLE_RATE;
-  Serial.printf("%16s %5.3f %5.3f %2d %2d active %d ies/ils/iws %.1f/%.1f/%.1f ms\n", "total", 
-		total, totalMax, AudioMemoryUsage(), AudioMemoryUsageMax(), get_active_vox(), 
-		msPerIes, msPerIls, msPerIws);
+  report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
+  report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
+  Serial.printf("%16s %2d %2d", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
+  Serial.printf("\n");
+  Serial.printf("active %d ies/ils/iws %.1f/%.1f/%.1f ms\n", get_active_vox(), msPerIes, msPerIls, msPerIws);
+}
+
+/* generic audio module report and reset */
+static void mreport(const char *tag, AudioStream& str) {
+  report(tag, str.cpu_cycles, str.cpu_cycles_max);
 }
 
 /* long report */
@@ -81,6 +73,7 @@ static void mreset(AudioStream &str) {
 
 static void sreset(void) {
   cpuCyclesPerAudioBufferMax = cpuCyclesPerAudioBuffer;
+  isrCyclesPerAudioBufferMax = isrCyclesPerAudioBuffer;
   AudioProcessorUsageMaxReset();
   AudioMemoryUsageMaxReset();
 }
@@ -97,6 +90,7 @@ static void Sreset(void) {
   mreset(wink);
   mreset(kyr);
   mreset(paddle);
+  mreset(button);
   mreset(arbiter);
   mreset(tone_ramp);
   mreset(key_ramp);
@@ -123,7 +117,17 @@ static void areport(void) {
   Serial.printf("pttq in %d items %d out %d\n", arbiter.pttq.in, arbiter.pttq.items(), arbiter.pttq.out);
 }
 
-const char *lorem = 
+/* button details */
+static void breport(void) {
+  Serial.printf("button thresholds: %d %d %d %d %d\n", get_button(0), get_button(1), get_button(2), get_button(3), get_button(4));
+}
+
+/* debounce details */
+static void dreport(void) {
+  Serial.printf("debounce: %d ms/10, %d samples\n", get_debounce(), tenth_ms_to_samples(get_debounce()));
+}
+
+static const char *lorem = 
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
   "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris "
@@ -131,16 +135,6 @@ const char *lorem =
   "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
   "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
   "culpa qui officia deserunt mollit anim id est laborum.";
-
-char *read_line() {
-  static char buff[256];
-  unsigned i = 0;
-  for (int c = Serial.read(); c != '\n'; c = Serial.read())
-    if (i < sizeof(buff)-1)
-      buff[i++] = c;
-  buff[i] = 0;
-  return buff;
-}
 
 static void mixer_set(const char *p) {
   AudioMixer4& left = l_usb_out;
@@ -176,19 +170,20 @@ static void mixer_set(const char *p) {
   }
 }
 
-void diagnostics_loop() {
-  // accumulate cycle count to normalize audio library usage
-  if (perAudioBuffer >= microsPerAudioBuffer) {
-    perAudioBuffer = 0;
-    cpuCyclesPerAudioBuffer = (ARM_DWT_CYCCNT - cpuCyclesRaw) >> 6;
-    cpuCyclesRaw = ARM_DWT_CYCCNT;
-    cpuCyclesPerAudioBufferMax = max(cpuCyclesPerAudioBufferMax, cpuCyclesPerAudioBuffer);
-     if (cpuCyclesPerAudioBufferMax > 100000) cpuCyclesPerAudioBufferMax = cpuCyclesPerAudioBuffer;
-  }
+static char *read_line() {
+  static char buff[256];
+  unsigned i = 0;
+  for (int c = Serial.read(); c != '\n'; c = Serial.read())
+    if (i < sizeof(buff)-1)
+      buff[i++] = c;
+  buff[i] = 0;
+  return buff;
+}
 
+void diagnostics_loop() {
   if (Serial.available()) {
     char *p = read_line();
-    Serial.printf("diag read '%s'\n", p);
+    // Serial.printf("diag read '%s'\n", p);
     switch (*p) {
     default: break;
     case '?': 
@@ -198,10 +193,12 @@ void diagnostics_loop() {
 		    " r -> reset usage counts\n"
 		    " R -> reset detailed usage counts\n"
 		    " a -> arbiter diagnostics\n"
+		    " b -> button diagnostics\n"
+		    " d -> debounce diagnostics\n"
 		    " w... -> send ... up to newline to wink keyer\n"
 		    " k... -> send ... up to newline to kyr keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
-		    " k -> send lorem ipsum to kyr keyer\n"
+		    " K -> send lorem ipsum to kyr keyer\n"
 		    " e -> default mixers\n"
 		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
 		    " i#### | il#### | ir#### -> set (both | left | right) i2s out mixers, # is 0|1\n"
@@ -213,6 +210,8 @@ void diagnostics_loop() {
     case 'r': sreset(); /* short reset */ break;
     case 'R': Sreset(); /* long reset */ break;
     case 'a': areport(); /* arbiter stats */ break;
+    case 'b': breport(); /* button stats */ break;
+    case 'd': dreport(); /* debounce stats */ break;
     case 'w': wink.send_text(p+1); break;
     case 'k': kyr.send_text(p+1); break;
     case 'W': wink.send_text(lorem); break;

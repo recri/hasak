@@ -76,7 +76,7 @@ static void nrpn_update_keyer(uint8_t vox) {
     ticksPerIws *= f;		// stretched inter-word pause
   }
   /* test for overflow */
-  ticksPerIws = min(ticksPerIws, 0x7fff);
+  // ticksPerIws = min(ticksPerIws, 0x7fff);
   /* Serial.printf("morse_keyer base dit %u, dit %u, dah %u, ies %u, ils %u, iws %u\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   /* storing msPerElement, because ticks gets too large */
@@ -157,6 +157,7 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   case KYRP_IQ_BALANCE:
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
+  case KYRP_DEBOUNCE:
     kyr_nrpn[nrpn] = value;  break;
     
     // case KYRP_MORSE+(0..63):
@@ -298,7 +299,8 @@ static void nrpn_setup(void) {
   nrpn_set( KYRP_IQ_BALANCE, 8096);
   nrpn_set(KYRP_ST_AUDIO_MODE, 0);
   nrpn_set(KYRP_ST_PAN, 8096);
-
+  nrpn_set(KYRP_DEBOUNCE, 50);
+  
   /* morse code table */
   for (int i = 0; i < 64; i += 1) kyr_nrpn[KYRP_MORSE+i] = morse[i];
 

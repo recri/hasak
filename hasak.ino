@@ -215,6 +215,40 @@ MyAudioControlSGTL5000     sgtl5000;
 ** core of program.
 */
 
+/*
+** keep track of cycles during each sample buffer time
+** used to normalize the cycle usage from the audio library
+** also track the cycle usage in the pollatch interrupt routine.
+*/
+elapsedMicros perAudioBuffer;	// counts up microseconds
+uint32_t microsPerAudioBuffer = AUDIO_BLOCK_SAMPLES * 1000000.0 / AUDIO_SAMPLE_RATE;
+uint32_t cpuCyclesRaw, cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax;
+uint32_t isrCpuCyclesRaw, isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax;
+
+static void timing_loop(void) {
+  if (perAudioBuffer >= microsPerAudioBuffer) {
+    perAudioBuffer = 0;
+    cpuCyclesPerAudioBuffer = (ARM_DWT_CYCCNT - cpuCyclesRaw) >> 6;
+    cpuCyclesRaw = ARM_DWT_CYCCNT;
+    // disable interrupts
+    isrCyclesPerAudioBuffer = isrCpuCyclesRaw >> 6;
+    isrCpuCyclesRaw = 0;
+    // enable interupts
+    cpuCyclesPerAudioBufferMax = max(cpuCyclesPerAudioBufferMax, cpuCyclesPerAudioBuffer);
+    isrCyclesPerAudioBufferMax = max(isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
+    // this discards an early transient
+    if (cpuCyclesPerAudioBufferMax > 100000) cpuCyclesPerAudioBufferMax = cpuCyclesPerAudioBuffer;
+  }
+}
+
+static float timing_percent(uint32_t cpuCycles) {
+  return 100*(float)cpuCycles/(float)cpuCyclesPerAudioBuffer;
+}
+
+static float timing_percent_max(uint32_t cpuCyclesMax) {
+  return 100*(float)cpuCyclesMax/(float)cpuCyclesPerAudioBufferMax;
+}
+
 //
 // poll input pins at sample rate
 // latch output pins at sample rate
@@ -228,14 +262,18 @@ uint8_t _key_out, _ptt_out;
 uint8_t _up_out, _down_out;
 
 static void pollatch() {
-  l_pad.send(digitalRead(KYR_L_PAD_PIN)^1);
-  r_pad.send(digitalRead(KYR_R_PAD_PIN)^1);
-  s_key.send(digitalRead(KYR_S_KEY_PIN)^1);
-  ptt_sw.send(digitalRead(KYR_PTT_SW_PIN)^1);
-  digitalWrite(KYR_KEY_OUT_PIN,_key_out=key_out.recv());
-  digitalWrite(KYR_PTT_OUT_PIN,_ptt_out=ptt_out.recv());
+  uint32_t cycles = ARM_DWT_CYCCNT;
+  l_pad.send(digitalReadFast(KYR_L_PAD_PIN)^1);
+  r_pad.send(digitalReadFast(KYR_R_PAD_PIN)^1);
+  s_key.send(digitalReadFast(KYR_S_KEY_PIN)^1);
+  ptt_sw.send(digitalReadFast(KYR_PTT_SW_PIN)^1);
+  _key_out=key_out.recv();
+  _ptt_out=ptt_out.recv();
   _up_out = up_out.recv();
   _down_out = down_out.recv();
+  digitalWriteFast(KYR_KEY_OUT_PIN,_key_out);
+  digitalWriteFast(KYR_PTT_OUT_PIN,_ptt_out);
+  isrCpuCyclesRaw += ARM_DWT_CYCCNT - cycles;
 }
 
 /*
@@ -273,6 +311,8 @@ void setup(void) {
 }
 
 void loop(void) {
+  // accumulate cycle count to normalize audio library usage
+  timing_loop();
   midi_loop();
   winkey_loop();
   diagnostics_loop();

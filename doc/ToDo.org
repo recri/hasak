@@ -24,10 +24,13 @@
 	Currently conflicts with EEPROM write.
 [ ] decode sidetone out, sort into timestamped queues by vox.
 	convert sidetone key line to run lengths
+[ ] Implement winkey control of keyer.
 [ ] implement a command mode based on headset button morse.
 	k3ng commands, 
 	using up/down buttons for adjustment.
 	with X transitioning into paddle control.
+[ ] Implement local control of keyer.
+	k3ng immediate mode should work, most if it is covered.
 [ ] implement a command line mode over serial monitor.
 	k3ng commands,
 [x] ptt_head breaks key and ptt.
@@ -52,9 +55,6 @@
 	to Ctrlr.
 [ ] Add tab to ctrlr panel for specifying morse key codes for characters.
 [ ] Add tab to ctrlr panel for the mixer matrix, or mixer presets.
-[ ] Implement local control of keyer.
-	k3ng immediate mode should work, most if it is covered.
-[ ] Implement winkey control of keyer.
 [ ] Pan sidetone to localize.
 [ ] Allow line-in audio to route through filters to headphone-out.
 [ ] Allow line-in IQ to route through sdr and filters to headphone-out.
@@ -67,7 +67,8 @@
 	not present if keyboard keys are used to key the keyer when listening
 	through the Teensy audio.  Is it usbMIDI.sendNow() disrupting the
 	usbAudio streaming?  No, that changed the effect but did not fix it.
-	Fixed with debouncing key switch input.
+	Fixed with debouncing key switch input. No, it was reducing the
+	time spent in the sample rate interrupt.
 [?] Rewrite effect_mute and put some of them back into the graph.
 [?] Try the fixed point complex rotor, both for sincos and ramp,
 	and with multiply_32x32_rshift32 instruction, it might.

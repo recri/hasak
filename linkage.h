@@ -27,7 +27,7 @@
 
 int get_active_vox(void);
 
-extern int16_t kyr_nrpn[];
+extern int16_t kyr_nrpn[KYRP_LAST];
 
 /* fetch a nrpn */
 static inline int get_nrpn(int nrpn) { 

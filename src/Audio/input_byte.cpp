@@ -46,7 +46,7 @@ void AudioInputByte::update(void)
   audio_block_t *block = allocate();
   if (block) {
     uint16_t *bp, *endp;
-    uint32_t sum;
+    int32_t sum;
     bp = (uint16_t *)block->data;
     endp = bp+AUDIO_BLOCK_SAMPLES;
     sum = 0;
@@ -68,7 +68,7 @@ void AudioInputByte::update(void)
       /* transmit(block_of_zeros()) by transmitting nothing */
       return;
     }
-    if (last == bool2fix(1) && sum == (int)(bool2fix(1)*AUDIO_BLOCK_SAMPLES)) {
+    if (last == bool2fix(1) && sum == bool2fix(1)*AUDIO_BLOCK_SAMPLES) {
       debounce = 0;
       release(block);
       transmit(block_of_ones());
