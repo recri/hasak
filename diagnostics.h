@@ -36,11 +36,12 @@ static void sreport(void) {
   float msPerIes = 1000.0f*get_vox_ies(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIls = 1000.0f*get_vox_ils(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIws = 1000.0f*get_vox_iws(get_active_vox())/AUDIO_SAMPLE_RATE;
+  Serial.printf("\tsample rate %f buffer size %d\n", AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES);
+  Serial.printf("\tactive %d ies/ils/iws %.1f/%.1f/%.1f ms\n", get_active_vox(), msPerIes, msPerIls, msPerIws);
   report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
   Serial.printf("%16s %2d %2d", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
   Serial.printf("\n");
-  Serial.printf("active %d ies/ils/iws %.1f/%.1f/%.1f ms\n", get_active_vox(), msPerIes, msPerIls, msPerIws);
 }
 
 /* generic audio module report and reset */
@@ -113,8 +114,15 @@ static void areport(void) {
   Serial.printf("arbiter vox %d, stream %d, tail %d, head %d, delay %d\n",
 		get_active_vox(), arbiter.active_stream, arbiter.active_tail, 
 		arbiter.active_head, arbiter.active_delay);
-  Serial.printf("keyq in %d items %d out %d\n", arbiter.keyq.in, arbiter.keyq.items(), arbiter.keyq.out);
-  Serial.printf("pttq in %d items %d out %d\n", arbiter.pttq.in, arbiter.pttq.items(), arbiter.pttq.out);
+  for (int i = 0; i < KYR_N_VOX; i += 1)
+    Serial.printf("stream %d vox %d priority %d local %d\n", 
+		  i, arbiter.vox[i], arbiter.priority[i], arbiter.local[i]);
+  Serial.printf("keyq in %d items %d out %d, overrun %d, underrun %d, maxusage %d\n",
+		arbiter.keyq.in, arbiter.keyq.items(), arbiter.keyq.out,
+		arbiter.keyq.overrun, arbiter.keyq.underrun, arbiter.keyq.maxusage);
+  Serial.printf("pttq in %d items %d out %d, overrun %d, underrun %d, maxusage %d\n",
+		arbiter.pttq.in, arbiter.pttq.items(), arbiter.pttq.out,
+		arbiter.pttq.overrun, arbiter.pttq.underrun, arbiter.pttq.maxusage);
 }
 
 /* button details */

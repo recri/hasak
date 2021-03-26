@@ -77,8 +77,8 @@ public:
     
   int16_t active_stream, active_tail, active_head, active_delay;
   RunLengthQueue keyq, pttq;
-private:
   uint8_t vox[KYR_N_VOX], priority[KYR_N_VOX], local[KYR_N_VOX];
+private:
   audio_block_t *inputQueueArray[KYR_N_VOX];
 };
 

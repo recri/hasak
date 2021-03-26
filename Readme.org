@@ -39,25 +39,32 @@
    the hardware DAC may need an amp.
 ** Hardware set up is straight forward.
    Most of this can be found in ./config.h.
-   Pin 0 is the right paddle key in.
-   Pin 1 is the left paddle key in.
-   Pin 2 is the straight key in.
-   Pin 3 is a PTT switch, as yet unused.
-   Pin 4 is Key out.
-   Pin 5 is PTT out.
-   On the Teensy 4 only, pin 20 should be jumpered to pin 22,
+*** Pin 0 is the right paddle key in.
+*** Pin 1 is the left paddle key in.
+*** Pin 2 is the straight key in.
+*** Pin 3 is a PTT switch, as yet unused.
+*** Pin 4 is Key out.
+*** Pin 5 is PTT out.
+*** On the Teensy 4 only, pin 20 should be jumpered to pin 22,
      it is the I2S LRCLK signal that is used to generate a 
      sample rate interrupt.
-   For a typical phone headset with microphone and button(s),
+*** Headphones
+**** Stereo headphones can be plugged into the audio adapter jack.    
+**** For a typical phone headset with microphone and button(s),
      you will need wires from audio adapter headphone L, R,
      MIC and GND, two ~220uF electrolyics to couple L and R
      to the headphones and a properly wired TRRS jack.
-     (I use 100uF electrolytics.)
-   Line in and line out.
-   There is ouput passed to the hardware DAC.
-	 On a Teensy 3.1/3.2, this is the pin labelled DAC/A14.
-	 On a Teensy 3.5/3.6, the pins are labelled   A21/A22.
-	 On a Teensy 4.0, the pins are labelled 10/12.
+     (I used 100uF electrolytics.)
+***** A wire from the Microphone line to pin 16/A2 will
+      enable the headset buttons.
+*** Line in and line out are available on the audio adapter
+*** There is ouput passed to the hardware DAC.
+**** On a Teensy 3.1/3.2, this is the pin labelled DAC/A14.
+**** On a Teensy 3.5/3.6, the pins are labelled   A21/A22.
+     The Teensy 3 DAC's haven't been tested.
+**** On a Teensy 4.0, the pins are labelled 10/12.
+     The Teensy 4.0 can drive headphones directly, but a bit of
+     filtering will make it easier on the ears.
 ** The keyer is currently configured as a keyer.
    The RX audio coming in over usb is mixed with locally generated
    sidetone and played over the headphones. You can configure the
@@ -70,14 +77,14 @@
 * To build the keyer
 ** You need the Arduino IDE with the Teensyduino extensions.  
    Consult pjrc.com for details.
-** Build the keyer with the proper board entry.
 ** Specify the  proper board in the Tools > Board > Teensyduino menu
 ** Specify USB Type to be Serial+MIDI+Audio
 ** Compile and download.
 * The keyer should start operating immediately.
   It will use the default settings that were compiled.
   It should produce sidetone for straight key and iambic
-  mode A at 18 WPM for the paddle.
+  mode A at 18 WPM for the paddle.  If RX audio is coming
+  over the USB it will be mixed with the sidetone.
 * Parameters can be changed with MIDI.   
 ** The file ctrlr/hasak.panel is a panel definition for Ctrlr,
    a MIDI control panel program.  
@@ -88,8 +95,6 @@
 ** Run Ctrlr with the panel definition as its only argument.
 ** The panel lays out the parameters that can be changed
    while the keyer is running.
-** Several issues have yet to be resolved,
-   the current but somewhat outdated list can be found in doc/ToDo.org
 * Known problems
 ** MIDI note on/off output is currently in the loop() function and
    subject to delays when the loop() function gets distracted by

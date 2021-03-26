@@ -81,7 +81,6 @@ static void nrpn_update_keyer(uint8_t vox) {
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   /* storing msPerElement, because ticks gets too large */
   AudioNoInterrupts();
-  
   set_vox_nrpn(vox, KYRP_PER_DIT, ticksPerDit/(AUDIO_SAMPLE_RATE/1000));
   set_vox_nrpn(vox, KYRP_PER_DAH, ticksPerDah/(AUDIO_SAMPLE_RATE/1000));
   set_vox_nrpn(vox, KYRP_PER_IES, ticksPerIes/(AUDIO_SAMPLE_RATE/1000));
@@ -153,13 +152,16 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   case KYRP_IQ_ENABLE:
   case KYRP_IQ_ADJUST:
   case KYRP_TX_ENABLE:
-  case KYRP_ST_ENABLE:
+    // case KYRP_ST_ENABLE:
   case KYRP_IQ_BALANCE:
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
   case KYRP_DEBOUNCE:
     kyr_nrpn[nrpn] = value;  break;
     
+  case KYRP_ST_ENABLE: // Serial.printf("ST_ENABLE %d\n", value);
+    kyr_nrpn[nrpn] = value;  break;
+
     // case KYRP_MORSE+(0..63):
     
     // case KYRP_MIXER+(0..23):
