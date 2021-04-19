@@ -1,0 +1,5 @@
+#!/bin/sh
+alsa_in -j hasak-in -d hw:CARD=hasak,DEV=0 -c 2 -r 48000 & 
+alsa_in -j imic-in -d hw:CARD=system,DEV=0 -c 2 -r 48000 &
+alsa_out -j hasak-out -d hw:CARD=hasak,DEV=0 -c 2 -r 48000 & 
+alsa_out -j imic-out -d hw:CARD=system,DEV=0 -c 2 -r 48000 &

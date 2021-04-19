@@ -26,69 +26,123 @@
 //   return code;
 // }
 //
+#define MORSE_NIL  0x01		// no character
+
+#define MORSE_A	   0x06		// A    .-
+#define MORSE_B	   0x11		// B    .---
+#define MORSE_C	   0x15		// C    -.-.
+#define MORSE_D	   0x09		// D    -..
+#define MORSE_E	   0x02		// E    .
+#define MORSE_F	   0x14		// F    ..-.
+#define MORSE_G	   0x0b		// G    --.
+#define MORSE_H	   0x10		// H    ....
+#define MORSE_I	   0x04		// I    ..
+#define MORSE_J	   0x1e		// J    .---
+#define MORSE_K	   0x0d		// K    -.-
+#define MORSE_L	   0x12		// L    .-..
+#define MORSE_M	   0x07		// M    -- 
+#define MORSE_N	   0x05		// N    -.
+#define MORSE_O	   0x0f		// O    ---
+#define MORSE_P	   0x16		// P    .--.
+#define MORSE_Q	   0x1b		// Q    --.-
+#define MORSE_R	   0x0a		// R    .-.
+#define MORSE_S	   0x08		// S    ...
+#define MORSE_T	   0x03		// T    -
+#define MORSE_U	   0x0c		// U    ..-
+#define MORSE_V	   0x18		// V    ...-
+#define MORSE_W	   0x0e		// W    .--
+#define MORSE_X	   0x19		// X    -..-
+#define MORSE_Y	   0x1d		// Y    -.--
+#define MORSE_Z	   0x13		// Z    --..
+
+#define MORSE_0	   0x3f		// 0    -----
+#define MORSE_1	   0x3e		// 1    .----
+#define MORSE_2	   0x3c		// 2    ..---
+#define MORSE_3	   0x38		// 3    ...--
+#define MORSE_4	   0x30		// 4    ....-
+#define MORSE_5	   0x20		// 5    .....
+#define MORSE_6	   0x21		// 6    -....
+#define MORSE_7	   0x23		// 7    --...
+#define MORSE_8	   0x27		// 8    ---..
+#define MORSE_9	   0x2f		// 9    ----.
+
+#define MORSE_DQUOTE 0x52	// "    .-..-.
+#define MORSE_SQUOTE 0x5e	// '    .----.    
+#define MORSE_LPAREN 0x36	// (    -.--.
+#define MORSE_RPAREN 0x6d	// )    -.--.-
+#define MORSE_PLUS   0x2a	// +    .-.-.
+#define MORSE_COMMA  0x73	// ,    --..--
+#define MORSE_MINUS  0x61	// -    -....-
+#define MORSE_PERIOD 0x6A	// .    .-.-.-
+#define MORSE_SLASH  0x29	// /    -..-.
+#define MORSE_COLON  0x78	// :    ---...
+#define MORSE_EQUAL  0x31	// =    -...-
+#define MORSE_QUERY  0x4c	// ?    ..--..
+#define MORSE_ATSIGN 0x56	// @    .--.-.
+
 static const unsigned char morse[64] = {
-   0x01,     //33 !    not in ITU-R M.1677-1
-   0x52,     //34 "    .-..-.
-   0x01,     //35 #    not in ITU-R M.1677-1
-   0x01,     //36 $    not in ITU-R M.1677-1
-   0x01,     //37 %    not in ITU-R M.1677-1
-   0x01,     //38 &    not in ITU-R M.1677-1
-   0x5e,     //39 '    .----.    
-   0x36,     //40 (    -.--.
-   0x6d,     //41 )    -.--.-
-   0x01,     //42 *    not in ITU-R M.1677-1
-   0x2a,     //43 +    .-.-.
-   0x73,     //44 ,    --..--
-   0x61,     //45 -    -....-
-   0x6A,     //46 .    .-.-.-
-   0x29,     //47 /    -..-.
-   0x3f,     //48 0    -----
-   0x3e,     //49 1    .----
-   0x3c,     //50 2    ..---
-   0x38,     //51 3    ...--
-   0x30,     //52 4    ....-
-   0x20,     //53 5    .....
-   0x21,     //54 6    -....
-   0x23,     //55 7    --...
-   0x27,     //56 8    ---..
-   0x2f,     //57 9    ----.
-   0x78,     //58 :    ---...
-   0x01,     //59 ;    not in ITU-R M.1677-1
-   0x01,     //60 <    not in ITU-R M.1677-1
-   0x31,     //61 =    -...-
-   0x01,     //62 >    not in ITU-R M.1677-1
-   0x4c,     //63 ?    ..--..
-   0x56,     //64 @    .--.-.
-   0x06,     //65 A    .-
-   0x11,     //66 B    .---
-   0x15,     //67 C    -.-.
-   0x09,     //68 D    -..
-   0x02,     //69 E    .
-   0x14,     //70 F    ..-.
-   0x0b,     //71 G    --.
-   0x10,     //72 H    ....
-   0x04,     //73 I    ..
-   0x1e,     //74 J    .---
-   0x0d,     //75 K    -.-
-   0x12,     //76 L    .-..
-   0x07,     //77 M    -- 
-   0x05,     //78 N    -.
-   0x0f,     //79 O    ---
-   0x16,     //80 P    .--.
-   0x1b,     //81 Q    --.-
-   0x0a,     //82 R    .-.
-   0x08,     //83 S    ...
-   0x03,     //84 T    -
-   0x0c,     //85 U    ..-
-   0x18,     //86 V    ...-
-   0x0e,     //87 W    .--
-   0x19,     //88 X    -..-
-   0x1d,     //89 Y    -.--
-   0x13,     //90 Z    --..
-   0x01,     //91 [    not in ITU-R M.1677-1
-   0x01,     //92 \    not in ITU-R M.1677-1
-   0x01,     //93 ]    not in ITU-R M.1677-1
-   0x01,     //94 ^    not in ITU-R M.1677-1
-   0x01,     //95 _    not in ITU-R M.1677-1
-   0x01      //96 `    not in ITU-R M.1677-1
+   MORSE_NIL,			//33 !    not in ITU-R M.1677-1
+   MORSE_DQUOTE,		//34 "    .-..-.
+   MORSE_NIL,			//35 #    not in ITU-R M.1677-1
+   MORSE_NIL,			//36 $    not in ITU-R M.1677-1
+   MORSE_NIL,			//37 %    not in ITU-R M.1677-1
+   MORSE_NIL,			//38 &    not in ITU-R M.1677-1
+   MORSE_SQUOTE,		//39 '    .----.    
+   MORSE_LPAREN,		//40 (    -.--.
+   MORSE_RPAREN,		//41 )    -.--.-
+   MORSE_NIL,			//42 *    not in ITU-R M.1677-1
+   MORSE_PLUS,			//43 +    .-.-.
+   MORSE_COMMA,			//44 ,    --..--
+   MORSE_MINUS,			//45 -    -....-
+   MORSE_PERIOD,		//46 .    .-.-.-
+   MORSE_SLASH,			//47 /    -..-.
+   MORSE_0,			//48 0    -----
+   MORSE_1,			//49 1    .----
+   MORSE_2,			//50 2    ..---
+   MORSE_3,			//51 3    ...--
+   MORSE_4,			//52 4    ....-
+   MORSE_5,			//53 5    .....
+   MORSE_6,			//54 6    -....
+   MORSE_7,			//55 7    --...
+   MORSE_8,			//56 8    ---..
+   MORSE_9,			//57 9    ----.
+   MORSE_COLON,			//58 :    ---...
+   MORSE_NIL,			//59 ;    not in ITU-R M.1677-1
+   MORSE_NIL,			//60 <    not in ITU-R M.1677-1
+   MORSE_EQUAL,			//61 =    -...-
+   MORSE_NIL,			//62 >    not in ITU-R M.1677-1
+   MORSE_QUERY,			//63 ?    ..--..
+   MORSE_ATSIGN,		//64 @    .--.-.
+   MORSE_A,			//65 A    .-
+   MORSE_B,			//66 B    .---
+   MORSE_C,			//67 C    -.-.
+   MORSE_D,			//68 D    -..
+   MORSE_E,			//69 E    .
+   MORSE_F,			//70 F    ..-.
+   MORSE_G,			//71 G    --.
+   MORSE_H,			//72 H    ....
+   MORSE_I,			//73 I    ..
+   MORSE_J,			//74 J    .---
+   MORSE_K,			//75 K    -.-
+   MORSE_L,			//76 L    .-..
+   MORSE_M,			//77 M    -- 
+   MORSE_N,			//78 N    -.
+   MORSE_O,			//79 O    ---
+   MORSE_P,			//80 P    .--.
+   MORSE_Q,			//81 Q    --.-
+   MORSE_R,			//82 R    .-.
+   MORSE_S,			//83 S    ...
+   MORSE_T,			//84 T    -
+   MORSE_U,			//85 U    ..-
+   MORSE_V,			//86 V    ...-
+   MORSE_W,			//87 W    .--
+   MORSE_X,			//88 X    -..-
+   MORSE_Y,			//89 Y    -.--
+   MORSE_Z,			//90 Z    --..
+   MORSE_NIL,			//91 [    not in ITU-R M.1677-1
+   MORSE_NIL,			//92 \    not in ITU-R M.1677-1
+   MORSE_NIL,			//93 ]    not in ITU-R M.1677-1
+   MORSE_NIL,			//94 ^    not in ITU-R M.1677-1
+   MORSE_NIL,			//95 _    not in ITU-R M.1677-1
+   MORSE_NIL			//96 `    not in ITU-R M.1677-1
 };

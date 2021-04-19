@@ -118,20 +118,23 @@
 ** Voices can have priority, lowest wins, and can be local, never transmitted,
 ** and can have their own keyer properties.
 */
-#define KYR_N_VOX 5		/* number of keyer voices */
+#define KYR_N_VOX 6		/* number of keyer voices */
 #define KYR_VOX_NONE	0	/* no active voice */
-#define KYR_VOX_S_KEY	1	/* Straight Key */
-#define KYR_VOX_PAD	2	/* Paddle */
-#define KYR_VOX_WINK	3	/* Winkey Key */
-#define KYR_VOX_KYR	4	/* Kyr Key */
-#define KYR_VOX_BUT	5	/* headset button */
+#define KYR_VOX_TUNE	1	/* tune switch */
+#define KYR_VOX_S_KEY	2	/* Straight Key */
+#define KYR_VOX_PAD	3	/* Paddle */
+#define KYR_VOX_WINK	4	/* Winkey Key */
+#define KYR_VOX_KYR	5	/* Kyr Key */
+#define KYR_VOX_BUT	6	/* headset button */
 
 /* 
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYR_IN_CHANNEL	1	/* default input channel used for keyer */
-#define KYR_OUT_CHANNEL 1	/* default output channel used for keyer */
+#define KYR_CC_IN_CHANNEL	1	/* default input channel used for keyer */
+#define KYR_CC_OUT_CHANNEL	1	/* default output channel used for keyer */
+#define KYR_NOTE_IN_CHANNEL	1
+#define KYR_NOTE_OUT_CHANNEL	1
 
 /*
 ** midi note usage
@@ -194,8 +197,8 @@
 #define KYRP_LINE_IN_LEVEL_R	(KYRP_CODEC+8) /* 0..15 default 5 */
 #define KYRP_LINE_OUT_LEVEL_L	(KYRP_CODEC+9) /* 13..31 default 29 */
 #define KYRP_LINE_OUT_LEVEL_R	(KYRP_CODEC+10) /* 13..31 default 29 */
-#define KYRP_MIC_BIAS		(KYRP_CODEC+11) /* 0..7, 1.25 .. 3.00 V by 0.250 V steps */
-#define KYRP_MIC_IMPEDANCE	(KYRP_CODEC+12)	/* 0..3, 0 off, else 2^n kilohm */
+//#define KYRP_MIC_BIAS		(KYRP_CODEC+11) /* 0..7, 1.25 .. 3.00 V by 0.250 V steps */
+//#define KYRP_MIC_IMPEDANCE	(KYRP_CODEC+12)	/* 0..3, 0 off, else 2^n kilohm */
 
 /* relocation base */
 #define KYRP_SOFT		(KYRP_CODEC+16) /* == 16 */
@@ -206,7 +209,7 @@
 #define KYRP_BUTTON_3		(KYRP_SOFT+3) /* headset button 3 - down pressed */
 #define KYRP_BUTTON_4		(KYRP_SOFT+4) /* headset button 4 - hey pressed */
 #define KYRP_SEND_MIDI		(KYRP_SOFT+5) /* send input paddle key events to midi notes */
-//#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* send input paddle key events to midi notes */
+#define KYRP_PTT_ENABLE		(KYRP_SOFT+6) /* enable PTT to operate */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd, excess 8096 */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
@@ -302,18 +305,20 @@
 #define KYRP_VOX_3		(KYRP_KEYER+96)	 /* == 216 text from winkey */
 #define KYRP_VOX_4		(KYRP_KEYER+128) /* == 248 text from keyer */
 #define KYRP_VOX_5		(KYRP_KEYER+160) /* == 280 headset button */
+#define KYRP_VOX_6		(KYRP_KEYER+192) /* == 280 headset button */
 
 /* sgtl5000 control */
-#define KYRP_LAST		(KYRP_VOX_5+32)	/* == 312 */
+#define KYRP_LAST		(KYRP_VOX_6+32)	/* == 344 */
 
 /* nrpn MSB numbers, bank select, not quite yet */
 #define KYRP_VOX_OFFSET		32
 #define KYRP_GLOBAL_OFFSET	KYRP_KEYER
-#define KYRP_S_KEY_OFFSET	KYRP_VOX_1
-#define KYRP_PAD_OFFSET		KYRP_VOX_2
-#define KYRP_WIND_OFFSET	KYRP_VOX_3
-#define KYRP_KYR_OFFSET		KYRP_VOX_4
-#define KYRP_BUT_OFFSET		KYRP_VOX_5
+#define KYRP_TUNE_OFFSET	KYRP_VOX_1
+#define KYRP_S_KEY_OFFSET	KYRP_VOX_2
+#define KYRP_PAD_OFFSET		KYRP_VOX_3
+#define KYRP_WIND_OFFSET	KYRP_VOX_4
+#define KYRP_KYR_OFFSET		KYRP_VOX_5
+#define KYRP_BUT_OFFSET		KYRP_VOX_6
 
 /* 
 ** these are named NRPN values
@@ -331,7 +336,7 @@
 /* paddle keyer modes, values of KYRP_PAD_MODE */
 #define KYRP_MODE_A			0 /* iambic mode A */
 #define KYRP_MODE_B			1 /* iambic mode  */
-#define KYRP_MODE_S			2 /* PAD_MODE */
+#define KYRP_MODE_S			2 /* bug mode */
 
 /* paddle adapter modes, values of KYRP_PAD_ADAPT */
 #define KYRP_ADAPT_NORMAL		0 /* unmodified input paddles */
@@ -348,5 +353,11 @@
 #define KYRP_IQ_NONE			0 /* no IQ */
 #define KYRP_IQ_LSB			1 /* IQ for lower sideband */
 #define KYRP_IQ_USB			2 /* IQ for upper sideband */
+
+/* send midi enable modes, values KYRP_SEND_MIDI */
+#define KYRP_SM_NONE			0 /* no midi */
+#define KYRP_SM_OUTPUT			1 /* send output key events */
+#define KYRP_SM_INPUT			2 /* send input key events */
+#define KYRP_SM_BOTH			3 /* send input and output events */
 
 #endif

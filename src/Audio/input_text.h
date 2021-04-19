@@ -30,8 +30,9 @@
 ** of a prefix operator to form prosigns by concatenation, but I'm feeling
 ** a little queasy about corner cases.
 **
-** The morse table could be expanded to include 128 or 256 slots with 14 bits
-** of encoding set via MIDI.
+** The morse table has moved into the NRPN array, so it can be augmented as
+** required.  It covers the 64 characters from ! to `, though many are undefined
+** by default.
 */
 
 #ifndef input_text_h_
@@ -72,7 +73,7 @@ private:
     }
     return -1;
   }
-  int can_send() { return (((ewptr+1) % ELEMENT_SIZE) != erptr); }
+  int can_send(void) { return (((ewptr+1) % ELEMENT_SIZE) != erptr); }
   int recv(void) {
     if (can_recv()) {
       int16_t value = elements[erptr];
@@ -94,8 +95,7 @@ public:
   int valid_text(uint8_t value) {
     // convert to upper case
     return (value >='a' && value <= 'z') ||
-      value == ' ' || value == '\t' || value == '\n' ||
-      value == '\e' ||
+      value == ' ' || value == '\t' || value == '\n' || value == '\e' ||
       (value-33 >= 0 && value-33 < 64 && get_nrpn(KYRP_MORSE+value-33) != 1);
   }
   // send_text queues a character for sending
@@ -121,6 +121,15 @@ public:
     }
     return -1;
   }
+  void repeat_text(const char *text) {
+    if (*text != '\0') {
+      p = repeat = text;
+      while (can_send_text()) {
+	if (*p == '\0') p = repeat;
+	send_text(*p++);
+      }
+    }
+  }
   const char *send_text(const char *p) {
     while (*p != '\0' && can_send_text()) {
       if ( ! valid_vox()) {
@@ -133,16 +142,34 @@ public:
   }
   // return true if there is room to queue a character
   int can_send_text() { return valid_vox() && (((bwptr+1) % BUFFER_SIZE) != brptr); }
+  int unsend_text(void) {
+    return -1;
+  }
+  int can_unsend_text(void) {
+    return 0;
+  }
 private:
   int recv_text(void) {
     if ( ! valid_vox()) {
       abort();
       return -1;
     }
+    if (repeat) {
+      while (can_send_text()) {
+	if (*p == '\0') p = repeat;
+	send_text(*p++);
+      }
+    }
     if (can_recv_text()) {
       uint8_t value = buffer[brptr++];
       erptr %= BUFFER_SIZE;
       return value;
+    }
+    if (repeat) {
+      while (can_send_text()) {
+	if (*p == '\0') p = repeat;
+	send_text(*p++);
+      }
     }
     return -1;
   }
@@ -212,6 +239,7 @@ public:
     code = 0;			// clear the code
     ewptr = erptr = 0;		// clear element buffer
     element = 0;		// clear the element
+    p = repeat = NULL;		// clear the repeat text
   }
   virtual void update(void);
 private:
@@ -226,6 +254,7 @@ private:
   uint8_t ewptr, erptr;
   uint8_t buffer[BUFFER_SIZE];
   uint8_t bwptr, brptr;
+  const char *repeat, *p;
 };
 
 #endif

@@ -33,11 +33,13 @@ extern int16_t kyr_nrpn[KYRP_LAST];
 static inline int get_nrpn(int nrpn) { 
   return nrpn >= 0 && nrpn <= KYRP_LAST ? kyr_nrpn[nrpn] : -1;
 }
+
 /* fetch a vox specialized nrpn, not yet implemented */
 static inline int get_vox_nrpn(int vox, int nrpn) {
   int value = get_nrpn(KYRP_KEYER+vox*KYRP_VOX_OFFSET+(nrpn-KYRP_KEYER));
   return (value >= 0) ? value : get_nrpn(nrpn);
 }
+
 /***************************************************************
 ** Parameter fetching
 ** keyers, oscillators, ramps, and ptt fetch parameters as required
@@ -88,10 +90,8 @@ static inline int get_iq_enable(void) { return get_nrpn(KYRP_IQ_ENABLE); }
 static inline int get_iq_adjust(void) { return get_nrpn(KYRP_IQ_ADJUST); }
 static inline int get_tx_enable(void) { return get_nrpn(KYRP_TX_ENABLE); }
 static inline int get_st_enable(void) { return get_nrpn(KYRP_ST_ENABLE); }
+static inline int get_ptt_enable(void) { return get_nrpn(KYRP_PTT_ENABLE); }
 static inline int get_send_midi(void) { return get_nrpn(KYRP_SEND_MIDI); }
-#ifdef KYRP_RECV_MIDI
-static inline int get_recv_midi(void) { return get_nrpn(KYRP_RECV_MIDI); }
-#endif
 
 /* unit conversions */
 static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE/1000.0); }

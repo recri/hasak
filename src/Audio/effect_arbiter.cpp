@@ -65,7 +65,7 @@ void AudioEffectArbiter::update(void)
     }
   } else {
     /* there is a currently active stream */
-    if (n_active == 0 || priority[active_stream] >= priority[ibest]) {
+    if (n_active == 0 || priority[active_stream] <= priority[ibest]) {
       /* no contention */
       /* send the active stream */
       send = 1;

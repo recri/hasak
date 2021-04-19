@@ -77,18 +77,24 @@ public:
     fall_table = get_table(get_vox_fall_ramp(vox));
     // int16_t iq_adjust = get_iq_adjust();
     // phase_increment = get_vox_tone(vox) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
-    phase_I = 90.0 * (4294967296.0 / 360.0);
     // don't know what the units of iqph are, yet, 
     // needs to be positive or negative offset from exact 90 phase.
     // have 14bits, so 13bits and sign, thats +/-8192
     // not sure that USB and LSB aren't actually the other way around
     // there should be a level balance here, too.
     // IQ might need its own frequency, too.
+    // I may have USB and LSB swapped
     switch (get_iq_enable()) {
     default:
     case KYRP_IQ_NONE: 
-    case KYRP_IQ_USB: phase_Q = 0.0 * (4294967296.0 / 360.0); break;
-    case KYRP_IQ_LSB: phase_Q = 180.0 * (4294967296.0 / 360.0); break;
+    case KYRP_IQ_USB: 
+      phase_I = +45.0 * (4294967296.0 / 360.0);
+      phase_Q = (360-45.0) * (4294967296.0 / 360.0);
+      break;
+    case KYRP_IQ_LSB: 
+      phase_I = (360-45.0) * (4294967296.0 / 360.0);
+      phase_Q = +45.0 * (4294967296.0 / 360.0); 
+      break;
     }
   }
   // fetch the current parameters for the fall ramp

@@ -136,10 +136,10 @@ static void mixer_setup(float gain=1.0) {
 
 // first channel, rx audio and microphone/line-in input, op on headset mode
 // switch codec to use microphone instead of line-in
-AudioConnection		patchCord900(usb_in, 0, l_i2s_out, 0);
-AudioConnection		patchCord910(usb_in, 1, r_i2s_out, 0);
-AudioConnection		patchCord920(i2s_in, 0, l_usb_out, 0);
-AudioConnection		patchCord930(i2s_in, 1, r_usb_out, 0);
+AudioConnection		patchCord900(i2s_in, 0, l_usb_out, 0);
+AudioConnection		patchCord910(i2s_in, 1, r_usb_out, 0);
+AudioConnection		patchCord920(usb_in, 0, l_i2s_out, 0);
+AudioConnection		patchCord930(usb_in, 1, r_i2s_out, 0);
 AudioConnection		patchCord940(usb_in, 0, l_hdw_out, 0);
 AudioConnection		patchCord950(usb_in, 1, r_hdw_out, 0);
 
@@ -147,10 +147,10 @@ AudioConnection		patchCord950(usb_in, 1, r_hdw_out, 0);
 // probably only sent to i2s for headphones/speakers
 // balance l vs r to localize
 // adjust level of sidetone
-AudioConnection		patchCord901(tone_ramp, 0, l_i2s_out, 1);
-AudioConnection		patchCord911(tone_ramp, 0, r_i2s_out, 1);
-AudioConnection		patchCord921(tone_ramp, 0, l_usb_out, 1);
-AudioConnection		patchCord931(tone_ramp, 0, r_usb_out, 1);
+AudioConnection		patchCord901(tone_ramp, 0, l_usb_out, 1);
+AudioConnection		patchCord911(tone_ramp, 0, r_usb_out, 1);
+AudioConnection		patchCord921(tone_ramp, 0, l_i2s_out, 1);
+AudioConnection		patchCord931(tone_ramp, 0, r_i2s_out, 1);
 AudioConnection		patchCord941(tone_ramp, 0, l_hdw_out, 1);
 AudioConnection		patchCord951(tone_ramp, 0, r_hdw_out, 1);
 
@@ -158,19 +158,21 @@ AudioConnection		patchCord951(tone_ramp, 0, r_hdw_out, 1);
 // send to usb_out to provide soundcard IQ TX stream to host sdr
 // send to i2s_out to provide soundcard IQ TX stream to softrock
 // also used for diagnostics when iq is disabled
-AudioConnection		patchCord902(key_ramp, 0, l_i2s_out, 2);
-AudioConnection		patchCord912(key_ramp, 1, r_i2s_out, 2);
-AudioConnection		patchCord922(key_ramp, 0, l_usb_out, 2);
-AudioConnection		patchCord932(key_ramp, 1, r_usb_out, 2);
+AudioConnection		patchCord902(key_ramp, 0, l_usb_out, 2);
+AudioConnection		patchCord912(key_ramp, 1, r_usb_out, 2);
+AudioConnection		patchCord922(key_ramp, 0, l_i2s_out, 2);
+AudioConnection		patchCord932(key_ramp, 1, r_i2s_out, 2);
 AudioConnection		patchCord942(key_ramp, 0, l_hdw_out, 2);
 AudioConnection		patchCord952(key_ramp, 1, r_hdw_out, 2);
 
-// fourth channel, unassigned
-// send test signals to usb_out for display on host
-// process audio or IQ from i2s_in and send to i2s_out
-// arbiter key_out and ptt_out to l/r_usb_out
-AudioConnection		patchCord923(arbiter, 1, l_usb_out, 3);
-AudioConnection		patchCord933(arbiter, 2, r_usb_out, 3);
+// fourth channel, loopback
+// send usb_in to usb_out, i2s_in to i2s_out and hdw_out
+AudioConnection		patchCord903(usb_in, 0, l_usb_out, 3);
+AudioConnection		patchCord913(usb_in, 1, r_usb_out, 3);
+AudioConnection		patchCord923(i2s_in, 0, l_i2s_out, 3);
+AudioConnection		patchCord933(i2s_in, 1, r_i2s_out, 3);
+AudioConnection		patchCord943(i2s_in, 0, l_hdw_out, 3);
+AudioConnection		patchCord953(i2s_in, 1, r_hdw_out, 3);
 
 // outputs
 AudioOutputByte		key_out;
@@ -284,6 +286,7 @@ static void midi_setup(void);
 static void midi_loop(void);
 static void winkey_setup(void);
 static void winkey_loop(void);
+static void diagnostics_setup(void);
 static void diagnostics_loop(void);
 
 void setup(void) {
@@ -294,20 +297,22 @@ void setup(void) {
   pinMode(KYR_PTT_SW_PIN, INPUT_PULLUP);
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
-#ifdef KYR_DUP_LRCLK
-  pinMode(KYR_DUP_LRCLK, INPUT);
-#endif
+
   arbiter_setup();
   mixer_setup();
   AudioMemory(40);
   nrpn_setup();
+
 #ifdef KYR_DUP_LRCLK
+  pinMode(KYR_DUP_LRCLK, INPUT);
   attachInterrupt(KYR_DUP_LRCLK, pollatch, RISING);
 #else
   attachInterrupt(KYR_LRCLK, pollatch, RISING);
 #endif
+
   midi_setup();
   winkey_setup();
+  diagnostics_setup();
 }
 
 void loop(void) {

@@ -31,17 +31,24 @@ static void report(const char *tag, uint32_t use, uint32_t umax) {
   // Serial.printf("\n");
 }
 
+elapsedMicros totalTime;
+
 /* summary report */
 static void sreport(void) {
   float msPerIes = 1000.0f*get_vox_ies(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIls = 1000.0f*get_vox_ils(get_active_vox())/AUDIO_SAMPLE_RATE;
   float msPerIws = 1000.0f*get_vox_iws(get_active_vox())/AUDIO_SAMPLE_RATE;
-  Serial.printf("\tsample rate %f buffer size %d\n", AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES);
+  Serial.printf("\t%f sample rate %f buffer size %d F_CPU %.1f MHz\n", totalTime/1e6, AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES, F_CPU/1e6f);
   Serial.printf("\tactive %d ies/ils/iws %.1f/%.1f/%.1f ms\n", get_active_vox(), msPerIes, msPerIls, msPerIws);
+  Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
   report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
   Serial.printf("%16s %2d %2d", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
   Serial.printf("\n");
+}
+
+static void treport(const char *p) {
+  Serial.printf("\t%f %s\n", totalTime/1e6, p);
 }
 
 /* generic audio module report and reset */
@@ -144,40 +151,65 @@ static const char *lorem =
   "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in "
   "culpa qui officia deserunt mollit anim id est laborum.";
 
-static void mixer_set(const char *p) {
-  AudioMixer4& left = l_usb_out;
-  AudioMixer4& right = r_usb_out;
-  const char *dev = "unk";
-  switch (p[0]) {
-  case 'u': dev = "usb"; left = l_usb_out; right = r_usb_out; break;
-  case 'i': dev = "i2s"; left = l_i2s_out; right = r_i2s_out; break;
-  case 'h': dev = "hdw"; left = l_hdw_out; right = r_hdw_out; break;
-  default: Serial.printf("unrecognized mixer string %s\n", p); return;
+/*
+** output mixer on/off
+** channel 1 usb_in for i2s_out or hdw_in, i2s_in for usb_out
+** channel 2 sidetone
+** channel 3 keyed IQ
+** channel 4 - test stream
+** loop over as many specs as are present
+*/
+static void mixer3_set(const char *dev, AudioMixer4& m, const char *p) {
+  // Serial.printf("prepare for %s do_left %d do_right %d at \"%s\"\n", dev, dol, dor, p);
+  for (int i = 0; i < 4; i += 1) {
+    switch (*p++) {
+    case '0': m.gain(i, 0.0f); continue;
+    case '1': m.gain(i, 1.0f); continue;
+    default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
+    }
   }
-  p += 1;
-  switch (p[0]) {
-  case 'l': /* left mixers */
-    for (int i = 0; i < 4; i += 1) {
-      Serial.printf("l_%s_out.gain(%d,%c)\n", dev, i, p[1+i]);
-      left.gain(i,p[1+i]=='1'?1.0: 0.0);
-    }
-    break;
-  case 'r': /* right mixers */
-    for (int i = 0; i < 4; i += 1) {
-      Serial.printf("r_%s_out.gain(%d,%c)\n", dev, i, p[1+i]);
-      right.gain(i,p[1+i]=='1'?1.0: 0.0);
-    }
-    break;
-  case '0': case '1': /* both mixers */
-    for (int i = 0; i < 4; i += 1) {
-      Serial.printf("*_%s_out.gain(%d,%c)\n", dev, i, p[i]);
-      left.gain(i,p[i]=='1'?1.0: 0.0);
-      right.gain(i,p[i]=='1'?1.0: 0.0);
-    }
-    break;
+}
+static void mixer2_set(const char *dev, AudioMixer4& l, AudioMixer4& r, const char *p) {
+  Serial.printf("recognized device %s\n", dev);
+  switch (*p) {
+  case 'l': 
+    mixer3_set(dev, l, p+1);	/* left mixers */
+    return;
+  case 'r':
+    mixer3_set(dev, r, p+1);	/* right mixers */
+    return;
+  case '0':
+  case '1': 
+    mixer3_set(dev, l, p); /* both mixers */
+    mixer3_set(dev, r, p); /* both mixers */
+    return;
+  default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
+  }
+}
+static void mixer_set(const char *p) {
+  Serial.printf("mixer_set(\"%s\")\n", p);
+  switch (*p) {
+  case 'u': return mixer2_set("usb", l_usb_out, r_usb_out, p+1); 
+  case 'i': return mixer2_set("i2s", l_i2s_out, r_i2s_out, p+1);
+  case 'h': return mixer2_set("hdw", l_hdw_out, r_hdw_out, p+1);
+  default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
   }
 }
 
+static char random_char(void) {
+  char c;
+  do c = random(0,128); while ( ! wink.valid_text(c)); 
+  return c;
+}
+
+static char *random_text(void) {
+  static char buff[256];
+  for (unsigned i = 0; i < sizeof(buff)-1; i += 1)
+    buff[i] = random_char();
+  buff[255] = 0;
+  return buff;
+}
+    
 static char *read_line() {
   static char buff[256];
   unsigned i = 0;
@@ -188,7 +220,17 @@ static char *read_line() {
   return buff;
 }
 
+char debug_buffer[4][256];
+
+void diagnostics_setup() { totalTime = 0; }
+
 void diagnostics_loop() {
+  // dump background debug messages
+  for (int i = 0; i < 4; i += 1)
+    if (debug_buffer[i][0] != 0) {
+      Serial.printf("%s\n", debug_buffer[i]);
+      debug_buffer[i][0] = 0;
+    }
   if (Serial.available()) {
     char *p = read_line();
     // Serial.printf("diag read '%s'\n", p);
@@ -198,6 +240,7 @@ void diagnostics_loop() {
       Serial.printf("hasak monitor usage:\n"
 		    " s -> audio library resource usage\n"
 		    " S -> detailed audio library resource usage\n"
+		    " t ... -> timestamp + ... to Serial\n"
 		    " r -> reset usage counts\n"
 		    " R -> reset detailed usage counts\n"
 		    " a -> arbiter diagnostics\n"
@@ -207,27 +250,30 @@ void diagnostics_loop() {
 		    " k... -> send ... up to newline to kyr keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
 		    " K -> send lorem ipsum to kyr keyer\n"
+		    " Z -> send random to wink keyer\n"
 		    " e -> default mixers\n"
 		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
 		    " i#### | il#### | ir#### -> set (both | left | right) i2s out mixers, # is 0|1\n"
 		    " u#### | ul#### | ur#### -> set (both | left | right) usb out mixers, # is 0|1\n"
 		    );
       break;
-    case 's': sreport(); /* short summary */; break;
-    case 'S': Sreport(); /* long summary */ break;
-    case 'r': sreset(); /* short reset */ break;
-    case 'R': Sreset(); /* long reset */ break;
-    case 'a': areport(); /* arbiter stats */ break;
-    case 'b': breport(); /* button stats */ break;
-    case 'd': dreport(); /* debounce stats */ break;
+    case 's': sreport(); break; /* short summary */
+    case 'S': Sreport(); break; /* long summary */
+    case 't': treport(p+1); break; /* timestamp */
+    case 'r': sreset(); break;	/* short reset */ 
+    case 'R': Sreset(); break;	/* long reset */
+    case 'a': areport(); break; /* arbiter stats */
+    case 'b': breport(); break; /* button stats */
+    case 'd': dreport(); break; /* debounce stats */
     case 'w': wink.send_text(p+1); break;
     case 'k': kyr.send_text(p+1); break;
     case 'W': wink.send_text(lorem); break;
     case 'K': kyr.send_text(lorem); break;
+    case 'Z': wink.send_text(random_text()); break;
     case 'e': mixer_setup(); /* default mixers */ break;
-    case 'u': 
-    case 'i': 
-    case 'h': mixer_set(p); break;
+    case 'h': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
+    case 'i': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
+    case 'u': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     }
   }
 }  

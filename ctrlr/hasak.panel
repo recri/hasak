@@ -4,10 +4,10 @@
        panelAuthorName="Roger Critchlow" panelAuthorEmail="rec@elf.org"
        panelAuthorUrl="https://elf.org" panelAuthorDesc="Control panel for Hasak Teensy / Audio keyer."
        panelVersionMajor="1" panelVersionMinor="1" panelVersionName="Coming-Home"
-       panelVendor="" panelDevice="" panelMidiSnapshotAfterLoad="0"
+       panelVendor="" panelDevice="" panelMidiSnapshotAfterLoad="1"
        panelMidiSnapshotAfterProgramChange="0" panelMidiSnapshotDelay="10"
        panelMidiSnapshotShowProgress="0" panelMidiInputChannelDevice="1"
-       panelMidiInputDevice="-- None" panelMidiControllerChannelDevice="1"
+       panelMidiInputDevice="hasak" panelMidiControllerChannelDevice="1"
        panelMidiControllerDevice="-- None" panelMidiOutputChannelDevice="1"
        panelMidiOutputDevice="hasak" panelMidiInputFromHost="0" panelMidiInputChannelHost="1"
        panelMidiOutputToHost="0" panelMidiOutputChannelHost="1" panelMidiThruH2H="0"
@@ -37,12 +37,13 @@
        ctrlrMenuBarBackgroundColour1="fff7f7f7" ctrlrMenuBarBackgroundColour2="ffcccccc"
        ctrlrMenuBarTextColour="ff000000" ctrlrMenuBarHighlightedTextColour="ffffffff"
        ctrlrMenuBarHighlightColour="ff4364ff" ctrlrMenuBarFont="&lt;Sans-Serif&gt;;18;0;0;0;0;1;3"
-       ctrlrUseEditorWrapper="0" panelIndex="0" uiPanelModulatorListViewTree="0">
+       ctrlrUseEditorWrapper="0" panelIndex="0" uiPanelModulatorListViewTree="0"
+       uiLuaConsoleInputRemoveAfterRun="1" uiLuaConsoleSnips="">
   <uiWindowManager>
     <uiChildWindow uiChildWindowName="MIDISettings" uiChildWindowState="368 219 800 500">
       <uiChildWindowContentState/>
     </uiChildWindow>
-    <uiChildWindow uiChildWindowName="LuaConsole" uiChildWindowState="368 219 800 500">
+    <uiChildWindow uiChildWindowName="LuaConsole" uiChildWindowState="647 166 800 500">
       <uiChildWindowContentState/>
     </uiChildWindow>
     <uiChildWindow uiChildWindowName="MIDILibrary" uiChildWindowState="368 256 800 500">
@@ -124,6 +125,46 @@
           <value name="mic-preamp" value="1"/>
         </panelState>
       </midiLibraryProgram>
+      <midiLibraryProgram name="Snapshot - 09:24:44" description="" number="0" midiLibraryCanGetItem="1"
+                          midiLibraryCanSendItem="1" uuid="c87ab4a95f334934885b8443fd190510"
+                          time="1618665884440">
+        <panelState panelVersionMajor="1" panelVersionMinor="1" time="1618665884440">
+          <value name="weight" value="50"/>
+          <value name="speed" value="25"/>
+          <value name="ratio" value="50"/>
+          <value name="comp-ms-10th" value="0"/>
+          <value name="farnsworth" value="0"/>
+          <value name="rise-ms-10th" value="50"/>
+          <value name="fall-ms-10th" value="50"/>
+          <value name="fall-ramp" value="0"/>
+          <value name="rise-ramp" value="0"/>
+          <value name="tone" value="607"/>
+          <value name="ptt-head-ms" value="0"/>
+          <value name="ptt-tail-ms" value="400"/>
+          <value name="iambic-mode" value="0"/>
+          <value name="paddle-adapt" value="0"/>
+          <value name="paddle-swap" value="0"/>
+          <value name="headphone-volume" value="40"/>
+          <value name="input-select" value="1"/>
+          <value name="line-out-mute" value="0"/>
+          <value name="headphone-mute" value="0"/>
+          <value name="line-in-level" value="5"/>
+          <value name="line-out-level" value="29"/>
+          <value name="paddle-1" value="0"/>
+          <value name="auto-ils" value="1"/>
+          <value name="auto-iws" value="0"/>
+          <value name="tx-enable" value="1"/>
+          <value name="st-enable" value="0"/>
+          <value name="input-1" value="1"/>
+          <value name="send-midi" value="1"/>
+          <value name="mic-bias" value="7"/>
+          <value name="mic-impedance" value="1"/>
+          <value name="mic-preamp" value="1"/>
+          <value name="paddle-keyer" value="2"/>
+          <value name="ptt-hang-time" value="7"/>
+          <value name="debounce" value="50"/>
+        </panelState>
+      </midiLibraryProgram>
     </midiLibrarySnapshots>
     <midiLibraryFirmware name="Firmware"/>
     <midiLibraryEditBuffer name="Edit buffer"/>
@@ -166,8 +207,8 @@
                  uiPanelInvisibleComponentAlpha="0.5" uiPanelTooltipBackgroundColour="0xffeeeebb"
                  uiPanelTooltipOutlineColour="0xff000000" uiPanelTooltipColour="0xff000000"
                  uiPanelTooltipCornerRound="1" uiPanelTooltipPlacement="2" uiPanelTooltipFont="&lt;Sans-Serif&gt;;15;1;0;0;0;1;3"
-                 uiPanelZoom="1" uiPanelViewPortSize="398" uiPanelPropertiesSize="100"
-                 uiPanelDisableCombosOnEdit="1">
+                 uiPanelZoom="1" uiPanelDisableCombosOnEdit="1" uiPanelPropertiesSize="198"
+                 uiPanelViewPortSize="298">
     <uiPanelCanvasLayer uiPanelCanvasLayerName="New layer" uiPanelCanvasLayerUid="3cb7e26c330000000000000000000000"
                         uiPanelCanvasLayerColour="0x000000" uiPanelCanvasLayerVisibility="1"
                         uiPanelCanvasLayerIndex="0"/>
@@ -225,7 +266,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="18"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="speed" modulatorMin="5" modulatorValue="20">
+             name="speed" modulatorMin="5" modulatorValue="22">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="120" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -559,7 +600,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="600"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="tone" modulatorMin="250" modulatorValue="600">
+             name="tone" modulatorMin="250" modulatorValue="607">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="129" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -863,7 +904,7 @@
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
                uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 200 128 32" uiType="uiCombo"/>
+               componentRectangle="336 232 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="19" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -875,7 +916,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="line-out-mute" modulatorMin="0" modulatorValue="1">
+             name="line-out-mute" modulatorMin="0" modulatorValue="0">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="4" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1115,7 +1156,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="tx-enable" modulatorMin="0" modulatorValue="0">
+             name="tx-enable" modulatorMin="0" modulatorValue="1">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="25" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1146,7 +1187,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="st-enable" modulatorMin="0" modulatorValue="1">
+             name="st-enable" modulatorMin="0" modulatorValue="0">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="26" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1202,114 +1243,8 @@
                uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 168 128 32"
+               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 200 128 32"
                componentLayerUid="3cb7e26c330000000000000000000000"/>
-  </modulator>
-  <modulator modulatorVstExported="1" modulatorMax="1" vstIndex="30" modulatorIsStatic="0"
-             modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
-             modulatorExcludeFromSnapshot="0" modulatorValueExpression="modulatorValue"
-             modulatorValueExpressionReverse="midiValue" modulatorControllerExpression="value"
-             luaModulatorGetValueForMIDI="-- None" luaModulatorGetValueFromMIDI="-- None"
-             modulatorLinkedToPanelProperty="-- None" modulatorLinkedToModulatorProperty="-- None"
-             modulatorLinkedToModulator="-- None" modulatorLinkedToModulatorSource="1"
-             modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
-             modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
-             modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="send-midi" modulatorMin="0" modulatorValue="1">
-    <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
-          midiMessageCtrlrNumber="21" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
-          midiMessageSysExFormula=""/>
-    <component componentLabelPosition="top" componentLabelJustification="centred"
-               componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"
-               componentLabelAlwaysOnTop="1" componentSentBack="0" componentLabelColour="0xff000000"
-               componentLabelFont="&lt;Sans-Serif&gt;;12;0;0;0;0;1;3" componentVisibleName=" "
-               componentMouseCursor="2" componentGroupName="" componentGroupped="0"
-               componentSnapSize="0" componentIsLocked="0" componentDisabled="0"
-               componentRadioGroupId="0" componentRadioGroupNotifyMidi="1" componentVisibility="1"
-               componentEffect="0" componentEffectRadius="1" componentEffectColour="0xff000000"
-               componentEffectOffsetX="0" componentEffectOffsetY="0" componentExcludedFromLabelDisplay="0"
-               componentValueDecimalPlaces="0" componentLuaMouseMoved="-- None"
-               componentLuaMouseDown="-- None" componentLuaMouseDrag="-- None"
-               componentLuaMouseDoubleClick="-- None" uiButtonTextColourOn="0xff000000"
-               uiToggleButtonFocusOutline="0x00000000" uiToggleButtonText="send midi notes"
-               uiButtonTrueValue="1" uiButtonFalseValue="0" uiButtonColourOff="0xff0000ff"
-               componentRectangle="336 112 128 32" uiType="uiToggleButton" componentLayerUid="3cb7e26c330000000000000000000000"/>
-  </modulator>
-  <modulator modulatorVstExported="1" modulatorMax="7" vstIndex="32" modulatorIsStatic="0"
-             modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
-             modulatorExcludeFromSnapshot="0" modulatorValueExpression="modulatorValue"
-             modulatorValueExpressionReverse="midiValue" modulatorControllerExpression="value"
-             luaModulatorGetValueForMIDI="-- None" luaModulatorGetValueFromMIDI="-- None"
-             modulatorLinkedToPanelProperty="-- None" modulatorLinkedToModulatorProperty="-- None"
-             modulatorLinkedToModulator="-- None" modulatorLinkedToModulatorSource="1"
-             modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
-             modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
-             modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="mic-bias" modulatorMin="0" modulatorValue="7">
-    <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
-          midiMessageCtrlrNumber="11" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
-          midiMessageSysExFormula=""/>
-    <component componentLabelPosition="bottom" componentLabelJustification="centred"
-               componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"
-               componentLabelAlwaysOnTop="1" componentSentBack="0" componentLabelColour="0xff000000"
-               componentLabelFont="&lt;Sans-Serif&gt;;12;0;0;0;0;1;3" componentVisibleName="mic bias"
-               componentMouseCursor="2" componentGroupName="" componentGroupped="0"
-               componentSnapSize="0" componentIsLocked="0" componentDisabled="0"
-               componentRadioGroupId="0" componentRadioGroupNotifyMidi="1" componentVisibility="1"
-               componentEffect="0" componentEffectRadius="1" componentEffectColour="0xff000000"
-               componentEffectOffsetX="0" componentEffectOffsetY="0" componentExcludedFromLabelDisplay="0"
-               componentValueDecimalPlaces="0" componentLuaMouseMoved="-- None"
-               componentLuaMouseDown="-- None" componentLuaMouseDrag="-- None"
-               componentLuaMouseDoubleClick="-- None" uiComboArrowColour="0xff0000ff"
-               uiComboOutlineColour="0xff0000ff" uiComboTextColour="0xff000000"
-               uiComboTextJustification="centred" uiComboFont="&lt;Sans-Serif&gt;;14;0;0;0;0;1;3"
-               uiComboMenuFont="&lt;Sans-Serif&gt;;16;0;0;0;0;1;3" uiComboButtonColour="0xff0000ff"
-               uiComboBgColour="0xffffffff" uiComboMenuBackgroundColour="0xfff0f0f0"
-               uiComboMenuFontColour="0xff000000" uiComboMenuHighlightColour="ffadd8e6"
-               uiComboMenuFontHighlightedColour="0xff232323" uiComboContent="1.25V&#10;1.50V&#10;1.75V&#10;2.00V&#10;2.25V&#10;2.50V&#10;2.75V&#10;3.00V"
-               uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
-               uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
-               uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" uiType="uiCombo" componentRectangle="336 272 128 32"
-               componentLayerUid="3cb7e26c330000000000000000000000"/>
-  </modulator>
-  <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="33" modulatorIsStatic="0"
-             modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
-             modulatorExcludeFromSnapshot="0" modulatorValueExpression="modulatorValue"
-             modulatorValueExpressionReverse="midiValue" modulatorControllerExpression="value"
-             luaModulatorGetValueForMIDI="-- None" luaModulatorGetValueFromMIDI="-- None"
-             modulatorLinkedToPanelProperty="-- None" modulatorLinkedToModulatorProperty="-- None"
-             modulatorLinkedToModulator="-- None" modulatorLinkedToModulatorSource="1"
-             modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
-             modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
-             modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="mic-impedance" modulatorMin="0" modulatorValue="1">
-    <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
-          midiMessageCtrlrNumber="12" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
-          midiMessageSysExFormula=""/>
-    <component componentLabelPosition="bottom" componentLabelJustification="centred"
-               componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"
-               componentLabelAlwaysOnTop="1" componentSentBack="0" componentLabelColour="0xff000000"
-               componentLabelFont="&lt;Sans-Serif&gt;;12;0;0;0;0;1;3" componentVisibleName="mic impedance"
-               componentMouseCursor="2" componentGroupName="" componentGroupped="0"
-               componentSnapSize="0" componentIsLocked="0" componentDisabled="0"
-               componentRadioGroupId="0" componentRadioGroupNotifyMidi="1" componentVisibility="1"
-               componentEffect="0" componentEffectRadius="1" componentEffectColour="0xff000000"
-               componentEffectOffsetX="0" componentEffectOffsetY="0" componentExcludedFromLabelDisplay="0"
-               componentValueDecimalPlaces="0" componentLuaMouseMoved="-- None"
-               componentLuaMouseDown="-- None" componentLuaMouseDrag="-- None"
-               componentLuaMouseDoubleClick="-- None" uiComboArrowColour="0xff0000ff"
-               uiComboOutlineColour="0xff0000ff" uiComboTextColour="0xff000000"
-               uiComboTextJustification="centred" uiComboFont="&lt;Sans-Serif&gt;;14;0;0;0;0;1;3"
-               uiComboMenuFont="&lt;Sans-Serif&gt;;16;0;0;0;0;1;3" uiComboButtonColour="0xff0000ff"
-               uiComboBgColour="0xffffffff" uiComboMenuBackgroundColour="0xfff0f0f0"
-               uiComboMenuFontColour="0xff000000" uiComboMenuHighlightColour="ffadd8e6"
-               uiComboMenuFontHighlightedColour="0xff232323" uiComboContent="off&#10;2k&#10;4k&#10;8k"
-               uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
-               uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
-               uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
-               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 304 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="34" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1321,7 +1256,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="mic-preamp" modulatorMin="0" modulatorValue="2">
+             name="mic-preamp" modulatorMin="0" modulatorValue="1">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="2" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1347,7 +1282,7 @@
                uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
                uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
                uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
-               componentRectangle="336 232 128 32" uiType="uiCombo"/>
+               componentRectangle="336 264 128 32" uiType="uiCombo"/>
   </modulator>
   <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="35" modulatorIsStatic="0"
              modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
@@ -1359,7 +1294,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="paddle-keyer" modulatorMin="0" modulatorValue="0">
+             name="paddle-keyer" modulatorMin="0" modulatorValue="2">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="142" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1397,7 +1332,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="ptt-hang-time" modulatorMin="0" modulatorValue="-1">
+             name="ptt-hang-time" modulatorMin="0" modulatorValue="7">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="143" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1435,7 +1370,7 @@
              modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
              modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
              modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
-             name="debounce" modulatorMin="0">
+             name="debounce" modulatorMin="0" modulatorValue="50">
     <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
           midiMessageCtrlrNumber="30" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
           midiMessageSysExFormula=""/>
@@ -1467,6 +1402,44 @@
                uiSliderSpringMode="0" uiSliderSpringValue="0" uiSliderMouseWheelInterval="1"
                uiSliderPopupBubble="0" uiType="uiSlider" componentRectangle="208 336 96 96"
                componentLayerUid="3cb7e26c330000000000000000000000"/>
+  </modulator>
+  <modulator modulatorVstExported="1" modulatorMax="3" vstIndex="38" modulatorIsStatic="0"
+             modulatorGlobalVariable="-1" modulatorMuteOnStart="0" modulatorMute="0"
+             modulatorExcludeFromSnapshot="0" modulatorValueExpression="modulatorValue"
+             modulatorValueExpressionReverse="midiValue" modulatorControllerExpression="value"
+             luaModulatorGetValueForMIDI="-- None" luaModulatorGetValueFromMIDI="-- None"
+             modulatorLinkedToPanelProperty="-- None" modulatorLinkedToModulatorProperty="-- None"
+             modulatorLinkedToModulator="-- None" modulatorLinkedToModulatorSource="1"
+             modulatorLinkedToComponent="Modulator" modulatorBaseValue="0"
+             modulatorCustomIndex="0" modulatorCustomName="" modulatorCustomIndexGroup="0"
+             modulatorCustomNameGroup="" modulatorVstNameFormat="%n" luaModulatorValueChange="-- None"
+             name="send-midi" modulatorMin="0">
+    <midi midiMessageType="6" midiMessageChannelOverride="0" midiMessageChannel="1"
+          midiMessageCtrlrNumber="21" midiMessageCtrlrValue="0" midiMessageMultiList="CC,ByteValue,MSB7bitValue,99,-2:CC,ByteValue,LSB7bitValue,98,-2:CC,ByteValue,MSB7bitValue,6,-1:CC,ByteValue,LSB7bitValue,38,-1"
+          midiMessageSysExFormula=""/>
+    <component componentLabelPosition="bottom" componentLabelJustification="centred"
+               componentLabelHeight="14" componentLabelWidth="0" componentLabelVisible="1"
+               componentLabelAlwaysOnTop="1" componentSentBack="0" componentLabelColour="0xff000000"
+               componentLabelFont="&lt;Sans-Serif&gt;;12;0;0;0;0;1;3" componentVisibleName="send midi notes"
+               componentMouseCursor="2" componentGroupName="" componentGroupped="0"
+               componentSnapSize="0" componentIsLocked="0" componentDisabled="0"
+               componentRadioGroupId="0" componentRadioGroupNotifyMidi="1" componentVisibility="1"
+               componentEffect="0" componentEffectRadius="1" componentEffectColour="0xff000000"
+               componentEffectOffsetX="0" componentEffectOffsetY="0" componentExcludedFromLabelDisplay="0"
+               componentValueDecimalPlaces="0" componentLuaMouseMoved="-- None"
+               componentLuaMouseDown="-- None" componentLuaMouseDrag="-- None"
+               componentLuaMouseDoubleClick="-- None" uiComboArrowColour="0xff0000ff"
+               uiComboOutlineColour="0xff0000ff" uiComboTextColour="0xff000000"
+               uiComboTextJustification="centred" uiComboFont="&lt;Sans-Serif&gt;;14;0;0;0;0;1;3"
+               uiComboMenuFont="&lt;Sans-Serif&gt;;16;0;0;0;0;1;3" uiComboButtonColour="0xff0000ff"
+               uiComboBgColour="0xffffffff" uiComboMenuBackgroundColour="0xfff0f0f0"
+               uiComboMenuFontColour="0xff000000" uiComboMenuHighlightColour="ffadd8e6"
+               uiComboMenuFontHighlightedColour="0xff232323" uiComboContent="none&#10;output&#10;input&#10;both"
+               uiComboMenuBackgroundRibbed="1" uiComboButtonGradient="0" uiComboButtonGradientColour1="ff0000ff"
+               uiComboButtonGradientColour2="ff00008b" uiComboButtonWidthOverride="0"
+               uiComboButtonWidth="16" uiComboDynamicContent="0" uiComboSelectedId="-1"
+               uiComboSelectedIndex="-1" componentLayerUid="3cb7e26c330000000000000000000000"
+               componentRectangle="336 168 128 32" uiType="uiCombo"/>
   </modulator>
   <panelCustomData/>
 </panel>

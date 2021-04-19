@@ -91,6 +91,10 @@ static void nrpn_update_keyer(uint8_t vox) {
 
   
 
+static void nrpn_report(const char *name, int16_t oldval, int16_t newval) {
+  Serial.printf("%s %d to %d\n", name, oldval, newval);
+}
+
 /*
 ** set a NRPN value.
 ** all are copied into the kyr_nrpn[] array.
@@ -133,12 +137,12 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   case KYRP_MIC_PREAMP_GAIN:
     sgtl5000.micPreampGain(value);
     kyr_nrpn[nrpn] = value; break;
-  case KYRP_MIC_BIAS:
-    sgtl5000.micBias(value);
-    kyr_nrpn[nrpn] = value; break;
-  case KYRP_MIC_IMPEDANCE:
-    sgtl5000.micImpedance(value);
-    kyr_nrpn[nrpn] = value; break;
+    // case KYRP_MIC_BIAS:
+    // sgtl5000.micBias(value);
+    // kyr_nrpn[nrpn] = value; break;
+    // case KYRP_MIC_IMPEDANCE:
+    // sgtl5000.micImpedance(value);
+    // kyr_nrpn[nrpn] = value; break;
 
   case KYRP_BUTTON_0:
   case KYRP_BUTTON_1:
@@ -149,9 +153,14 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 #if defined(KYRP_RECV_MIDI)
   case KYRP_RECV_MIDI:
 #endif
-  case KYRP_IQ_ENABLE:
-  case KYRP_IQ_ADJUST:
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_IQ_ENABLE: 
+    // nrpn_report("IQ_ENABLE", kyr_nrpn[nrpn], value);
+    kyr_nrpn[nrpn] = value;  break;
   case KYRP_TX_ENABLE:
+    // nrpn_report("TX_ENABLE", kyr_nrpn[nrpn], value);
+    kyr_nrpn[nrpn] = value;  break;
+  case KYRP_IQ_ADJUST:
     // case KYRP_ST_ENABLE:
   case KYRP_IQ_BALANCE:
   case KYRP_ST_AUDIO_MODE:
@@ -274,8 +283,8 @@ static void nrpn_setup(void) {
   /* codec setup */
   nrpn_set(KYRP_INPUT_SELECT, 0);
   nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
-  kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
-  nrpn_set(KYRP_MIC_IMPEDANCE, 1);   // taken from audio library
+  // kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
+  // nrpn_set(KYRP_MIC_IMPEDANCE, 1);   // taken from audio library
   nrpn_set(KYRP_MUTE_LINE_OUT, 1);
   nrpn_set(KYRP_LINE_IN_LEVEL, 5);
   nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
@@ -298,7 +307,7 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_IQ_ADJUST, 8096);
   nrpn_set(KYRP_TX_ENABLE, 0);
   nrpn_set(KYRP_ST_ENABLE, 1);
-  nrpn_set( KYRP_IQ_BALANCE, 8096);
+  nrpn_set(KYRP_IQ_BALANCE, 8096);
   nrpn_set(KYRP_ST_AUDIO_MODE, 0);
   nrpn_set(KYRP_ST_PAN, 8096);
   nrpn_set(KYRP_DEBOUNCE, 50);
