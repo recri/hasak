@@ -336,7 +336,7 @@ static int winkey_from_host() { return Serial2.read(); }
 static void winkey_to_host(int c) { Serial2.write(c); }
 
 // remove last queued character
-static void winkey_backspace(void) { if (wink.can_unsend_text()) wink.unsend_text(); }
+static void winkey_backspace(void) { wink.unsend_text(); }
 
 // clear queued characters
 static void winkey_clearbuf(void) { wink.abort(); }
