@@ -47,6 +47,7 @@ public:
   int items(void) { return wptr-rptr; }
   bool can_unput(void) { return can_get(); }
   void unput(void) { wptr -= 1; }
+  const int SIZE = RING_BUFFER_SIZE;
 private:
   unsigned wptr = 0, rptr = 0;
   T buff[RING_BUFFER_SIZE];

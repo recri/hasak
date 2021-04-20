@@ -43,7 +43,7 @@ public:
   }
 
   /* test the waters */
-  int can_put_run(void) { return items()<RING_BUFFER_SIZE; }
+  int can_put_run(void) { return items()<SIZE; }
     
   /* append the run onto the queue */
   int put_run(int run) { 
