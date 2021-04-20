@@ -199,7 +199,7 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 
     keyer_case(KYR_VOX_KYR, KYRP_VOX_6-KYRP_VOX_0);    // button key params
     
-#if 0
+#if 0      
     // default keyer params
 #define VOX KYR_VOX_NONE
 #define VOXP KYRP_VOX_0-KYRP_VOX_0
