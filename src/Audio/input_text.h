@@ -41,6 +41,7 @@
 #include "Arduino.h"
 #include "../../linkage.h"
 #include "AudioStream.h"
+#include "ring_buffer.h"
 
 /*
 ** Teensy Audio Library component for morse code text input
@@ -87,9 +88,17 @@ private:
 public:
   // text buffer
   // valid vox returns true if we can send
-  int valid_vox() {
+  int valid_vox(void) {
     uint8_t active = get_active_vox();
     return active == KYR_VOX_NONE || active == vox;
+  }
+  // valid vox or abort
+  int valid_vox_or_abort(void) {
+    if ( ! valid_vox()) {
+      abort();
+      return 0;
+    }
+    return 1;
   }
   // valid_text identifies acceptable characters
   int valid_text(uint8_t value) {
@@ -104,85 +113,72 @@ public:
   // was rejected by valid_text
   int send_text(uint8_t value) {
     // only if we're allowed
-    if ( ! valid_vox()) {
-      abort();
-      return -1;
-    }
+    if ( ! valid_vox_or_abort()) return -1;
     // reject false characters
     if ( ! valid_text(value)) return -1;
     // convert to upper case
     if (value >='a' && value <= 'z') value -= 32;
     // map spaces to space
     if (value == ' ' || value == '\t' || value == '\n') value = ' ';
-    if (can_send_text()) {
-      buffer[bwptr++] = value;
-      bwptr %= BUFFER_SIZE;
+    if (chars.can_put()) {
+      chars.put(value);
       return 0;
     }
     return -1;
   }
-  void repeat_text(const char *text) {
-    if (*text != '\0') {
-      p = repeat = text;
-      while (can_send_text()) {
-	if (*p == '\0') p = repeat;
-	send_text(*p++);
-      }
-    }
-  }
-  const char *send_text(const char *p) {
-    while (*p != '\0' && can_send_text()) {
-      if ( ! valid_vox()) {
-	abort();
-	return p;
-      }
-      send_text(*p++);
-    }
-    return *p == '\0' ? NULL : p;
-  }
+  //  void repeat_text(const char *text) {
+  //    if (*text != '\0') {
+  //      p = repeat = text;
+  //      while (can_send_text()) {
+  //	if (*p == '\0') p = repeat;
+  //	send_text(*p++);
+  //      }
+  //    }
+  //  }
+  //  const char *send_text(const char *p) {
+  //    while (*p != '\0' && can_send_text()) {
+  //      if ( ! valid_vox()) {
+  //	abort();
+  //	return p;
+  //      }
+  //      send_text(*p++);
+  //    }
+  //    return *p == '\0' ? NULL : p;
+  //  }
   // return true if there is room to queue a character
-  int can_send_text() { return valid_vox() && (((bwptr+1) % BUFFER_SIZE) != brptr); }
-  int unsend_text(void) {
-    return -1;
+  int can_send_text() { return valid_vox() && chars.can_put(); }
+  void unsend_text(void) {
+    noInterrupts();
+    if (chars.can_unput()) chars.unput();
+    interrupts();
   }
-  int can_unsend_text(void) {
-    return 0;
-  }
+  //  int can_unsend_text(void) {
+  //    return 0;
+  //  }
 private:
   int recv_text(void) {
-    if ( ! valid_vox()) {
-      abort();
-      return -1;
-    }
-    if (repeat) {
-      while (can_send_text()) {
-	if (*p == '\0') p = repeat;
-	send_text(*p++);
-      }
-    }
-    if (can_recv_text()) {
-      uint8_t value = buffer[brptr++];
-      erptr %= BUFFER_SIZE;
-      return value;
-    }
-    if (repeat) {
-      while (can_send_text()) {
-	if (*p == '\0') p = repeat;
-	send_text(*p++);
-      }
-    }
+    if ( ! valid_vox_or_abort()) return -1;
+    //    if (repeat) {
+    //      while (can_send_text()) {
+    //	if (*p == '\0') p = repeat;
+    //	send_text(*p++);
+    //      }
+    //    }
+    if (chars.can_get()) return chars.get();
+    //    if (repeat) {
+    //      while (can_send_text()) {
+    //		if (*p == '\0') p = repeat;
+    //		send_text(*p++);
+    //      }
+    //    }
     return -1;
   }
   int peek_text(void) {
-    if ( ! valid_vox()) {
-      abort();
-      return -1;
-    }
-    if (can_recv_text())
-      return buffer[brptr];
+    if ( ! valid_vox_or_abort()) return -1;
+    if (chars.can_get()) return chars.peek();
     return -1;
   }
-  int can_recv_text(void) { return brptr != bwptr; }
+  int can_recv_text(void) { return chars.can_get(); }
 
   // pull characters from the text buffer
   // translate into morse elements
@@ -190,10 +186,7 @@ private:
   // return 1 if a character was translated
   // return 0 if no character was available
   int get_elements() {
-    if ( ! valid_vox()) {
-      abort();
-      return 0;
-    }
+    if ( ! valid_vox_or_abort()) return -1;
     if (code > 1) {
       send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
       send(-get_vox_ies(vox));
@@ -235,11 +228,12 @@ private:
   }
 public:
   void abort() {
-    bwptr = brptr = 0;		// clear text buffer
+    // bwptr = brptr = 0;		// clear text buffer
+    chars.reset();		// clear text buffer
     code = 0;			// clear the code
     ewptr = erptr = 0;		// clear element buffer
     element = 0;		// clear the element
-    p = repeat = NULL;		// clear the repeat text
+    // p = repeat = NULL;		// clear the repeat text
   }
   virtual void update(void);
 private:
@@ -252,9 +246,10 @@ private:
   int16_t *wptr, n;
   int16_t elements[ELEMENT_SIZE];
   uint8_t ewptr, erptr;
-  uint8_t buffer[BUFFER_SIZE];
-  uint8_t bwptr, brptr;
-  const char *repeat, *p;
+  RingBuffer<uint8_t, BUFFER_SIZE> chars;
+  // uint8_t buffer[BUFFER_SIZE];
+  // uint8_t bwptr, brptr;
+  // const char *repeat, *p;
 };
 
 #endif

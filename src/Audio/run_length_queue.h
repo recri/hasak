@@ -35,15 +35,15 @@
 ** negative runs indicate sequences of 0's
 ** a zero run indicates empty
 */
-class RunLengthQueue : public RingBuffer<int> {
+class RunLengthQueue : public RingBuffer<int,64> {
 public:
-  RunLengthQueue() : RingBuffer<int>() {
+  RunLengthQueue() : RingBuffer<int,64>() {
     in = out = 0;
     overrun = underrun = maxusage = 0;
   }
 
   /* test the waters */
-  int can_put_run(void) { return items()<SIZE; }
+  int can_put_run(void) { return can_put(); }
     
   /* append the run onto the queue */
   int put_run(int run) { 
@@ -102,8 +102,8 @@ public:
     return out < 0;
   }
 
-  void reset(void) {
-    RingBuffer::reset();
+  void reset_runs(void) {
+    reset();
     in = out = 0;
   }
 
