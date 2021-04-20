@@ -56,6 +56,7 @@
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
 AudioInputAnalog	adc_in;	// headset switch detect
+AudioSynthWaveformDc	tune;	// tune switch
 AudioInputByte		s_key;	// straight key in
 AudioInputByte		l_pad;	// left paddle in
 AudioInputByte		r_pad;	// right paddle in
@@ -74,20 +75,22 @@ AudioConnection		patchCord1c(adc_in, 0, button, 0);
 
 // arbitration
 AudioEffectArbiter	arbiter;
-AudioConnection		patchCord2b(s_key, 0, arbiter, 0);
-AudioConnection		patchCord2a(paddle, 0, arbiter, 1);
-AudioConnection		patchCord2c(wink, 0, arbiter, 2);
-AudioConnection		patchCord2d(kyr, 0, arbiter, 3);
-AudioConnection		patchCord2e(button, 0, arbiter, 4);
+AudioConnection		patchCord2f(tune, 0, arbiter, 0);
+AudioConnection		patchCord2b(s_key, 0, arbiter, 1);
+AudioConnection		patchCord2a(paddle, 0, arbiter, 2);
+AudioConnection		patchCord2c(wink, 0, arbiter, 3);
+AudioConnection		patchCord2d(kyr, 0, arbiter, 4);
+AudioConnection		patchCord2e(button, 0, arbiter, 5);
 
 static void arbiter_setup(void) {
   // define the voices the arbiter sees on input channels
   // changing to let their identity be their priority
-  arbiter.define_vox(0, KYR_VOX_S_KEY, KYR_VOX_S_KEY, 0);
-  arbiter.define_vox(1, KYR_VOX_PAD, KYR_VOX_PAD, 0);
-  arbiter.define_vox(2, KYR_VOX_WINK, KYR_VOX_WINK, 0);
-  arbiter.define_vox(3, KYR_VOX_KYR, KYR_VOX_KYR, 1);
-  arbiter.define_vox(4, KYR_VOX_BUT, KYR_VOX_BUT, 1);
+  arbiter.define_vox(0, KYR_VOX_TUNE, KYR_VOX_TUNE, 0);
+  arbiter.define_vox(1, KYR_VOX_S_KEY, KYR_VOX_S_KEY, 0);
+  arbiter.define_vox(2, KYR_VOX_PAD, KYR_VOX_PAD, 0);
+  arbiter.define_vox(3, KYR_VOX_WINK, KYR_VOX_WINK, 0);
+  arbiter.define_vox(4, KYR_VOX_KYR, KYR_VOX_KYR, 1);
+  arbiter.define_vox(5, KYR_VOX_BUT, KYR_VOX_BUT, 1);
 }
 
 int get_active_vox(void) { return arbiter.get_active_vox(); }
