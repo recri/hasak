@@ -299,16 +299,16 @@
 #define KYRP_HANG_TIME		(KYRP_KEYER+23) /* time in dits ptt should linger after key */
 
 /* four (or more) repetitions of the keyer block for per voice customizations */
-#define KYRP_VOX_0		(KYRP_KEYER+0)	 /* == 120 default */
-#define KYRP_VOX_1		(KYRP_KEYER+32)	 /* == 152 straight key */
-#define KYRP_VOX_2		(KYRP_KEYER+64)	 /* == 184 paddle */
-#define KYRP_VOX_3		(KYRP_KEYER+96)	 /* == 216 text from winkey */
-#define KYRP_VOX_4		(KYRP_KEYER+128) /* == 248 text from keyer */
-#define KYRP_VOX_5		(KYRP_KEYER+160) /* == 280 headset button */
-#define KYRP_VOX_6		(KYRP_KEYER+192) /* == 280 headset button */
+#define KYRP_VOX_0		(KYRP_KEYER+0*32) /* == 120 default */
+#define KYRP_VOX_1		(KYRP_KEYER+1*32) /* == 152 tune */
+#define KYRP_VOX_2		(KYRP_KEYER+2*32) /* == 184 straight key */
+#define KYRP_VOX_3		(KYRP_KEYER+3*32) /* == 216 paddle */
+#define KYRP_VOX_4		(KYRP_KEYER+4*32) /* == 248 text from winkey */
+#define KYRP_VOX_5		(KYRP_KEYER+5*32) /* == 280 text from keyer */
+#define KYRP_VOX_6		(KYRP_KEYER+6*32) /* == 312 headset button */
 
 /* sgtl5000 control */
-#define KYRP_LAST		(KYRP_VOX_6+32)	/* == 344 */
+#define KYRP_LAST		(KYRP_KEYER+7*32) /* == 344 */
 
 /* nrpn MSB numbers, bank select, not quite yet */
 #define KYRP_VOX_OFFSET		32
