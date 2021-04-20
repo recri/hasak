@@ -1,3 +1,27 @@
+/* -*- mode: c++; tab-width: 8 -*- */
+/*
+ * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
+ * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * ad5dz, rec@elf.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice, development funding notice, and this permission
+ * notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 // Morse code for ASCII characters 33 - 90, from ITU-R M.1677-1
 // read from bit0 to bit7
 // 0 = dot, 1 = dash
@@ -79,6 +103,22 @@
 #define MORSE_EQUAL  0x31	// =    -...-
 #define MORSE_QUERY  0x4c	// ?    ..--..
 #define MORSE_ATSIGN 0x56	// @    .--.-.
+
+/* Additional characters defined by Winkeyer
+   filtered to those not already in ITU-R M.1677-1
+   and to those that are actually defined as something
+   | ASCII | Hex  | Prosign |
+   | ' '   | 0x20 | (space) |
+   | '$'   | 0x24 |  SX     |
+   | ':'   | 0x3A |  KN     | contra-ITU
+   | ';'   | 0x3B |  AA     |
+   | '<'   | 0x3C |  AR     | dups PLUS
+   | '>'   | 0x3E |  SK     | sometimes ASTERISK
+   | '['   | 0x5B |  AS     |
+   | '\'   | 0x5C |  DN     |
+   | ']'   | 0x5D |  KN     | dups LPAREN
+   | '|'   | 0x7C |(½ dit pad)|
+*/
 
 static const unsigned char morse[64] = {
    MORSE_NIL,			//33 !    not in ITU-R M.1677-1
