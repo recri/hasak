@@ -27,6 +27,10 @@
 
 #include <Arduino.h>
 
+#ifndef RING_BUFFER_SIZE
+#define RING_BUFFER_SIZE 128
+#endif
+
 /* circular buffer of int for run lengths */
 /* a negative int represents abs(int) zeros */
 /* a positive int represents abs(int) ones */
@@ -37,13 +41,15 @@ public:
   void reset(void) { wptr = rptr = 0; }
   bool can_get(void) { return rptr!=wptr; }
   bool can_put(void) { return (wptr+1) != rptr; }
-  T peek(void) { return buff[rptr%SIZE]; }
-  T get(void) { return buff[rptr++%SIZE]; }
-  void put(T val) { buff[wptr++%SIZE] = val; }
+  T peek(void) { return buff[rptr%RING_BUFFER_SIZE]; }
+  T get(void) { return buff[rptr++%RING_BUFFER_SIZE]; }
+  void put(T val) { buff[wptr++%RING_BUFFER_SIZE] = val; }
   int items(void) { return wptr-rptr; }
-  static const int SIZE = 128;
+  bool can_unput(void) { return can_get(); }
+  void unput(void) { wptr -= 1; }
+  const int SIZE = RING_BUFFER_SIZE;
 private:
   unsigned wptr = 0, rptr = 0;
-  T buff[SIZE];
+  T buff[RING_BUFFER_SIZE];
 };
 #endif
