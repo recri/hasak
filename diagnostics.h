@@ -221,6 +221,8 @@ static char *read_line() {
 }
 
 char debug_buffer[4][256];
+const char *wink_send_ptr = NULL;
+const char *kyr_send_ptr = NULL;
 
 void diagnostics_setup() { totalTime = 0; }
 
@@ -231,6 +233,11 @@ void diagnostics_loop() {
       Serial.printf("%s\n", debug_buffer[i]);
       debug_buffer[i][0] = 0;
     }
+  while (wink_send_ptr != NULL && *wink_send_ptr != 0 && wink.can_send_text())
+    wink.send_text(*wink_send_ptr++);
+  while (kyr_send_ptr != NULL && *kyr_send_ptr != 0 && kyr.can_send_text())
+    kyr.send_text(*kyr_send_ptr++);
+    
   if (Serial.available()) {
     char *p = read_line();
     // Serial.printf("diag read '%s'\n", p);
@@ -265,11 +272,11 @@ void diagnostics_loop() {
     case 'a': areport(); break; /* arbiter stats */
     case 'b': breport(); break; /* button stats */
     case 'd': dreport(); break; /* debounce stats */
-    case 'w': wink.send_text(p+1); break;
-    case 'k': kyr.send_text(p+1); break;
-    case 'W': wink.send_text(lorem); break;
-    case 'K': kyr.send_text(lorem); break;
-    case 'Z': wink.send_text(random_text()); break;
+    case 'w': wink_send_ptr = p+1; break;
+    case 'k': kyr_send_ptr = p+1; break;
+    case 'W': wink_send_ptr = lorem; break;
+    case 'K': kyr_send_ptr = lorem; break;
+    case 'Z': wink_send_ptr = random_text(); break;
     case 'e': mixer_setup(); /* default mixers */ break;
     case 'h': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'i': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
