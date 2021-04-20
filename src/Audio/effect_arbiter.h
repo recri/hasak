@@ -58,8 +58,8 @@ public:
   bool is_local(void) { return active_stream >= 0 && local[active_stream]; }
   
   void queue_reset(void) {
-    keyq.reset();
-    pttq.reset();
+    keyq.reset_runs();
+    pttq.reset_runs();
   }
 
   bool queue_is_all_zeros(void) { 

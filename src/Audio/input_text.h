@@ -41,7 +41,6 @@
 #include "Arduino.h"
 #include "../../linkage.h"
 #include "AudioStream.h"
-#define RING_BUFFER_SIZE 64
 #include "ring_buffer.h"
 
 /*
@@ -57,9 +56,6 @@ public:
       n = AUDIO_BLOCK_SAMPLES;
     }
     element = 0;
-    prosign = 0;
-    code = 0;
-    ewptr = erptr = 0;
   }
 
 private:
@@ -68,27 +64,18 @@ private:
   // return 0 if the value was successfully queued
   // return -1 if there is no room
   int send(int16_t value) {
-    if (can_send()) {
-      elements[ewptr] = value;
-      ewptr = (ewptr+1)%ELEMENT_SIZE;
+    if (elements.can_put()) {
+      elements.put(value);
       return 0;
     }
     return -1;
   }
-  int can_send(void) { return (((ewptr+1) % ELEMENT_SIZE) != erptr); }
-  int recv(void) {
-    if (can_recv()) {
-      int16_t value = elements[erptr];
-      erptr = (erptr+1)%ELEMENT_SIZE;
-      return value;
-    }
-    return 0;
-  }
-  int can_recv(void) { return erptr != ewptr || get_elements(); }
+  int recv(void) { return can_recv() ? elements.get() :  0; }
+  int can_recv(void) { return elements.can_get() || get_more_elements(); }
 
 public:
   // text buffer
-  // valid vox returns true if we can send
+  // valid vox returns true if we are allowed to send
   int valid_vox(void) {
     uint8_t active = get_active_vox();
     return active == KYR_VOX_NONE || active == vox;
@@ -105,7 +92,7 @@ public:
   int valid_text(uint8_t value) {
     // convert to upper case
     return (value >='a' && value <= 'z') ||
-      value == ' ' || value == '\t' || value == '\n' || value == '\e' ||
+      value == ' ' || value == '\t' || value == '\n' || value == '\e' || value == '|' ||
       (value-33 >= 0 && value-33 < 64 && get_nrpn(KYRP_MORSE+value-33) != 1);
   }
   // send_text queues a character for sending
@@ -127,25 +114,6 @@ public:
     }
     return -1;
   }
-  //  void repeat_text(const char *text) {
-  //    if (*text != '\0') {
-  //      p = repeat = text;
-  //      while (can_send_text()) {
-  //	if (*p == '\0') p = repeat;
-  //	send_text(*p++);
-  //      }
-  //    }
-  //  }
-  //  const char *send_text(const char *p) {
-  //    while (*p != '\0' && can_send_text()) {
-  //      if ( ! valid_vox()) {
-  //	abort();
-  //	return p;
-  //      }
-  //      send_text(*p++);
-  //    }
-  //    return *p == '\0' ? NULL : p;
-  //  }
   // return true if there is room to queue a character
   int can_send_text() { return valid_vox() && chars.can_put(); }
   void unsend_text(void) {
@@ -153,66 +121,32 @@ public:
     if (chars.can_unput()) chars.unput();
     interrupts();
   }
-  //  int can_unsend_text(void) {
-  //    return 0;
-  //  }
 private:
-  int recv_text(void) {
-    if ( ! valid_vox_or_abort()) return -1;
-    //    if (repeat) {
-    //      while (can_send_text()) {
-    //	if (*p == '\0') p = repeat;
-    //	send_text(*p++);
-    //      }
-    //    }
-    if (chars.can_get()) return chars.get();
-    //    if (repeat) {
-    //      while (can_send_text()) {
-    //		if (*p == '\0') p = repeat;
-    //		send_text(*p++);
-    //      }
-    //    }
-    return -1;
-  }
-  int peek_text(void) {
-    if ( ! valid_vox_or_abort()) return -1;
-    if (chars.can_get()) return chars.peek();
-    return -1;
-  }
+  int recv_text(void) { return valid_vox_or_abort() && chars.can_get() ? chars.get() : -1; }
+  int peek_text(void) { return valid_vox_or_abort() && chars.can_get() ? chars.peek() : -1; }
   int can_recv_text(void) { return chars.can_get(); }
 
-  // pull characters from the text buffer
+  // pull a character from the text buffer
   // translate into morse elements
   // and push them into the element buffer
-  // return 1 if a character was translated
-  // return 0 if no character was available
-  int get_elements() {
-    if ( ! valid_vox_or_abort()) return -1;
-    if (code > 1) {
-      send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
-      send(-get_vox_ies(vox));
-      code >>= 1;
-      return 1;
-    }
-    if (code == 1) {
-      // end of code decoding
-      if ( ! prosign) {
-	send(-(get_vox_ils(vox)-get_vox_ies(vox)));
-	code = 0;
-	return 1;
-      }
-      prosign = 0;
-      code = 0;
-    }
-    if ( ! can_recv_text())
-      return 0;
+  // return 1 if elements were generated
+  // return 0 if no luck
+  int get_more_elements() {
+    if ( ! valid_vox_or_abort()) return 0;
+    if ( ! can_recv_text()) return 0;
     uint8_t value = recv_text();
     if (value == ' ') {
       // send word space
       send(-get_vox_iws(vox));
-      // clear the space from the input queue
       return 1;
     }
+    if (value == '|') {
+      // send half dit space
+      send(-get_vox_dit(vox)/2);
+      return 1;
+    }
+    int sent = 0;
+    uint8_t prosign = 0;
     if (value == '\e') {
       // prosign together the next two characters
       prosign = 1;
@@ -221,36 +155,33 @@ private:
       // get the next char
       value = recv_text();
     }
-    code = get_nrpn(KYRP_MORSE+value-33);
-    send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
-    send(-get_vox_ies(vox));
-    code >>= 1;
-    return 1;
+    uint8_t code = get_nrpn(KYRP_MORSE+value-33);
+    while (code > 1) {
+      send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
+      send(-get_vox_ies(vox));
+      code >>= 1;
+      sent += 2;
+    }
+    if (code == 1 && ! prosign) {
+      send(-(get_vox_ils(vox)-get_vox_ies(vox)));
+      sent += 1;
+    }
+    return sent > 0;
   }
 public:
   void abort() {
-    // bwptr = brptr = 0;		// clear text buffer
     chars.reset();		// clear text buffer
-    code = 0;			// clear the code
-    ewptr = erptr = 0;		// clear element buffer
+    elements.reset();		// clear element buffer
     element = 0;		// clear the element
-    // p = repeat = NULL;		// clear the repeat text
   }
   virtual void update(void);
 private:
-  static const int ELEMENT_SIZE = 8;
-  static const int BUFFER_SIZE = 1024;
   const int vox;
   int element;
-  uint8_t prosign, code;
   audio_block_t *block;
   int16_t *wptr, n;
-  int16_t elements[ELEMENT_SIZE];
-  uint8_t ewptr, erptr;
-  RingBuffer<uint8_t> chars;
-  // uint8_t buffer[BUFFER_SIZE];
-  // uint8_t bwptr, brptr;
-  // const char *repeat, *p;
+  RingBuffer<int16_t, 32> elements;
+  RingBuffer<uint8_t, 64> chars;
 };
 
 #endif

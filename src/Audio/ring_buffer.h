@@ -34,22 +34,21 @@
 /* circular buffer of int for run lengths */
 /* a negative int represents abs(int) zeros */
 /* a positive int represents abs(int) ones */
-template <class T>
+template <class T, unsigned SIZE>
 class RingBuffer {
 public:
   RingBuffer() { }
   void reset(void) { wptr = rptr = 0; }
   bool can_get(void) { return rptr!=wptr; }
   bool can_put(void) { return (wptr+1) != rptr; }
-  T peek(void) { return buff[rptr%RING_BUFFER_SIZE]; }
-  T get(void) { return buff[rptr++%RING_BUFFER_SIZE]; }
-  void put(T val) { buff[wptr++%RING_BUFFER_SIZE] = val; }
+  T peek(void) { return buff[rptr%SIZE]; }
+  T get(void) { return buff[rptr++%SIZE]; }
+  void put(T val) { buff[wptr++%SIZE] = val; }
   int items(void) { return wptr-rptr; }
   bool can_unput(void) { return can_get(); }
   void unput(void) { wptr -= 1; }
-  const int SIZE = RING_BUFFER_SIZE;
 private:
   unsigned wptr = 0, rptr = 0;
-  T buff[RING_BUFFER_SIZE];
+  T buff[SIZE];
 };
 #endif

@@ -220,9 +220,18 @@ static char *read_line() {
   return buff;
 }
 
+static const char *wink_send_ptr = NULL;
+static const char *kyr_send_ptr = NULL;
+
+static int send_some_text(const char *text, AudioInputText& input) {
+  if (text == NULL) return 0;
+  if (*text == 0) return 0;
+  if ( ! input.valid_vox()) return 0;
+  while (*text != 0 && input.can_send_text()) input.send_text(*text++);
+  return *text != 0 && input.valid_vox();
+}
+
 char debug_buffer[4][256];
-const char *wink_send_ptr = NULL;
-const char *kyr_send_ptr = NULL;
 
 void diagnostics_setup() { totalTime = 0; }
 
@@ -233,11 +242,8 @@ void diagnostics_loop() {
       Serial.printf("%s\n", debug_buffer[i]);
       debug_buffer[i][0] = 0;
     }
-  while (wink_send_ptr != NULL && *wink_send_ptr != 0 && wink.can_send_text())
-    wink.send_text(*wink_send_ptr++);
-  while (kyr_send_ptr != NULL && *kyr_send_ptr != 0 && kyr.can_send_text())
-    kyr.send_text(*kyr_send_ptr++);
-    
+  if ( ! send_some_text(wink_send_ptr, wink)) wink_send_ptr = NULL;
+  if ( ! send_some_text(kyr_send_ptr, kyr)) kyr_send_ptr = NULL;
   if (Serial.available()) {
     char *p = read_line();
     // Serial.printf("diag read '%s'\n", p);
