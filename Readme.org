@@ -1,5 +1,5 @@
 * Ham and Swiss Army Knife (hasak) keyer
-**  This is a morse code keyer built for the Hermes Lite 
+** A morse code keyer for the Softerhardware/CWKeyer
    low latency keyer project.  The goal is to allow
    the operator to hear keyed code with low latency
    while listening to and keying a possibly remote
@@ -9,6 +9,20 @@
    acts as a morse code keyer, takes its parameters from MIDI,
    and produces very low latency sidetone.
 
+   The current release is built for the CWKeyer prototype.  I
+   haven't tested against the Teensy4+AudioAdapter, bare Teensy4,
+   Teensy3+AudioAdapter, or bare Teensy3.
+
+   This release responds to the four control potentiometers and
+   produces output through the WM8960 codec.  It keys from a straight
+   key or paddle.  It plays audio from the computer.
+   
+   This release is somewhat inconsistent on my prototype.  Sometimes
+   I get no audio at all after downloading code, sometimes I get a
+   continuous tone, and sometimes I get a working keyer.  Not sure
+   what causes it, but it generally goes away with a few rounds of
+   unplugging and replugging the USB cable or a fresh download.
+** Hasak details
    All of the timing and sequencing happens inside the Teensy Audio
    Library processing loop with sample accuracy. The pins which
    reflect key, paddle, and switch closures are sampled and latched
@@ -32,114 +46,3 @@
    mode, the ctrlr panel only exposes some parameters, it isn't decoding
    the morse being keyed, and there needs to be a way for the keyer to
    save its parameters in non-volatile memory and to export them to ctrlr.
-** It currently runs on a Teensy 4.0 with Teensy Audio 
-   Adapter board, but it also runs on a plain Teensy 4.0 with audio
-   output to MQS.  And it also runs on a Teensy 3.1/3.2 with Teensy
-   Audio Adapter.  I suspect it will work on a plain Teensy 3, but
-   the hardware DAC may need an amp.
-** Hardware set up is straight forward.
-   Most of this can be found in ./config.h.
-*** Pin 0 is the right paddle key in.
-*** Pin 1 is the left paddle key in.
-*** Pin 2 is the straight key in.
-*** Pin 3 is a PTT switch, as yet unused.
-*** Pin 4 is Key out.
-*** Pin 5 is PTT out.
-*** On the Teensy 4 only, pin 20 should be jumpered to pin 22,
-     it is the I2S LRCLK signal that is used to generate a 
-     sample rate interrupt.
-*** Headphones
-**** Stereo headphones can be plugged into the audio adapter jack.    
-**** For a typical phone headset with microphone and button(s),
-     you will need wires from audio adapter headphone L, R,
-     MIC and GND, two ~220uF electrolyics to couple L and R
-     to the headphones and a properly wired TRRS jack.
-     (I used 100uF electrolytics.)
-***** A wire from the Microphone line to pin 16/A2 will
-      enable the headset buttons.
-*** Line in and line out are available on the audio adapter
-*** There is ouput passed to the hardware DAC.
-**** On a Teensy 3.1/3.2, this is the pin labelled DAC/A14.
-**** On a Teensy 3.5/3.6, the pins are labelled   A21/A22.
-     The Teensy 3 DAC's haven't been tested.
-**** On a Teensy 4.0, the pins are labelled 10/12.
-     The Teensy 4.0 can drive headphones directly, but a bit of
-     filtering will make it easier on the ears.
-** The keyer is currently configured as a keyer.
-   The RX audio coming in over usb is mixed with locally generated
-   sidetone and played over the headphones. You can configure the
-   keying parameters in the ctrlr panel. If you enable TX on the 
-   ctrlr panel then the keyer will send CMOS key_out and ptt_out
-   on pins 4 and 5. If IQ and TX are enabled, the keyer will send
-   keyed IQ to usb audio.  If send midi and TX are enabled, the
-   keyer will send MIDI note on/off events as usb MIDI for key_out
-   and ptt_out.
-* To build the keyer
-** You need the Arduino IDE with the Teensyduino extensions.  
-   Consult pjrc.com for details.
-** Specify the  proper board in the Tools > Board > Teensyduino menu
-** Specify USB Type to be Serial+MIDI+Audio
-** Compile and download.
-* The keyer should start operating immediately.
-  It will use the default settings that were compiled.
-  It should produce sidetone for straight key and iambic
-  mode A at 18 WPM for the paddle.  If RX audio is coming
-  over the USB it will be mixed with the sidetone.
-* Parameters can be changed with MIDI.   
-** The file ctrlr/hasak.panel is a panel definition for Ctrlr,
-   a MIDI control panel program.  
-** You can download Ctrlr from https://ctrlr.org/nightly/?C=M;O=D,
-   I only use the 5.3.201 release, later versions have issues.
-*** If you run Ctrlr on linux, be sure to vist Edit> Preferences
-    and uncheck "Use OS native file open/save dialogs ..."
-** Run Ctrlr with the panel definition as its only argument.
-** The panel lays out the parameters that can be changed
-   while the keyer is running.
-* Known problems
-** MIDI note on/off output is currently in the loop() function and
-   subject to delays when the loop() function gets distracted by
-   other IO.
-** The earphones make a loud pop when the codec is enabled.
-   It doesn't happen if you use the headphone jack on the audio
-   adapter.  But the codec cannot provide microphone bias while
-   using the headphones in capless mode with VGND.
-* Other configurations are possible.
-** The keyer can play as a 2x2 USB sound card.  Simply configure
-   the codec for line-in and line-out and route usb_in to i2s_out
-   and i2s_in to usb_out.
-** The keyer could supply IQ to line-out for an SDR transceiver,
-   you would need to route the sidetone to the hardware audio out.
-** The keyer could clean up audio output from a receiver.   
-    Take the receiver's output in through line-in, add an audio 
-    processing pipeline to the audio loop, route the processed
-    output to the headphones.  [This is Christoph's idea.]
-** The keyer could be a complete SDR for a Softrock Lite II.
-    You would need to add an SDR receiver to the audio pipeline,
-    and some scheme for tuning.
-** The keyer could be a complete SDR for a Softrock Ensemble RX.
-    Building on the Softrock Lite II solution, you'd need to add
-    software for driving the Ensemble RX over the Teensy 4 usb host
-    interface, and a scheme for tuning further.
-**  The keyer could be a complete SDR for a Softrock Ensemble RX/TX.
-    Building on the Softrock Ensemble RX solution, you'd just add the
-    IQ to line-out routing, and send audio output to the hardware
-    audio device.
-** With a usb host interface, you would also be able to add keyboards,
-    mice, a MIDI controller, and so on.  Though you have to watch the
-    power requirements.
-** With a Qwiic interface (3V3,GND,SDA,SCL) you could add a variety
-    of prebuilt Qwiic peripherals: rotary encoders, buttons, 12 key pad,
-    IO extenders, OLED displays, and so on.  Most of these are readily 
-    available prototyping boards at Sparkfun, and Sparkfun also has a 
-    service to custom build boards with combinations of some modules.
-** Keyer could be a real time clock.    
-    Would need to add a coin cell to keep it powered. Time gets synched
-    when you upload a new sketch to the Teensy 4.
-* Don't forget
-** Teensy 4 pin 20 jumpered to pin 22.
-** Don't connect the audio adapter headphone jack shield/ground pad
-   to anything, it's a virtual ground biased at ~1.55V.
-** If you run Ctrlr on linux, be sure to vist Edit> Preferences
-   and uncheck "Use OS native file open/save dialogs ..."
-** Have fun.
--- 73 -- rec -- ad5dz --

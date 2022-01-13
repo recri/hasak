@@ -217,7 +217,7 @@ static void nrpn_setup(void) {
 
   /* unmute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
-  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 40*8*1024/100);
+  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 64);
 
   /* soft controls */
   nrpn_set(KYRP_BUTTON_0, 6800);  /* off */
@@ -250,7 +250,7 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_COMP,0);
   nrpn_set(KYRP_FARNS,0);
   nrpn_set(KYRP_TONE,600);
-  nrpn_set(KYRP_LEVEL, 2048);
+  nrpn_set(KYRP_LEVEL, 64);
   nrpn_set(KYRP_RISE_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_FALL_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_RISE_RAMP, KYRP_RAMP_HANN);
