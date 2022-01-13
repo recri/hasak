@@ -44,7 +44,7 @@
 #include "src/Audio/effect_arbiter.h"
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/output_byte.h"
-#include "src/Audio/my_control_sgtl5000.h"
+
 // audio sample values
 #include "src/Audio/sample_value.h"
 
@@ -214,7 +214,8 @@ AudioConnection		patchCord11f(r_hdw_out, 0, hdw_out, 1);
 #endif
 
 // codec control
-MyAudioControlSGTL5000     sgtl5000;
+AudioControlSGTL5000     sgtl5000; // the codec in the teensy audio shield
+AudioControlWM8960	   wm8960; // the codec in the CWKeyer shield
 
 /*
 ** core of program.
@@ -265,9 +266,10 @@ static float timing_percent_max(uint32_t cpuCyclesMax) {
 //
 uint8_t _key_out, _ptt_out;
 uint8_t _up_out, _down_out;
-
+uint32_t _pollcount = 0;
 static void pollatch() {
   uint32_t cycles = ARM_DWT_CYCCNT;
+  _pollcount += 1;
   l_pad.send(digitalReadFast(KYR_L_PAD_PIN)^1);
   r_pad.send(digitalReadFast(KYR_R_PAD_PIN)^1);
   s_key.send(digitalReadFast(KYR_S_KEY_PIN)^1);
@@ -289,6 +291,8 @@ static void midi_setup(void);
 static void midi_loop(void);
 static void winkey_setup(void);
 static void winkey_loop(void);
+static void input_setup(void);
+static void input_loop(void);
 static void diagnostics_setup(void);
 static void diagnostics_loop(void);
 
@@ -306,15 +310,30 @@ void setup(void) {
   AudioMemory(40);
   nrpn_setup();
 
-#ifdef KYR_DUP_LRCLK
+  /* We want to sample the switch inputs at the sample rate.
+   * We can do that by attaching a pin interrupt to the LRCLK
+   * pin.  But that doesn't work on the Teensy4, so we jumper
+   * the LRCLK pin to another pin and attach a pin interrupt
+   * to the second pin.  But that doesn't work if people don't
+   * want to hack on their Teensys, so we can also use an
+   * interval timer.
+   */
+#if defined(KYRC_USE_LRCLK)  
+  attachInterrupt(KYR_LRCLK, pollatch, RISING);
+#endif
+#if defined(KYRC_DUP_LRCLK)
   pinMode(KYR_DUP_LRCLK, INPUT);
   attachInterrupt(KYR_DUP_LRCLK, pollatch, RISING);
-#else
-  attachInterrupt(KYR_LRCLK, pollatch, RISING);
+#endif
+#if defined(KYRC_USE_TIMER)
+  static IntervalTimer timer;
+  timer.priority(96);
+  timer.begin(pollatch, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 #endif
 
   midi_setup();
   winkey_setup();
+  input_setup();
   diagnostics_setup();
 }
 
@@ -323,10 +342,14 @@ void loop(void) {
   timing_loop();
   midi_loop();
   winkey_loop();
+  input_loop();
   diagnostics_loop();
 }
 
+#include "codec.h"
 #include "nrpn.h"
 #include "midi.h"
 #include "winkey.h"
 #include "diagnostics.h"
+#include "inputs.h"
+

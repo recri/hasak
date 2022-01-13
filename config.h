@@ -27,6 +27,19 @@
 
 /* KYR configuration */
 
+/* per sample interrupt source */
+//#define KYRC_USE_LRCLK	1	/* Should we use LRCLK directly for 48k interrupts/second */
+//#define KYRC_DUP_LRCLK	1	/* Should we duplicate LRCLK to another pin for 48k interrupts/second */
+#define KYRC_USE_TIMER		1	/* Should we use an interval timer for 48k interrupts/second */
+#if defined(KYRC_USE_LRCLK) + defined(KYRC_DUP_LRCLK) + defined(KYRC_USE_TIMER) > 1
+#error "only one of KYRC_USE_LRCLK, KYRC_DUP_LRCLK, and KYRC_USE_TIMER should be defined"
+#elif defined(KYRC_USE_LRCLK) + defined(KYRC_DUP_LRCLK) + defined(KYRC_USE_TIMER) < 1
+#error "one of KYRC_USE_LRCLK, KYRC_DUP_LRCLK, and KYRC_USE_TIMER should be defined"
+#endif
+
+/* potentiometer input */
+#define KYRC_ENABLE_POTS 1	/* Should we read potentiometers for volume, pitch, and speed */
+
 /* decide which Teensy we're running on */
 #if defined(TEENSYDUINO)
   #if defined(ARDUINO_TEENSY40)
@@ -68,7 +81,9 @@
 #define KYR_MCLK	23
 #define KYR_BCLK	21
 #define KYR_LRCLK	20
-#define KYR_DUP_LRCLK	22	/* wire 20 to 22 and see if I get an LRCLK interrupt on the Teensy 4 w/out AudioAdapter */
+#if defined(KYRC_DUP_LRCLK)
+#define KYR_DUP_LRCLK	25	/* wire 20 to 25 to get an LRCLK interrupt on the Teensy 4 */
+#endif
 /* I2C 18, 19 */
 #define KYR_SCL		19
 #define KYR_SDA		18
@@ -103,12 +118,28 @@
 /* 
 ** pin allocations for standard input switches and output latches
 */
-#define KYR_R_PAD_PIN	0
-#define KYR_L_PAD_PIN	1
-#define KYR_S_KEY_PIN	2
-#define KYR_PTT_SW_PIN	3
-#define KYR_KEY_OUT_PIN	4
-#define KYR_PTT_OUT_PIN	5
+#define KYR_R_PAD_PIN	0	// [x] CWKeyer proto 
+#define KYR_L_PAD_PIN	1	// [x] CWKeyer proto
+#define KYR_S_KEY_PIN	2	// [x] CWKeyer proto
+#define KYR_PTT_SW_PIN	3	// [x] CWKeyer proto
+#define KYR_KEY_OUT_PIN	4	// [x] CWKeyer proto
+#define KYR_PTT_OUT_PIN	5	// [x] CWKeyer proto
+#define KYR_VOLUME_POT	A1	// [x] CWKeyer proto = 
+#define KYR_ST_VOL_POT	A2	// [x] CWKeyer proto =
+#define KYR_ST_FREQ_POT	A3	// [x] CWKeyer proto =
+#define KYR_SPEED_POT	A8	// [x] CWKeyer proto = 22!
+
+/*
+** whether to enable potentiometers or not
+*/
+#define KYR_SHIFT_POTS  5	// right shift adc results to clear noise
+#define KYR_SKIP_READ	1	// reads to skip
+#define KYR_AVG_READ	2	// reads to average
+
+/*
+** whether to enable line level inputs/outputs
+*/
+#define KYR_ENABLE_LINE 0	// CWKeyer proto has no line level
 
 /*
 ** keyer voices
@@ -125,7 +156,7 @@
 #define KYR_VOX_PAD	3	/* Paddle */
 #define KYR_VOX_WINK	4	/* Winkey Key */
 #define KYR_VOX_KYR	5	/* Kyr Key */
-#define KYR_VOX_BUT	6	/* headset button */
+#define KYR_VOX_BUT	6	/* headset button (not implemented) */
 
 /* 
 ** MIDI usage
@@ -162,6 +193,7 @@
 **  2) set value with control change 6 (MSB) and 38 (LSB)
 ** The actual value set is 14 bits (MSB<<7)|LSB
 ** The value is stored when CC 38 (LSB) is received.
+** Old values of MSB are reused with the last set value.
 */
 
 /* control change messages used */
@@ -231,25 +263,25 @@
 /* relocation base */
 #define KYRP_MIXER		(KYRP_MORSE+64) /* == 96 */
 
-#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* i2s in raw */
-#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* i2s in unmuted by ptt_sw */
-#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* sidetone */
+#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* i2s in raw left */
+#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* i2s in unmuted by ptt_sw left */
+#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* sidetone left */
 #define KYRP_MIX_USB_L3		(KYRP_MIXER+3)
 #define KYRP_MIX_USB_R0		(KYRP_MIXER+4)  /* ditto for right channel */
 #define KYRP_MIX_USB_R1		(KYRP_MIXER+5)
 #define KYRP_MIX_USB_R2		(KYRP_MIXER+6)
 #define KYRP_MIX_USB_R3		(KYRP_MIXER+7)
-#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* usb in raw */
-#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* usb in muted by sidetone vox */
-#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* sidetone */
+#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* usb in raw left */
+#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* usb in muted by sidetone vox left */
+#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* sidetone left */
 #define KYRP_MIX_I2S_L3		(KYRP_MIXER+11)
 #define KYRP_MIX_I2S_R0		(KYRP_MIXER+12) /* ditto for right channel */
 #define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)
 #define KYRP_MIX_I2S_R2		(KYRP_MIXER+14)
 #define KYRP_MIX_I2S_R3		(KYRP_MIXER+15)
-#define KYRP_MIX_MQS_L0		(KYRP_MIXER+16) /* usb in raw */
-#define KYRP_MIX_MQS_L1		(KYRP_MIXER+17) /* usb in muted by sidetone vox */
-#define KYRP_MIX_MQS_L2		(KYRP_MIXER+18) /* sidetone  */
+#define KYRP_MIX_MQS_L0		(KYRP_MIXER+16) /* usb in raw left */
+#define KYRP_MIX_MQS_L1		(KYRP_MIXER+17) /* usb in muted by sidetone vox left */
+#define KYRP_MIX_MQS_L2		(KYRP_MIXER+18) /* sidetone  left */
 #define KYRP_MIX_MQS_L3		(KYRP_MIXER+19)
 #define KYRP_MIX_MQS_R0		(KYRP_MIXER+20) /* ditto for right channel */
 #define KYRP_MIX_MQS_R1		(KYRP_MIXER+21)
@@ -297,6 +329,7 @@
 
 #define KYRP_PAD_KEYER		(KYRP_KEYER+22) /* paddle keyer implementation */
 #define KYRP_HANG_TIME		(KYRP_KEYER+23) /* time in dits ptt should linger after key */
+#define KYRP_LEVEL		(KYRP_KEYER+24) /* sidetone level 0 .. 0x3FFF */
 
 /* four (or more) repetitions of the keyer block for per voice customizations */
 #define KYRP_VOX_0		(KYRP_KEYER+0*32) /* == 120 default */

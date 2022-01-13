@@ -79,6 +79,7 @@ static inline int get_vox_rise_time(int vox) { return get_vox_nrpn(vox, KYRP_RIS
 static inline int get_vox_rise_ramp(int vox) { return get_vox_nrpn(vox, KYRP_RISE_RAMP); }
 static inline int get_vox_fall_time(int vox) { return get_vox_nrpn(vox, KYRP_FALL_TIME); }
 static inline int get_vox_fall_ramp(int vox) { return get_vox_nrpn(vox, KYRP_FALL_RAMP); }
+static inline int get_vox_level(int vox) { return get_vox_nrpn(vox, KYRP_LEVEL); }
 
 /* keyer ptt parameters */
 static inline int get_vox_ptt_head(int vox) { return get_vox_nrpn(vox, KYRP_HEAD_TIME); }

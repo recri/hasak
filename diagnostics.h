@@ -44,7 +44,7 @@ static void sreport(void) {
   report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
   Serial.printf("%16s %2d %2d", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
-  Serial.printf("\n");
+  Serial.printf("pollcount %ld\n", _pollcount);
 }
 
 static void treport(const char *p) {
@@ -231,17 +231,20 @@ static int send_some_text(const char *text, AudioInputText& input) {
   return *text != 0 && input.valid_vox();
 }
 
+static uint8_t logging = 0;
+
 char debug_buffer[4][256];
 
 void diagnostics_setup() { totalTime = 0; }
 
 void diagnostics_loop() {
   // dump background debug messages
-  for (int i = 0; i < 4; i += 1)
-    if (debug_buffer[i][0] != 0) {
-      Serial.printf("%s\n", debug_buffer[i]);
-      debug_buffer[i][0] = 0;
-    }
+  if (logging)
+    for (int i = 0; i < 4; i += 1)
+      if (debug_buffer[i][0] != 0) {
+	Serial.printf("%s\n", debug_buffer[i]);
+	debug_buffer[i][0] = 0;
+      }
   if ( ! send_some_text(wink_send_ptr, wink)) wink_send_ptr = NULL;
   if ( ! send_some_text(kyr_send_ptr, kyr)) kyr_send_ptr = NULL;
   if (Serial.available()) {
@@ -259,6 +262,7 @@ void diagnostics_loop() {
 		    " a -> arbiter diagnostics\n"
 		    " b -> button diagnostics\n"
 		    " d -> debounce diagnostics\n"
+		    " l -> logging toggle\n"
 		    " w... -> send ... up to newline to wink keyer\n"
 		    " k... -> send ... up to newline to kyr keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
@@ -278,6 +282,7 @@ void diagnostics_loop() {
     case 'a': areport(); break; /* arbiter stats */
     case 'b': breport(); break; /* button stats */
     case 'd': dreport(); break; /* debounce stats */
+    case 'l': logging ^= 1; Serial.printf("logging %s\n", logging?"on":"off"); break;
     case 'w': wink_send_ptr = p+1; break;
     case 'k': kyr_send_ptr = p+1; break;
     case 'W': wink_send_ptr = lorem; break;

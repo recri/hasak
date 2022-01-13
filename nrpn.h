@@ -89,7 +89,9 @@ static void nrpn_update_keyer(uint8_t vox) {
   AudioInterrupts();
 }
 
-  
+// echo the nprn settings back to the control echo channel
+static void nrpn_echo(uint16_t nrpn, uint16_t value) {
+}  
 
 static void nrpn_report(const char *name, int16_t oldval, int16_t newval) {
   Serial.printf("%s %d to %d\n", name, oldval, newval);
@@ -106,44 +108,21 @@ static void nrpn_report(const char *name, int16_t oldval, int16_t newval) {
 static void nrpn_set(uint16_t nrpn, uint16_t value) {
   switch (nrpn) {
   case KYRP_HEAD_PHONE_VOLUME:
-    // inspecting the sgtl5000 source finds only 7-8bits of precision for this.
-    sgtl5000.volume(value/127.0); kyr_nrpn[nrpn] = value;  break; // fix.me - automate
   case KYRP_INPUT_SELECT:
-    sgtl5000.inputSelect(value); kyr_nrpn[nrpn] = value; break;
   case KYRP_MUTE_HEAD_PHONES:
-    if (value) sgtl5000.muteHeadphone(); else sgtl5000.unmuteHeadphone();    
-    kyr_nrpn[nrpn] = value;  break;
   case KYRP_MUTE_LINE_OUT:
-    if (value) sgtl5000.muteLineout(); else sgtl5000.unmuteLineout();
-    kyr_nrpn[nrpn] = value; break;
+  case KYRP_LINE_OUT_LEVEL_L:
+  case KYRP_LINE_OUT_LEVEL_R:
+  case KYRP_LINE_IN_LEVEL_L:
+  case KYRP_LINE_IN_LEVEL_R:
+  case KYRP_MIC_PREAMP_GAIN:
+    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_LINE_OUT_LEVEL:
     kyr_nrpn[KYRP_LINE_OUT_LEVEL_L] = kyr_nrpn[KYRP_LINE_OUT_LEVEL_R] = value;
-    sgtl5000.lineOutLevel(kyr_nrpn[KYRP_LINE_OUT_LEVEL_L],kyr_nrpn[KYRP_LINE_OUT_LEVEL_R]); break;
-  case KYRP_LINE_OUT_LEVEL_L:
-    kyr_nrpn[KYRP_LINE_OUT_LEVEL_L] = value;
-    sgtl5000.lineOutLevel(kyr_nrpn[KYRP_LINE_OUT_LEVEL_L],kyr_nrpn[KYRP_LINE_OUT_LEVEL_R]); break;
-  case KYRP_LINE_OUT_LEVEL_R:
-    kyr_nrpn[KYRP_LINE_OUT_LEVEL_R] = value;
-    sgtl5000.lineOutLevel(kyr_nrpn[KYRP_LINE_OUT_LEVEL_L],kyr_nrpn[KYRP_LINE_OUT_LEVEL_R]); break;
+    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_LINE_IN_LEVEL:
     kyr_nrpn[KYRP_LINE_IN_LEVEL_L] = kyr_nrpn[KYRP_LINE_IN_LEVEL_R] = value;
-    sgtl5000.lineInLevel(kyr_nrpn[KYRP_LINE_IN_LEVEL_L],kyr_nrpn[KYRP_LINE_IN_LEVEL_R]); break;
-  case KYRP_LINE_IN_LEVEL_L:
-    kyr_nrpn[KYRP_LINE_IN_LEVEL_L] = value;
-    sgtl5000.lineInLevel(kyr_nrpn[KYRP_LINE_IN_LEVEL_L],kyr_nrpn[KYRP_LINE_IN_LEVEL_R]); break;
-  case KYRP_LINE_IN_LEVEL_R:
-    kyr_nrpn[KYRP_LINE_IN_LEVEL_R] = value;
-    sgtl5000.lineInLevel(kyr_nrpn[KYRP_LINE_IN_LEVEL_L],kyr_nrpn[KYRP_LINE_IN_LEVEL_R]); break;
-  case KYRP_MIC_PREAMP_GAIN:
-    sgtl5000.micPreampGain(value);
-    kyr_nrpn[nrpn] = value; break;
-    // case KYRP_MIC_BIAS:
-    // sgtl5000.micBias(value);
-    // kyr_nrpn[nrpn] = value; break;
-    // case KYRP_MIC_IMPEDANCE:
-    // sgtl5000.micImpedance(value);
-    // kyr_nrpn[nrpn] = value; break;
-
+    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_BUTTON_0:
   case KYRP_BUTTON_1:
   case KYRP_BUTTON_2:
@@ -153,23 +132,33 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 #if defined(KYRP_RECV_MIDI)
   case KYRP_RECV_MIDI:
 #endif
-    kyr_nrpn[nrpn] = value;  break;
+    kyr_nrpn[nrpn] = value;
+    nrpn_echo(nrpn, value);
+    break;
   case KYRP_IQ_ENABLE: 
     // nrpn_report("IQ_ENABLE", kyr_nrpn[nrpn], value);
-    kyr_nrpn[nrpn] = value;  break;
+    kyr_nrpn[nrpn] = value;  
+    nrpn_echo(nrpn, value);
+    break;
   case KYRP_TX_ENABLE:
     // nrpn_report("TX_ENABLE", kyr_nrpn[nrpn], value);
-    kyr_nrpn[nrpn] = value;  break;
+    kyr_nrpn[nrpn] = value;
+    nrpn_echo(nrpn, value);
+    break;
   case KYRP_IQ_ADJUST:
     // case KYRP_ST_ENABLE:
   case KYRP_IQ_BALANCE:
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
   case KYRP_DEBOUNCE:
-    kyr_nrpn[nrpn] = value;  break;
+    kyr_nrpn[nrpn] = value;
+    nrpn_echo(nrpn, value);
+    break;
     
   case KYRP_ST_ENABLE: // Serial.printf("ST_ENABLE %d\n", value);
-    kyr_nrpn[nrpn] = value;  break;
+    kyr_nrpn[nrpn] = value;
+    nrpn_echo(nrpn, value);
+    break;
 
     // case KYRP_MORSE+(0..63):
     
@@ -180,125 +169,25 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME: \
   case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT: \
   case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS: \
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME: \
-    kyr_nrpn[nrpn] = value; break; \
+  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME: case VOXP+KYRP_LEVEL: \
+    kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
   case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS: \
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
+    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); nrpn_echo(nrpn, value); break;
     
     keyer_case(KYR_VOX_NONE, KYRP_VOX_0-KYRP_VOX_0);    // default keyer params
-
     keyer_case(KYR_VOX_TUNE, KYRP_VOX_1-KYRP_VOX_0);    // tune params
-
     keyer_case(KYR_VOX_S_KEY, KYRP_VOX_2-KYRP_VOX_0);    // straight key keyer params
-
     keyer_case(KYR_VOX_PAD, KYRP_VOX_3-KYRP_VOX_0);    // paddle keyer params
-
     keyer_case(KYR_VOX_WINK, KYRP_VOX_4-KYRP_VOX_0);    // winkey text keyer params
-
     keyer_case(KYR_VOX_KYR, KYRP_VOX_5-KYRP_VOX_0);    // kyr text keyer params
-
     keyer_case(KYR_VOX_KYR, KYRP_VOX_6-KYRP_VOX_0);    // button key params
     
-#if 0      
-    // default keyer params
-#define VOX KYR_VOX_NONE
-#define VOXP KYRP_VOX_0-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-
-    // tune params
-#define VOX KYR_VOX_TUNE
-#define VOXP KYRP_VOX_1-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-
-    // straight key keyer params
-#define VOX KYR_VOX_S_KEY
-#define VOXP KYRP_VOX_2-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-
-    // paddle keyer params
-#define VOX KYR_VOX_PAD
-#define VOXP KYRP_VOX_3-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-
-    // winkey text keyer params
-#define VOX KYR_VOX_WINK
-#define VOXP KYRP_VOX_4-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-
-    // kyr text keyer params
-#define VOX KYR_VOX_KYR
-#define VOXP KYRP_VOX_5-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-
-    // button key params
-#define VOX KYR_VOX_KYR
-#define VOXP KYRP_VOX_6-KYRP_VOX_0
-  case VOXP+KYRP_TONE: case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME:
-  case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: case VOXP+KYRP_PAD_MODE: case VOXP+KYRP_PAD_SWAP: case VOXP+KYRP_PAD_ADAPT:
-  case VOXP+KYRP_PER_DIT: case VOXP+KYRP_PER_DAH: case VOXP+KYRP_PER_IES: case VOXP+KYRP_PER_ILS: case VOXP+KYRP_PER_IWS:
-  case VOXP+KYRP_AUTO_ILS: case VOXP+KYRP_AUTO_IWS: case VOXP+KYRP_PAD_KEYER: case VOXP+KYRP_HANG_TIME:
-    kyr_nrpn[nrpn] = value; break;
-  case VOXP+KYRP_SPEED: case VOXP+KYRP_WEIGHT: case VOXP+KYRP_RATIO: case VOXP+KYRP_COMP: case VOXP+KYRP_FARNS:
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer(VOX); break;
-#undef VOX
-#undef VOXP
-#endif
-
   default: 
     if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) ||
 	(nrpn >= KYRP_MIXER && nrpn < KYRP_MIXER+24)) {
-      kyr_nrpn[nrpn] = value; break;
+      kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     }
     Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
-
   }
 }
 
@@ -311,9 +200,7 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 
 static void nrpn_setup(void) {
 
-  /* enable codec */
-  /* this causes a loud pop with cap coupled head phone outputs */
-  sgtl5000.enable();
+  codec_enable();
 
   /* mute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
@@ -330,7 +217,7 @@ static void nrpn_setup(void) {
 
   /* unmute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
-  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 40);
+  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 40*8*1024/100);
 
   /* soft controls */
   nrpn_set(KYRP_BUTTON_0, 6800);  /* off */
@@ -363,6 +250,7 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_COMP,0);
   nrpn_set(KYRP_FARNS,0);
   nrpn_set(KYRP_TONE,600);
+  nrpn_set(KYRP_LEVEL, 2048);
   nrpn_set(KYRP_RISE_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_FALL_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_RISE_RAMP, KYRP_RAMP_HANN);

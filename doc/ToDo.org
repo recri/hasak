@@ -1,3 +1,8 @@
+* Todo list as of 2022-01-13
+[ ] make default serial monitor start winkey when needed
+[ ] rewrite winkey without second serial monitor
+[ ] implement nrpn_echo
+[ ] write cwkeyer.js progressive web app controller
 * Todo list as of 2020-04-03
 [x] 2Serial+MIDI+Audio is possible, one Serial for winkeyer, one for monitor
 https://forum.pjrc.com/threads/66330-Dual-SerialUSB-and-MIDI-config-possible?highlight=teensy4+usb+midi
@@ -12,15 +17,15 @@ https://forum.pjrc.com/threads/66330-Dual-SerialUSB-and-MIDI-config-possible?hig
 	as the default values are the only useful ones
 [x] change ctrlr to match mic bias/mic impedance elimination	
 [x] split kyr_in_channel to differentiate kyr_cc_in and kyr_note_in, ditto out
-[ ] add channel and note configuration to nrpn's.
-[ ] add channel and note configuration to ctrlr.
+[ ] nrpn's: add channel and note configuration to .
+[ ] ctrlr: add channel and note configuration to .
 [ ] Implement winkey control of keyer.
-[ ] add winkeyer additional prosign characters.
-[ ] add winkeyer 1/2 dit additional space for |.
+[ ] winkeyer: add additional prosign characters.
+[x] winkeyer: add 1/2 dit additional space for |.
 [ ] add pause to text keyers.
-[ ] rewrite text keyers to use RingBuffer.
-[ ] implement XOFF 
-[ ] map Winkeyer paddle point to debounce.
+[x] rewrite text keyers to use RingBuffer.
+[ ] winkeyer: implement XOFF 
+[x] Winkeyer: map paddle switch point to debounce.
 [ ] simplify multiple banks of keyer voices down to Voice A and B, so you can have two voices
 	and switch between them to compare settings.
 [-] write web app to install hex files

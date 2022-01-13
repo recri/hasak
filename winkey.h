@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#if 1
+#if 0
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 // Teensy keyer with audio (WinKey emulator)
