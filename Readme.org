@@ -22,6 +22,16 @@
    continuous tone, and sometimes I get a working keyer.  Not sure
    what causes it, but it generally goes away with a few rounds of
    unplugging and replugging the USB cable or a fresh download.
+** Yet to be done
+*** Winkey emulation
+   most of the code is there, but it's not hooked up.  I'll be
+   dependent on others for testing.
+*** Midi controller	
+   I'm working on a web app that will query and set keyer parameters.
+*** Other hardware   
+   The code should be able to run on a bare Teensy3, a Teensy3+AudioAdapter,
+   a bare Teensy4, and a Teensy4+AudioAdapter, but I need to rebuild the
+   variants to test that those still work.
 ** Hasak details
    All of the timing and sequencing happens inside the Teensy Audio
    Library processing loop with sample accuracy. The pins which

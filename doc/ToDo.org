@@ -3,6 +3,7 @@
 [ ] rewrite winkey without second serial monitor
 [ ] implement nrpn_echo
 [ ] write cwkeyer.js progressive web app controller
+[ ] verify bare Teensy3/4 and Teensy3/4+AudioAdapter
 * Todo list as of 2020-04-03
 [x] 2Serial+MIDI+Audio is possible, one Serial for winkeyer, one for monitor
 https://forum.pjrc.com/threads/66330-Dual-SerialUSB-and-MIDI-config-possible?highlight=teensy4+usb+midi
