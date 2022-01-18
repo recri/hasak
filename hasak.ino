@@ -55,7 +55,9 @@
 // inputs
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
+#if defined(KYRC_ENABLE_ADC_IN)
 AudioInputAnalog	adc_in;	// headset switch detect
+#endif
 AudioSynthWaveformDc	tune;	// tune switch
 AudioInputByte		s_key;	// straight key in
 AudioInputByte		l_pad;	// left paddle in
@@ -71,7 +73,9 @@ AudioConnection         patchCord1b(r_pad, 0, paddle, 1);
 
 // button discriminator
 AudioEffectButton	button;
+#if defined(KYRC_ENABLE_ADC_IN)
 AudioConnection		patchCord1c(adc_in, 0, button, 0);
+#endif
 
 // arbitration
 AudioEffectArbiter	arbiter;
@@ -198,6 +202,7 @@ AudioOutputI2S          i2s_out;
 AudioConnection		patchCord11c(l_i2s_out, 0, i2s_out, 0);
 AudioConnection		patchCord11d(r_i2s_out, 0, i2s_out, 1);
 
+#if defined(KYRC_ENABLE_HDW_OUT)
 #if defined(TEENSY31) || defined(TEENSY32)
 AudioOutputAnalog	hdw_out;
 AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);
@@ -211,6 +216,7 @@ AudioConnection		patchCord11f(r_hdw_out, 0, hdw_out, 1);
 AudioOutputMQS		hdw_out;
 AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);
 AudioConnection		patchCord11f(r_hdw_out, 0, hdw_out, 1);
+#endif
 #endif
 
 // codec control

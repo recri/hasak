@@ -61,8 +61,16 @@ static void Sreport(void) {
   // report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max, AudioMemoryUsage(), AudioMemoryUsageMax(), 0, 0);
   // report("denom", cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax, 0, 0, 0, 0);
   sreport();
+#if defined(KYRC_ENABLE_ADC_IN)
   mreport("i2s_in", i2s_in);       mreport("usb_in", usb_in);       mreport("adc_in", adc_in);   Serial.println();
+#else
+  mreport("i2s_in", i2s_in);       mreport("usb_in", usb_in);       Serial.println();
+#endif
+#if defined(KYRC_ENABLE_HDW_OUT)
   mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);     mreport("hdw_out", hdw_out); Serial.println();
+#else
+  mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);	    Serial.println();
+#endif
   mreport("l_pad", l_pad);         mreport("r_pad", r_pad);         mreport("s_key", s_key);     Serial.println();
   mreport("ptt sw", ptt_sw);       mreport("winkey", wink);         mreport("kyr", kyr);         Serial.println();
   mreport("paddle", paddle);       mreport("button", button);       mreport("arbiter", arbiter); Serial.println();
@@ -90,7 +98,9 @@ static void Sreset(void) {
   sreset();
   mreset(i2s_in);
   mreset(usb_in);
+#if defined(KYRC_ENABLE_ADC_IN)
   mreset(adc_in);
+#endif
   mreset(l_pad);
   mreset(r_pad);
   mreset(s_key);

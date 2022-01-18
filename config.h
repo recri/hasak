@@ -40,6 +40,12 @@
 /* potentiometer input */
 #define KYRC_ENABLE_POTS 1	/* Should we read potentiometers for volume, pitch, and speed */
 
+/* enable hardware output */
+//#define KYRC_ENABLE_HDW_OUT 1
+
+/* enable hardware input */
+//#define KYRC_ENABLE_ADC_IN 1
+
 /* decide which Teensy we're running on */
 #if defined(TEENSYDUINO)
   #if defined(ARDUINO_TEENSY40)
