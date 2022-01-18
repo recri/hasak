@@ -136,17 +136,11 @@
 #define KYR_EXT_PTT_PIN	3	// [x] CWKeyer proto
 #define KYR_KEY_OUT_PIN	4	// [x] CWKeyer proto
 #define KYR_PTT_OUT_PIN	5	// [x] CWKeyer proto
+
 #define KYR_VOLUME_POT	A1	// [x] CWKeyer proto = 
 #define KYR_ST_VOL_POT	A2	// [x] CWKeyer proto =
 #define KYR_ST_FREQ_POT	A3	// [x] CWKeyer proto =
 #define KYR_SPEED_POT	A8	// [x] CWKeyer proto = 22!
-
-/*
-** whether to enable potentiometers or not
-*/
-//#define KYR_SHIFT_POTS  5	// right shift adc results to clear noise
-//#define KYR_SKIP_READ	1	// reads to skip
-//#define KYR_AVG_READ	2	// reads to average
 
 /*
 ** whether to enable line level inputs/outputs
@@ -174,12 +168,12 @@
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYRC_CC_CHAN_IN		1	/* default input channel used for keyer */
-#define KYRC_CC_CHAN_OUT	1	/* default output channel used for keyer */
-#define KYRC_NOTE_IN_CHAN_OUT	1
-#define KYRC_NOTE_OUT_CHAN_OUT	1
-#define KYRC_NOTE_IN_CHAN_IN	0
-#define KYRC_NOTE_OUT_CHAN_IN	0
+#define KYRC_CC_CHAN_RECV	1	/* default input channel  for keyer control change */
+#define KYRC_CC_CHAN_SEND	1	/* default output channel for keyer control change */
+#define KYRC_NOTE_IN_CHAN_SEND	1	/* default output channel for keyer input notes */
+#define KYRC_NOTE_OUT_CHAN_SEND	1	/* default output channel for keyer output notes */
+#define KYRC_NOTE_IN_CHAN_RECV	0	/* default input channel for keyer input notes */
+#define KYRC_NOTE_OUT_CHAN_RECV	0	/* default input channel for keyer output notes */
 
 /*
 ** midi note usage
@@ -266,12 +260,12 @@
 #define KYRP_ST_PAN		(KYRP_SOFT+14) /* pan sidetone left or right */
 #define KYRP_DEBOUNCE		(KYRP_SOFT+15) /* debounce period in ms/10 */
 
-#define KYRP_CC_CHAN_OUT	(KYRP_SOFT+16) /* midi channel for sending controls */
-#define KYRP_CC_CHAN_IN		(KYRP_SOFT+17) /* midi channle for receiving controls */
-#define KYRP_NOTE_IN_CHAN_OUT	(KYRP_SOFT+18) /* midi channel for sending notes */
-#define KYRP_NOTE_OUT_CHAN_OUT	(KYRP_SOFT+19) /* midi channel for sending notes */
-#define KYRP_NOTE_IN_CHAN_IN	(KYRP_SOFT+20) /* midi channle for receiving notes */
-#define KYRP_NOTE_OUT_CHAN_IN	(KYRP_SOFT+21) /* midi channle for receiving notes */
+#define KYRP_CC_CHAN_SEND	(KYRP_SOFT+16) /* midi channel for sending controls */
+#define KYRP_CC_CHAN_RECV	(KYRP_SOFT+17) /* midi channle for receiving controls */
+#define KYRP_NOTE_IN_CHAN_SEND	(KYRP_SOFT+18) /* midi channel for sending notes */
+#define KYRP_NOTE_OUT_CHAN_SEND	(KYRP_SOFT+19) /* midi channel for sending notes */
+#define KYRP_NOTE_IN_CHAN_RECV	(KYRP_SOFT+20) /* midi channle for receiving notes */
+#define KYRP_NOTE_OUT_CHAN_RECV	(KYRP_SOFT+21) /* midi channle for receiving notes */
 
 #define KYRP_VERSION		(KYRP_SOFT+22) /* version of hasak nrpn set */
 

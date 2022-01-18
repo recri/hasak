@@ -10,8 +10,9 @@
 [x] separate nrpn_set_defaults() from nrpn_setup()
 [x] implement nrpn_echo
 [x] make output notes configurable
-[ ] rename KYR_ to KYRC_ if configurable
-[ ] give voices their own notes
+[-] rename KYR_ to KYRC_ if configurable
+[x] better names for KYRP_NOTE_(IN|OUT)_CHAN_(IN|OUT)
+[x] give voices their own notes
 	better to simply send 1+vox as velocity for noteOn?
 [ ] use a logarithmic ramp for volumes
 [ ] make pot pins configurable.
@@ -28,6 +29,7 @@
 [ ]	 for keying a character on wink
 [ ] plug a phone headset into a splitter and into microphone jack
 	and see if you read ExT_PTT
+[ ] make a key/ptt led indicator for the key/ptt output jack
 [x] rename PTT_SW as EXT_PTT.
 [ ] annotate config.h for postprocessing into javascript
 [ ] solve the initialization bug
