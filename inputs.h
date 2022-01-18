@@ -5,8 +5,8 @@ static void input_setup(void) {
   pinMode(KYR_ST_VOL_POT, INPUT);
   pinMode(KYR_ST_FREQ_POT, INPUT);
   pinMode(KYR_SPEED_POT, INPUT);
-  analogReadRes(12);		/* 12 bits of resolution */
-  analogReadAveraging(32);	/* 32 hardware read (maximum) averaging,  */
+  // analogReadRes(12);		/* 12 bits of resolution */
+  // analogReadAveraging(32);	/* 32 hardware read (maximum) averaging,  */
 #endif
 }
 
@@ -16,7 +16,7 @@ static int read_pot(int pin, int *cooked) {
   // bin down to 8 bit values with hysteresis
   // multiply back up to 14 bit values
   const int S1 = 4, S2 = S1+2;	/* bin at 8 bits */
-  int raw = analogRead(pin);
+  int raw = analogRead(pin)+analogRead(pin)+analogRead(pin)+analogRead(pin);
   int rawbin = raw >> S1, cookedbin = *cooked >> S2;
   if (rawbin > cookedbin+1) {
     *cooked = ((rawbin-1)<<S2);
