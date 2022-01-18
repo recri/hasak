@@ -103,8 +103,8 @@ static void midi_loop(void) {
   int send = get_send_midi();
   if (send) {
     static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
-    int send_input = send == KYRP_SM_INPUT || send == KYRP_SM_BOTH;
-    int send_output = send == KYRP_SM_OUTPUT || send == KYRP_SM_BOTH;
+    int send_input = send == KYRV_SM_INPUT || send == KYRV_SM_BOTH;
+    int send_output = send == KYRV_SM_OUTPUT || send == KYRV_SM_BOTH;
     if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYR_L_PAD_NOTE, send_input);
     if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYR_R_PAD_NOTE, send_input);
     if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYR_S_KEY_NOTE, send_input);

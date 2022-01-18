@@ -172,7 +172,7 @@ public:
 
       case KEYED:	// Wait for timer to expire
 	if ((_keyerDuration -= ticks) > 0) {
-	  if (pad_mode() == KYRP_MODE_B) update_PaddleLatch(dit_on, dah_on);	// early paddle latch in Iambic B mode
+	  if (pad_mode() == KYRV_MODE_B) update_PaddleLatch(dit_on, dah_on);	// early paddle latch in Iambic B mode
 	  return _keyOut;
 	}
 	_keyOut = 0;	       // key is off

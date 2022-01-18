@@ -60,7 +60,7 @@ class KeyerAd5dz : public KeyerGeneric {
     case KEYER_DIT: keyOut = 1; memToOff(); break;
     case KEYER_DAH: keyOut = 1; memToOff(); break;
     case KEYER_DIT_SPACE: // fall through
-    case KEYER_DAH_SPACE: keyOut = 0; if (key == KEY_OFF && pad_mode() == KYRP_MODE_A) memToOff(); break;
+    case KEYER_DAH_SPACE: keyOut = 0; if (key == KEY_OFF && pad_mode() == KYRV_MODE_A) memToOff(); break;
     case KEYER_SYMBOL_SPACE: memToOff(); break;
     case KEYER_WORD_SPACE: break;
       // default: fprintf(stderr, "uncaught case %d in transitionTo()", newState);

@@ -117,10 +117,10 @@ void AudioEffectPaddle::update(void)
   int16_t *pa, *pb, *pc, *end;
 
   switch (get_vox_pad_keyer(vox)) {
-  case KYRP_KEYER_AD5DZ: keyer = &ad5dz; break;
-  case KYRP_KEYER_K1EL: keyer = &k1el; break;
-  case KYRP_KEYER_ND7PA: keyer = &nd7pa; break;
-  case KYRP_KEYER_VK6PH: keyer = &vk6ph; break;
+  case KYRV_KEYER_AD5DZ: keyer = &ad5dz; break;
+  case KYRV_KEYER_K1EL: keyer = &k1el; break;
+  case KYRV_KEYER_ND7PA: keyer = &nd7pa; break;
+  case KYRV_KEYER_VK6PH: keyer = &vk6ph; break;
   }
   blocka = receiveReadOnly(0);
   pa = blocka ? blocka->data : (int16_t *)zeros;

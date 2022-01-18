@@ -86,12 +86,12 @@ public:
     // I may have USB and LSB swapped
     switch (get_iq_enable()) {
     default:
-    case KYRP_IQ_NONE: 
-    case KYRP_IQ_USB: 
+    case KYRV_IQ_NONE: 
+    case KYRV_IQ_USB: 
       phase_I = +45.0 * (4294967296.0 / 360.0);
       phase_Q = (360-45.0) * (4294967296.0 / 360.0);
       break;
-    case KYRP_IQ_LSB: 
+    case KYRV_IQ_LSB: 
       phase_I = (360-45.0) * (4294967296.0 / 360.0);
       phase_Q = +45.0 * (4294967296.0 / 360.0); 
       break;
@@ -115,9 +115,9 @@ public:
   const int16_t *get_table(int16_t ramp) {
     switch (ramp) {
     default:
-    case KYRP_RAMP_HANN: return hann_ramp;
-    case KYRP_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
-    case KYRP_RAMP_LINEAR: return linear_ramp;
+    case KYRV_RAMP_HANN: return hann_ramp;
+    case KYRV_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
+    case KYRV_RAMP_LINEAR: return linear_ramp;
     }
   }
   // get the interpolated ramp value at pos

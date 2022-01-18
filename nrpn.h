@@ -225,7 +225,7 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_BUTTON_2, -1800); /* up */
   nrpn_set(KYRP_BUTTON_3, -500);  /* down */
   nrpn_set(KYRP_BUTTON_4, -2250); /* hey google */
-  nrpn_set(KYRP_SEND_MIDI, KYRP_SM_BOTH);
+  nrpn_set(KYRP_SEND_MIDI, KYRV_SM_BOTH);
 #if defined(KYRP_RECV_MIDI)
   nrpn_set(KYRP_RECV_MIDI, 0);
 #endif
@@ -253,17 +253,17 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_LEVEL, 64);
   nrpn_set(KYRP_RISE_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_FALL_TIME, 50);	// 5.0 ms
-  nrpn_set(KYRP_RISE_RAMP, KYRP_RAMP_HANN);
-  nrpn_set(KYRP_FALL_RAMP, KYRP_RAMP_HANN);
+  nrpn_set(KYRP_RISE_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(KYRP_FALL_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_TAIL_TIME, 0);	// 0 ms
   nrpn_set(KYRP_HEAD_TIME, 0);	// 0 ms
   nrpn_set(KYRP_HANG_TIME, 8);	/* 8 dits */
-  nrpn_set(KYRP_PAD_MODE, KYRP_MODE_A);
+  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
-  nrpn_set(KYRP_PAD_ADAPT, KYRP_ADAPT_NORMAL);
-  nrpn_set(KYRP_PAD_KEYER, KYRP_KEYER_ND7PA);
+  nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
+  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_ND7PA);
   nrpn_set(KYRP_HANG_TIME, 7);
   
   /* voice specializations */
-  for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRP_NOT_SET;
+  for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;
 }

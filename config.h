@@ -361,42 +361,41 @@
 
 /* 
 ** these are named NRPN values
-** should be refactored to be named KYRV_* instead of KYRP_*
 */
 
 /* the unset value */
-#define KYRP_NOT_SET			-1
+#define KYRV_NOT_SET			-1
 
 /* slew ramps, values of KYRP_RISE_RAMP and KYRP_FALL_RAMP */
-#define KYRP_RAMP_HANN			0 /* ramp from Hann window, raised cosine */
-#define KYRP_RAMP_BLACKMAN_HARRIS	1 /* ramp from Blackman Harris window */
-#define KYRP_RAMP_LINEAR		2 /* linear ramp, for comparison */
+#define KYRV_RAMP_HANN			0 /* ramp from Hann window, raised cosine */
+#define KYRV_RAMP_BLACKMAN_HARRIS	1 /* ramp from Blackman Harris window */
+#define KYRV_RAMP_LINEAR		2 /* linear ramp, for comparison */
 
 /* paddle keyer modes, values of KYRP_PAD_MODE */
-#define KYRP_MODE_A			0 /* iambic mode A */
-#define KYRP_MODE_B			1 /* iambic mode  */
-#define KYRP_MODE_S			2 /* bug mode */
+#define KYRV_MODE_A			0 /* iambic mode A */
+#define KYRV_MODE_B			1 /* iambic mode  */
+#define KYRV_MODE_S			2 /* bug mode */
 
 /* paddle adapter modes, values of KYRP_PAD_ADAPT */
-#define KYRP_ADAPT_NORMAL		0 /* unmodified input paddles */
-#define KYRP_ADAPT_ULTIMATIC		1 /* modified to produce ultimatic */
-#define KYRP_ADAPT_SINGLE		2 /* modified to simulate single lever paddle */
+#define KYRV_ADAPT_NORMAL		0 /* unmodified input paddles */
+#define KYRV_ADAPT_ULTIMATIC		1 /* modified to produce ultimatic */
+#define KYRV_ADAPT_SINGLE		2 /* modified to simulate single lever paddle */
 
 /* paddle keyers, values of KYRP_PAD_KEYER */
-#define KYRP_KEYER_AD5DZ		0 /* iambic keyer by ad5dz */
-#define KYRP_KEYER_K1EL			1 /* iambic keyer by k1el */
-#define KYRP_KEYER_ND7PA		2 /* iambic keyer by nd7pa */
-#define KYRP_KEYER_VK6PH		3 /* iambic keyer by vk6ph */
+#define KYRV_KEYER_AD5DZ		0 /* iambic keyer by ad5dz */
+#define KYRV_KEYER_K1EL			1 /* iambic keyer by k1el */
+#define KYRV_KEYER_ND7PA		2 /* iambic keyer by nd7pa */
+#define KYRV_KEYER_VK6PH		3 /* iambic keyer by vk6ph */
 
 /* iq enable modes, values of KYRP_IQ_ENABLE */
-#define KYRP_IQ_NONE			0 /* no IQ */
-#define KYRP_IQ_LSB			1 /* IQ for lower sideband */
-#define KYRP_IQ_USB			2 /* IQ for upper sideband */
+#define KYRV_IQ_NONE			0 /* no IQ */
+#define KYRV_IQ_LSB			1 /* IQ for lower sideband */
+#define KYRV_IQ_USB			2 /* IQ for upper sideband */
 
 /* send midi enable modes, values KYRP_SEND_MIDI */
-#define KYRP_SM_NONE			0 /* no midi */
-#define KYRP_SM_OUTPUT			1 /* send output key events */
-#define KYRP_SM_INPUT			2 /* send input key events */
-#define KYRP_SM_BOTH			3 /* send input and output events */
+#define KYRV_SM_NONE			0 /* no midi */
+#define KYRV_SM_OUTPUT			1 /* send output key events */
+#define KYRV_SM_INPUT			2 /* send input key events */
+#define KYRV_SM_BOTH			3 /* send input and output events */
 
 #endif
