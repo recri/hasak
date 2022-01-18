@@ -230,6 +230,11 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_PAN, 8096);
   nrpn_set(KYRP_DEBOUNCE, 50);
   
+  nrpn_set(KYRP_CC_CHAN_IN, KYR_CC_IN_CHANNEL);
+  nrpn_set(KYRP_CC_CHAN_OUT, KYR_CC_OUT_CHANNEL);
+  nrpn_set(KYRP_NOTE_CHAN_IN, KYR_NOTE_IN_CHANNEL);
+  nrpn_set(KYRP_NOTE_CHAN_OUT, KYR_NOTE_OUT_CHANNEL);
+
   /* morse code table */
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
     nrpn_set(i, morse[i-KYRP_MORSE]);
@@ -276,6 +281,7 @@ static void nrpn_write_eeprom(void) {
 }
 
 static int nrpn_read_eeprom(void) {
+  return 0;
 }
 
 static void nrpn_setup(void) {

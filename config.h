@@ -223,10 +223,10 @@
 */
 
 /* NRPN_GLOBAL_BLOCK - parameters controlling the entire keyer */
-#define KYRP_GLOBAL		0
+#define KYRP_GLOBAL		0		/* relocation */
 
 /* relocation base */
-#define KYRP_CODEC		(KYRP_GLOBAL)	/* relocation base = 0 */
+#define KYRP_CODEC		(KYRP_GLOBAL)	/* relocation -> */
 #define KYRP_HEAD_PHONE_VOLUME	(KYRP_CODEC+0)	/* sgl5000 output volume */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1)	/* 0..1 input from microphone or line-in */
 #define KYRP_MIC_PREAMP_GAIN	(KYRP_CODEC+2)	/* 0-3 -> 0, 20, 30, 40 dB */
@@ -242,7 +242,7 @@
 //#define KYRP_MIC_IMPEDANCE	(KYRP_CODEC+12)	/* 0..3, 0 off, else 2^n kilohm */
 
 /* relocation base */
-#define KYRP_SOFT		(KYRP_CODEC+16) /* == 16 */
+#define KYRP_SOFT		(KYRP_CODEC+16) /* relocation -> */
 /* other things that we might control */
 #define KYRP_BUTTON_0		(KYRP_SOFT+0) /* headset button 0 - none pressed */
 #define KYRP_BUTTON_1		(KYRP_SOFT+1) /* headset button 1 - center or only pressed */
@@ -260,38 +260,43 @@
 #define KYRP_ST_PAN		(KYRP_SOFT+13) /* pan sidetone left or right */
 #define KYRP_DEBOUNCE		(KYRP_SOFT+14) /* debounce period in ms/10 */
 
+#define KYRP_CC_CHAN_OUT	(KYRP_SOFT+15) /* midi channel for sending controls */
+#define KYRP_CC_CHAN_IN		(KYRP_SOFT+16) /* midi channle for receiving controls */
+#define KYRP_NOTE_CHAN_OUT	(KYRP_SOFT+17) /* midi channel for sending notes */
+#define KYRP_NOTE_CHAN_IN	(KYRP_SOFT+18) /* midi channle for receiving notes */
+
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
 /* lower case alpha are mapped to upper case on input */
 /* relocation base */
-#define KYRP_MORSE		(KYRP_SOFT+16) /* == 32 */
+#define KYRP_MORSE		(KYRP_SOFT+32) /* relocation -> */
 
 /* 24 output mixer levels */
 /* left and right channel mixers for four channels for each of usb_out, i2s_out, and mqs_out */
 /* the incoming channels are usb_in audio raw, usb_in audio muted by sidetone, i2s in audio, sidetone */
 /* relocation base */
-#define KYRP_MIXER		(KYRP_MORSE+64) /* == 96 */
+#define KYRP_MIXER		(KYRP_MORSE+64) /* relocation -> */
 
-#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* i2s in raw left */
-#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* i2s in unmuted by ptt_sw left */
-#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* sidetone left */
-#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)
+#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* i2s_in left */
+#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* sidetone left */
+#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* IQ left */
+#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)  /* usb_in */
 #define KYRP_MIX_USB_R0		(KYRP_MIXER+4)  /* ditto for right channel */
 #define KYRP_MIX_USB_R1		(KYRP_MIXER+5)
 #define KYRP_MIX_USB_R2		(KYRP_MIXER+6)
 #define KYRP_MIX_USB_R3		(KYRP_MIXER+7)
-#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* usb in raw left */
-#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* usb in muted by sidetone vox left */
-#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* sidetone left */
-#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11)
+#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* usb_in left */
+#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* sidetone left */
+#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* IQ left */
+#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11) /* i2s_in left */
 #define KYRP_MIX_I2S_R0		(KYRP_MIXER+12) /* ditto for right channel */
 #define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)
 #define KYRP_MIX_I2S_R2		(KYRP_MIXER+14)
 #define KYRP_MIX_I2S_R3		(KYRP_MIXER+15)
-#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* usb in raw left */
-#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* usb in muted by sidetone vox left */
-#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* sidetone  left */
-#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19)
+#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* usb_in left */
+#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* sidetone left */
+#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* IQ left */
+#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19) /* i2s_in left */
 #define KYRP_MIX_HDW_R0		(KYRP_MIXER+20) /* ditto for right channel */
 #define KYRP_MIX_HDW_R1		(KYRP_MIXER+21)
 #define KYRP_MIX_HDW_R2		(KYRP_MIXER+22)
@@ -300,7 +305,7 @@
 /* NRPN_KEYER_BLOCK - default keyer parameters */
 /* these are NRPN's which apply to keyer voices, some voices do not use all of them */
 /* relocation base */
-#define KYRP_KEYER		(KYRP_MIXER+24) /* == 120 */
+#define KYRP_KEYER		(KYRP_MIXER+24) /* relocation -> */
 
 /* keyer timing */
 #define KYRP_SPEED		(KYRP_KEYER+0)	/* keyer speed control */
@@ -341,16 +346,15 @@
 #define KYRP_LEVEL		(KYRP_KEYER+24) /* sidetone level 0 .. 0x3FFF */
 
 /* four (or more) repetitions of the keyer block for per voice customizations */
-#define KYRP_VOX_0		(KYRP_KEYER+0*32) /* == 120 default */
-#define KYRP_VOX_1		(KYRP_KEYER+1*32) /* == 152 tune */
-#define KYRP_VOX_2		(KYRP_KEYER+2*32) /* == 184 straight key */
-#define KYRP_VOX_3		(KYRP_KEYER+3*32) /* == 216 paddle */
-#define KYRP_VOX_4		(KYRP_KEYER+4*32) /* == 248 text from winkey */
-#define KYRP_VOX_5		(KYRP_KEYER+5*32) /* == 280 text from keyer */
-#define KYRP_VOX_6		(KYRP_KEYER+6*32) /* == 312 headset button */
+#define KYRP_VOX_0		(KYRP_KEYER+0*32) /* relocation -> default keyer */
+#define KYRP_VOX_1		(KYRP_KEYER+1*32) /* relocation -> tune keyer */
+#define KYRP_VOX_2		(KYRP_KEYER+2*32) /* relocation ->  straight key */
+#define KYRP_VOX_3		(KYRP_KEYER+3*32) /* relocation -> paddle */
+#define KYRP_VOX_4		(KYRP_KEYER+4*32) /* relocation -> text from winkey */
+#define KYRP_VOX_5		(KYRP_KEYER+5*32) /* relocation -> text from keyer */
+#define KYRP_VOX_6		(KYRP_KEYER+6*32) /* relocation -> headset button */
 
-/* sgtl5000 control */
-#define KYRP_LAST		(KYRP_KEYER+7*32) /* == 344 */
+#define KYRP_LAST		(KYRP_KEYER+7*32) /* relocation */
 
 /* nrpn MSB numbers, bank select, not quite yet */
 #define KYRP_VOX_OFFSET		32

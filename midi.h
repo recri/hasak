@@ -1,20 +1,15 @@
 /***************************************************************
 ** MIDI input handling.
 ***************************************************************/
-/*
-** this could be a NRPN, too, but the penalty for screwing it up
-** could be pretty fierce.  it could also be split into different
-** channels for receive and send.
-*/
-static uint8_t kyr_cc_in_channel = KYR_CC_IN_CHANNEL;
-static uint8_t kyr_cc_out_channel = KYR_CC_OUT_CHANNEL;
-static uint8_t kyr_note_in_channel = KYR_NOTE_IN_CHANNEL;
-static uint8_t kyr_note_out_channel = KYR_NOTE_OUT_CHANNEL;
 
 static uint32_t kyr_recv_note = 0;
 static uint32_t kyr_send_note = 0;
 static uint32_t kyr_recv_nrpn = 0;
 static uint32_t kyr_send_nrpn = 0;
+
+static int midi_valid_channel(const int channel) { return channel > 0 && channel <= 16; }
+
+static int midi_valid_note(const int note) { return note >= 0 && note <= 127; }
 
 #ifdef KYRP_RECV_MIDI
 /*
@@ -24,9 +19,9 @@ static uint32_t kyr_send_nrpn = 0;
 ** receive a note on event and do something with it.
 ** only if KYRP_RECV_MIDI is enabled and it's on our channel.
 */
-static void myNoteOn(byte channel, byte note, byte velocity) {
+static void midi_note_on(byte channel, byte note, byte velocity) {
   kyr_recv_note += 1;
-  if (get_recv_midi() && (channel == kyr_in_channel)) {
+  if (get_recv_midi() && (channel == get_nrpn(KYRP_CC_CHAN_IN))) {
     switch (note) {
     case KYR_L_PAD_NOTE:      /* note used to report raw left paddle switch */
       digitalWrite(KYR_L_PAD_PIN, velocity == 0); break;
@@ -46,12 +41,12 @@ static void myNoteOn(byte channel, byte note, byte velocity) {
   }
 }
 
-static void myNoteOff(byte channel, byte note, byte velocity) {
-  myNoteOn(channel, note, 0);
+static void midi_note_off(byte channel, byte note, byte velocity) {
+  midi_note_on(channel, note, 0);
 }
 #endif
 
-static void myControlChange(byte channel, byte control, byte value) {
+static void midi_receive_nrpn(byte channel, byte control, byte value) {
   /*
   ** handle NRPN format
   ** the canned ctrlr format sends MSB, LSB
@@ -59,7 +54,7 @@ static void myControlChange(byte channel, byte control, byte value) {
   */
   static uint16_t cc_nrpn, cc_value;
 
-  if (channel == kyr_cc_in_channel)
+  if (channel == get_nrpn(KYRP_CC_CHAN_IN))
     switch (control) {
     case KYR_CC_MSB:	/* Data Entry (MSB) */
       cc_value = (value&127)<<7;
@@ -68,6 +63,7 @@ static void myControlChange(byte channel, byte control, byte value) {
       kyr_recv_nrpn += 1;
       cc_value |= value&127;
       nrpn_set(cc_nrpn, cc_value); 
+      kyr_recv_nrpn += 1;
       break;
     case KYR_CC_NRPN_MSB:	/* Non-registered Parameter (MSB) */
       cc_nrpn = (value&127)<<7;
@@ -80,20 +76,32 @@ static void myControlChange(byte channel, byte control, byte value) {
     }
 }
 
+static void midi_send_nrpn(const int nrpn, const int value) {
+  int channel = get_nrpn(KYRP_CC_CHAN_OUT);
+  if (midi_valid_channel(channel)) {
+    usbMIDI.sendControlChange(KYR_CC_NRPN_MSB, (nrpn>>7)&127, channel);
+    usbMIDI.sendControlChange(KYR_CC_NRPN_LSB, nrpn&127, channel);
+    usbMIDI.sendControlChange(KYR_CC_MSB, (value>>7)&127, channel);
+    usbMIDI.sendControlChange(KYR_CC_LSB, value&127, channel);
+    kyr_send_nrpn += 1;
+  }
+}
+
 static void midi_setup(void) {
 #ifdef KYRP_RECV_MIDI
-  usbMIDI.setHandleNoteOn(myNoteOn);
-  usbMIDI.setHandleNoteOff(myNoteOff);
+  usbMIDI.setHandleNoteOn(midi_note_on);
+  usbMIDI.setHandleNoteOff(midi_note_off);
 #endif
-  usbMIDI.setHandleControlChange(myControlChange);
+  usbMIDI.setHandleControlChange(midi_receive_nrpn);
 }
 
 static uint8_t midi_send_toggle(uint8_t pin, uint8_t note, uint8_t send) {
   // if the pin was high, then it went low, and is now active, so send velocity 1
   // if the pin was low, then it went high, and is now off, so send velocity 0
-  if (send) {
+  int channel = get_nrpn(KYRP_NOTE_CHAN_OUT);
+  if (send && midi_valid_channel(channel)) {
     kyr_send_note += 1;
-    usbMIDI.sendNoteOn(note, pin, kyr_note_out_channel);
+    usbMIDI.sendNoteOn(note, pin, channel);
     usbMIDI.send_now();		// send it now
   }
   return pin ^ 1;		// invert the pin
