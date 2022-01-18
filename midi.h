@@ -29,8 +29,8 @@ static void midi_note_on(byte channel, byte note, byte velocity) {
       digitalWrite(KYR_R_PAD_PIN, velocity == 0); break;
     case KYR_S_KEY_NOTE:      /* note used to report raw straight key switch */
       digitalWrite(KYR_S_KEY_PIN, velocity == 0); break;
-    case KYR_PTT_SW_NOTE:      /* note used to report raw ptt switch */
-      digitalWrite(KYR_PTT_SW_PIN, velocity == 0); break;
+    case KYR_EXT_PTT_NOTE:      /* note used to report raw ptt switch */
+      digitalWrite(KYR_EXT_PTT_PIN, velocity == 0); break;
     case KYR_KEY_OUT_NOTE:      /* note used to send external key signal */
       digitalWrite(KYR_KEY_OUT_PIN, velocity == 0); break;
     case KYR_PTT_OUT_NOTE:      /* note used to send external ptt signal */
@@ -116,7 +116,7 @@ static void midi_loop(void) {
     if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYR_L_PAD_NOTE, send_input);
     if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYR_R_PAD_NOTE, send_input);
     if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYR_S_KEY_NOTE, send_input);
-    if (digitalRead(KYR_PTT_SW_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYR_PTT_SW_NOTE, send_input);
+    if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYR_EXT_PTT_NOTE, send_input);
     if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYR_KEY_OUT_NOTE, send_output);
     if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYR_PTT_OUT_NOTE, send_output);
   }

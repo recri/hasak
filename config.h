@@ -30,6 +30,9 @@
 /* KYRP_* are parameter numbers */
 /* KYRV_* are parameter values */
 
+/* Version of hasak */
+#define KYRC_VERSION 100
+
 /* per sample interrupt source */
 //#define KYRC_USE_LRCLK	1	/* Should we use LRCLK directly for 48k interrupts/second */
 //#define KYRC_DUP_LRCLK	1	/* Should we duplicate LRCLK to another pin for 48k interrupts/second */
@@ -130,7 +133,7 @@
 #define KYR_R_PAD_PIN	0	// [x] CWKeyer proto 
 #define KYR_L_PAD_PIN	1	// [x] CWKeyer proto
 #define KYR_S_KEY_PIN	2	// [x] CWKeyer proto
-#define KYR_PTT_SW_PIN	3	// [x] CWKeyer proto
+#define KYR_EXT_PTT_PIN	3	// [x] CWKeyer proto
 #define KYR_KEY_OUT_PIN	4	// [x] CWKeyer proto
 #define KYR_PTT_OUT_PIN	5	// [x] CWKeyer proto
 #define KYR_VOLUME_POT	A1	// [x] CWKeyer proto = 
@@ -185,7 +188,7 @@
 #define KYR_L_PAD_NOTE		0      /* note used to report raw left paddle switch */
 #define KYR_R_PAD_NOTE		1      /* note used to report raw right paddle switch */
 #define KYR_S_KEY_NOTE		2      /* note used to report raw straight key switch */
-#define KYR_PTT_SW_NOTE		3      /* note used to report raw ptt switch */
+#define KYR_EXT_PTT_NOTE		3      /* note used to report raw ptt switch */
 #define KYR_KEY_OUT_NOTE	4      /* note used to send external key signal */
 #define KYR_PTT_OUT_NOTE	5      /* note used to send external ptt signal */
 

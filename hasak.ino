@@ -254,7 +254,7 @@ static void pollatch() {
   l_pad.send(digitalReadFast(KYR_L_PAD_PIN)^1);
   r_pad.send(digitalReadFast(KYR_R_PAD_PIN)^1);
   s_key.send(digitalReadFast(KYR_S_KEY_PIN)^1);
-  ptt_sw.send(digitalReadFast(KYR_PTT_SW_PIN)^1);
+  ptt_sw.send(digitalReadFast(KYR_EXT_PTT_PIN)^1);
   _key_out=key_out.recv();
   _ptt_out=ptt_out.recv();
   _up_out = up_out.recv();
@@ -283,7 +283,7 @@ void setup(void) {
   pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
   pinMode(KYR_R_PAD_PIN, INPUT_PULLUP);
   pinMode(KYR_S_KEY_PIN, INPUT_PULLUP);
-  pinMode(KYR_PTT_SW_PIN, INPUT_PULLUP);
+  pinMode(KYR_EXT_PTT_PIN, INPUT_PULLUP);
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
 
