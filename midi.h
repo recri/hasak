@@ -16,11 +16,11 @@ static int midi_valid_note(const int note) { return note >= 0 && note <= 127; }
 */
 /*
 ** receive a note on event and do something with it.
-** only if KYRP_RECV_MIDI is enabled and it's on our channel.
+** only if it's on our channel, which might be
 */
 static void midi_note_on(byte channel, byte note, byte velocity) {
   kyr_recv_note += 1;
-  if (get_recv_midi() && (channel == get_nrpn(KYRP_CC_CHAN_IN))) {
+  if (channel == get_nrpn(KYRP_NOTE_IN_CHAN_IN)) {
     if (note == get_nrpn(KYRP_L_PAD_NOTE)) {
       /* note used to report raw left paddle switch */
       digitalWrite(KYR_L_PAD_PIN, velocity == 0);
@@ -33,7 +33,10 @@ static void midi_note_on(byte channel, byte note, byte velocity) {
     } else if (note == get_nrpn(KYRP_EXT_PTT_NOTE)) {
       /* note used to report raw ptt switch */
       digitalWrite(KYR_EXT_PTT_PIN, velocity == 0);
-    } else if (note == get_nrpn(KYRP_KEY_OUT_NOTE)) {
+    }
+  }
+  if (channel == get_nrpn(KYRP_NOTE_OUT_CHAN_IN)) {
+    if (note == get_nrpn(KYRP_KEY_OUT_NOTE)) {
       /* note used to send external key signal */
       digitalWrite(KYR_KEY_OUT_PIN, velocity == 0);
     } else if (note == get_nrpn(KYRP_PTT_OUT_NOTE)) {
@@ -89,39 +92,36 @@ static void midi_send_nrpn(const int16_t nrpn, const int16_t value) {
 }
 
 static void midi_setup(void) {
-#ifdef KYRP_RECV_MIDI
   usbMIDI.setHandleNoteOn(midi_note_on);
   usbMIDI.setHandleNoteOff(midi_note_off);
-#endif
   usbMIDI.setHandleControlChange(midi_receive_nrpn);
 }
 
-static uint16_t midi_send_toggle(const uint16_t pin, const int16_t note_nrpn, int16_t send) {
-  // if the pin was high, then it went low, and is now active, so send velocity 1
-  // if the pin was low, then it went high, and is now off, so send velocity 0
-  const int channel = get_nrpn(KYRP_NOTE_CHAN_OUT);
-  const int note = get_nrpn(note_nrpn);
-  if (send && midi_valid_channel(channel) && midi_valid_note(note)) {
-    kyr_send_note += 1;
-    usbMIDI.sendNoteOn(note, pin, channel);
-    usbMIDI.send_now();		// send it now
+static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrpn, int16_t channel) {
+  // if the pinvalue was high, then it went low, and is now active, so send velocity 1
+  // if the pinvalue was low, then it went high, and is now off, so send velocity 0
+
+  if (midi_valid_channel(channel)) {
+    const int note = get_nrpn(note_nrpn);
+    if ( midi_valid_note(note)) {
+      kyr_send_note += 1;
+      usbMIDI.sendNoteOn(note, pinvalue, channel);
+      usbMIDI.send_now();		// send it now
+    }
   }
-  return pin ^ 1;		// invert the pin
+  return pinvalue ^ 1;		// invert the pin
 }
 
 static void midi_loop(void) {
-  int send = get_send_midi();
-  if (send) {
-    static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
-    int send_input = send == KYRV_SM_INPUT || send == KYRV_SM_BOTH;
-    int send_output = send == KYRV_SM_OUTPUT || send == KYRV_SM_BOTH;
-    if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYRP_L_PAD_NOTE, send_input);
-    if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_R_PAD_NOTE, send_input);
-    if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_S_KEY_NOTE, send_input);
-    if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_EXT_PTT_NOTE, send_input);
-    if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_KEY_OUT_NOTE, send_output);
-    if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_PTT_OUT_NOTE, send_output);
-  }
+  static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
+  int input_channel = get_nrpn(KYRP_NOTE_IN_CHAN_OUT);
+  int output_channel = get_nrpn(KYRP_NOTE_OUT_CHAN_OUT);
+  if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYRP_L_PAD_NOTE, input_channel);
+  if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_R_PAD_NOTE, input_channel);
+  if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_S_KEY_NOTE, input_channel);
+  if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_EXT_PTT_NOTE, input_channel);
+  if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_KEY_OUT_NOTE, output_channel);
+  if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_PTT_OUT_NOTE, output_channel);
   while (usbMIDI.read());
 }
 

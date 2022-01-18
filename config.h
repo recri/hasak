@@ -174,10 +174,12 @@
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYR_CC_IN_CHANNEL	1	/* default input channel used for keyer */
-#define KYR_CC_OUT_CHANNEL	1	/* default output channel used for keyer */
-#define KYR_NOTE_IN_CHANNEL	1
-#define KYR_NOTE_OUT_CHANNEL	1
+#define KYRC_CC_CHAN_IN		1	/* default input channel used for keyer */
+#define KYRC_CC_CHAN_OUT	1	/* default output channel used for keyer */
+#define KYRC_NOTE_IN_CHAN_OUT	1
+#define KYRC_NOTE_OUT_CHAN_OUT	1
+#define KYRC_NOTE_IN_CHAN_IN	0
+#define KYRC_NOTE_OUT_CHAN_IN	0
 
 /*
 ** midi note usage
@@ -252,8 +254,8 @@
 #define KYRP_BUTTON_2		(KYRP_SOFT+2) /* headset button 2 - up pressed */
 #define KYRP_BUTTON_3		(KYRP_SOFT+3) /* headset button 3 - down pressed */
 #define KYRP_BUTTON_4		(KYRP_SOFT+4) /* headset button 4 - hey pressed */
-#define KYRP_SEND_MIDI		(KYRP_SOFT+5) /* send input paddle key events to midi notes */
-#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* receive and act on midi notes */
+//#define KYRP_SEND_MIDI		(KYRP_SOFT+5) /* send input paddle key events to midi notes */
+//#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* receive and act on midi notes */
 #define KYRP_PTT_ENABLE		(KYRP_SOFT+7) /* enable PTT to operate */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+8) /* 0,1,2 -> none, LSB, USB */
 #define KYRP_IQ_ADJUST		(KYRP_SOFT+9) /* adjustment to iq phase, +/- units tbd, excess 8096 */
@@ -266,17 +268,19 @@
 
 #define KYRP_CC_CHAN_OUT	(KYRP_SOFT+16) /* midi channel for sending controls */
 #define KYRP_CC_CHAN_IN		(KYRP_SOFT+17) /* midi channle for receiving controls */
-#define KYRP_NOTE_CHAN_OUT	(KYRP_SOFT+18) /* midi channel for sending notes */
-#define KYRP_NOTE_CHAN_IN	(KYRP_SOFT+19) /* midi channle for receiving notes */
+#define KYRP_NOTE_IN_CHAN_OUT	(KYRP_SOFT+18) /* midi channel for sending notes */
+#define KYRP_NOTE_OUT_CHAN_OUT	(KYRP_SOFT+19) /* midi channel for sending notes */
+#define KYRP_NOTE_IN_CHAN_IN	(KYRP_SOFT+20) /* midi channle for receiving notes */
+#define KYRP_NOTE_OUT_CHAN_IN	(KYRP_SOFT+21) /* midi channle for receiving notes */
 
-#define KYRP_VERSION		(KYRP_SOFT+20) /* version of hasak nrpn set */
+#define KYRP_VERSION		(KYRP_SOFT+22) /* version of hasak nrpn set */
 
-#define KYRP_L_PAD_NOTE		(KYRP_SOFT+21+0)      /* note used to report raw left paddle switch */
-#define KYRP_R_PAD_NOTE		(KYRP_SOFT+21+1)      /* note used to report raw right paddle switch */
-#define KYRP_S_KEY_NOTE		(KYRP_SOFT+21+2)      /* note used to report raw straight key switch */
-#define KYRP_EXT_PTT_NOTE	(KYRP_SOFT+21+3)      /* note used to report raw ptt switch */
-#define KYRP_KEY_OUT_NOTE	(KYRP_SOFT+21+4)      /* note used to send external key signal */
-#define KYRP_PTT_OUT_NOTE	(KYRP_SOFT+21+5)      /* note used to send external ptt signal */
+#define KYRP_L_PAD_NOTE		(KYRP_SOFT+23+0)      /* note used to report raw left paddle switch */
+#define KYRP_R_PAD_NOTE		(KYRP_SOFT+23+1)      /* note used to report raw right paddle switch */
+#define KYRP_S_KEY_NOTE		(KYRP_SOFT+23+2)      /* note used to report raw straight key switch */
+#define KYRP_EXT_PTT_NOTE	(KYRP_SOFT+23+3)      /* note used to report raw ptt switch */
+#define KYRP_KEY_OUT_NOTE	(KYRP_SOFT+23+4)      /* note used to send external key signal */
+#define KYRP_PTT_OUT_NOTE	(KYRP_SOFT+23+5)      /* note used to send external ptt signal */
 
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
@@ -413,9 +417,9 @@
 #define KYRV_IQ_USB			2 /* IQ for upper sideband */
 
 /* send midi enable modes, values KYRP_SEND_MIDI */
-#define KYRV_SM_NONE			0 /* no midi */
-#define KYRV_SM_OUTPUT			1 /* send output key events */
-#define KYRV_SM_INPUT			2 /* send input key events */
-#define KYRV_SM_BOTH			3 /* send input and output events */
+//#define KYRV_SM_NONE			0 /* no midi */
+//#define KYRV_SM_OUTPUT			1 /* send output key events */
+//#define KYRV_SM_INPUT			2 /* send input key events */
+//#define KYRV_SM_BOTH			3 /* send input and output events */
 
 #endif

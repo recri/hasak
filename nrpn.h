@@ -127,10 +127,6 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_BUTTON_2:
   case KYRP_BUTTON_3:
   case KYRP_BUTTON_4:
-  case KYRP_SEND_MIDI:
-#if defined(KYRP_RECV_MIDI)
-  case KYRP_RECV_MIDI:
-#endif
   case KYRP_PTT_ENABLE:
   case KYRP_IQ_ENABLE: 
   case KYRP_TX_ENABLE:
@@ -142,8 +138,10 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_DEBOUNCE:
   case KYRP_CC_CHAN_OUT:
   case KYRP_CC_CHAN_IN:
-  case KYRP_NOTE_CHAN_OUT:
-  case KYRP_NOTE_CHAN_IN:
+  case KYRP_NOTE_IN_CHAN_OUT:
+  case KYRP_NOTE_OUT_CHAN_OUT:
+  case KYRP_NOTE_IN_CHAN_IN:
+  case KYRP_NOTE_OUT_CHAN_IN:
   case KYRP_L_PAD_NOTE:
   case KYRP_R_PAD_NOTE:
   case KYRP_S_KEY_NOTE:
@@ -223,10 +221,6 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_BUTTON_2, -1800); /* up */
   nrpn_set(KYRP_BUTTON_3, -500);  /* down */
   nrpn_set(KYRP_BUTTON_4, -2250); /* hey google */
-  nrpn_set(KYRP_SEND_MIDI, KYRV_SM_BOTH);
-#if defined(KYRP_RECV_MIDI)
-  nrpn_set(KYRP_RECV_MIDI, 0);
-#endif
   nrpn_set(KYRP_PTT_ENABLE, 0);
   nrpn_set(KYRP_IQ_ENABLE, 0);
   nrpn_set(KYRP_IQ_ADJUST, 8096);
@@ -237,10 +231,12 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_PAN, 8096);
   nrpn_set(KYRP_DEBOUNCE, 50);
   
-  nrpn_set(KYRP_CC_CHAN_IN, KYR_CC_IN_CHANNEL);
-  nrpn_set(KYRP_CC_CHAN_OUT, KYR_CC_OUT_CHANNEL);
-  nrpn_set(KYRP_NOTE_CHAN_IN, KYR_NOTE_IN_CHANNEL);
-  nrpn_set(KYRP_NOTE_CHAN_OUT, KYR_NOTE_OUT_CHANNEL);
+  nrpn_set(KYRP_CC_CHAN_IN, KYRC_CC_CHAN_IN);
+  nrpn_set(KYRP_CC_CHAN_OUT, KYRC_CC_CHAN_OUT);
+  nrpn_set(KYRP_NOTE_IN_CHAN_OUT, KYRC_NOTE_IN_CHAN_OUT);
+  nrpn_set(KYRP_NOTE_OUT_CHAN_OUT, KYRC_NOTE_OUT_CHAN_OUT);
+  nrpn_set(KYRP_NOTE_IN_CHAN_IN, KYRC_NOTE_IN_CHAN_IN);
+  nrpn_set(KYRP_NOTE_OUT_CHAN_IN, KYRC_NOTE_OUT_CHAN_IN);
 
   nrpn_set(KYRP_VERSION, KYRC_VERSION);
 

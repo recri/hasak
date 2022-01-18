@@ -10,6 +10,7 @@
 [x] separate nrpn_set_defaults() from nrpn_setup()
 [x] implement nrpn_echo
 [x] make output notes configurable
+[ ] rename KYR_ to KYRC_ if configurable
 [ ] give voices their own notes
 	better to simply send 1+vox as velocity for noteOn?
 [ ] use a logarithmic ramp for volumes
@@ -34,7 +35,7 @@
 	but keyer still broken.
 [ ] add named stored messages, with named interpolations,
 	saved to and restored from eeprom
-[ ] replace SEND_MIDI/RECV_MIDI with channels
+[x] replace SEND_MIDI/RECV_MIDI with channels
 	KYRP_SEND_INPUT_NOTE_CHANNEL and KYRP_SEND_OUTPUT_NOTE_CHANNEL
 	replace KYRP_SEND_MIDI
 	KYRP_RECV_INPUT_NOTE_CHANNEL and KYRP_RECV_OUTPUT_NOTE_CHANNEL

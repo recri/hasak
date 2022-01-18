@@ -92,8 +92,6 @@ static inline int16_t get_iq_adjust(void) { return get_nrpn(KYRP_IQ_ADJUST); }
 static inline int16_t get_tx_enable(void) { return get_nrpn(KYRP_TX_ENABLE); }
 static inline int16_t get_st_enable(void) { return get_nrpn(KYRP_ST_ENABLE); }
 static inline int16_t get_ptt_enable(void) { return get_nrpn(KYRP_PTT_ENABLE); }
-static inline int16_t get_send_midi(void) { return get_nrpn(KYRP_SEND_MIDI); }
-static inline int16_t get_recv_midi(void) { return get_nrpn(KYRP_RECV_MIDI); }
 
 /* unit conversions */
 static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE*0.001); }
