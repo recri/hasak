@@ -26,6 +26,9 @@
 #define config_h_
 
 /* KYR configuration */
+/* KYRC_* are configured values */
+/* KYRP_* are parameter numbers */
+/* KYRV_* are parameter values */
 
 /* per sample interrupt source */
 //#define KYRC_USE_LRCLK	1	/* Should we use LRCLK directly for 48k interrupts/second */
@@ -138,9 +141,9 @@
 /*
 ** whether to enable potentiometers or not
 */
-#define KYR_SHIFT_POTS  5	// right shift adc results to clear noise
-#define KYR_SKIP_READ	1	// reads to skip
-#define KYR_AVG_READ	2	// reads to average
+//#define KYR_SHIFT_POTS  5	// right shift adc results to clear noise
+//#define KYR_SKIP_READ	1	// reads to skip
+//#define KYR_AVG_READ	2	// reads to average
 
 /*
 ** whether to enable line level inputs/outputs
@@ -285,14 +288,14 @@
 #define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)
 #define KYRP_MIX_I2S_R2		(KYRP_MIXER+14)
 #define KYRP_MIX_I2S_R3		(KYRP_MIXER+15)
-#define KYRP_MIX_MQS_L0		(KYRP_MIXER+16) /* usb in raw left */
-#define KYRP_MIX_MQS_L1		(KYRP_MIXER+17) /* usb in muted by sidetone vox left */
-#define KYRP_MIX_MQS_L2		(KYRP_MIXER+18) /* sidetone  left */
-#define KYRP_MIX_MQS_L3		(KYRP_MIXER+19)
-#define KYRP_MIX_MQS_R0		(KYRP_MIXER+20) /* ditto for right channel */
-#define KYRP_MIX_MQS_R1		(KYRP_MIXER+21)
-#define KYRP_MIX_MQS_R2		(KYRP_MIXER+22)
-#define KYRP_MIX_MQS_R3		(KYRP_MIXER+23)
+#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* usb in raw left */
+#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* usb in muted by sidetone vox left */
+#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* sidetone  left */
+#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19)
+#define KYRP_MIX_HDW_R0		(KYRP_MIXER+20) /* ditto for right channel */
+#define KYRP_MIX_HDW_R1		(KYRP_MIXER+21)
+#define KYRP_MIX_HDW_R2		(KYRP_MIXER+22)
+#define KYRP_MIX_HDW_R3		(KYRP_MIXER+23)
 
 /* NRPN_KEYER_BLOCK - default keyer parameters */
 /* these are NRPN's which apply to keyer voices, some voices do not use all of them */

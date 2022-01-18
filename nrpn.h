@@ -93,6 +93,10 @@ static void nrpn_update_keyer(uint8_t vox) {
 static void nrpn_echo(uint16_t nrpn, uint16_t value) {
 }  
 
+static void nrpn_set_mixer(const int nrpn, const int value, AudioMixer4& mixer) {
+  mixer.gain((nrpn-KYRP_MIXER)%4, value/127.0);
+}
+
 static void nrpn_report(const char *name, int16_t oldval, int16_t newval) {
   Serial.printf("%s %d to %d\n", name, oldval, newval);
 }
@@ -132,37 +136,43 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 #if defined(KYRP_RECV_MIDI)
   case KYRP_RECV_MIDI:
 #endif
-    kyr_nrpn[nrpn] = value;
-    nrpn_echo(nrpn, value);
-    break;
+  case KYRP_PTT_ENABLE:
   case KYRP_IQ_ENABLE: 
-    // nrpn_report("IQ_ENABLE", kyr_nrpn[nrpn], value);
-    kyr_nrpn[nrpn] = value;  
-    nrpn_echo(nrpn, value);
-    break;
   case KYRP_TX_ENABLE:
-    // nrpn_report("TX_ENABLE", kyr_nrpn[nrpn], value);
-    kyr_nrpn[nrpn] = value;
-    nrpn_echo(nrpn, value);
-    break;
   case KYRP_IQ_ADJUST:
-    // case KYRP_ST_ENABLE:
+  case KYRP_ST_ENABLE:
   case KYRP_IQ_BALANCE:
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
   case KYRP_DEBOUNCE:
-    kyr_nrpn[nrpn] = value;
-    nrpn_echo(nrpn, value);
-    break;
-    
-  case KYRP_ST_ENABLE: // Serial.printf("ST_ENABLE %d\n", value);
-    kyr_nrpn[nrpn] = value;
-    nrpn_echo(nrpn, value);
-    break;
+    kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
 
-    // case KYRP_MORSE+(0..63):
+    // case KYRP_MORSE+(0..63): see default case
     
-    // case KYRP_MIXER+(0..23):
+  case KYRP_MIX_USB_L0:
+  case KYRP_MIX_USB_L1:
+  case KYRP_MIX_USB_L2:
+  case KYRP_MIX_USB_L3: nrpn_set_mixer(nrpn, value, l_usb_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+  case KYRP_MIX_USB_R0:
+  case KYRP_MIX_USB_R1:
+  case KYRP_MIX_USB_R2:
+  case KYRP_MIX_USB_R3: nrpn_set_mixer(nrpn, value, r_usb_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+  case KYRP_MIX_I2S_L0:
+  case KYRP_MIX_I2S_L1:
+  case KYRP_MIX_I2S_L2:
+  case KYRP_MIX_I2S_L3: nrpn_set_mixer(nrpn, value, l_i2s_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+  case KYRP_MIX_I2S_R0:
+  case KYRP_MIX_I2S_R1:
+  case KYRP_MIX_I2S_R2:
+  case KYRP_MIX_I2S_R3: nrpn_set_mixer(nrpn, value, r_i2s_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+  case KYRP_MIX_HDW_L0:
+  case KYRP_MIX_HDW_L1:
+  case KYRP_MIX_HDW_L2:
+  case KYRP_MIX_HDW_L3: nrpn_set_mixer(nrpn, value, l_hdw_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+  case KYRP_MIX_HDW_R0:
+  case KYRP_MIX_HDW_R1:
+  case KYRP_MIX_HDW_R2:
+  case KYRP_MIX_HDW_R3: nrpn_set_mixer(nrpn, value, r_hdw_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
 
     // keyer case table
 #define keyer_case(VOX, VOXP) \
@@ -183,8 +193,7 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
     keyer_case(KYR_VOX_KYR, KYRP_VOX_6-KYRP_VOX_0);    // button key params
     
   default: 
-    if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) ||
-	(nrpn >= KYRP_MIXER && nrpn < KYRP_MIXER+24)) {
+    if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64)) {
       kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     }
     Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value); break;
@@ -229,6 +238,7 @@ static void nrpn_setup(void) {
 #if defined(KYRP_RECV_MIDI)
   nrpn_set(KYRP_RECV_MIDI, 0);
 #endif
+  nrpn_set(KYRP_PTT_ENABLE, 0);
   nrpn_set(KYRP_IQ_ENABLE, 0);
   nrpn_set(KYRP_IQ_ADJUST, 8096);
   nrpn_set(KYRP_TX_ENABLE, 0);
@@ -239,10 +249,21 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_DEBOUNCE, 50);
   
   /* morse code table */
-  for (int i = 0; i < 64; i += 1) kyr_nrpn[KYRP_MORSE+i] = morse[i];
+  for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
+    nrpn_set(i, morse[i-KYRP_MORSE]);
 
-  /* mixer matrix */
-  
+  for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1)
+    switch (i) {
+    case KYRP_MIX_I2S_L0: case KYRP_MIX_I2S_R0: /* usb_in to i2s_out */
+    case KYRP_MIX_I2S_L1: case KYRP_MIX_I2S_R1: /* sidetone to i2s_out */
+    case KYRP_MIX_HDW_L0: case KYRP_MIX_HDW_R0: /* usb_in to hdw_out */
+    case KYRP_MIX_HDW_L1: case KYRP_MIX_HDW_R1: /* sidetone to i2s_out */
+    case KYRP_MIX_USB_L2: case KYRP_MIX_USB_R2:	/* keyed IQ to usb_out */
+      nrpn_set(i, 127); continue;
+    default:
+      nrpn_set(i, 0); continue;
+    }
+
   /* keyer defaults */
   nrpn_set(KYRP_SPEED,18);
   nrpn_set(KYRP_WEIGHT,50);
@@ -255,14 +276,15 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_FALL_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_RISE_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_FALL_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(KYRP_TAIL_TIME, 0);	// 0 ms
   nrpn_set(KYRP_HEAD_TIME, 0);	// 0 ms
+  nrpn_set(KYRP_TAIL_TIME, 0);	// 0 ms
   nrpn_set(KYRP_HANG_TIME, 8);	/* 8 dits */
   nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
   nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_ND7PA);
-  nrpn_set(KYRP_HANG_TIME, 7);
+  nrpn_set(KYRP_AUTO_ILS, 1);
+  nrpn_set(KYRP_AUTO_IWS, 0);
   
   /* voice specializations */
   for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;

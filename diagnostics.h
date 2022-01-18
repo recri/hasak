@@ -298,7 +298,7 @@ void diagnostics_loop() {
     case 'W': wink_send_ptr = lorem; break;
     case 'K': kyr_send_ptr = lorem; break;
     case 'Z': wink_send_ptr = random_text(); break;
-    case 'e': mixer_setup(); /* default mixers */ break;
+    case 'e': mixer_set("i1100"); mixer_set("h1100"); mixer_set("u0010"); break;
     case 'h': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'i': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'u': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;

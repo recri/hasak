@@ -115,31 +115,6 @@ AudioMixer4              l_usb_out;
 AudioMixer4              r_usb_out;
 AudioMixer4              l_hdw_out;
 AudioMixer4              r_hdw_out;
-static void mixer_setup(float gain=1.0) {
-  // set everything off
-  for (int i = 0; i < 4; i += 1) {
-    l_i2s_out.gain(i, 0);
-    r_i2s_out.gain(i, 0);
-    l_usb_out.gain(i, 0);
-    r_usb_out.gain(i, 0);
-    l_hdw_out.gain(i, 0);
-    r_hdw_out.gain(i, 0);
-  }
-  // mix rx_in and sidetone to headphones
-  for (int i = 0; i < 2; i += 1) {
-    l_i2s_out.gain(i, gain);
-    r_i2s_out.gain(i, gain);
-    l_hdw_out.gain(i, gain);
-    r_hdw_out.gain(i, gain);
-  }
-  // keyed IQ to usb_out
-  l_usb_out.gain(2, gain);
-  r_usb_out.gain(2, gain);
-  // temporary test: sidetone on l_usb_out, iq on r_usb_out, to see ppt_head.
-  // l_usb_out should lead r_usb_out by head_time, but doesn't
-  // l_usb_out.gain(2, gain);
-  // l_usb_out.gain(3, 0);
-}
 
 // first channel, rx audio and microphone/line-in input, op on headset mode
 // switch codec to use microphone instead of line-in
@@ -304,6 +279,7 @@ static void diagnostics_loop(void);
 
 void setup(void) {
   Serial.begin(115200);
+
   pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
   pinMode(KYR_R_PAD_PIN, INPUT_PULLUP);
   pinMode(KYR_S_KEY_PIN, INPUT_PULLUP);
@@ -312,7 +288,6 @@ void setup(void) {
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
 
   arbiter_setup();
-  mixer_setup();
   AudioMemory(40);
   nrpn_setup();
 
