@@ -145,6 +145,10 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
   case KYRP_DEBOUNCE:
+  case KYRP_CC_CHAN_OUT:
+  case KYRP_CC_CHAN_IN:
+  case KYRP_NOTE_CHAN_OUT:
+  case KYRP_NOTE_CHAN_IN:
     kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
 
     // case KYRP_MORSE+(0..63): see default case
@@ -304,5 +308,15 @@ static void nrpn_setup(void) {
   /* unmute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
 
+#if 0
+  for (int i = 0; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;
+#endif
   nrpn_set_defaults();
+#if 0
+  for (int i = 0; i < KYRP_LAST; i += 1)
+    if (kyr_nrpn[i] == KYRV_NOT_SET) {
+      if (i >= KYRP_VOX_1) continue;
+      Serial.printf("nrpn #%d is not initialized\n", i);
+    }
+#endif
 }
