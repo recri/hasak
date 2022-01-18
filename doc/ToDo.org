@@ -1,9 +1,30 @@
 * Todo list as of 2022-01-13
 [ ] make default serial monitor start winkey when needed
 [ ] rewrite winkey without second serial monitor
-[ ] implement nrpn_echo
-[ ] write cwkeyer.js progressive web app controller
+[x] implement nrpn_echo
+[-] write cwkeyer.js progressive web app controller
 [ ] verify bare Teensy3/4 and Teensy3/4+AudioAdapter
+[ ] make output notes configurable
+[ ] give voices their own notes
+[ ] use a logarithmic ramp for volumes
+[ ] make pot pins configurable.
+[ ] implement echo all
+[ ] implement save to eeprom
+[ ] implement read from eeprom
+[ ] make a VERSION nrpn
+[ ] make virtual NRPNs for
+[ ] load defaults, 
+[ ] load eeprom,
+[ ] save eeprom,
+[ ] echo all settings
+[ ] make virtual NRPN for keying a character on kyr
+[ ] make virtual NRPN for keying a character on wink
+[ ] plug a phone headset into a splitter and into microphone jack
+	and see if you read ExT_PTT
+[ ] rename PTT_SW as EXT_PTT.
+[ ] annotate config.h for postprocessing into javascript
+[ ] solve the initialization bug
+[ ] find nice web components for pwa
 * Todo list as of 2020-04-03
 [x] 2Serial+MIDI+Audio is possible, one Serial for winkeyer, one for monitor
 https://forum.pjrc.com/threads/66330-Dual-SerialUSB-and-MIDI-config-possible?highlight=teensy4+usb+midi
