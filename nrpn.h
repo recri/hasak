@@ -144,8 +144,16 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_CC_CHAN_IN:
   case KYRP_NOTE_CHAN_OUT:
   case KYRP_NOTE_CHAN_IN:
+  case KYRP_L_PAD_NOTE:
+  case KYRP_R_PAD_NOTE:
+  case KYRP_S_KEY_NOTE:
+  case KYRP_EXT_PTT_NOTE:
+  case KYRP_KEY_OUT_NOTE:
+  case KYRP_PTT_OUT_NOTE:
     kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-
+  case KYRP_VERSION:
+    kyr_nrpn[nrpn] = KYRC_VERSION; nrpn_echo(nrpn, value); break;
+    
     // case KYRP_MORSE+(0..63): see default case
     
   case KYRP_MIX_USB_L0:
@@ -233,6 +241,15 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_CC_CHAN_OUT, KYR_CC_OUT_CHANNEL);
   nrpn_set(KYRP_NOTE_CHAN_IN, KYR_NOTE_IN_CHANNEL);
   nrpn_set(KYRP_NOTE_CHAN_OUT, KYR_NOTE_OUT_CHANNEL);
+
+  nrpn_set(KYRP_VERSION, KYRC_VERSION);
+
+  nrpn_set(KYRP_L_PAD_NOTE, KYR_L_PAD_NOTE);
+  nrpn_set(KYRP_R_PAD_NOTE, KYR_R_PAD_NOTE);
+  nrpn_set(KYRP_S_KEY_NOTE, KYR_S_KEY_NOTE);
+  nrpn_set(KYRP_EXT_PTT_NOTE, KYR_EXT_PTT_NOTE);
+  nrpn_set(KYRP_KEY_OUT_NOTE, KYR_KEY_OUT_NOTE);
+  nrpn_set(KYRP_PTT_OUT_NOTE, KYR_PTT_OUT_NOTE);
 
   /* morse code table */
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 

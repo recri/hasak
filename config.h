@@ -188,7 +188,7 @@
 #define KYR_L_PAD_NOTE		0      /* note used to report raw left paddle switch */
 #define KYR_R_PAD_NOTE		1      /* note used to report raw right paddle switch */
 #define KYR_S_KEY_NOTE		2      /* note used to report raw straight key switch */
-#define KYR_EXT_PTT_NOTE		3      /* note used to report raw ptt switch */
+#define KYR_EXT_PTT_NOTE	3      /* note used to report raw ptt switch */
 #define KYR_KEY_OUT_NOTE	4      /* note used to send external key signal */
 #define KYR_PTT_OUT_NOTE	5      /* note used to send external ptt signal */
 
@@ -253,20 +253,30 @@
 #define KYRP_BUTTON_3		(KYRP_SOFT+3) /* headset button 3 - down pressed */
 #define KYRP_BUTTON_4		(KYRP_SOFT+4) /* headset button 4 - hey pressed */
 #define KYRP_SEND_MIDI		(KYRP_SOFT+5) /* send input paddle key events to midi notes */
-#define KYRP_PTT_ENABLE		(KYRP_SOFT+6) /* enable PTT to operate */
-#define KYRP_IQ_ENABLE		(KYRP_SOFT+7) /* 0,1,2 -> none, LSB, USB */
-#define KYRP_IQ_ADJUST		(KYRP_SOFT+8) /* adjustment to iq phase, +/- units tbd, excess 8096 */
-#define KYRP_TX_ENABLE		(KYRP_SOFT+9) /* 0, 1 -> disable, enable */
-#define KYRP_ST_ENABLE		(KYRP_SOFT+10) /* 0, 1 -> disable, enable  */
-#define KYRP_IQ_BALANCE		(KYRP_SOFT+11) /*  adjustment to iq balance, +/- units tbd, excess 8096 */
-#define KYRP_ST_AUDIO_MODE	(KYRP_SOFT+12) /* sound card operation mode */
-#define KYRP_ST_PAN		(KYRP_SOFT+13) /* pan sidetone left or right */
-#define KYRP_DEBOUNCE		(KYRP_SOFT+14) /* debounce period in ms/10 */
+#define KYRP_RECV_MIDI		(KYRP_SOFT+6) /* receive and act on midi notes */
+#define KYRP_PTT_ENABLE		(KYRP_SOFT+7) /* enable PTT to operate */
+#define KYRP_IQ_ENABLE		(KYRP_SOFT+8) /* 0,1,2 -> none, LSB, USB */
+#define KYRP_IQ_ADJUST		(KYRP_SOFT+9) /* adjustment to iq phase, +/- units tbd, excess 8096 */
+#define KYRP_TX_ENABLE		(KYRP_SOFT+10) /* 0, 1 -> disable, enable */
+#define KYRP_ST_ENABLE		(KYRP_SOFT+11) /* 0, 1 -> disable, enable  */
+#define KYRP_IQ_BALANCE		(KYRP_SOFT+12) /*  adjustment to iq balance, +/- units tbd, excess 8096 */
+#define KYRP_ST_AUDIO_MODE	(KYRP_SOFT+13) /* sound card operation mode */
+#define KYRP_ST_PAN		(KYRP_SOFT+14) /* pan sidetone left or right */
+#define KYRP_DEBOUNCE		(KYRP_SOFT+15) /* debounce period in ms/10 */
 
-#define KYRP_CC_CHAN_OUT	(KYRP_SOFT+15) /* midi channel for sending controls */
-#define KYRP_CC_CHAN_IN		(KYRP_SOFT+16) /* midi channle for receiving controls */
-#define KYRP_NOTE_CHAN_OUT	(KYRP_SOFT+17) /* midi channel for sending notes */
-#define KYRP_NOTE_CHAN_IN	(KYRP_SOFT+18) /* midi channle for receiving notes */
+#define KYRP_CC_CHAN_OUT	(KYRP_SOFT+16) /* midi channel for sending controls */
+#define KYRP_CC_CHAN_IN		(KYRP_SOFT+17) /* midi channle for receiving controls */
+#define KYRP_NOTE_CHAN_OUT	(KYRP_SOFT+18) /* midi channel for sending notes */
+#define KYRP_NOTE_CHAN_IN	(KYRP_SOFT+19) /* midi channle for receiving notes */
+
+#define KYRP_VERSION		(KYRP_SOFT+20) /* version of hasak nrpn set */
+
+#define KYRP_L_PAD_NOTE		(KYRP_SOFT+21+0)      /* note used to report raw left paddle switch */
+#define KYRP_R_PAD_NOTE		(KYRP_SOFT+21+1)      /* note used to report raw right paddle switch */
+#define KYRP_S_KEY_NOTE		(KYRP_SOFT+21+2)      /* note used to report raw straight key switch */
+#define KYRP_EXT_PTT_NOTE	(KYRP_SOFT+21+3)      /* note used to report raw ptt switch */
+#define KYRP_KEY_OUT_NOTE	(KYRP_SOFT+21+4)      /* note used to send external key signal */
+#define KYRP_PTT_OUT_NOTE	(KYRP_SOFT+21+5)      /* note used to send external ptt signal */
 
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through ` */
