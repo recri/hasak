@@ -207,25 +207,7 @@ static void nrpn_set(uint16_t nrpn, uint16_t value) {
 */
 #include "morse_table.h"
 
-static void nrpn_setup(void) {
-
-  codec_enable();
-
-  /* mute headphones */
-  nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
-  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 0);
-
-  /* codec setup */
-  nrpn_set(KYRP_INPUT_SELECT, 0);
-  nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
-  // kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
-  // nrpn_set(KYRP_MIC_IMPEDANCE, 1);   // taken from audio library
-  nrpn_set(KYRP_MUTE_LINE_OUT, 1);
-  nrpn_set(KYRP_LINE_IN_LEVEL, 5);
-  nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
-
-  /* unmute headphones */
-  nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
+static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_HEAD_PHONE_VOLUME, 64);
 
   /* soft controls */
@@ -288,4 +270,33 @@ static void nrpn_setup(void) {
   
   /* voice specializations */
   for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;
+}
+
+static void nrpn_write_eeprom(void) {
+}
+
+static int nrpn_read_eeprom(void) {
+}
+
+static void nrpn_setup(void) {
+
+  codec_enable();
+
+  /* mute headphones */
+  nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
+  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 0);
+
+  /* codec setup */
+  nrpn_set(KYRP_INPUT_SELECT, 0);
+  nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
+  // kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
+  // nrpn_set(KYRP_MIC_IMPEDANCE, 1);   // taken from audio library
+  nrpn_set(KYRP_MUTE_LINE_OUT, 1);
+  nrpn_set(KYRP_LINE_IN_LEVEL, 5);
+  nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
+
+  /* unmute headphones */
+  nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
+
+  nrpn_set_defaults();
 }
