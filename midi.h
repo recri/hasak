@@ -76,7 +76,7 @@ static void midi_receive_nrpn(byte channel, byte control, byte value) {
     }
 }
 
-static void midi_send_nrpn(const int nrpn, const int value) {
+static void midi_send_nrpn(const int16_t nrpn, const int16_t value) {
   int channel = get_nrpn(KYRP_CC_CHAN_OUT);
   if (midi_valid_channel(channel)) {
     usbMIDI.sendControlChange(KYR_CC_NRPN_MSB, (nrpn>>7)&127, channel);

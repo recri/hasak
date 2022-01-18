@@ -7,7 +7,7 @@
 int16_t kyr_nrpn[KYRP_LAST];
 
 /* set a nrpn without */
-static inline void set_nrpn(int nrpn, int value) {
+static inline void set_nrpn(const int16_t nrpn, const int16_t value) {
   if (nrpn >= 0 && nrpn <= KYRP_LAST)
     kyr_nrpn[nrpn] = value;
 }
@@ -27,22 +27,16 @@ static inline void set_nrpn(int nrpn, int value) {
 */
 
 /* set a vox specialized nrpn */
-static inline void set_vox_nrpn(int vox, int nrpn, int value) {
+static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
   if (vox >= 0 && vox <= KYR_N_VOX && nrpn >= KYRP_KEYER && nrpn < KYRP_VOX_1)
     set_nrpn(nrpn+vox*(KYRP_VOX_1-KYRP_VOX_0), value);
 }
-
-//static inline void set_vox_dit(int vox, int value) {  set_vox_nrpn(vox, KYRP_PER_DIT, value); }
-//static inline void set_vox_dah(int vox, int value) {  set_vox_nrpn(vox, KYRP_PER_DAH, value); }
-//static inline void set_vox_ies(int vox, int value) {  set_vox_nrpn(vox, KYRP_PER_IES, value); }
-//static inline void set_vox_ils(int vox, int value) {  set_vox_nrpn(vox, KYRP_PER_ILS, value); }
-//static inline void set_vox_iws(int vox, int value) {  set_vox_nrpn(vox, KYRP_PER_IWS, value); }
 
 /*
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
-static void nrpn_update_keyer(uint8_t vox) {
+static void nrpn_update_keyer(const int16_t vox) {
   const float wordDits = 50;
   const float sampleRate = AUDIO_SAMPLE_RATE;
   const float wpm = get_vox_speed(vox);
@@ -90,14 +84,15 @@ static void nrpn_update_keyer(uint8_t vox) {
 }
 
 // echo the nprn settings back to the control echo channel
-static void nrpn_echo(uint16_t nrpn, uint16_t value) {
+static void nrpn_echo(const int16_t nrpn, const int16_t value) {
+  midi_send_nrpn(nrpn, value);
 }  
 
-static void nrpn_set_mixer(const int nrpn, const int value, AudioMixer4& mixer) {
+static void nrpn_set_mixer(const int16_t nrpn, const int16_t value, AudioMixer4& mixer) {
   mixer.gain((nrpn-KYRP_MIXER)%4, value/127.0);
 }
 
-static void nrpn_report(const char *name, int16_t oldval, int16_t newval) {
+static void nrpn_report(const char *name, const int16_t oldval, const int16_t newval) {
   Serial.printf("%s %d to %d\n", name, oldval, newval);
 }
 
@@ -109,7 +104,7 @@ static void nrpn_report(const char *name, int16_t oldval, int16_t newval) {
 ** none are sent into the audio library processing loop,
 ** it pulls parameters as necessary.
 */
-static void nrpn_set(uint16_t nrpn, uint16_t value) {
+static void nrpn_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
   case KYRP_HEAD_PHONE_VOLUME:
   case KYRP_INPUT_SELECT:
@@ -280,6 +275,8 @@ static void nrpn_set_defaults(void) {
   /* voice specializations */
   for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;
 }
+
+#include "EEPROM.h"
 
 static void nrpn_write_eeprom(void) {
 }

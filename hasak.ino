@@ -97,7 +97,7 @@ static void arbiter_setup(void) {
   arbiter.define_vox(5, KYR_VOX_BUT, KYR_VOX_BUT, 1);
 }
 
-int get_active_vox(void) { return arbiter.get_active_vox(); }
+int16_t get_active_vox(void) { return arbiter.get_active_vox(); }
 
 // shaped key waveform
 AudioSynthKeyedTone	tone_ramp(1); // one channel sidetone ramp
@@ -326,6 +326,8 @@ void loop(void) {
   input_loop();
   diagnostics_loop();
 }
+
+static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 
 #include "codec.h"
 #include "nrpn.h"
