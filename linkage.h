@@ -97,4 +97,19 @@ static inline int16_t get_ptt_enable(void) { return get_nrpn(KYRP_PTT_ENABLE); }
 static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE*0.001); }
 static inline int tenth_ms_to_samples(int tenthms) { return tenthms * (AUDIO_SAMPLE_RATE*0.0001); }
 
+/* translate 7 bit dbdown code to linear 7 bit integer multiplier */
+static int16_t dbdown7bit(const int16_t level) {
+  /* echo 'set dbd {}; for {set i 0} {$i < 128} {incr i} { lappend dbd [format %3d [expr {int(127*($i ? pow(10, ($i-127)/8.0/20.0) : 0.0))}]] }; puts [join $dbd ,]' | tclsh */
+  int8_t table[128] = {
+     0, 20, 21, 21, 21, 21, 22, 22, 22, 23, 23, 23, 24, 24, 24, 25, 25, 26, 26, 26, 27, 27, 28, 28, 28, 29, 29, 30, 30, 30, 31, 31,
+    32, 32, 33, 33, 34, 34, 35, 35, 36, 36, 37, 37, 38, 39, 39, 40, 40, 41, 41, 42, 43, 43, 44, 45, 45, 46, 47, 47, 48, 49, 49, 50,
+    51, 52, 52, 53, 54, 55, 55, 56, 57, 58, 59, 60, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 80,
+    81, 82, 83, 84, 86, 87, 88, 89, 91, 92, 93, 95, 96, 98, 99,100,102,103,105,106,108,109,111,113, 114,116,118,119,121,123,125,127
+  };
+  return table[level&127];
+}
+
+/* translate 7 bit dbdown code to float level */
+static float dbdown(const int16_t level) { return 0.007874f*dbdown7bit(level); }
+
 #endif

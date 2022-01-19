@@ -327,12 +327,18 @@ void loop(void) {
   diagnostics_loop();
 }
 
-static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
+/* valid teensy pin number, from teensy core sources */
+static int valid_pin(int pin) { return pin >= 0 && pin < CORE_NUM_TOTAL_PINS; }
 
-#include "codec.h"
+static void codec_enable(void);
+static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
+static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
+static void input_nrpn_set(const int16_t nrpn, const int16_t value);
+
 #include "nrpn.h"
+#include "codec.h"
 #include "midi.h"
+#include "input.h"
 #include "winkey.h"
 #include "diagnostics.h"
-#include "inputs.h"
 

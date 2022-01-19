@@ -14,8 +14,8 @@
 [x] better names for KYRP_NOTE_(IN|OUT)_CHAN_(IN|OUT)
 [x] give voices their own notes
 	better to simply send 1+vox as velocity for noteOn?
-[ ] use a logarithmic ramp for volumes
-[ ] make pot pins configurable.
+[x] use a logarithmic ramp for volumes
+[x] make pot pins configurable.
 [ ] implement echo all
 [ ] implement save to eeprom
 [ ] implement read from eeprom
@@ -26,10 +26,10 @@
 [ ]	save eeprom,
 [ ]	echo all settings
 [ ]	for keying a character on kyr
-[ ]	 for keying a character on wink
-[ ] plug a phone headset into a splitter and into microphone jack
-	and see if you read ExT_PTT
-[ ] make a key/ptt led indicator for the key/ptt output jack
+[ ]	for keying a character on wink
+[ ] add mixer output unmute bitmap nrpn, leaves mixer levels be.
+[ ] mixer set with left and right in same nrpn
+[ ] mixers as AudioMixer4 mixer[3][2];
 [x] rename PTT_SW as EXT_PTT.
 [ ] annotate config.h for postprocessing into javascript
 [ ] solve the initialization bug
@@ -43,6 +43,9 @@
 	KYRP_RECV_INPUT_NOTE_CHANNEL and KYRP_RECV_OUTPUT_NOTE_CHANNEL
 	would replace bit values of KYRP_RECV_MIDI
 	with channel == 0 muting the action.
+[ ] plug a phone headset into a splitter and into microphone jack
+	and see if you read ExT_PTT
+[ ] make a key/ptt led indicator for the key/ptt output jack
 [-] write cwkeyer.js progressive web app controller
 [ ] find/make nice web components for pwa
 [ ] replace diagnostics with PWA functions.

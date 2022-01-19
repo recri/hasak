@@ -140,7 +140,7 @@ public:
     scale = (phase >> 8) & 0xFFFF;
     val2 *= scale;
     val1 *= 0x10000 - scale;
-    return get_vox_level(vox)*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
+    return dbdown7bit(get_vox_level(vox))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
     // return val1+val2;
   }
   uint32_t phase_increment(void) {

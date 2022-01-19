@@ -89,7 +89,7 @@ static void nrpn_echo(const int16_t nrpn, const int16_t value) {
 }  
 
 static void nrpn_set_mixer(const int16_t nrpn, const int16_t value, AudioMixer4& mixer) {
-  mixer.gain((nrpn-KYRP_MIXER)%4, value/127.0);
+  mixer.gain((nrpn-KYRP_MIXER)%4, dbdown(value));
 }
 
 static void nrpn_report(const char *name, const int16_t oldval, const int16_t newval) {
@@ -106,7 +106,11 @@ static void nrpn_report(const char *name, const int16_t oldval, const int16_t ne
 */
 static void nrpn_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
+  case KYRP_VERSION:
+    kyr_nrpn[nrpn] = KYRC_VERSION; nrpn_echo(nrpn, value); break;
   case KYRP_HEAD_PHONE_VOLUME:
+    nrpn_report("KYRP_HEAD_PHONE_VOLUME", kyr_nrpn[nrpn], value);
+    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_INPUT_SELECT:
   case KYRP_MUTE_HEAD_PHONES:
   case KYRP_MUTE_LINE_OUT:
@@ -149,8 +153,11 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_KEY_OUT_NOTE:
   case KYRP_PTT_OUT_NOTE:
     kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_VERSION:
-    kyr_nrpn[nrpn] = KYRC_VERSION; nrpn_echo(nrpn, value); break;
+  case KYRP_VOLUME_POT:
+  case KYRP_ST_VOL_POT:
+  case KYRP_ST_FREQ_POT:
+  case KYRP_SPEED_POT:
+    input_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     
     // case KYRP_MORSE+(0..63): see default case
     
@@ -216,10 +223,10 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_HEAD_PHONE_VOLUME, 64);
 
   /* soft controls */
-  nrpn_set(KYRP_BUTTON_0, 6800);  /* off */
+  nrpn_set(KYRP_BUTTON_0,  6800); /* off */
   nrpn_set(KYRP_BUTTON_1, -2700); /* center */
   nrpn_set(KYRP_BUTTON_2, -1800); /* up */
-  nrpn_set(KYRP_BUTTON_3, -500);  /* down */
+  nrpn_set(KYRP_BUTTON_3,  -500); /* down */
   nrpn_set(KYRP_BUTTON_4, -2250); /* hey google */
   nrpn_set(KYRP_PTT_ENABLE, 0);
   nrpn_set(KYRP_IQ_ENABLE, 0);
@@ -246,6 +253,11 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_EXT_PTT_NOTE, KYR_EXT_PTT_NOTE);
   nrpn_set(KYRP_KEY_OUT_NOTE, KYR_KEY_OUT_NOTE);
   nrpn_set(KYRP_PTT_OUT_NOTE, KYR_PTT_OUT_NOTE);
+
+  nrpn_set(KYRP_VOLUME_POT, KYR_VOLUME_POT);
+  nrpn_set(KYRP_ST_VOL_POT, KYR_ST_VOL_POT);
+  nrpn_set(KYRP_ST_FREQ_POT, KYR_ST_FREQ_POT);
+  nrpn_set(KYRP_SPEED_POT, KYR_SPEED_POT);
 
   /* morse code table */
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 

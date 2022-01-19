@@ -1,4 +1,21 @@
 #if 0
+// A base class for all Codecs, DACs and ADCs, so at least the
+// most basic functionality is consistent.
+
+#define AUDIO_INPUT_LINEIN  0
+#define AUDIO_INPUT_MIC     1
+
+class AudioControl
+{
+public:
+	virtual bool enable(void) = 0;
+	virtual bool disable(void) = 0;
+	virtual bool volume(float volume) = 0;      // volume 0.0 to 1.0
+	virtual bool inputLevel(float volume) = 0;  // volume 0.0 to 1.0
+	virtual bool inputSelect(int n) = 0;
+};
+#endif
+#if 0
 // WM8960 controls
     bool enable(void);
     bool disable(void) { return false; }
@@ -111,12 +128,14 @@ static void codec_enable(void) {
   wm8960.enable();
 }
 
-static void codec_nrpn_set(uint16_t nrpn, uint16_t value) {
+static void codec_nrpn_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
   case KYRP_HEAD_PHONE_VOLUME: {
-    float volume = value*7.87401574803e-3f; // 7 bit unsigned to 0.0 .. 1.0
+    float volume = dbdown(value); // 7 bit unsigned to 0.0 .. 1.0
+    Serial.printf("codec volume %d %.4f\n", value, volume);
     sgtl5000.volume(volume);
     wm8960.volume(volume);
+    Serial.printf("codec volume2 %d %.4f\n", value, volume);
     break;
   }
   case KYRP_INPUT_SELECT:
