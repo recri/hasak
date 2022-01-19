@@ -16,6 +16,7 @@
 	better to simply send 1+vox as velocity for noteOn?
 [x] use a logarithmic ramp for volumes
 [x] make pot pins configurable.
+[ ] fix the broken volume, it gets stuck.
 [ ] implement echo all
 [ ] implement save to eeprom
 [ ] implement read from eeprom

@@ -226,7 +226,7 @@
 
 /* relocation base */
 #define KYRP_CODEC		(KYRP_GLOBAL)	/* relocation -> */
-#define KYRP_HEAD_PHONE_VOLUME	(KYRP_CODEC+0)	/* sgl5000 output volume */
+#define KYRP_VOLUME		(KYRP_CODEC+0)	/* output volume */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1)	/* 0..1 input from microphone or line-in */
 #define KYRP_MIC_PREAMP_GAIN	(KYRP_CODEC+2)	/* 0-3 -> 0, 20, 30, 40 dB */
 #define KYRP_MUTE_HEAD_PHONES	(KYRP_CODEC+3)	/* 0..1 true or false */

@@ -108,8 +108,8 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
   case KYRP_VERSION:
     kyr_nrpn[nrpn] = KYRC_VERSION; nrpn_echo(nrpn, value); break;
-  case KYRP_HEAD_PHONE_VOLUME:
-    nrpn_report("KYRP_HEAD_PHONE_VOLUME", kyr_nrpn[nrpn], value);
+  case KYRP_VOLUME:
+    // nrpn_report("KYRP_VOLUME", kyr_nrpn[nrpn], value);
     codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_INPUT_SELECT:
   case KYRP_MUTE_HEAD_PHONES:
@@ -220,7 +220,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 #include "morse_table.h"
 
 static void nrpn_set_defaults(void) {
-  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 64);
+  nrpn_set(KYRP_VOLUME, 64);
 
   /* soft controls */
   nrpn_set(KYRP_BUTTON_0,  6800); /* off */
@@ -316,7 +316,7 @@ static void nrpn_setup(void) {
 
   /* mute headphones */
   nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
-  nrpn_set(KYRP_HEAD_PHONE_VOLUME, 0);
+  nrpn_set(KYRP_VOLUME, 0);
 
   /* codec setup */
   nrpn_set(KYRP_INPUT_SELECT, 0);
