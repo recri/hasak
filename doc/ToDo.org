@@ -22,6 +22,7 @@
 [x] simplify input.h,
 [x] reduce frequency of reads in input.h
 [x] get full 0 .. 127 scale in input.h
+[x] clean up missing codec nrpns in wm8960
 [ ] implement echo all
 [ ] implement save to eeprom
 [ ] implement read from eeprom

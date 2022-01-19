@@ -10,6 +10,8 @@ static void codec_sgtl5000_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
   case KYRP_VOLUME:
     sgtl5000.volume(value*0.007874f); break;
+  case KYRP_MIC_PREAMP_GAIN:
+    break;
   case KYRP_INPUT_SELECT:
     sgtl5000.inputSelect(value); break;
   case KYRP_MUTE_HEAD_PHONES: 
@@ -37,8 +39,20 @@ static void codec_wm8960_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
   case KYRP_VOLUME:
     wm8960.volume(value*0.007874f); break;
+  case KYRP_MIC_PREAMP_GAIN:
+    break;
   case KYRP_INPUT_SELECT:
     wm8960.inputSelect(value); break;
+  case KYRP_MUTE_HEAD_PHONES: 
+    break;
+  case KYRP_MUTE_LINE_OUT:
+    break;
+  case KYRP_LINE_OUT_LEVEL:
+    break;
+  case KYRP_LINE_OUT_LEVEL_L:
+    break;
+  case KYRP_LINE_OUT_LEVEL_R:
+    break;
   case KYRP_LINE_IN_LEVEL:
     wm8960.leftInputVolume(value); wm8960.rightInputVolume(value); break;
   case KYRP_LINE_IN_LEVEL_L:
