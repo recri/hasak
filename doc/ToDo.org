@@ -16,7 +16,12 @@
 	better to simply send 1+vox as velocity for noteOn?
 [x] use a logarithmic ramp for volumes
 [x] make pot pins configurable.
-[ ] fix the broken volume, it gets stuck.
+[x] fix the broken volume, it gets stuck.
+[x] rename KYRP_HEAD_PHONE_VOLUME to KYRP_VOLUME
+[x] drop dbdown conversion for KYRP_VOLUME, already db scale
+[x] simplify input.h,
+[x] reduce frequency of reads in input.h
+[x] get full 0 .. 127 scale in input.h
 [ ] implement echo all
 [ ] implement save to eeprom
 [ ] implement read from eeprom
