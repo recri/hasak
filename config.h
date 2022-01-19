@@ -33,6 +33,9 @@
 /* Version of hasak */
 #define KYRC_VERSION 100
 
+/* Magic number to identify valid eeprom contents */
+#define KYRC_MAGIC   0xad5d
+
 /* per sample interrupt source */
 //#define KYRC_USE_LRCLK	1	/* Should we use LRCLK directly for 48k interrupts/second */
 //#define KYRC_DUP_LRCLK	1	/* Should we duplicate LRCLK to another pin for 48k interrupts/second */
@@ -51,29 +54,38 @@
 
 /* enable hardware input */
 //#define KYRC_ENABLE_ADC_IN 1
-
 /* decide which Teensy we're running on */
 #if defined(TEENSYDUINO)
   #if defined(ARDUINO_TEENSY40)
   #define TEENSY4 1
   #define TEENSY40 1
+  #define EEPROM_BYTES 1080
   #elif defined(ARDUINO_TEENSY41)
   #define TEENSY4 1
   #define TEENSY41 1
+  #define EEPROM_BYTES 4284
+  #elif defined(ARDUINO_TEENSY30)
+  #define TEENSY3 1
+  #define TEENSY30 1
+  #define EEPROM_BYTES 2048
   #elif defined(ARDUINO_TEENSY31)
   #define TEENSY3 1
   #define TEENSY31 1
+  #define EEPROM_BYTES 2048
   #elif defined(ARDUINO_TEENSY32)
   #define TEENSY3 1
   #define TEENSY32 1
+  #define EEPROM_BYTES 2048
   #elif defined(ARDUINO_TEENSY35)
   #define TEENSY3 1
   #define TEENSY35 1
+  #define EEPROM_BYTES 4096
   #elif defined(ARDUINO_TEENSY36)
   #define TEENSY3 1
   #define TEENSY36 1
+  #define EEPROM_BYTES 4096
   #else
-  #error "You're not building for a Teensy 4.1, 4.0, 3.6, 3.5, 3.2 or 3.1?"
+  #error "You're not building for a Teensy 4.1, 4.0, 3.6, 3.5, 3.2, 3.1 or 3.0?"
   #endif
 #else
   #error "You're not building for a Teensy?"
@@ -141,11 +153,6 @@
 #define KYR_ST_VOL_POT	A2	// [x] CWKeyer proto =
 #define KYR_ST_FREQ_POT	A3	// [x] CWKeyer proto =
 #define KYR_SPEED_POT	A8	// [x] CWKeyer proto = 22!
-
-/*
-** whether to enable line level inputs/outputs
-*/
-#define KYR_ENABLE_LINE 0	// CWKeyer proto has no line level
 
 /*
 ** keyer voices
@@ -380,12 +387,29 @@
 #define KYRP_KYR_OFFSET		KYRP_VOX_5
 #define KYRP_BUT_OFFSET		KYRP_VOX_6
 
+#define KYRE_EXEC		(KYRP_LAST) /* relocation -> */
+#define KYRE_WRITE_EEPROM	(KYRE_EXEC+0) /* write kyr_nrpn to eeprom */
+#define KYRE_READ_EEPROM	(KYRE_EXEC+1) /* read kyr_nrpn from eeprom */
+#define KYRE_SET_DEFAULT	(KYRE_EXEC+2) /* load kyr_nrpn with default values */
+#define KYRE_ECHO_ALL		(KYRE_EXEC+3) /* echo all set nrpns to midi */
+#define KYRE_SEND_WINK		(KYRE_EXEC+4) /* send character value to wink vox */
+#define KYRE_SEND_KYR		(KYRE_EXEC+5) /* send character value to kyr vox */
+#define KYRE_MSG_INDEX		(KYRE_EXEC+6) /* set index into kyr_msgs */
+#define KYRE_MSG_WRITE		(KYRE_EXEC+7) /* set kyr_msgs[index++] */
+#define KYRE_MSG_READ		(KYRE_EXEC+8) /* read kyr_msgs[index++] */
+#define KYRE_MSG_SIZE		(KYRE_EXEC+9) /* send the size of kyr_msgs */
+#define KYRE_PLAY_WINK		(KYRE_EXEC+10) /* queue message by number through wink */
+#define KYRE_PLAY_KYR		(KYRE_EXEC+11) /* queue message by number through kyr */ 
+#define KYRE_NRPN_SIZE		(KYRE_EXEC+12) /* size of kyr_nrpn */
+
 /* 
 ** these are named NRPN values
 */
 
 /* the unset value */
-#define KYRV_NOT_SET			-1
+#define KYRV_NOT_SET			-1	    /* 16 bit value */
+#define KYRV_MASK			((1<<14)-1) /* fourteen bit values */
+#define KYRV_SIGN_EXTEND(v)		((((int16_t)(v))<<2)>>2) /* sign extend 14 bits to 16 */
 
 /* slew ramps, values of KYRP_RISE_RAMP and KYRP_FALL_RAMP */
 #define KYRV_RAMP_HANN			0 /* ramp from Hann window, raised cosine */
@@ -412,11 +436,5 @@
 #define KYRV_IQ_NONE			0 /* no IQ */
 #define KYRV_IQ_LSB			1 /* IQ for lower sideband */
 #define KYRV_IQ_USB			2 /* IQ for upper sideband */
-
-/* send midi enable modes, values KYRP_SEND_MIDI */
-//#define KYRV_SM_NONE			0 /* no midi */
-//#define KYRV_SM_OUTPUT			1 /* send output key events */
-//#define KYRV_SM_INPUT			2 /* send input key events */
-//#define KYRV_SM_BOTH			3 /* send input and output events */
 
 #endif
