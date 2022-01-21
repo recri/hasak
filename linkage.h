@@ -50,6 +50,7 @@ static inline int16_t get_button(int button) { return (((int16_t)get_nrpn(KYRP_B
 
 /* debounce interval */
 static inline int16_t get_debounce(void) { return get_nrpn(KYRP_DEBOUNCE); }
+static inline int16_t get_comp(void) { return get_nrpn(KYRP_COMP); }
 
 /* paddle modes */
 static inline int16_t get_vox_pad_mode(const int16_t vox) { return get_vox_nrpn(vox, KYRP_PAD_MODE); }
@@ -70,7 +71,6 @@ static inline int16_t get_vox_iws(const int16_t vox) { return get_vox_nrpn(vox, 
 static inline int16_t get_vox_speed(const int16_t vox) { return get_vox_nrpn(vox, KYRP_SPEED); }
 static inline int16_t get_vox_weight(const int16_t vox) { return get_vox_nrpn(vox, KYRP_WEIGHT); }
 static inline int16_t get_vox_ratio(const int16_t vox) { return get_vox_nrpn(vox, KYRP_RATIO); }
-static inline int16_t get_vox_comp(const int16_t vox) { return get_vox_nrpn(vox, KYRP_COMP); }
 static inline int16_t get_vox_farns(const int16_t vox) { return get_vox_nrpn(vox, KYRP_FARNS); }
 
 /* keyed tone parameters */

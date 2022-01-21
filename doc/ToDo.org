@@ -34,6 +34,8 @@
 [-] write cwkeyer.js progressive web app controller
 [ ] find/make nice web components for pwa
 [ ] replace diagnostics with PWA functions.
+[ ] implement mouse wheel on spinner value change behavior
+[ ] implement drag mouse out of spinner value change behvior
 [x] disable codec's which don't return true to codec.enable()
 [x] compile time hdw_out and adc_in
 [x] no adc config in inputs.h, simply add 4 analogRead()

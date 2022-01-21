@@ -299,18 +299,9 @@ void setup(void) {
    * want to hack on their Teensys, so we can also use an
    * interval timer.
    */
-#if defined(KYRC_USE_LRCLK)  
-  attachInterrupt(KYR_LRCLK, pollatch, RISING);
-#endif
-#if defined(KYRC_DUP_LRCLK)
-  pinMode(KYR_DUP_LRCLK, INPUT);
-  attachInterrupt(KYR_DUP_LRCLK, pollatch, RISING);
-#endif
-#if defined(KYRC_USE_TIMER)
   static IntervalTimer timer;
   timer.priority(96);
   timer.begin(pollatch, 1e6/AUDIO_SAMPLE_RATE_EXACT);
-#endif
 
   midi_setup();
   winkey_setup();

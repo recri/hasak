@@ -34,8 +34,8 @@ static inline void set_nrpn(const int16_t nrpn, const int16_t value) {
 
 /* set a vox specialized nrpn */
 static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
-  if (vox >= 0 && vox <= KYR_N_VOX && nrpn >= KYRP_KEYER && nrpn < KYRP_VOX_1)
-    set_nrpn(nrpn+vox*(KYRP_VOX_1-KYRP_VOX_0), value);
+  if (vox >= 0 && vox <= KYR_N_VOX && nrpn >= KYRP_KEYER && nrpn < KYRP_VOX_TUNE)
+    set_nrpn(nrpn+vox*KYRP_VOX_OFFSET, value);
 }
 
 /*
@@ -48,22 +48,22 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   const float wpm = get_vox_speed(vox);
   const float weight = get_vox_weight(vox);
   const float ratio = get_vox_ratio(vox);
-  const float compensation = get_vox_comp(vox);
+  //const float compensation = get_vox_comp(vox);
   const float farnsworth = get_vox_farns(vox);;
   const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
-  const float c = compensation / 10.0 / ms_per_dit; /* ms/10 / ms_per_dit */
+  // const float c = compensation / 10.0 / ms_per_dit; /* ms/10 / ms_per_dit */ 
   /* Serial.printf("nrpn_update_keyer sr %f, word %d, wpm %f, weight %d, ratio %d, comp %d, farns %d\n", 
      sampleRate, wordDits, wpm, weight, ratio, compensation, farnsworth); */
   /* Serial.printf("morse_keyer r %f, w %f, c %f\n", r, w, c); */
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
   const unsigned ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
-  int ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
-  int ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
-  int ticksPerIes = (1  -w-c) * ticksPerBaseDit;
-  int ticksPerIls = (3  -w-c) * ticksPerBaseDit;
-  int ticksPerIws = (7  -w-c) * ticksPerBaseDit;
+  int ticksPerDit = (1+r+w) * ticksPerBaseDit; /* +c */
+  int ticksPerDah = (3-r+w) * ticksPerBaseDit; /* +c */
+  int ticksPerIes = (1  -w) * ticksPerBaseDit; /* -c */
+  int ticksPerIls = (3  -w) * ticksPerBaseDit; /* -c */
+  int ticksPerIws = (7  -w) * ticksPerBaseDit; /* -c */
     
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
@@ -127,6 +127,7 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_AUDIO_MODE, 0);
   nrpn_set(KYRP_ST_PAN, 8096);
   nrpn_set(KYRP_DEBOUNCE, 50);
+  nrpn_set(KYRP_COMP,0);
   
   nrpn_set(KYRP_CC_CHAN_RECV, KYRC_CC_CHAN_RECV);
   nrpn_set(KYRP_CC_CHAN_SEND, KYRC_CC_CHAN_SEND);
@@ -169,7 +170,6 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_SPEED,18);
   nrpn_set(KYRP_WEIGHT,50);
   nrpn_set(KYRP_RATIO,50);
-  nrpn_set(KYRP_COMP,0);
   nrpn_set(KYRP_FARNS,0);
   nrpn_set(KYRP_TONE,600);
   nrpn_set(KYRP_LEVEL, 64);
@@ -188,7 +188,7 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_AUTO_IWS, 0);
   
   /* voice specializations */
-  for (int i = KYRP_VOX_1; i < KYRP_LAST; i += 1)
+  for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
     kyr_nrpn[i] = KYRV_NOT_SET;
 }
 
@@ -240,8 +240,6 @@ static int nrpn_read_eeprom(void) {
 */
 static void nrpn_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
-  case KYRP_VERSION:
-    kyr_nrpn[nrpn] = KYRC_VERSION; nrpn_echo(nrpn, value); break;
   case KYRP_VOLUME:
     // nrpn_report("KYRP_VOLUME", kyr_nrpn[nrpn], value);
     codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
@@ -322,95 +320,75 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 
     // keyer voice cases
 #define keyer_case(VOX, VOXP) \
-  case VOXP+KYRP_TONE: \
-  case VOXP+KYRP_HEAD_TIME: \
-  case VOXP+KYRP_TAIL_TIME: \
-  case VOXP+KYRP_RISE_TIME: \
-  case VOXP+KYRP_FALL_TIME: \
-  case VOXP+KYRP_RISE_RAMP: \
-  case VOXP+KYRP_FALL_RAMP: \
-  case VOXP+KYRP_PAD_MODE: \
-  case VOXP+KYRP_PAD_SWAP: \
-  case VOXP+KYRP_PAD_ADAPT: \
-  case VOXP+KYRP_PER_DIT: \
-  case VOXP+KYRP_PER_DAH: \
-  case VOXP+KYRP_PER_IES: \
-  case VOXP+KYRP_PER_ILS: \
-  case VOXP+KYRP_PER_IWS: \
-  case VOXP+KYRP_AUTO_ILS: \
-  case VOXP+KYRP_AUTO_IWS: \
+  case VOXP+KYRP_TONE:	    case VOXP+KYRP_LEVEL:     case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_HANG_TIME: \
+  case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME: case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: \
+  case VOXP+KYRP_PAD_MODE:  case VOXP+KYRP_PAD_SWAP:  case VOXP+KYRP_PAD_ADAPT: case VOXP+KYRP_AUTO_ILS:  case VOXP+KYRP_AUTO_IWS: \
   case VOXP+KYRP_PAD_KEYER: \
-  case VOXP+KYRP_HANG_TIME: \
-  case VOXP+KYRP_LEVEL: \
     kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
-  case VOXP+KYRP_SPEED: \
-  case VOXP+KYRP_WEIGHT: \
-  case VOXP+KYRP_RATIO: \
-  case VOXP+KYRP_COMP: \
-  case VOXP+KYRP_FARNS: \
+  case VOXP+KYRP_SPEED:     case VOXP+KYRP_WEIGHT:    case VOXP+KYRP_RATIO:     case VOXP+KYRP_FARNS: \
     kyr_nrpn[nrpn] = value; nrpn_update_keyer_timing(VOX); nrpn_echo(nrpn, value); break;
     
-    keyer_case(KYR_VOX_NONE, KYRP_VOX_0-KYRP_VOX_0);    // default keyer params
-    keyer_case(KYR_VOX_TUNE, KYRP_VOX_1-KYRP_VOX_0);    // tune params
-    keyer_case(KYR_VOX_S_KEY, KYRP_VOX_2-KYRP_VOX_0);    // straight key keyer params
-    keyer_case(KYR_VOX_PAD, KYRP_VOX_3-KYRP_VOX_0);    // paddle keyer params
-    keyer_case(KYR_VOX_WINK, KYRP_VOX_4-KYRP_VOX_0);    // winkey text keyer params
-    keyer_case(KYR_VOX_KYR, KYRP_VOX_5-KYRP_VOX_0);    // kyr text keyer params
-    keyer_case(KYR_VOX_KYR, KYRP_VOX_6-KYRP_VOX_0);    // button key params
+    keyer_case(KYR_VOX_NONE, KYRP_VOX_NONE-KYRP_KEYER); // default keyer params
+    keyer_case(KYR_VOX_TUNE, KYRP_VOX_TUNE-KYRP_KEYER); // tune params
+    keyer_case(KYR_VOX_S_KEY, KYRP_VOX_S_KEY-KYRP_KEYER); // straight key keyer params
+    keyer_case(KYR_VOX_PAD, KYRP_VOX_PAD-KYRP_KEYER);     // paddle keyer params
+    keyer_case(KYR_VOX_WINK, KYRP_VOX_WINK-KYRP_KEYER); // winkey text keyer params
+    keyer_case(KYR_VOX_KYR, KYRP_VOX_KYR-KYRP_KEYER);   // kyr text keyer params
+    keyer_case(KYR_VOX_KYR, KYRP_VOX_BUT-KYRP_KEYER);   // button key params
 
 #undef keyer_case    
     
-    /* rest of these are ephemeral, they keep no state in kyr_nrpn */
-  case KYRE_WRITE_EEPROM:
+    /* commands, keep no state in kyr_nrpn */
+  case KYRP_WRITE_EEPROM:
     nrpn_write_eeprom();
     nrpn_echo(nrpn, 1);
     break;
-  case KYRE_READ_EEPROM: 
+  case KYRP_READ_EEPROM: 
     nrpn_echo(nrpn, nrpn_read_eeprom());
     break;
-  case KYRE_SET_DEFAULT:
+  case KYRP_SET_DEFAULT:
     nrpn_set_defaults();
     nrpn_echo(nrpn, 1);
     break;
-  case KYRE_ECHO_ALL:
+  case KYRP_ECHO_ALL:
     for (int i = 0; i < KYRP_LAST; i += 1) 
       if (kyr_nrpn[i] != KYRV_NOT_SET) 
 	nrpn_echo(i, kyr_nrpn[i]);
     nrpn_echo(nrpn, 0);
     break;
-  case KYRE_SEND_WINK: 
+  case KYRP_SEND_WINK: 
     wink.send_text(value&127); 
     nrpn_echo(nrpn, value&127);
     break;
-  case KYRE_SEND_KYR: 
+  case KYRP_SEND_KYR: 
     kyr.send_text(value&127);
     nrpn_echo(nrpn, value&127);
     break;
-  case KYRE_MSG_INDEX: 
+  case KYRP_MSG_INDEX: 
     kyr_index = min(sizeof(kyr_msgs)-1, max(0, value));
     nrpn_echo(nrpn, kyr_index);
     break;
-  case KYRE_MSG_WRITE:
+  case KYRP_MSG_WRITE:
     nrpn_echo(nrpn, value&127);
     kyr_msgs[kyr_index++] = value&127;
     kyr_index = min(sizeof(kyr_msgs)-1, max(0, value));
     break;
-  case KYRE_MSG_READ: 
+  case KYRP_MSG_READ: 
     nrpn_echo(nrpn, kyr_msgs[kyr_index++]);
     kyr_index = min(sizeof(kyr_msgs)-1, max(0, value));
     break;
-  case KYRE_MSG_SIZE:
-    nrpn_echo(nrpn, sizeof(kyr_msgs));
-    break;
-  case KYRE_PLAY_WINK:
+  case KYRP_PLAY_WINK:
     nrpn_echo(nrpn, value);
     break;
-  case KYRE_PLAY_KYR:
+  case KYRP_PLAY_KYR:
     nrpn_echo(nrpn, value);
     break;
-  case KYRE_NRPN_SIZE:
-    nrpn_echo(nrpn, sizeof(kyr_nrpn));
-    break;
+
+    /* information only, cause no side effects */
+  case KYRP_VERSION: nrpn_echo(nrpn, KYRC_VERSION); break;
+  case KYRP_NRPN_SIZE: nrpn_echo(nrpn, sizeof(kyr_nrpn)); break;
+  case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(kyr_msgs)); break;
+
   default: 
     if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64)) {
       kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value);
@@ -448,7 +426,7 @@ static void nrpn_setup(void) {
 #if 0
   for (int i = 0; i < KYRP_LAST; i += 1)
     if (kyr_nrpn[i] == KYRV_NOT_SET) {
-      if (i >= KYRP_VOX_1) continue;
+      if (i >= KYRP_VOX_TUNE) continue;
       Serial.printf("nrpn #%d is not initialized\n", i);
     }
 #endif
