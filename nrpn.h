@@ -95,7 +95,7 @@ static void nrpn_echo(const int16_t nrpn, const int16_t value) {
 }  
 
 static void nrpn_set_mixer(const int16_t nrpn, const int16_t value, AudioMixer4& mixer) {
-  mixer.gain((nrpn-KYRP_MIXER)%4, dbdown(value));
+  mixer.gain((nrpn-KYRP_MIXER)%4, int_to_127ths(value));
 }
 
 static void nrpn_report(const char *name, const int16_t oldval, const int16_t newval) {

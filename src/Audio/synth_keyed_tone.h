@@ -140,8 +140,7 @@ public:
     scale = (phase >> 8) & 0xFFFF;
     val2 *= scale;
     val1 *= 0x10000 - scale;
-    return dbdown7bit(get_vox_nrpn(vox, KYRP_LEVEL))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
-    // return val1+val2;
+    return get_vox_nrpn(vox, KYRP_LEVEL)*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
   }
   uint32_t phase_increment(void) {
     return get_vox_nrpn(vox, KYRP_TONE) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
