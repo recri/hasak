@@ -116,7 +116,7 @@ void AudioEffectPaddle::update(void)
   audio_block_t *blocka, *blockb, *blockc;
   int16_t *pa, *pb, *pc, *end;
 
-  switch (get_vox_pad_keyer(vox)) {
+  switch (get_nrpn(KYRP_PAD_KEYER)) {
   case KYRV_KEYER_AD5DZ: keyer = &ad5dz; break;
   case KYRV_KEYER_K1EL: keyer = &k1el; break;
   case KYRV_KEYER_ND7PA: keyer = &nd7pa; break;
@@ -127,8 +127,8 @@ void AudioEffectPaddle::update(void)
   blockb = receiveReadOnly(1);
   pb = blockb ? blockb->data : (int16_t *)zeros;
   blockc = allocate();
-  int adapter = get_vox_pad_adapt(vox);
-  int swapped = get_vox_pad_swap(vox);
+  int adapter = get_nrpn(KYRP_PAD_ADAPT);
+  int swapped = get_nrpn(KYRP_PAD_SWAP);
   if (blockc) {
     int sum = 0;
     pc = blockc->data;

@@ -98,13 +98,13 @@ void AudioEffectArbiter::update(void)
     }
 
     /* deal with sidetone key stream first */
-    if (block[active_stream] && (get_st_enable() || local[active_stream]))
+    if (block[active_stream] && (get_nrpn(KYRP_ST_ENABLE) || local[active_stream]))
       transmit(block[active_stream], 0);
 
     /* fetch current ptt parameters */
     int vox = get_active_vox();
-    int ptt_head = ms_to_samples(get_vox_ptt_head(vox));
-    int ptt_tail = max(ms_to_samples(get_vox_ptt_tail(vox)), get_vox_ptt_hang(vox)*get_vox_dit(vox));
+    int ptt_head = ms_to_samples(get_nrpn(KYRP_HEAD_TIME));
+    int ptt_tail = ms_to_samples(max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_vox_nrpn(vox, KYRP_PER_DIT)));
 
     /* deal with actual change in active_delay, or a mismatch triggered by change_over */
     if (ptt_head != active_delay) {
@@ -166,7 +166,7 @@ void AudioEffectArbiter::update(void)
 	sumk += *pk++ = bool2fix(key);
 	sump += *pp++ = bool2fix(ptt);
       }
-      if (active_stream >= 0 && get_tx_enable() && ! local[active_stream]) {
+      if (active_stream >= 0 && get_nrpn(KYRP_TX_ENABLE) && ! local[active_stream]) {
 	if (sumk != 0) transmit(keyout, 1); // send key out stream
 	if (sump != 0) transmit(pttout, 2); // send ptt out stream
       }

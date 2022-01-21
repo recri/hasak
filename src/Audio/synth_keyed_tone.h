@@ -71,12 +71,12 @@ public:
   // oscillatar may vary
   void start_rise() {
     vox = get_active_vox();		// current vox, vox is consistent across in the arbiter
-    rate = 0xFFFFFFFFu / (get_vox_rise_time(vox) * 1e-4 * AUDIO_SAMPLE_RATE);
-    fall_rate = 0xFFFFFFFFu / (get_vox_fall_time(vox) * 1e-4 * AUDIO_SAMPLE_RATE);
-    table = get_table(get_vox_rise_ramp(vox));
-    fall_table = get_table(get_vox_fall_ramp(vox));
-    // int16_t iq_adjust = get_iq_adjust();
-    // phase_increment = get_vox_tone(vox) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+    rate = 0xFFFFFFFFu / tenth_ms_to_samples(get_nrpn(KYRP_RISE_TIME));
+    fall_rate = 0xFFFFFFFFu / tenth_ms_to_samples(get_nrpn(KYRP_FALL_TIME));
+    table = get_table(get_nrpn(KYRP_RISE_RAMP));
+    fall_table = get_table(get_nrpn(KYRP_FALL_RAMP));
+    // int16_t iq_adjust = get_nrpn(KYRP_IQ_ADJUST);
+    // phase_increment = get_vox_nrpn(vox, KYRP_TONE) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
     // don't know what the units of iqph are, yet, 
     // needs to be positive or negative offset from exact 90 phase.
     // have 14bits, so 13bits and sign, thats +/-8192
@@ -84,7 +84,7 @@ public:
     // there should be a level balance here, too.
     // IQ might need its own frequency, too.
     // I may have USB and LSB swapped
-    switch (get_iq_enable()) {
+    switch (get_nrpn(KYRP_IQ_ENABLE)) {
     default:
     case KYRV_IQ_NONE: 
     case KYRV_IQ_USB: 
@@ -140,11 +140,11 @@ public:
     scale = (phase >> 8) & 0xFFFF;
     val2 *= scale;
     val1 *= 0x10000 - scale;
-    return dbdown7bit(get_vox_level(vox))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
+    return dbdown7bit(get_vox_nrpn(vox, KYRP_LEVEL))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
     // return val1+val2;
   }
   uint32_t phase_increment(void) {
-    return get_vox_tone(vox) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
+    return get_vox_nrpn(vox, KYRP_TONE) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
   }
   virtual void update(void);
 private:

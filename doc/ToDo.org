@@ -10,7 +10,10 @@
 	rather than popping to the new value.
 [ ] add mixer output unmute bitmap nrpn, leaves mixer levels be.
 [ ] mixer set with left and right in same nrpn
-[ ] mixers as AudioMixer4 mixer[3][2];
+[ ] reimplement compensation
+[ ] reimplement ptt_enable
+[x] mixers as AudioMixer4 mixer[6];
+	doesn't work, what don't I understand?
 [-] rename KYR_ to KYRC_ if configurable
 [-] make virtual NRPNs for
 [x]	load defaults, 
@@ -22,13 +25,16 @@
 [x]	for reading and writing saved messages
 [-]	for playing message on kyr
 [-]	for playing message on wink
-[ ] annotate config.h for postprocessing into javascript
+[-]	for seting index into kyr_msgs
+[-]	for storing a byte into kyr_msgs
+[-]	for reading a byte from kyr_msgs
+[x] annotate config.h for postprocessing into javascript
 [ ] solve the initialization bug
 	still mysterious, same nrpn values except for gaps,
 	but keyer still broken.
 [-] add named stored messages, with named interpolations,
 	saved to and restored from eeprom
-[ ] plug a phone headset into a splitter and into microphone jack
+[-] plug a phone headset into a splitter and into microphone jack
 	and see if you read ExT_PTT
 [ ] make a key/ptt led indicator for the key/ptt output jack
 [-] write cwkeyer.js progressive web app controller
@@ -36,7 +42,12 @@
 [ ] replace diagnostics with PWA functions.
 [ ] implement mouse wheel on spinner value change behavior
 [ ] implement drag mouse out of spinner value change behvior
+[x] move COMP into vox independent parameters
+[x] move PTT timing into vox independent parameters
+[x] move PAD config into vox independent parameters
+[x] move RAMP config into vox independent parameters
 [x] disable codec's which don't return true to codec.enable()
+[x] reduce codec NRPN's to the common control interface.
 [x] compile time hdw_out and adc_in
 [x] no adc config in inputs.h, simply add 4 analogRead()
 	to construct a 12 bit input

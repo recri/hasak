@@ -87,7 +87,7 @@ void AudioInputByte::update(void)
 	sum += *bp++ = last;
       } else if (*bp != last) {
 	sum += last = *bp++;
-	debounce = get_debounce();
+	debounce = ms_to_samples(get_nrpn(KYRP_DEBOUNCE));
       } else {
 	sum += *bp++;
       }

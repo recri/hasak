@@ -30,14 +30,14 @@ class KeyerGeneric {
  KeyerGeneric(const int vox) : vox(vox) { }
   void init(void) { }
   virtual int clock(int dit, int dah, int ticks) { return 0; }
-  int pad_mode(void) { return get_vox_pad_mode(vox); }
-  int dit(void) { return get_vox_dit(vox); }
-  int dah(void) { return get_vox_dah(vox); }
-  int ies(void) { return get_vox_ies(vox); }
-  int ils(void) { return get_vox_ils(vox); }
-  int iws(void) { return get_vox_iws(vox); }
-  int auto_ils(void) { return get_vox_auto_ils(vox); }
-  int auto_iws(void) { return get_vox_auto_iws(vox); }
+  int pad_mode(void) { return get_nrpn(KYRP_PAD_MODE); }
+  int dit(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_DIT)); }
+  int dah(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_DAH)); }
+  int ies(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IES)); }
+  int ils(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_ILS)); }
+  int iws(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IWS)); }
+  int auto_ils(void) { return get_nrpn(KYRP_AUTO_ILS); }
+  int auto_iws(void) { return get_nrpn(KYRP_AUTO_IWS); }
   
  private:
   const int vox;

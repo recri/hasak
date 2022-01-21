@@ -137,12 +137,12 @@ private:
     uint8_t value = recv_text();
     if (value == ' ') {
       // send word space
-      send(-get_vox_iws(vox));
+      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IWS)));
       return 1;
     }
     if (value == '|') {
       // send half dit space
-      send(-get_vox_dit(vox)/2);
+      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_DIT))/2);
       return 1;
     }
     int sent = 0;
@@ -157,13 +157,13 @@ private:
     }
     uint8_t code = get_nrpn(KYRP_MORSE+value-33);
     while (code > 1) {
-      send(code & 1 ? get_vox_dah(vox) : get_vox_dit(vox));
-      send(-get_vox_ies(vox));
+      send(ms_to_samples(get_vox_nrpn(vox, code & 1 ? KYRP_PER_DAH : KYRP_PER_DIT)));
+      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IES)));
       code >>= 1;
       sent += 2;
     }
     if (code == 1 && ! prosign) {
-      send(-(get_vox_ils(vox)-get_vox_ies(vox)));
+      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_ILS)-get_vox_nrpn(vox, KYRP_PER_IES)));
       sent += 1;
     }
     return sent > 0;

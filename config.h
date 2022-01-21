@@ -214,8 +214,6 @@
 ** KYRP_MIXER - the 24 output mixer levels
 ** KYRP_KEYER - the default keyer parameters
 ** KYRP_VOX_* - the voice specific keyer parameters
-** KYRE_* - commands
-** KYRI_* - information
 */
 #define KYRV_NOT_SET -1		/* {type val label {16 bit not set value}} */
 #define KYRV_MASK    0x3fff	/* {type val label {14 bit mask}} */
@@ -225,19 +223,12 @@
 #define KYRP_GLOBAL		0 /* {type rel label {base of nrpns}} */
 
 #define KYRP_CODEC		(KYRP_GLOBAL) /* {type rel label {base of codec nrpns}} */
+
 #define KYRP_VOLUME		(KYRP_CODEC+0) /* {type par label {output volume} units {dB/2} range {0 127}} */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1) /* {type par label {input select} values {0 microphone 1 {line in}}} */
-#define KYRP_MIC_PREAMP_GAIN	(KYRP_CODEC+2) /* {type par label {microphone preamp gain} ignore 1} */
-#define KYRP_MUTE_HEAD_PHONES	(KYRP_CODEC+3) /* {type par label {head phone mute} range {0 1}} */
-#define KYRP_MUTE_LINE_OUT	(KYRP_CODEC+4) /* {type par label {line out mute} range {0 1}} */
-#define KYRP_LINE_IN_LEVEL	(KYRP_CODEC+5) /* {type par label {line in level} range {0 15} default 5 ignore 1} */
-#define KYRP_LINE_OUT_LEVEL	(KYRP_CODEC+6) /* {type par label {line out level} range {13 31} default 29 ignore 1} */
-#define KYRP_LINE_IN_LEVEL_L	(KYRP_CODEC+7) /* {type par label {left line in level} range {0 15} default 5 ignore 1} */
-#define KYRP_LINE_IN_LEVEL_R	(KYRP_CODEC+8) /* {type par label {right line in level} range {0 15} default 5 ignore 1} */
-#define KYRP_LINE_OUT_LEVEL_L	(KYRP_CODEC+9) /* {type par label {left line out level} range {13 31} default 29 ignore 1} */
-#define KYRP_LINE_OUT_LEVEL_R	(KYRP_CODEC+10)	/* {type par label {right line out level} range {13 31} default 29 ignore 1} */
+#define KYRP_INPUT_LEVEL	(KYRP_CODEC+2) /* {type par label {input level} range {0 127} units pp127} */
 
-#define KYRP_SOFT		(KYRP_CODEC+11) /* {type rel label {base of soft params}} */
+#define KYRP_SOFT		(KYRP_CODEC+3) /* {type rel label {base of soft params}} */
 
 #define KYRP_BUTTON_0		(KYRP_SOFT+0) /* {type par label {headset button 0 - none pressed} range {-8192 8191} ignore 1} */
 #define KYRP_BUTTON_1		(KYRP_SOFT+1) /* {type par label {headset button 1 - center or only pressed} range {-8192 8191} ignore 1} */
@@ -249,16 +240,54 @@
 #define KYRV_IQ_NONE		0 /* {type val value-of KYRP_IQ_ENABLE label {no IQ}} */
 #define KYRV_IQ_LSB		1 /* {type val value-of KYRP_IQ_ENABLE label {IQ for lower sideband}} */
 #define KYRV_IQ_USB		2 /* {type val value-of KYRP_IQ_ENABLE label {IQ for upper sideband}} */
-#define KYRP_IQ_ADJUST		(KYRP_SOFT+7) /* {type par label {adjustment to IQ phase} range {-8192 8191} units {tbd}} */
+#define KYRP_IQ_ADJUST		(KYRP_SOFT+7) /* {type par label {adjustment to IQ phase} range {-8192 8191} units pp8191} */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+8) /* {type par label {soft enable TX} range {0 1}} */
 #define KYRP_ST_ENABLE		(KYRP_SOFT+9) /* {type par label {enable sidetone generation} range {0 1}} */
-#define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type par label {adjustment to IQ balance} range {-8192 8191} units tbd} */
+#define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type par label {adjustment to IQ balance} range {-8192 8191} units pp8191} */
 #define KYRP_ST_AUDIO_MODE	(KYRP_SOFT+11) /* {type par label {sidetone operation mode} values tbd cmt {what?}} */
 #define KYRP_ST_PAN		(KYRP_SOFT+12) /* {type par label {sidetone pan left or right} values {-8192 8191}} */
-#define KYRP_DEBOUNCE		(KYRP_SOFT+13) /* {type par label {debounce period} range {0 127} units ms/10} */
-#define KYRP_COMP		(KYRP_SOFT+14)	/* {type par label {keyer compensation} range {0 16383} default 0 units µs} */
 
-#define KYRP_CHAN		(KYRP_SOFT+15) /* {type rel label {base of midi channels}} */
+#define KYRP_COMM		(KYRP_SOFT+13) /* {type rel label {keyer parameters shared across voices}} */
+
+#define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label {debounce period} range {0 127} units ms/10} */
+#define KYRP_COMP		(KYRP_COMM+1) /* {type par label {keyer compensation} range {-8192 8191} default 0 units ms/10} */
+
+#define KYRP_PTT		(KYRP_COMM+2) /* {type rel label {PTT timing parameters}} */
+
+#define KYRP_HEAD_TIME		(KYRP_PTT+0) /* {type par label {time ptt should lead key, key delay} range {0 127} unit ms/10} */
+#define KYRP_TAIL_TIME		(KYRP_PTT+1) /* {type par label {time ptt should linger after key} range {0 127} unit ms/10} */
+#define KYRP_HANG_TIME		(KYRP_PTT+2) /* {type par label {time in dits ptt should linger after key} range {0 127} units dits} */
+
+#define KYRP_RAMP		(KYRP_PTT+3) /* {type rel label {base of the keyer ramp parameters}} */
+
+#define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par label {key rise ramp length} range {0 16383} units ms/10} */
+#define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par label {key fall ramp length} range {0 16383} units ms/10} */
+#define KYRP_RISE_RAMP		(KYRP_RAMP+2)	/* {type par label {key rise ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
+#define KYRP_FALL_RAMP		(KYRP_RAMP+3)	/* {type par label {key fall ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
+#define KYRV_RAMP_HANN		0 /* {type val label {ramp from Hann window, raised cosine} value-of {KYRP_*_RAMP}} */
+#define KYRV_RAMP_BLACKMAN_HARRIS 1 /* {type val label {ramp from Blackman Harris window} value-of {KYRP_*_RAMP}} */
+#define KYRV_RAMP_LINEAR	2 /* {type val label {linear ramp, for comparison} value-of {KYRP_*_RAMP}} */
+
+#define KYRP_PAD		(KYRP_RAMP+4) /* {type rel label {base of paddle keyer parameters}} */
+
+#define KYRP_PAD_MODE		(KYRP_PAD+0)	/* {type par label {iambic keyer mode A/B/S} values KYRV_MODE_* default KYRV_MODE_A} */
+#define KYRV_MODE_A		0 /* {type val label {paddle keyer iambic mode A} value-of {KYRP_PAD_MODE}} */
+#define KYRV_MODE_B		1 /* {type val label {paddle keyer iambic mode B} value-of {KYRP_PAD_MODE}} */
+#define KYRV_MODE_S		2 /* {type val label {paddle keyer bug mode} value-of {KYRP_PAD_MODE}} */
+#define KYRP_PAD_SWAP		(KYRP_PAD+1)	/* {type par label {swap paddles} range {0 1} default 0} */
+#define KYRP_PAD_ADAPT		(KYRP_PAD+2)	/* {type par label {paddle adapter normal/ultimatic/single lever} values KYRV_ADAPT_* default KYRV_ADAPT_NORMAL} */
+#define KYRV_ADAPT_NORMAL	0 /* {type val label {paddle keyer unmodified} value-of {KYRP_PAD_ADAPT}} */
+#define KYRV_ADAPT_ULTIMATIC	1 /* {type val label {paddle keyer modified to produce ultimatic keyer} value-of {KYRP_PAD_ADAPT}} */
+#define KYRV_ADAPT_SINGLE	2 /* {type val label {paddle keyer modified to simulate single lever paddle} value-of {KYRP_PAD_ADAPT}} */
+#define KYRP_AUTO_ILS		(KYRP_PAD+3) /* {type par label {automatic letter space timing} range {0 1} default 1} */
+#define KYRP_AUTO_IWS		(KYRP_PAD+4)	/* {type par label {automatic word space timing} range {0 1} default 0} */
+#define KYRP_PAD_KEYER		(KYRP_PAD+5) /* {type par label {paddle keyer implementation} values KYRV_KEYER_* default KYRV_KEYER_VK6PH} */
+#define KYRV_KEYER_AD5DZ	0 /* {type val label {paddle keyer algorithm by ad5dz} value-of {KYRP_PAD_KEYER}}  */
+#define KYRV_KEYER_K1EL		1 /* {type val label {paddle keyer algorithm by k1el} value-of {KYRP_PAD_KEYER}} */
+#define KYRV_KEYER_ND7PA	2 /* {type val label {paddle keyer algorithm by nd7pa} value-of {KYRP_PAD_KEYER}} */
+#define KYRV_KEYER_VK6PH	3 /* {type val label {paddle keyer algorithm by vk6ph} value-of {KYRP_PAD_KEYER}} */
+
+#define KYRP_CHAN		(KYRP_PAD+6) /* {type rel label {base of midi channels}} */
 #define KYRP_CHAN_SEND_CC	(KYRP_CHAN+0) /* {type par label {midi channel for sending controls} range {0 16}} */
 #define KYRP_CHAN_RECV_CC	(KYRP_CHAN+1) /* {type par label {midi channle for receiving controls} range {0 16}} */
 #define KYRP_CHAN_SEND_NOTE_IN	(KYRP_CHAN+2) /* {type par label {midi channel for sending input notes} range {0 16}} */
@@ -329,56 +358,23 @@
 /* keyer parameters - for all keys */
 #define KYRP_TONE		(KYRP_KEYER+0) /* {type par label {sidetone and IQ oscillator frequency} range {0 16383}} */
 #define KYRP_LEVEL		(KYRP_KEYER+1) /* {type par label {sidetone level} range {0 127} default 64} */
-#define KYRP_HEAD_TIME		(KYRP_KEYER+2) /* {type par label {time ptt should lead key, key delay} range {0 127} unit ms} */
-#define KYRP_TAIL_TIME		(KYRP_KEYER+3) /* {type par label {time ptt should linger after key} range {0 127} unit ms} */
-#define KYRP_HANG_TIME		(KYRP_KEYER+4) /* {type par label {time in dits ptt should linger after key} units dits range {0 127}} */
-
-#define KYRP_RAMP		(KYRP_KEYER+5) /* {type rel label {base of the keyer ramp parameters}} */
-
-#define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par label {key rise ramp length} range {0 16383} units µs} */
-#define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par label {key fall ramp length} range {0 16383} units µs} */
-#define KYRP_RISE_RAMP		(KYRP_RAMP+2)	/* {type par label {key rise ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
-#define KYRP_FALL_RAMP		(KYRP_RAMP+3)	/* {type par label {key fall ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
-#define KYRV_RAMP_HANN		0 /* {type val label {ramp from Hann window, raised cosine} value-of {KYRP_*_RAMP}} */
-#define KYRV_RAMP_BLACKMAN_HARRIS 1 /* {type val label {ramp from Blackman Harris window} value-of {KYRP_*_RAMP}} */
-#define KYRV_RAMP_LINEAR	2 /* {type val label {linear ramp, for comparison} value-of {KYRP_*_RAMP}} */
-
-/* keyer parameters - for paddle and text keys */
-#define KYRP_TIME		(KYRP_RAMP+4) /* {type rel label {base of keyer element timing parameters}} */
-
-#define KYRP_SPEED		(KYRP_TIME+0)	/* {type par label {keyer speed control} range {0 127} units wpm} */
-#define KYRP_WEIGHT		(KYRP_TIME+1)	/* {type par label {keyer mark/space weight} range {0 127} default 64} */
-#define KYRP_RATIO		(KYRP_TIME+2)	/* {type par label {keyer dit/dah ratio} range {0 127} default 64} */
-#define KYRP_FARNS		(KYRP_TIME+3)	/* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
+#define KYRP_SPEED		(KYRP_KEYER+2)	/* {type par label {keyer speed control} range {0 127} units wpm} */
+#define KYRP_WEIGHT		(KYRP_KEYER+3)	/* {type par label {keyer mark/space weight} range {0 127} default 64} */
+#define KYRP_RATIO		(KYRP_KEYER+4)	/* {type par label {keyer dit/dah ratio} range {0 127} default 64} */
+#define KYRP_FARNS		(KYRP_KEYER+5)	/* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
 
 /* keyer parameters - for paddle keyers - this all fits into one word 2+1+2+1+1+2 == 9 bits  */
-#define KYRP_PAD		(KYRP_TIME+4) /* {type rel label {base of paddle keyer parameters}} */
-#define KYRP_PAD_MODE		(KYRP_PAD+0)	/* {type par label {iambic keyer mode A/B/S} values KYRV_MODE_* default KYRV_MODE_A} */
-#define KYRV_MODE_A		0 /* {type val label {paddle keyer iambic mode A} value-of {KYRP_PAD_MODE}} */
-#define KYRV_MODE_B		1 /* {type val label {paddle keyer iambic mode B} value-of {KYRP_PAD_MODE}} */
-#define KYRV_MODE_S		2 /* {type val label {paddle keyer bug mode} value-of {KYRP_PAD_MODE}} */
-#define KYRP_PAD_SWAP		(KYRP_PAD+1)	/* {type par label {swap paddles} range {0 1} default 0} */
-#define KYRP_PAD_ADAPT		(KYRP_PAD+2)	/* {type par label {paddle adapter normal/ultimatic/single lever} values KYRV_ADAPT_* default KYRV_ADAPT_NORMAL} */
-#define KYRV_ADAPT_NORMAL	0 /* {type val label {paddle keyer unmodified} value-of {KYRP_PAD_ADAPT}} */
-#define KYRV_ADAPT_ULTIMATIC	1 /* {type val label {paddle keyer modified to produce ultimatic keyer} value-of {KYRP_PAD_ADAPT}} */
-#define KYRV_ADAPT_SINGLE	2 /* {type val label {paddle keyer modified to simulate single lever paddle} value-of {KYRP_PAD_ADAPT}} */
-#define KYRP_AUTO_ILS		(KYRP_PAD+3) /* {type par label {automatic letter space timing} range {0 1} default 1} */
-#define KYRP_AUTO_IWS		(KYRP_PAD+4)	/* {type par label {automatic word space timing} range {0 1} default 0} */
-#define KYRP_PAD_KEYER		(KYRP_PAD+5) /* {type par label {paddle keyer implementation} values KYRV_KEYER_* default KYRV_KEYER_VK6PH} */
-#define KYRV_KEYER_AD5DZ	0 /* {type val label {paddle keyer algorithm by ad5dz} value-of {KYRP_PAD_KEYER}}  */
-#define KYRV_KEYER_K1EL		1 /* {type val label {paddle keyer algorithm by k1el} value-of {KYRP_PAD_KEYER}} */
-#define KYRV_KEYER_ND7PA	2 /* {type val label {paddle keyer algorithm by nd7pa} value-of {KYRP_PAD_KEYER}} */
-#define KYRV_KEYER_VK6PH	3 /* {type val label {paddle keyer algorithm by vk6ph} value-of {KYRP_PAD_KEYER}} */
-
 /* keyer timings in samples for paddle and text keyers - scratch values */
-#define KYRP_SPE		(KYRP_PAD+6) /* {type rel label {base of per sample timing scratch block}} */
+#define KYRP_SPE		(KYRP_KEYER+6) /* {type rel label {base of per sample timing scratch block}} */
 #define KYRP_PER_DIT		(KYRP_SPE+0) /* {type scr label {samples per dit}} */
 #define KYRP_PER_DAH		(KYRP_SPE+2) /* {type scr label {samples per dah}} */
 #define KYRP_PER_IES		(KYRP_SPE+3) /* {type scr label {samples per inter element space}} */
 #define KYRP_PER_ILS		(KYRP_SPE+4) /* {type scr label {samples per inter letter space}} */
 #define KYRP_PER_IWS		(KYRP_SPE+5) /* {type scr label {samples per inter word space}} */
+
 #define KYRP_KEYER_LAST		(KYRP_SPE+6) /* {type rel label {end of keyer block}} */
-/* four (or more) repetitions of the keyer block for per voice customizations */
+
+/* seve repetitions of the keyer block for per voice customizations */
 #define KYRP_VOX_OFFSET		(KYRP_KEYER_LAST-KYRP_KEYER) /* {type rel label {size of keyer parameter block}} */
 #define KYRP_VOX_NONE		(KYRP_KEYER+KYR_VOX_NONE*KYRP_VOX_OFFSET) /* {type rel label {base of default keyer parameters}} */
 #define KYRP_VOX_TUNE		(KYRP_KEYER+KYR_VOX_TUNE*KYRP_VOX_OFFSET) /* {type rel label {base of tune keyer parameters}} */
@@ -408,6 +404,7 @@
 #define KYRP_VERSION		(KYRP_INFO+0) /* {type inf label {version of hasak nrpn set}} */
 #define KYRP_NRPN_SIZE		(KYRP_INFO+1) /* {type inf label {size of kyr_nrpn}} */
 #define KYRP_MSG_SIZE		(KYRP_INFO+2) /* {type inf label {send the size of kyr_msgs}} */
+#define KYRP_SAMPLE_RATE	(KYRP_INFO+3) /* {type inf label {sample rate of audio library} units sps/100 */
 
 /* end of defined nrpns */
 /* end of config.h */

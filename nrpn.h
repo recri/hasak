@@ -19,12 +19,12 @@ static inline void set_nrpn(const int16_t nrpn, const int16_t value) {
 }
 
 /*
-** The idea of set_vox_*(vox, val) and get_vox_*(vox) is that
+** The idea of set_vox_nrpn(vox, val) and get_vox_nrpn(vox) is that
 ** keyer voices may have customized parameters, but
 ** fall back to the common parameter set when no
 ** customized parameter has been set.
-** So set_vox_*() sets the bank of the kyr_nrpn that
-** is vox specific, and get_vox_*(vox) looks in the vox
+** So set_vox_nrpn() sets the bank of the kyr_nrpn that
+** is vox specific, and get_vox_nrpn(vox, NRPN) looks in the vox
 ** specific bank and returns its value if it has been
 ** set, otherwise returns the value from the default bank.
 **
@@ -45,12 +45,12 @@ static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int
 static void nrpn_update_keyer_timing(const int16_t vox) {
   const float wordDits = 50;
   const float sampleRate = AUDIO_SAMPLE_RATE;
-  const float wpm = get_vox_speed(vox);
-  const float weight = get_vox_weight(vox);
-  const float ratio = get_vox_ratio(vox);
-  //const float compensation = get_vox_comp(vox);
-  const float farnsworth = get_vox_farns(vox);;
-  const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
+  const float wpm = get_vox_nrpn(vox, KYRP_SPEED);
+  const float weight = get_vox_nrpn(vox, KYRP_WEIGHT);
+  const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
+  //const float compensation = get_vox_nrpn(vox, KYRP_COMP);
+  const float farnsworth = get_vox_nrpn(vox, KYRP_FARNS);;
+  // const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
   // const float c = compensation / 10.0 / ms_per_dit; /* ms/10 / ms_per_dit */ 
@@ -81,11 +81,11 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   /* storing msPerElement, because ticks gets too large */
   AudioNoInterrupts();
-  set_vox_nrpn(vox, KYRP_PER_DIT, ticksPerDit/(AUDIO_SAMPLE_RATE/1000));
-  set_vox_nrpn(vox, KYRP_PER_DAH, ticksPerDah/(AUDIO_SAMPLE_RATE/1000));
-  set_vox_nrpn(vox, KYRP_PER_IES, ticksPerIes/(AUDIO_SAMPLE_RATE/1000));
-  set_vox_nrpn(vox, KYRP_PER_ILS, ticksPerIls/(AUDIO_SAMPLE_RATE/1000));
-  set_vox_nrpn(vox, KYRP_PER_IWS, ticksPerIws/(AUDIO_SAMPLE_RATE/1000));
+  set_vox_nrpn(vox, KYRP_PER_DIT, samples_to_ms(ticksPerDit));
+  set_vox_nrpn(vox, KYRP_PER_DAH, samples_to_ms(ticksPerDah));
+  set_vox_nrpn(vox, KYRP_PER_IES, samples_to_ms(ticksPerIes));
+  set_vox_nrpn(vox, KYRP_PER_ILS, samples_to_ms(ticksPerIls));
+  set_vox_nrpn(vox, KYRP_PER_IWS, samples_to_ms(ticksPerIws));
   AudioInterrupts();
 }
 
@@ -110,7 +110,11 @@ static void nrpn_report(const char *name, const int16_t oldval, const int16_t ne
 #include "morse_table.h"
 
 static void nrpn_set_defaults(void) {
+  nrpn_set(KYRP_VERSION, KYRC_VERSION);
+
   nrpn_set(KYRP_VOLUME, 64);
+  nrpn_set(KYRP_INPUT_SELECT, 0);
+  nrpn_set(KYRP_INPUT_LEVEL, 64);
 
   /* soft controls */
   nrpn_set(KYRP_BUTTON_0,  6800&KYRV_MASK); /* off */
@@ -136,7 +140,6 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_CHAN_RECV_NOTE_IN, KYRC_CHAN_RECV_NOTE_IN);
   nrpn_set(KYRP_CHAN_RECV_NOTE_OUT, KYRC_CHAN_RECV_NOTE_OUT);
 
-  nrpn_set(KYRP_VERSION, KYRC_VERSION);
 
   nrpn_set(KYRP_NOTE_L_PAD, KYR_NOTE_L_PAD);
   nrpn_set(KYRP_NOTE_R_PAD, KYR_NOTE_R_PAD);
@@ -152,14 +155,6 @@ static void nrpn_set_defaults(void) {
 
   /* morse code table */
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
-
-
-
-
-
-
-
-
     nrpn_set(i, morse[i-KYRP_MORSE]);
 
   for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1)
@@ -174,13 +169,7 @@ static void nrpn_set_defaults(void) {
       nrpn_set(i, 0); continue;
     }
 
-  /* keyer defaults */
-  nrpn_set(KYRP_SPEED,18);
-  nrpn_set(KYRP_WEIGHT,50);
-  nrpn_set(KYRP_RATIO,50);
-  nrpn_set(KYRP_FARNS,0);
-  nrpn_set(KYRP_TONE,600);
-  nrpn_set(KYRP_LEVEL, 64);
+  /* keyer defaults - common */
   nrpn_set(KYRP_RISE_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_FALL_TIME, 50);	// 5.0 ms
   nrpn_set(KYRP_RISE_RAMP, KYRV_RAMP_HANN);
@@ -191,9 +180,17 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
-  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_ND7PA);
+  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
   nrpn_set(KYRP_AUTO_ILS, 1);
   nrpn_set(KYRP_AUTO_IWS, 0);
+
+  /* keyer defaults - per voice */
+  nrpn_set(KYRP_TONE, 600);
+  nrpn_set(KYRP_LEVEL, 64);
+  nrpn_set(KYRP_SPEED,18);
+  nrpn_set(KYRP_WEIGHT,50);
+  nrpn_set(KYRP_RATIO,50);
+  nrpn_set(KYRP_FARNS,0);
   
   /* voice specializations */
   for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
@@ -249,22 +246,8 @@ static int nrpn_read_eeprom(void) {
 static void nrpn_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
   case KYRP_VOLUME:
-    // nrpn_report("KYRP_VOLUME", kyr_nrpn[nrpn], value);
-    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_INPUT_SELECT:
-  case KYRP_MUTE_HEAD_PHONES:
-  case KYRP_MUTE_LINE_OUT:
-  case KYRP_LINE_OUT_LEVEL_L:
-  case KYRP_LINE_OUT_LEVEL_R:
-  case KYRP_LINE_IN_LEVEL_L:
-  case KYRP_LINE_IN_LEVEL_R:
-  case KYRP_MIC_PREAMP_GAIN:
-    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_LINE_OUT_LEVEL:
-    kyr_nrpn[KYRP_LINE_OUT_LEVEL_L] = kyr_nrpn[KYRP_LINE_OUT_LEVEL_R] = value;
-    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_LINE_IN_LEVEL:
-    kyr_nrpn[KYRP_LINE_IN_LEVEL_L] = kyr_nrpn[KYRP_LINE_IN_LEVEL_R] = value;
+  case KYRP_INPUT_LEVEL:
     codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_BUTTON_0:
   case KYRP_BUTTON_1:
@@ -279,7 +262,23 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_IQ_BALANCE:
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
+
   case KYRP_DEBOUNCE:
+  case KYRP_COMP:
+  case KYRP_HEAD_TIME:
+  case KYRP_TAIL_TIME:
+  case KYRP_HANG_TIME:
+  case KYRP_RISE_TIME:
+  case KYRP_FALL_TIME:
+  case KYRP_RISE_RAMP:
+  case KYRP_FALL_RAMP:
+  case KYRP_PAD_MODE:
+  case KYRP_PAD_SWAP:
+  case KYRP_PAD_ADAPT:
+  case KYRP_AUTO_ILS:
+  case KYRP_AUTO_IWS:
+  case KYRP_PAD_KEYER:
+
   case KYRP_CHAN_SEND_CC:
   case KYRP_CHAN_RECV_CC:
   case KYRP_CHAN_SEND_NOTE_IN:
@@ -328,10 +327,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 
     // keyer voice cases
 #define keyer_case(VOX, VOXP) \
-  case VOXP+KYRP_TONE:	    case VOXP+KYRP_LEVEL:     case VOXP+KYRP_HEAD_TIME: case VOXP+KYRP_TAIL_TIME: case VOXP+KYRP_HANG_TIME: \
-  case VOXP+KYRP_RISE_TIME: case VOXP+KYRP_FALL_TIME: case VOXP+KYRP_RISE_RAMP: case VOXP+KYRP_FALL_RAMP: \
-  case VOXP+KYRP_PAD_MODE:  case VOXP+KYRP_PAD_SWAP:  case VOXP+KYRP_PAD_ADAPT: case VOXP+KYRP_AUTO_ILS:  case VOXP+KYRP_AUTO_IWS: \
-  case VOXP+KYRP_PAD_KEYER: \
+  case VOXP+KYRP_TONE:	    case VOXP+KYRP_LEVEL: \
     kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
   case VOXP+KYRP_SPEED:     case VOXP+KYRP_WEIGHT:    case VOXP+KYRP_RATIO:     case VOXP+KYRP_FARNS: \
     kyr_nrpn[nrpn] = value; nrpn_update_keyer_timing(VOX); nrpn_echo(nrpn, value); break;
@@ -396,7 +392,8 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_VERSION: nrpn_echo(nrpn, KYRC_VERSION); break;
   case KYRP_NRPN_SIZE: nrpn_echo(nrpn, sizeof(kyr_nrpn)); break;
   case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(kyr_msgs)); break;
-
+  case KYRP_SAMPLE_RATE: nrpn_echo(nrpn, ((uint16_t)AUDIO_SAMPLE_RATE)/100); break;
+				   
   default: 
     if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64)) {
       kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value);
@@ -412,20 +409,20 @@ static void nrpn_setup(void) {
   codec_enable();
 
   /* mute headphones */
-  nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
-  nrpn_set(KYRP_VOLUME, 0);
+  // nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
+  nrpn_set(KYRP_VOLUME, 64);
 
   /* codec setup */
-  nrpn_set(KYRP_INPUT_SELECT, 0);
-  nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
+  // nrpn_set(KYRP_INPUT_SELECT, 0);
+  // nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
   // kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
   // nrpn_set(KYRP_MIC_IMPEDANCE, 1);   // taken from audio library
-  nrpn_set(KYRP_MUTE_LINE_OUT, 1);
-  nrpn_set(KYRP_LINE_IN_LEVEL, 5);
-  nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
+  // nrpn_set(KYRP_MUTE_LINE_OUT, 1);
+  //  nrpn_set(KYRP_LINE_IN_LEVEL, 5);
+  // nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
 
   /* unmute headphones */
-  nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
+  // nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
 
 #if 0
   for (int i = 0; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;

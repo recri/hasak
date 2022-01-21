@@ -39,7 +39,7 @@ void AudioSynthKeyedTone::update(void)
 
   blockk = receiveReadOnly();
   if (channels == 1) {
-    if (! get_st_enable()) {
+    if (! get_nrpn(KYRP_ST_ENABLE)) {
       if (blockk) release(blockk);
       return;
     }
@@ -50,7 +50,7 @@ void AudioSynthKeyedTone::update(void)
       return;
     }
   } else if (channels == 2) {
-    if (get_iq_enable() == KYRV_IQ_NONE) {
+    if (get_nrpn(KYRP_IQ_ENABLE) == KYRV_IQ_NONE) {
       if (blockk) release(blockk);
       return;
     }
