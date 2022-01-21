@@ -21,25 +21,25 @@ static int midi_valid_note(const int note) { return note >= 0 && note <= 127; }
 static void midi_note_on(byte channel, byte note, byte velocity) {
   kyr_recv_note += 1;
   if (channel == get_nrpn(KYRP_CHAN_RECV_NOTE_IN)) {
-    if (note == get_nrpn(KYRP_L_PAD_NOTE)) {
+    if (note == get_nrpn(KYRP_NOTE_L_PAD)) {
       /* note used to report raw left paddle switch */
       digitalWrite(KYR_L_PAD_PIN, velocity == 0);
-    } else if (note == get_nrpn(KYRP_R_PAD_NOTE)) {
+    } else if (note == get_nrpn(KYRP_NOTE_R_PAD)) {
       /* note used to report raw right paddle switch */
       digitalWrite(KYR_R_PAD_PIN, velocity == 0);
-    } else if (note == get_nrpn(KYRP_S_KEY_NOTE)) {
+    } else if (note == get_nrpn(KYRP_NOTE_S_KEY)) {
       /* note used to report raw straight key switch */
       digitalWrite(KYR_S_KEY_PIN, velocity == 0);
-    } else if (note == get_nrpn(KYRP_EXT_PTT_NOTE)) {
+    } else if (note == get_nrpn(KYRP_NOTE_EXT_PTT)) {
       /* note used to report raw ptt switch */
       digitalWrite(KYR_EXT_PTT_PIN, velocity == 0);
     }
   }
   if (channel == get_nrpn(KYRP_CHAN_RECV_NOTE_OUT)) {
-    if (note == get_nrpn(KYRP_KEY_OUT_NOTE)) {
+    if (note == get_nrpn(KYRP_NOTE_KEY_OUT)) {
       /* note used to send external key signal */
       digitalWrite(KYR_KEY_OUT_PIN, velocity == 0);
-    } else if (note == get_nrpn(KYRP_PTT_OUT_NOTE)) {
+    } else if (note == get_nrpn(KYRP_NOTE_PTT_OUT)) {
       /* note used to send external ptt signal */
       digitalWrite(KYR_PTT_OUT_PIN, velocity == 0);
     }
@@ -116,12 +116,12 @@ static void midi_loop(void) {
   static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
   int input_channel = get_nrpn(KYRP_CHAN_SEND_NOTE_IN);
   int output_channel = get_nrpn(KYRP_CHAN_SEND_NOTE_OUT);
-  if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYRP_L_PAD_NOTE, input_channel, 0);
-  if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_R_PAD_NOTE, input_channel, 0);
-  if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_S_KEY_NOTE, input_channel, 0);
-  if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_EXT_PTT_NOTE, input_channel, 0);
-  if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_KEY_OUT_NOTE, output_channel, get_active_vox());
-  if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_PTT_OUT_NOTE, output_channel, get_active_vox());
+  if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYRP_NOTE_L_PAD, input_channel, 0);
+  if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_NOTE_R_PAD, input_channel, 0);
+  if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_NOTE_S_KEY, input_channel, 0);
+  if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_NOTE_EXT_PTT, input_channel, 0);
+  if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_NOTE_KEY_OUT, output_channel, get_active_vox());
+  if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_NOTE_PTT_OUT, output_channel, get_active_vox());
   while (usbMIDI.read());
 }
 

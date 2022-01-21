@@ -138,12 +138,12 @@ static void nrpn_set_defaults(void) {
 
   nrpn_set(KYRP_VERSION, KYRC_VERSION);
 
-  nrpn_set(KYRP_L_PAD_NOTE, KYR_L_PAD_NOTE);
-  nrpn_set(KYRP_R_PAD_NOTE, KYR_R_PAD_NOTE);
-  nrpn_set(KYRP_S_KEY_NOTE, KYR_S_KEY_NOTE);
-  nrpn_set(KYRP_EXT_PTT_NOTE, KYR_EXT_PTT_NOTE);
-  nrpn_set(KYRP_KEY_OUT_NOTE, KYR_KEY_OUT_NOTE);
-  nrpn_set(KYRP_PTT_OUT_NOTE, KYR_PTT_OUT_NOTE);
+  nrpn_set(KYRP_NOTE_L_PAD, KYR_NOTE_L_PAD);
+  nrpn_set(KYRP_NOTE_R_PAD, KYR_NOTE_R_PAD);
+  nrpn_set(KYRP_NOTE_S_KEY, KYR_NOTE_S_KEY);
+  nrpn_set(KYRP_NOTE_EXT_PTT, KYR_NOTE_EXT_PTT);
+  nrpn_set(KYRP_NOTE_KEY_OUT, KYR_NOTE_KEY_OUT);
+  nrpn_set(KYRP_NOTE_PTT_OUT, KYR_NOTE_PTT_OUT);
 
   nrpn_set(KYRP_VOLUME_POT, KYR_VOLUME_POT);
   nrpn_set(KYRP_ST_VOL_POT, KYR_ST_VOL_POT);
@@ -286,12 +286,12 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_CHAN_SEND_NOTE_OUT:
   case KYRP_CHAN_RECV_NOTE_IN:
   case KYRP_CHAN_RECV_NOTE_OUT:
-  case KYRP_L_PAD_NOTE:
-  case KYRP_R_PAD_NOTE:
-  case KYRP_S_KEY_NOTE:
-  case KYRP_EXT_PTT_NOTE:
-  case KYRP_KEY_OUT_NOTE:
-  case KYRP_PTT_OUT_NOTE:
+  case KYRP_NOTE_L_PAD:
+  case KYRP_NOTE_R_PAD:
+  case KYRP_NOTE_S_KEY:
+  case KYRP_NOTE_EXT_PTT:
+  case KYRP_NOTE_KEY_OUT:
+  case KYRP_NOTE_PTT_OUT:
     kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_VOLUME_POT:
   case KYRP_ST_VOL_POT:

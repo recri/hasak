@@ -176,12 +176,12 @@
 ** by default we send notes for the following input keys
 ** and transmit key events.
 */
-#define KYR_L_PAD_NOTE		0      /* {type def label {note used to report raw left paddle switch}} */
-#define KYR_R_PAD_NOTE		1      /* {type def label {note used to report raw right paddle switch}} */
-#define KYR_S_KEY_NOTE		2      /* {type def label {note used to report raw straight key switch}} */
-#define KYR_EXT_PTT_NOTE	3      /* {type def label {note used to report raw ptt switch}} */
-#define KYR_KEY_OUT_NOTE	4      /* {type def label {note used to send external key signal}} */
-#define KYR_PTT_OUT_NOTE	5      /* {type def label {note used to send external ptt signal}} */
+#define KYR_NOTE_L_PAD		0      /* {type def label {note used to report raw left paddle switch}} */
+#define KYR_NOTE_R_PAD		1      /* {type def label {note used to report raw right paddle switch}} */
+#define KYR_NOTE_S_KEY		2      /* {type def label {note used to report raw straight key switch}} */
+#define KYR_NOTE_EXT_PTT	3      /* {type def label {note used to report raw ptt switch}} */
+#define KYR_NOTE_KEY_OUT	4      /* {type def label {note used to send external key signal}} */
+#define KYR_NOTE_PTT_OUT	5      /* {type def label {note used to send external ptt signal}} */
 
 /*
 ** midi control change usage.
@@ -268,13 +268,13 @@
 #define KYRV_CHAN_INVALID	0	       /* {type val label {invalid channel, used to disable midi channel}} */
 
 #define KYRP_NOTE		(KYRP_CHAN+6) /* {type rel label {base of midi notes}} */
-#define KYRP_L_PAD_NOTE		(KYRP_NOTE+0) /* {type par label {note for left paddle switch input} range {0 128}} */
-#define KYRP_R_PAD_NOTE		(KYRP_NOTE+1) /* {type par label {note for right paddle switch input} range {0 128}} */
-#define KYRP_S_KEY_NOTE		(KYRP_NOTE+2) /* {type par label {note for straight key switch input} range {0 128}} */
-#define KYRP_EXT_PTT_NOTE	(KYRP_NOTE+3) /* {type par label {note for external ptt switch input} range {0 128}} */
-#define KYRP_KEY_OUT_NOTE	(KYRP_NOTE+4) /* {type par label {note for key/ptt key output} range {0 128}} */
-#define KYRP_PTT_OUT_NOTE	(KYRP_NOTE+5) /* {type par label {note for key/ptt ptt output} range {0 128}} */
-#define KYRV_INVALID_NOTE	128	       /* {type val label {invalid note, used to disable midi events}} */
+#define KYRP_NOTE_L_PAD		(KYRP_NOTE+0) /* {type par label {note for left paddle switch input} range {0 128}} */
+#define KYRP_NOTE_R_PAD		(KYRP_NOTE+1) /* {type par label {note for right paddle switch input} range {0 128}} */
+#define KYRP_NOTE_S_KEY		(KYRP_NOTE+2) /* {type par label {note for straight key switch input} range {0 128}} */
+#define KYRP_NOTE_EXT_PTT	(KYRP_NOTE+3) /* {type par label {note for external ptt switch input} range {0 128}} */
+#define KYRP_NOTE_KEY_OUT	(KYRP_NOTE+4) /* {type par label {note for key/ptt key output} range {0 128}} */
+#define KYRP_NOTE_PTT_OUT	(KYRP_NOTE+5) /* {type par label {note for key/ptt ptt output} range {0 128}} */
+#define KYRV_NOTE_INVALID	128	       /* {type val label {invalid note, used to disable midi events}} */
 
 #define KYRP_PINS		(KYRP_NOTE+6) /* {type rel label {base of hardware pin assignments}} */
 #define KYRP_VOLUME_POT		(KYRP_PINS+0) /* {type par label {pin for volume pot}} */
