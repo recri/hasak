@@ -33,6 +33,52 @@ proc extract-units {cmt} {
     return {}
 }
 
+proc jsformat-par {name table} {
+    dict with table {
+	# values:
+	# range:
+	# units:
+	set vals {}
+	lappend vals "nrpn: $value"
+	lappend vals "label: \"$label\""
+	if {[info exists range]} { lappend vals "range: \[[join $range {, }]\]" }
+	if {[info exists units]} { lappend vals "units: \"$units\"" }
+	if {[info exists values]} { lappend vals "values: \[join [lmap v [dict keys $table $values] {string concat \" $v \"}] {, }]\]" }
+	return "$name: { [join $vals {, }] }"
+    }
+}
+proc jsformat-val {name table} {
+    dict with table {
+	# , valueof: ${value-of}
+	return "$name: { value: $value, label: \"$label\" }"
+    }
+}
+proc jsformat-rel {name table} {
+    dict with table {
+	return "$name: { nrpn: $value, label: \"$label\" }"
+    }
+}
+proc jsformat-type {type values} {
+    set js {}
+    dict for {name table} $values {
+	if {[dict get $table type] eq $type} {
+	    lappend js [jsformat-$type $name $table]
+	}
+    }
+    return $js
+}
+proc jsformat {values} {
+    set v [dict get $values KYRC_VERSION value]
+    set d ",\n    "
+    set f {}
+    append f "const CWKeyerHasak$v = {\n"
+    append f "  nrps: {\n    [join [jsformat-type par $values] $d] },\n"
+    append f "  vals: {\n    [join [jsformat-type val $values] $d] },\n"
+    append f "  rels: {\n    [join [jsformat-type rel $values] $d] }\n"
+    append f "}"
+    return $f
+}
+
 proc main {argv} {
     array set options {output c}
     if {([llength $argv]%2) != 0 ||
@@ -114,11 +160,7 @@ proc main {argv} {
 		puts [format "#define %-${vwid}s %3d %s" $name [dict get $table value] "/* {$table} */"]
 	    }
 	}
-	{js} {
-	    dict for {name table} $values {
-		puts [format "#define %-${vwid}s %3d %s" $name [dict get $table value] [dict get $table $name comment]]
-	    }
-	}
+	{js} { puts [jsformat $values] }
 	all {
 	    dict for {name table} $values {
 		puts "$name $table"

@@ -129,12 +129,12 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_DEBOUNCE, 50);
   nrpn_set(KYRP_COMP,0);
   
-  nrpn_set(KYRP_CC_CHAN_RECV, KYRC_CC_CHAN_RECV);
-  nrpn_set(KYRP_CC_CHAN_SEND, KYRC_CC_CHAN_SEND);
-  nrpn_set(KYRP_NOTE_IN_CHAN_SEND, KYRC_NOTE_IN_CHAN_SEND);
-  nrpn_set(KYRP_NOTE_OUT_CHAN_SEND, KYRC_NOTE_OUT_CHAN_SEND);
-  nrpn_set(KYRP_NOTE_IN_CHAN_RECV, KYRC_NOTE_IN_CHAN_RECV);
-  nrpn_set(KYRP_NOTE_OUT_CHAN_RECV, KYRC_NOTE_OUT_CHAN_RECV);
+  nrpn_set(KYRP_CHAN_RECV_CC, KYRC_CHAN_RECV_CC);
+  nrpn_set(KYRP_CHAN_SEND_CC, KYRC_CHAN_SEND_CC);
+  nrpn_set(KYRP_CHAN_SEND_NOTE_IN, KYRC_CHAN_SEND_NOTE_IN);
+  nrpn_set(KYRP_CHAN_SEND_NOTE_OUT, KYRC_CHAN_SEND_NOTE_OUT);
+  nrpn_set(KYRP_CHAN_RECV_NOTE_IN, KYRC_CHAN_RECV_NOTE_IN);
+  nrpn_set(KYRP_CHAN_RECV_NOTE_OUT, KYRC_CHAN_RECV_NOTE_OUT);
 
   nrpn_set(KYRP_VERSION, KYRC_VERSION);
 
@@ -152,6 +152,14 @@ static void nrpn_set_defaults(void) {
 
   /* morse code table */
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
+
+
+
+
+
+
+
+
     nrpn_set(i, morse[i-KYRP_MORSE]);
 
   for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1)
@@ -272,12 +280,12 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
   case KYRP_DEBOUNCE:
-  case KYRP_CC_CHAN_SEND:
-  case KYRP_CC_CHAN_RECV:
-  case KYRP_NOTE_IN_CHAN_SEND:
-  case KYRP_NOTE_OUT_CHAN_SEND:
-  case KYRP_NOTE_IN_CHAN_RECV:
-  case KYRP_NOTE_OUT_CHAN_RECV:
+  case KYRP_CHAN_SEND_CC:
+  case KYRP_CHAN_RECV_CC:
+  case KYRP_CHAN_SEND_NOTE_IN:
+  case KYRP_CHAN_SEND_NOTE_OUT:
+  case KYRP_CHAN_RECV_NOTE_IN:
+  case KYRP_CHAN_RECV_NOTE_OUT:
   case KYRP_L_PAD_NOTE:
   case KYRP_R_PAD_NOTE:
   case KYRP_S_KEY_NOTE:

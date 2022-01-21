@@ -163,12 +163,12 @@
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYRC_CC_CHAN_RECV	1	/* {type def label {default input channel  for keyer control change}} */
-#define KYRC_CC_CHAN_SEND	1	/* {type def label {default output channel for keyer control change}} */
-#define KYRC_NOTE_IN_CHAN_SEND	1	/* {type def label {default output channel for keyer input notes}} */
-#define KYRC_NOTE_OUT_CHAN_SEND	1	/* {type def label {default output channel for keyer output notes}} */
-#define KYRC_NOTE_IN_CHAN_RECV	0	/* {type def label {default input channel for keyer input notes}} */
-#define KYRC_NOTE_OUT_CHAN_RECV	0	/* {type def label {default input channel for keyer output notes}} */
+#define KYRC_CHAN_RECV_CC	1	/* {type def label {default input channel  for keyer control change}} */
+#define KYRC_CHAN_SEND_CC	1	/* {type def label {default output channel for keyer control change}} */
+#define KYRC_CHAN_SEND_NOTE_IN	1	/* {type def label {default output channel for keyer input notes}} */
+#define KYRC_CHAN_SEND_NOTE_OUT	1	/* {type def label {default output channel for keyer output notes}} */
+#define KYRC_CHAN_RECV_NOTE_IN	0	/* {type def label {default input channel for keyer input notes}} */
+#define KYRC_CHAN_RECV_NOTE_OUT	0	/* {type def label {default input channel for keyer output notes}} */
 
 /*
 ** midi note usage
@@ -259,15 +259,15 @@
 #define KYRP_COMP		(KYRP_SOFT+14)	/* {type par label {keyer compensation} range {0 16383} default 0 units µs} */
 
 #define KYRP_CHAN		(KYRP_SOFT+15) /* {type rel label {base of midi channels}} */
-#define KYRP_CC_CHAN_SEND	(KYRP_CHAN+0) /* {type par label {midi channel for sending controls} range {0 16}} */
-#define KYRP_CC_CHAN_RECV	(KYRP_CHAN+1) /* {type par label {midi channle for receiving controls} range {0 16}} */
-#define KYRP_NOTE_IN_CHAN_SEND	(KYRP_CHAN+2) /* {type par label {midi channel for sending input notes} range {0 16}} */
-#define KYRP_NOTE_OUT_CHAN_SEND	(KYRP_CHAN+3) /* {type par label {midi channel for sending output notes} range {0 16}} */
-#define KYRP_NOTE_IN_CHAN_RECV	(KYRP_CHAN+4) /* {type par label {midi channel for receiving input notes} range {0 16}} */
-#define KYRP_NOTE_OUT_CHAN_RECV	(KYRP_CHAN+5) /* {type par label {midi channel for receiving output notes} range {0 16}} */
-#define KYRV_INVALID_CHAN	0	       /* {type val label {invalid channel, used to disable midi channel}} */
+#define KYRP_CHAN_SEND_CC	(KYRP_CHAN+0) /* {type par label {midi channel for sending controls} range {0 16}} */
+#define KYRP_CHAN_RECV_CC	(KYRP_CHAN+1) /* {type par label {midi channle for receiving controls} range {0 16}} */
+#define KYRP_CHAN_SEND_NOTE_IN	(KYRP_CHAN+2) /* {type par label {midi channel for sending input notes} range {0 16}} */
+#define KYRP_CHAN_SEND_NOTE_OUT	(KYRP_CHAN+3) /* {type par label {midi channel for sending output notes} range {0 16}} */
+#define KYRP_CHAN_RECV_NOTE_IN	(KYRP_CHAN+4) /* {type par label {midi channel for receiving input notes} range {0 16}} */
+#define KYRP_CHAN_RECV_NOTE_OUT	(KYRP_CHAN+5) /* {type par label {midi channel for receiving output notes} range {0 16}} */
+#define KYRV_CHAN_INVALID	0	       /* {type val label {invalid channel, used to disable midi channel}} */
 
-#define KYRP_NOTE		(KYRP_CHAN+6) /* {type rel label {base of midi notes */
+#define KYRP_NOTE		(KYRP_CHAN+6) /* {type rel label {base of midi notes}} */
 #define KYRP_L_PAD_NOTE		(KYRP_NOTE+0) /* {type par label {note for left paddle switch input} range {0 128}} */
 #define KYRP_R_PAD_NOTE		(KYRP_NOTE+1) /* {type par label {note for right paddle switch input} range {0 128}} */
 #define KYRP_S_KEY_NOTE		(KYRP_NOTE+2) /* {type par label {note for straight key switch input} range {0 128}} */
@@ -276,7 +276,7 @@
 #define KYRP_PTT_OUT_NOTE	(KYRP_NOTE+5) /* {type par label {note for key/ptt ptt output} range {0 128}} */
 #define KYRV_INVALID_NOTE	128	       /* {type val label {invalid note, used to disable midi events}} */
 
-#define KYRP_PINS		(KYRP_NOTE+6) /* {type rel label {base of hardware pin assignments */
+#define KYRP_PINS		(KYRP_NOTE+6) /* {type rel label {base of hardware pin assignments}} */
 #define KYRP_VOLUME_POT		(KYRP_PINS+0) /* {type par label {pin for volume pot}} */
 #define KYRP_ST_VOL_POT		(KYRP_PINS+1) /* {type par label {pin for sidetone volume pot} range {0 127}} */
 #define KYRP_ST_FREQ_POT	(KYRP_PINS+2) /* {type par label {pin for sidetone frequency pot} range {0 127}} */
@@ -337,8 +337,8 @@
 
 #define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par label {key rise ramp length} range {0 16383} units µs} */
 #define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par label {key fall ramp length} range {0 16383} units µs} */
-#define KYRP_RISE_RAMP		(KYRP_RAMP+2)	/* {type par label {key rise ramp} range KYRV_RAMP_* default KYRV_RAMP_HANN} */
-#define KYRP_FALL_RAMP		(KYRP_RAMP+3)	/* {type par label {key fall ramp} range KYRV_RAMP_* default KYRV_RAMP_HANN} */
+#define KYRP_RISE_RAMP		(KYRP_RAMP+2)	/* {type par label {key rise ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
+#define KYRP_FALL_RAMP		(KYRP_RAMP+3)	/* {type par label {key fall ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
 #define KYRV_RAMP_HANN		0 /* {type val label {ramp from Hann window, raised cosine} value-of {KYRP_*_RAMP}} */
 #define KYRV_RAMP_BLACKMAN_HARRIS 1 /* {type val label {ramp from Blackman Harris window} value-of {KYRP_*_RAMP}} */
 #define KYRV_RAMP_LINEAR	2 /* {type val label {linear ramp, for comparison} value-of {KYRP_*_RAMP}} */
@@ -352,26 +352,26 @@
 #define KYRP_FARNS		(KYRP_TIME+3)	/* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
 
 /* keyer parameters - for paddle keyers - this all fits into one word 2+1+2+1+1+2 == 9 bits  */
-#define KYRP_PAD		(KYRP_TIME+4)
-#define KYRP_PAD_MODE		(KYRP_PAD+0)	/* {type par label {iambic keyer mode A/B/S} range KYRV_MODE_* default KYRV_MODE_A} */
+#define KYRP_PAD		(KYRP_TIME+4) /* {type rel label {base of paddle keyer parameters}} */
+#define KYRP_PAD_MODE		(KYRP_PAD+0)	/* {type par label {iambic keyer mode A/B/S} values KYRV_MODE_* default KYRV_MODE_A} */
 #define KYRV_MODE_A		0 /* {type val label {paddle keyer iambic mode A} value-of {KYRP_PAD_MODE}} */
 #define KYRV_MODE_B		1 /* {type val label {paddle keyer iambic mode B} value-of {KYRP_PAD_MODE}} */
 #define KYRV_MODE_S		2 /* {type val label {paddle keyer bug mode} value-of {KYRP_PAD_MODE}} */
 #define KYRP_PAD_SWAP		(KYRP_PAD+1)	/* {type par label {swap paddles} range {0 1} default 0} */
-#define KYRP_PAD_ADAPT		(KYRP_PAD+2)	/* {type par label {paddle adapter normal/ultimatic/single lever} range KYRV_ADAPT_* default KYRV_ADAPT_NORMAL} */
+#define KYRP_PAD_ADAPT		(KYRP_PAD+2)	/* {type par label {paddle adapter normal/ultimatic/single lever} values KYRV_ADAPT_* default KYRV_ADAPT_NORMAL} */
 #define KYRV_ADAPT_NORMAL	0 /* {type val label {paddle keyer unmodified} value-of {KYRP_PAD_ADAPT}} */
 #define KYRV_ADAPT_ULTIMATIC	1 /* {type val label {paddle keyer modified to produce ultimatic keyer} value-of {KYRP_PAD_ADAPT}} */
 #define KYRV_ADAPT_SINGLE	2 /* {type val label {paddle keyer modified to simulate single lever paddle} value-of {KYRP_PAD_ADAPT}} */
 #define KYRP_AUTO_ILS		(KYRP_PAD+3) /* {type par label {automatic letter space timing} range {0 1} default 1} */
 #define KYRP_AUTO_IWS		(KYRP_PAD+4)	/* {type par label {automatic word space timing} range {0 1} default 0} */
-#define KYRP_PAD_KEYER		(KYRP_PAD+5) /* {type par label {paddle keyer implementation} range KYRV_KEYER_* default KYRV_KEYER_VK6PH} */
+#define KYRP_PAD_KEYER		(KYRP_PAD+5) /* {type par label {paddle keyer implementation} values KYRV_KEYER_* default KYRV_KEYER_VK6PH} */
 #define KYRV_KEYER_AD5DZ	0 /* {type val label {paddle keyer algorithm by ad5dz} value-of {KYRP_PAD_KEYER}}  */
 #define KYRV_KEYER_K1EL		1 /* {type val label {paddle keyer algorithm by k1el} value-of {KYRP_PAD_KEYER}} */
 #define KYRV_KEYER_ND7PA	2 /* {type val label {paddle keyer algorithm by nd7pa} value-of {KYRP_PAD_KEYER}} */
 #define KYRV_KEYER_VK6PH	3 /* {type val label {paddle keyer algorithm by vk6ph} value-of {KYRP_PAD_KEYER}} */
 
 /* keyer timings in samples for paddle and text keyers - scratch values */
-#define KYRP_SPE		(KYRP_PAD+6)
+#define KYRP_SPE		(KYRP_PAD+6) /* {type rel label {base of per sample timing scratch block}} */
 #define KYRP_PER_DIT		(KYRP_SPE+0) /* {type scr label {samples per dit}} */
 #define KYRP_PER_DAH		(KYRP_SPE+2) /* {type scr label {samples per dah}} */
 #define KYRP_PER_IES		(KYRP_SPE+3) /* {type scr label {samples per inter element space}} */
