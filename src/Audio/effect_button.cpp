@@ -55,7 +55,7 @@ void AudioEffectButton::update(void)
     int avg = sum / AUDIO_BLOCK_SAMPLES;
     int dist[N_BUTTONS], ibest = 0;    
     for (int i = 0; i < N_BUTTONS; i += 1) {
-      dist[i] = abs(avg-get_button(i));
+      dist[i] = abs(avg-signed_value(get_nrpn(KYRP_BUTTON_0+i)));
       if (dist[i] < dist[ibest])
 	ibest = i;
     }

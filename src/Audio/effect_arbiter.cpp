@@ -142,7 +142,7 @@ void AudioEffectArbiter::update(void)
       }
     }
 
-    /* okay, if active_head is zero, active_tail is zero, and both queues are
+    /* okay, if active_head is zero, active_tail is zero, and both queues are ? */
     /* fill output buffers with queued output and apply ptt_tail */
     audio_block_t *keyout = allocate(), *pttout = allocate();
     if (keyout && pttout) {

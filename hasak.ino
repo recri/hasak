@@ -109,12 +109,16 @@ AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);  // transmit key line
 // output mixers
 // channel 0 rx_input from usb_in or mic_input from i2s_in
 // 
-AudioMixer4              l_i2s_out;
-AudioMixer4              r_i2s_out;
 AudioMixer4              l_usb_out;
 AudioMixer4              r_usb_out;
+AudioMixer4              l_i2s_out;
+AudioMixer4              r_i2s_out;
 AudioMixer4              l_hdw_out;
 AudioMixer4              r_hdw_out;
+// output mixer pointers in order of output mixer nrpns
+AudioMixer4		*mix_out[6] = {
+  &l_usb_out, &r_usb_out, &l_i2s_out, &r_i2s_out, &l_hdw_out, &r_hdw_out
+};
 
 // first channel, rx audio and microphone/line-in input, op on headset mode
 // switch codec to use microphone instead of line-in

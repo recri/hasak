@@ -144,7 +144,10 @@ static void areport(void) {
 
 /* button details */
 static void breport(void) {
-  Serial.printf("button thresholds: %d %d %d %d %d\n", get_button(0), get_button(1), get_button(2), get_button(3), get_button(4));
+  Serial.printf("button thresholds: %d %d %d %d %d\n", 
+		signed_value(get_nrpn(KYRP_BUTTON_0)), signed_value(get_nrpn(KYRP_BUTTON_1)),
+		signed_value(get_nrpn(KYRP_BUTTON_2)), signed_value(get_nrpn(KYRP_BUTTON_3)),
+		signed_value(get_nrpn(KYRP_BUTTON_4)));
 }
 
 /* debounce details */
@@ -261,7 +264,6 @@ void diag_nrpn_report(void) {
   Serial.printf("KYRP_TX_ENABLE %d\n", get_nrpn(KYRP_TX_ENABLE));
   Serial.printf("KYRP_ST_ENABLE %d\n", get_nrpn(KYRP_ST_ENABLE));
   Serial.printf("KYRP_IQ_BALANCE %d\n", get_nrpn(KYRP_IQ_BALANCE));
-  Serial.printf("KYRP_ST_AUDIO_MODE %d\n", get_nrpn(KYRP_ST_AUDIO_MODE));
   Serial.printf("KYRP_ST_PAN %d\n", get_nrpn(KYRP_ST_PAN));
 
   Serial.printf("KYRP_DEBOUNCE %d\n", get_nrpn(KYRP_DEBOUNCE));

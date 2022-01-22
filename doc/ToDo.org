@@ -8,12 +8,14 @@
 	and the sidetone levels (6)
 	should happen in small steps over a period of time
 	rather than popping to the new value.
-[ ] add mixer output unmute bitmap nrpn, leaves mixer levels be.
+[x] add mixer output unmute bitmap nrpn, leaves mixer levels be.
 [ ] mixer set with left and right in same nrpn
-[ ] reimplement compensation
+[x] reimplement compensation
+	put it back into the keyer timing
 [ ] reimplement ptt_enable
 [x] mixers as AudioMixer4 mixer[6];
 	doesn't work, what don't I understand?
+	do it as pointers and it works
 [-] rename KYR_ to KYRC_ if configurable
 [-] make virtual NRPNs for
 [x]	load defaults, 

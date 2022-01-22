@@ -48,22 +48,19 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   const float wpm = get_vox_nrpn(vox, KYRP_SPEED);
   const float weight = get_vox_nrpn(vox, KYRP_WEIGHT);
   const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
-  //const float compensation = get_vox_nrpn(vox, KYRP_COMP);
+  const float compensation = tenth_ms_to_ms(signed_value(get_vox_nrpn(vox, KYRP_COMP)));
   const float farnsworth = get_vox_nrpn(vox, KYRP_FARNS);;
-  // const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
+  const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
-  // const float c = compensation / 10.0 / ms_per_dit; /* ms/10 / ms_per_dit */ 
-  /* Serial.printf("nrpn_update_keyer sr %f, word %d, wpm %f, weight %d, ratio %d, comp %d, farns %d\n", 
-     sampleRate, wordDits, wpm, weight, ratio, compensation, farnsworth); */
-  /* Serial.printf("morse_keyer r %f, w %f, c %f\n", r, w, c); */
+  const float c = compensation / ms_per_dit; /* ms/10 / ms_per_dit */ 
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
   const unsigned ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
-  int ticksPerDit = (1+r+w) * ticksPerBaseDit; /* +c */
-  int ticksPerDah = (3-r+w) * ticksPerBaseDit; /* +c */
-  int ticksPerIes = (1  -w) * ticksPerBaseDit; /* -c */
-  int ticksPerIls = (3  -w) * ticksPerBaseDit; /* -c */
-  int ticksPerIws = (7  -w) * ticksPerBaseDit; /* -c */
+  int ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
+  int ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
+  int ticksPerIes = (1  -w-c) * ticksPerBaseDit;
+  int ticksPerIls = (3  -w-c) * ticksPerBaseDit;
+  int ticksPerIws = (7  -w-c) * ticksPerBaseDit;
     
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
@@ -124,12 +121,11 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_BUTTON_4, -2250&KYRV_MASK); /* hey google */
   nrpn_set(KYRP_PTT_ENABLE, 0);
   nrpn_set(KYRP_IQ_ENABLE, 0);
-  nrpn_set(KYRP_IQ_ADJUST, 8096);
+  nrpn_set(KYRP_IQ_ADJUST, 0);
   nrpn_set(KYRP_TX_ENABLE, 0);
   nrpn_set(KYRP_ST_ENABLE, 1);
-  nrpn_set(KYRP_IQ_BALANCE, 8096);
-  nrpn_set(KYRP_ST_AUDIO_MODE, 0);
-  nrpn_set(KYRP_ST_PAN, 8096);
+  nrpn_set(KYRP_IQ_BALANCE, 0);
+  nrpn_set(KYRP_ST_PAN, 0);
   nrpn_set(KYRP_DEBOUNCE, 50);
   nrpn_set(KYRP_COMP,0);
   
@@ -260,7 +256,6 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_IQ_ADJUST:
   case KYRP_ST_ENABLE:
   case KYRP_IQ_BALANCE:
-  case KYRP_ST_AUDIO_MODE:
   case KYRP_ST_PAN:
 
   case KYRP_DEBOUNCE:

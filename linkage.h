@@ -53,6 +53,8 @@ static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE*0.001);
 static inline float samples_to_ms(int samples) { return samples / (AUDIO_SAMPLE_RATE*0.001); }
 static inline int tenth_ms_to_samples(int tenthms) { return tenthms * (AUDIO_SAMPLE_RATE*0.0001); }
 static inline float samples_to_tenth_ms(int samples) { return samples / (AUDIO_SAMPLE_RATE*0.0001); }
+static inline float tenth_ms_to_ms(int tenthms) { return tenthms*0.1f; }
 static inline float int_to_127ths(int val) { return val*0.007874f; }
+static inline int16_t signed_value(int16_t val) { return (val<<2)>>2; }
 
 #endif
