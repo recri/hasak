@@ -22,7 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#if 0
+#if ! defined(KYRC_ENABLE_WINKEY)
+void winkey_setup(void) { }
+void winkey_loop(void) { }
+#else
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 // Teensy keyer with audio (WinKey emulator)
@@ -141,28 +144,28 @@ static void winkey_set(winkey_property_t p, int v) {
     //
     if (get_nrpn(KYRP_PAD_SWAP) != PADDLE_SWAP(v))
       nrpn_set(KYRP_PAD_SWAP, PADDLE_SWAP(v) != 0);
-    if (get_nrpn(KYRP_PAD_KEYER) != KYRP_KEYER_VK6PH)
-      nrpn_set(KYRP_PAD_KEYER, KYRP_KEYER_VK6PH);
+    if (get_nrpn(KYRP_PAD_KEYER) != KYRV_KEYER_VK6PH)
+      nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
     if (ULTIMATIC(v)) {
-      if (get_nrpn(KYRP_PAD_ADAPT) != KYRP_ADAPT_ULTIMATIC)
-	nrpn_set(KYRP_PAD_ADAPT, KYRP_ADAPT_ULTIMATIC);
-      if (get_nrpn(KYRP_PAD_MODE) != KYRP_MODE_A)
-	nrpn_set(KYRP_PAD_MODE, KYRP_MODE_A);
+      if (get_nrpn(KYRP_PAD_ADAPT) != KYRV_ADAPT_ULTIMATIC)
+	nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_ULTIMATIC);
+      if (get_nrpn(KYRP_PAD_MODE) != KYRV_MODE_A)
+	nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
     } else {
-      if (get_nrpn(KYRP_PAD_ADAPT) != KYRP_ADAPT_NORMAL)
-	nrpn_set(KYRP_PAD_ADAPT, KYRP_ADAPT_NORMAL);
+      if (get_nrpn(KYRP_PAD_ADAPT) != KYRV_ADAPT_NORMAL)
+	nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
       switch (PADDLE_MODE(v)) {
       case 0:
-	if (get_nrpn(KYRP_PAD_MODE) != KYRP_MODE_B)
-	  nrpn_set(KYRP_PAD_MODE, KYRP_MODE_B);
+	if (get_nrpn(KYRP_PAD_MODE) != KYRV_MODE_B)
+	  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_B);
 	break;
       case 1: 
-	if (get_nrpn(KYRP_PAD_MODE) != KYRP_MODE_A)
-	  nrpn_set(KYRP_PAD_MODE, KYRP_MODE_A);
+	if (get_nrpn(KYRP_PAD_MODE) != KYRV_MODE_A)
+	  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
 	break;
       case 3:
-	if (get_nrpn(KYRP_PAD_MODE) != KYRP_MODE_S)
-	  nrpn_set(KYRP_PAD_MODE, KYRP_MODE_S);
+	if (get_nrpn(KYRP_PAD_MODE) != KYRV_MODE_S)
+	  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_S);
 	break;
       }
     }
@@ -272,13 +275,13 @@ static int winkey_get(winkey_property_t p) {
   case WK_MODE_REGISTER: {
     int v = 0;
     if (get_nrpn(KYRP_PAD_SWAP)) v |= 0x08;
-    if (get_nrpn(KYRP_PAD_ADAPT) == KYRP_ADAPT_ULTIMATIC)
+    if (get_nrpn(KYRP_PAD_ADAPT) == KYRV_ADAPT_ULTIMATIC)
       v |= 0x20;
     else 
       switch (get_nrpn(KYRP_PAD_MODE)) {
-      case KYRP_MODE_A: v |= 0x10; break;
-      case KYRP_MODE_B: v |= 0x00; break;
-      case KYRP_MODE_S: v |= 0x30; break;
+      case KYRV_MODE_A: v |= 0x10; break;
+      case KYRV_MODE_B: v |= 0x00; break;
+      case KYRV_MODE_S: v |= 0x30; break;
       }
     // PADDLE_ECHO FIX.ME
     // SERIAL_ECHO FIX.ME
@@ -304,8 +307,6 @@ static int winkey_get(winkey_property_t p) {
     return 0;
   }
 }
-
-#include <EEPROM.h>
 
 static uint8_t WKstatus=0xC0;           // reported to host when it changes
 static int inum;                        // counter for number of bytes received in a given state
@@ -594,9 +595,8 @@ void winkey_state_machine() {
     winkey_to_host(128+SpeedPot);
     OldSpeedPot=SpeedPot;  
   }
-
 }
-#endif
+
 /***************************************************************
  ** Winkey interface
  ***************************************************************/
@@ -604,5 +604,7 @@ static void winkey_setup(void) {
 }
 
 static void winkey_loop(void) {
+  winkey_state_machine();
 }
 
+#endif

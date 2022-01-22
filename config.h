@@ -45,6 +45,9 @@
 /* enable hardware input */
 //#define KYRC_ENABLE_ADC_IN 1	/* {type conf label {Should we enable a hardware input channel}} */
 
+/* enable winkey emulator */
+//#define KYRC_ENABLE_WINKEY 1  /* {type conf label {Should we enable the winkey emulator}} */
+
 /*
 ** decide which Teensy we're running on
 */

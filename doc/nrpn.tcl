@@ -58,25 +58,25 @@ proc jsformat-rel {name table} {
 	return "$name: { nrpn: $value, label: \"$label\" }"
     }
 }
-proc jsformat-type {type values} {
+proc jsformat-any {name table} {
+    set vals {}
+    dict for {key value} $table {
+	lappend vals "$key: \"$value\""
+    }
+    return $vals
+}
+
+proc jsformat-all {values} {
     set js {}
     dict for {name table} $values {
-	if {[dict get $table type] eq $type} {
-	    lappend js [jsformat-$type $name $table]
-	}
+	lappend js [jsformat-any $name $table]
     }
     return $js
 }
 proc jsformat {values} {
     set v [dict get $values KYRC_VERSION value]
     set d ",\n    "
-    set f {}
-    append f "const CWKeyerHasak$v = {\n"
-    append f "  nrps: {\n    [join [jsformat-type par $values] $d] },\n"
-    append f "  vals: {\n    [join [jsformat-type val $values] $d] },\n"
-    append f "  rels: {\n    [join [jsformat-type rel $values] $d] }\n"
-    append f "}"
-    return $f
+    return "const CWKeyerHasak$v = {\n  [join [jsformat-all $values] $d]\n};"
 }
 
 proc main {argv} {
