@@ -235,7 +235,7 @@
 #define KYRP_BUTTON_2		(KYRP_SOFT+2) /* {type par label {headset button 2 - up pressed} range {-8192 8191} units adc ignore 1}  */
 #define KYRP_BUTTON_3		(KYRP_SOFT+3) /* {type par label {headset button 3 - down pressed} range {-8192 8191} units adc ignore 1}  */
 #define KYRP_BUTTON_4		(KYRP_SOFT+4) /* {type par label {headset button 4 - hey pressed} range {-8192 8191} units adc ignore 1}  */
-#define KYRP_PTT_ENABLE		(KYRP_SOFT+5) /* {type par label {require EXT_PTT to transmit} range {0 1}} */
+#define KYRP_PTT_ENABLE		(KYRP_SOFT+5) /* {type par label {require EXT_PTT to transmit} range {0 1} ignore 1} */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+6) /* {type par label {IQ mode} values KYRV_IQ_*} */
 #define KYRV_IQ_NONE		0 /* {type val value-of KYRP_IQ_ENABLE label {no IQ}} */
 #define KYRV_IQ_LSB		1 /* {type val value-of KYRP_IQ_ENABLE label {IQ for lower sideband}} */
@@ -360,7 +360,7 @@
 #define KYRP_LEVEL		(KYRP_KEYER+1) /* {type par label {sidetone level} range {0 127} default 64 unit {1/127th full scale}} */
 #define KYRP_SPEED		(KYRP_KEYER+2)	/* {type par label {keyer speed control} range {0 127} units wpm} */
 #define KYRP_WEIGHT		(KYRP_KEYER+3)	/* {type par label {keyer mark/space weight} range {25 75} unit pct default 50} */
-#define KYRP_RATIO		(KYRP_KEYER+4)	/* {type par label {keyer dit/dah ratio} range {25 75} unit pct default 64} */
+#define KYRP_RATIO		(KYRP_KEYER+4)	/* {type par label {keyer dit/dah ratio} range {25 75} unit pct default 50} */
 #define KYRP_FARNS		(KYRP_KEYER+5)	/* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
 
 /* keyer parameters - for paddle keyers - this all fits into one word 2+1+2+1+1+2 == 9 bits  */
@@ -401,6 +401,7 @@
 #define KYRP_PLAY_KYR		(KYRP_EXEC+10) /* {type cmd label {queue message by number through kyr}} */ 
 
 #define KYRP_INFO		(KYRP_EXEC+11) /* {type rel label {base of information nrpns}} */
+
 #define KYRP_VERSION		(KYRP_INFO+0) /* {type inf label {version of hasak nrpn set}} */
 #define KYRP_NRPN_SIZE		(KYRP_INFO+1) /* {type inf label {size of kyr_nrpn}} */
 #define KYRP_MSG_SIZE		(KYRP_INFO+2) /* {type inf label {send the size of kyr_msgs}} */

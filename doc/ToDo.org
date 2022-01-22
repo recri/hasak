@@ -12,6 +12,7 @@
 [ ] mixer set with left and right in same nrpn
 [x] reimplement compensation
 	put it back into the keyer timing
+[ ] implement key_out compensation.
 [ ] reimplement ptt_enable
 [x] mixers as AudioMixer4 mixer[6];
 	doesn't work, what don't I understand?

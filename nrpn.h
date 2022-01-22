@@ -91,8 +91,25 @@ static void nrpn_echo(const int16_t nrpn, const int16_t value) {
   midi_send_nrpn(nrpn, value);
 }  
 
-static void nrpn_set_mixer(const int16_t nrpn, const int16_t value, AudioMixer4& mixer) {
-  mixer.gain((nrpn-KYRP_MIXER)%4, int_to_127ths(value));
+static void nrpn_update_mixer(const int16_t nrpn, const int16_t value) {
+  if (nrpn == KYRP_OUT_ENABLE) {
+    // Serial.printf("update_mixer(%d, 0x%03x)\n", nrpn, value);
+    AudioNoInterrupts();
+    kyr_nrpn[nrpn] = value;
+    for (int i = KYRP_MIX_USB_L0; i <= KYRP_MIX_HDW_R3; i += 1)
+      nrpn_update_mixer(i, get_nrpn(i));
+    AudioInterrupts();
+  } else if (nrpn >= KYRP_MIX_USB_L0 && nrpn <= KYRP_MIX_HDW_R3) {
+    uint16_t index = (nrpn-KYRP_MIXER)/4; /* index of mixer in mix_out */
+    uint16_t chan = (nrpn-KYRP_MIXER)%4;  /* channel of the mixer */
+    uint16_t mask = 1<<(11-(((index>>1)<<2)+chan)); /* bit enabling channel */
+    float gain = ((mask&get_nrpn(KYRP_OUT_ENABLE)) ? 1 : 0) * int_to_127ths(value);
+    //Serial.printf("update_mixer(%d, %d) index %d chan %d mask %03x gain %f\n", 
+    //		  nrpn, value, index, chan, mask, gain);
+   mix_out[index]->gain(chan, gain);
+  } else {
+    Serial.printf("unexpected nrpn %d in nprn_update_mixer\n", nrpn);
+  }
 }
 
 static void nrpn_report(const char *name, const int16_t oldval, const int16_t newval) {
@@ -153,17 +170,10 @@ static void nrpn_set_defaults(void) {
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
     nrpn_set(i, morse[i-KYRP_MORSE]);
 
-  for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1)
-    switch (i) {
-    case KYRP_MIX_I2S_L0: case KYRP_MIX_I2S_R0: /* usb_in to i2s_out */
-    case KYRP_MIX_I2S_L1: case KYRP_MIX_I2S_R1: /* sidetone to i2s_out */
-    case KYRP_MIX_HDW_L0: case KYRP_MIX_HDW_R0: /* usb_in to hdw_out */
-    case KYRP_MIX_HDW_L1: case KYRP_MIX_HDW_R1: /* sidetone to i2s_out */
-    case KYRP_MIX_USB_L2: case KYRP_MIX_USB_R2:	/* keyed IQ to usb_out */
-      nrpn_set(i, 127); continue;
-    default:
-      nrpn_set(i, 0); continue;
-    }
+  /* output mixers */
+  for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1) nrpn_set(i, 127);
+  /* output mixers enable */
+  nrpn_set(KYRP_OUT_ENABLE, 0b001011001100); /* IQ to usb, usb+sidetone to i2s and hdw */
 
   /* keyer defaults - common */
   nrpn_set(KYRP_RISE_TIME, 50);	// 5.0 ms
@@ -208,7 +218,7 @@ static void nrpn_write_eeprom(void) {
     if (value != kyr_nrpn[nrpn])
       Serial.printf("nrpn_write_eeprom kyr_nrpn[%d] == %d != %d\n", nrpn, value, kyr_nrpn[nrpn]);
   }
-  for (int i = 0; i < sizeof(kyr_msgs); i += 1) {
+  for (unsigned i = 0; i < sizeof(kyr_msgs); i += 1) {
     int8_t value;
     EEPROM.get(sizeof(kyr_header)+sizeof(kyr_nrpn)+sizeof(kyr_header)+i, value);
     if (value != kyr_msgs[i])
@@ -293,32 +303,12 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_SPEED_POT:
     input_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     
+  case KYRP_OUT_ENABLE:
+    nrpn_update_mixer(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+
     // case KYRP_MORSE+(0..63): see default case
     
-  case KYRP_MIX_USB_L0:
-  case KYRP_MIX_USB_L1:
-  case KYRP_MIX_USB_L2:
-  case KYRP_MIX_USB_L3: nrpn_set_mixer(nrpn, value, l_usb_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_MIX_USB_R0:
-  case KYRP_MIX_USB_R1:
-  case KYRP_MIX_USB_R2:
-  case KYRP_MIX_USB_R3: nrpn_set_mixer(nrpn, value, r_usb_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_MIX_I2S_L0:
-  case KYRP_MIX_I2S_L1:
-  case KYRP_MIX_I2S_L2:
-  case KYRP_MIX_I2S_L3: nrpn_set_mixer(nrpn, value, l_i2s_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_MIX_I2S_R0:
-  case KYRP_MIX_I2S_R1:
-  case KYRP_MIX_I2S_R2:
-  case KYRP_MIX_I2S_R3: nrpn_set_mixer(nrpn, value, r_i2s_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_MIX_HDW_L0:
-  case KYRP_MIX_HDW_L1:
-  case KYRP_MIX_HDW_L2:
-  case KYRP_MIX_HDW_L3: nrpn_set_mixer(nrpn, value, l_hdw_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_MIX_HDW_R0:
-  case KYRP_MIX_HDW_R1:
-  case KYRP_MIX_HDW_R2:
-  case KYRP_MIX_HDW_R3: nrpn_set_mixer(nrpn, value, r_hdw_out); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+    // case KYRP_MIXER+(0..23): see default case
 
     // keyer voice cases
 #define keyer_case(VOX, VOXP) \
@@ -390,8 +380,12 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_SAMPLE_RATE: nrpn_echo(nrpn, ((uint16_t)AUDIO_SAMPLE_RATE)/100); break;
 				   
   default: 
-    if ((nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64)) {
+    if (nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) {
       kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value);
+      break;
+    }
+    if (nrpn >= KYRP_MIX_USB_L0 && nrpn <= KYRP_MIX_HDW_R3) {
+      nrpn_update_mixer(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value);
       break;
     }
     Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value);
@@ -400,34 +394,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 }
 
 static void nrpn_setup(void) {
-
   codec_enable();
-
-  /* mute headphones */
-  // nrpn_set(KYRP_MUTE_HEAD_PHONES, 1);
   nrpn_set(KYRP_VOLUME, 64);
-
-  /* codec setup */
-  // nrpn_set(KYRP_INPUT_SELECT, 0);
-  // nrpn_set(KYRP_MIC_PREAMP_GAIN, 0); // suggestion in audio docs
-  // kyr_nrpn[KYRP_MIC_BIAS] = 7;	     // taken from audio library
-  // nrpn_set(KYRP_MIC_IMPEDANCE, 1);   // taken from audio library
-  // nrpn_set(KYRP_MUTE_LINE_OUT, 1);
-  //  nrpn_set(KYRP_LINE_IN_LEVEL, 5);
-  // nrpn_set(KYRP_LINE_OUT_LEVEL, 29);
-
-  /* unmute headphones */
-  // nrpn_set(KYRP_MUTE_HEAD_PHONES, 0);
-
-#if 0
-  for (int i = 0; i < KYRP_LAST; i += 1) kyr_nrpn[i] = KYRV_NOT_SET;
-#endif
   nrpn_set_defaults();
-#if 0
-  for (int i = 0; i < KYRP_LAST; i += 1)
-    if (kyr_nrpn[i] == KYRV_NOT_SET) {
-      if (i >= KYRP_VOX_TUNE) continue;
-      Serial.printf("nrpn #%d is not initialized\n", i);
-    }
-#endif
 }

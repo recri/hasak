@@ -40,14 +40,6 @@ static inline int16_t get_vox_nrpn(const int16_t vox, const int16_t nrpn) {
   return (value >= 0) ? value : get_nrpn(nrpn);
 }
 
-/***************************************************************
-** Parameter fetching
-** keyers, oscillators, ramps, and ptt fetch parameters as required
-** which allows them to vary as you twiddle the ctrlr dials
-***************************************************************/
-/* button voltages */
-static inline int16_t get_button(int button) { return (((int16_t)get_nrpn(KYRP_BUTTON_0+button))<<2)>>2; } // sign extended 14 bit value
-
 /* unit conversions */
 static inline int ms_to_samples(int ms) { return ms * (AUDIO_SAMPLE_RATE*0.001); }
 static inline float samples_to_ms(int samples) { return samples / (AUDIO_SAMPLE_RATE*0.001); }

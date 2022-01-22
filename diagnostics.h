@@ -278,7 +278,6 @@ void diag_nrpn_report(void) {
   Serial.printf("KYRP_RISE_RAMP %d\n", get_nrpn(KYRP_RISE_RAMP));
   Serial.printf("KYRP_FALL_RAMP %d\n", get_nrpn(KYRP_FALL_RAMP));
 
-
   Serial.printf("KYRP_PAD_MODE %d\n", get_nrpn(KYRP_PAD_MODE));
   Serial.printf("KYRP_PAD_SWAP %d\n", get_nrpn(KYRP_PAD_SWAP));
   Serial.printf("KYRP_PAD_ADAPT %d\n", get_nrpn(KYRP_PAD_ADAPT));
