@@ -110,13 +110,13 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   // store the values
   /* Serial.printf("morse_keyer base dit %ld, dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
-  AudioNoInterrupts();
+  // AudioNoInterrupts();
   set_vox_xnrpn(vox, KYRP_XPER_DIT, ticksPerDit);
   set_vox_xnrpn(vox, KYRP_XPER_DAH, ticksPerDah);
   set_vox_xnrpn(vox, KYRP_XPER_IES, ticksPerIes);
   set_vox_xnrpn(vox, KYRP_XPER_ILS, ticksPerIls);
   set_vox_xnrpn(vox, KYRP_XPER_IWS, ticksPerIws);
-  AudioInterrupts();
+  // AudioInterrupts();
   /* Serial.printf("morse_keyer dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      get_vox_xnrpn(vox, KYRP_XPER_DIT), get_vox_xnrpn(vox, KYRP_XPER_DAH),
      get_vox_xnrpn(vox, KYRP_XPER_IES), get_vox_xnrpn(vox, KYRP_XPER_ILS),
@@ -242,6 +242,8 @@ static void nrpn_set_defaults(void) {
   /* voice specializations */
   for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
     hasak.nrpn[i] = KYRV_NOT_SET;
+  for (int i = KYRP_XVOX_TUNE; i < KYRP_XLAST; i += 1)
+    hasak.xnrpn[i-KYRP_XKEYER] = KYRV_NOT_SET;
 }
 
 #include "EEPROM.h"
