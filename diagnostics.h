@@ -152,7 +152,7 @@ static void breport(void) {
 
 /* debounce details */
 static void dreport(void) {
-  Serial.printf("debounce: %d ms/10, %d samples\n", get_nrpn(KYRP_DEBOUNCE), tenth_ms_to_samples(get_nrpn(KYRP_DEBOUNCE)));
+  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(get_nrpn(KYRP_DEBOUNCE)), get_nrpn(KYRP_DEBOUNCE));
 }
 
 static const char *lorem = 

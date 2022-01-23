@@ -71,8 +71,8 @@ public:
   // oscillatar may vary
   void start_rise() {
     vox = get_active_vox();		// current vox, vox is consistent across in the arbiter
-    rate = 0xFFFFFFFFu / tenth_ms_to_samples(get_nrpn(KYRP_RISE_TIME));
-    fall_rate = 0xFFFFFFFFu / tenth_ms_to_samples(get_nrpn(KYRP_FALL_TIME));
+    rate = 0xFFFFFFFFu / get_nrpn(KYRP_RISE_TIME); // ramp rise time in samples
+    fall_rate = 0xFFFFFFFFu / get_nrpn(KYRP_FALL_TIME); // ramp fall time in samples
     table = get_table(get_nrpn(KYRP_RISE_RAMP));
     fall_table = get_table(get_nrpn(KYRP_FALL_RAMP));
     // int16_t iq_adjust = get_nrpn(KYRP_IQ_ADJUST);

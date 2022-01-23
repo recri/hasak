@@ -258,14 +258,14 @@
 
 #define KYRP_PTT		(KYRP_COMM+1) /* {type rel label {PTT timing parameters}} */
 
-#define KYRP_HEAD_TIME		(KYRP_PTT+0) /* {type par label {time ptt should lead key, key delay} range {0 127} unit ms} */
-#define KYRP_TAIL_TIME		(KYRP_PTT+1) /* {type par label {time ptt should linger after key} range {0 127} unit ms} */
+#define KYRP_HEAD_TIME		(KYRP_PTT+0) /* {type par label {time ptt should lead key, key delay} range {0 127} unit samples} */
+#define KYRP_TAIL_TIME		(KYRP_PTT+1) /* {type par label {time ptt should linger after key} range {0 127} unit samples} */
 #define KYRP_HANG_TIME		(KYRP_PTT+2) /* {type par label {time in dits ptt should linger after key} range {0 127} units dits} */
 
 #define KYRP_RAMP		(KYRP_PTT+3) /* {type rel label {base of the keyer ramp parameters}} */
 
-#define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par label {key rise ramp length} range {0 16383} units ms/10} */
-#define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par label {key fall ramp length} range {0 16383} units ms/10} */
+#define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par label {key rise ramp length} range {0 16383} units samples} */
+#define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par label {key fall ramp length} range {0 16383} units samples} */
 #define KYRP_RISE_RAMP		(KYRP_RAMP+2)	/* {type par label {key rise ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
 #define KYRP_FALL_RAMP		(KYRP_RAMP+3)	/* {type par label {key fall ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN} */
 #define KYRV_RAMP_HANN		0 /* {type val label {ramp from Hann window, raised cosine} value-of {KYRP_*_RAMP}} */
@@ -367,7 +367,7 @@
 #define KYRP_WEIGHT		(KYRP_KEYER+3) /* {type par label {keyer mark/space weight} range {25 75} unit pct default 50} */
 #define KYRP_RATIO		(KYRP_KEYER+4) /* {type par label {keyer dit/dah ratio} range {25 75} unit pct default 50} */
 #define KYRP_FARNS		(KYRP_KEYER+5) /* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
-#define KYRP_COMP		(KYRP_KEYER+6) /* {type par label {keyer compensation} range {-8192 8191} default 0 units ms/10} */
+#define KYRP_COMP		(KYRP_KEYER+6) /* {type par label {keyer compensation} range {-8192 8191} default 0 units samples} */
 #define KYRP_SPEED_FRAC		(KYRP_KEYER+7) /* {type par label {keyer speed fraction} range {0 127} default 0 units wpm/128} */
 
 #define KYRP_KEYER_LAST		(KYRP_KEYER+8) /* {type rel label {end of keyer block}} */

@@ -83,7 +83,7 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   const float wpm = get_vox_nrpn(vox, KYRP_SPEED)+get_vox_nrpn(vox, KYRP_SPEED_FRAC)*7.8125e-3f;
   const float weight = get_vox_nrpn(vox, KYRP_WEIGHT);
   const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
-  const float compensation = tenth_ms_to_ms(signed_value(get_vox_nrpn(vox, KYRP_COMP)));
+  const float compensation = samples_to_ms(signed_value(get_vox_nrpn(vox, KYRP_COMP)));
   const float farnsworth = get_vox_nrpn(vox, KYRP_FARNS);;
   const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
