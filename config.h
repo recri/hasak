@@ -384,7 +384,7 @@
 
 #define KYRP_LAST		(KYRP_VOX_BUT+KYRP_VOX_OFFSET) /* {type rel label {one past end of stored keyer parameters}} */
 
-#define KYRP_XFIRST		(KYRP_LAST) /* {type rel label {base of extended nrpn block}} */
+#define KYRP_XFIRST		(1000) /* {type rel label {base of extended nrpn block}} */
 
 #define KYRP_XKEYER		(KYRP_XFIRST) /* {type rel label {base of extended keyer block}} */
 
@@ -405,9 +405,9 @@
 #define KYRP_XVOX_KYR		(KYRP_XKEYER+KYR_VOX_KYR*KYRP_XVOX_OFFSET) /* {type rel label {base of text from hasak parameters}} */
 #define KYRP_XVOX_BUT		(KYRP_XKEYER+KYR_VOX_BUT*KYRP_XVOX_OFFSET) /* {type rel label {base of headset button keyer parameters}} */
 
-#define KYRP_XLAST		(KYRP_XVOX_BUT+KYRP_XVOX_OFFSET)
+#define KYRP_XLAST		(KYRP_XVOX_BUT+KYRP_XVOX_OFFSET) /* {type rel label {end+1 of extended keyer block}} */
 
-#define KYRP_EXEC		(KYRP_XLAST) /* {type rel label {base of command nrpns}} */
+#define KYRP_EXEC		(2000) /* {type rel label {base of command nrpns}} */
 
 #define KYRP_WRITE_EEPROM	(KYRP_EXEC+0) /* {type cmd label {write nrpn+msgs to eeprom}} */
 #define KYRP_READ_EEPROM	(KYRP_EXEC+1) /* {type cmd label {read nrpn+msgs from eeprom}} */
@@ -421,13 +421,15 @@
 #define KYRP_PLAY_WINK		(KYRP_EXEC+9) /* {type cmd label {queue message by number through wink}} */
 #define KYRP_PLAY_KYR		(KYRP_EXEC+10) /* {type cmd label {queue message by number through kyr}} */ 
 
-#define KYRP_INFO		(KYRP_EXEC+11) /* {type rel label {base of information nrpns}} */
+#define KYRP_INFO		(3000) /* {type rel label {base of information nrpns}} */
 
 #define KYRP_VERSION		(KYRP_INFO+0) /* {type inf label {version of hasak nrpn set}} */
 #define KYRP_NRPN_SIZE		(KYRP_INFO+1) /* {type inf label {size of nrpn array}} */
 #define KYRP_MSG_SIZE		(KYRP_INFO+2) /* {type inf label {send the size of msgs array}} */
 #define KYRP_SAMPLE_RATE	(KYRP_INFO+3) /* {type inf label {sample rate of audio library} units sps/100} */
 #define KYRP_EEPROM_LENGTH	(KYRP_INFO+4) /* {type inf label {result of EEPROM.length()} units bytes} */
+#define KYRP_ID_CPU		(KYRP_INFO+5) /* {type inf label {which teensy microprocessor are we running}} */
+#define KYRP_ID_CODEC		(KYRP_INFO+6) /* {type inf label {which codec are we running}} */
 
 /* end of defined nrpns */
 /* end of config.h */

@@ -6,6 +6,13 @@
 static bool codec_sgtl5000;
 static bool codec_wm8960;
 
+static int16_t codec_identify(void) {
+  if (codec_sgtl5000 && codec_wm8960) return 5000+8960;
+  if (codec_sgtl5000) return 5000;
+  if (codec_wm8960) return 8960;
+  return 0;
+}
+
 static void codec_enable(void) {
   codec_sgtl5000 = sgtl5000.enable();
   codec_wm8960 = wm8960.enable();

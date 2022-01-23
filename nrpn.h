@@ -426,7 +426,25 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(hasak.msgs)); break;
   case KYRP_SAMPLE_RATE: nrpn_echo(nrpn, ((uint16_t)AUDIO_SAMPLE_RATE)/100); break;
   case KYRP_EEPROM_LENGTH: nrpn_echo(nrpn, nrpn_eeprom_length()); break;
-				   
+  case KYRP_ID_CPU:
+#if defined(TEENSY30)
+    nrpn_echo(nrpn, 30); break;
+#elif defined(TEENSY31)
+    nrpn_echo(nrpn, 31); break;
+#elif defined(TEENSY32)
+    nrpn_echo(nrpn, 32); break;
+#elif defined(TEENSY35)
+    nrpn_echo(nrpn, 35); break;
+#elif defined(TEENSY36)
+    nrpn_echo(nrpn, 36); break;
+#elif defined(TEENSY40)
+    nrpn_echo(nrpn, 40); break;
+#elif defined(TEENSY41)
+    nrpn_echo(nrpn, 41); break;
+#else
+    nrpn_echo(nrpn, 0); break;
+#endif
+  case KYRP_ID_CODEC: nrpn_echo(nrpn, codec_identify()); break;
   default: 
     if (nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) {
       hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value);

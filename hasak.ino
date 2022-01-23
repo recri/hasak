@@ -326,6 +326,7 @@ void loop(void) {
 static int valid_pin(int pin) { return pin >= 0 && pin < CORE_NUM_TOTAL_PINS; }
 
 static void codec_enable(void);
+static int16_t codec_identify(void);
 static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
 static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 static void input_nrpn_set(const int16_t nrpn, const int16_t value);

@@ -70,7 +70,10 @@ proc jsformat-any {name table} {
 proc jsformat-all {values} {
     set js {}
     dict for {name table} $values {
-	lappend js [jsformat-any $name $table]
+	if {[dict get $table type] in {rel par cmd inf val} ||
+	    [string match *VOX* $name]} {
+	    lappend js [jsformat-any $name $table]
+	}
     }
     return $js
 }
