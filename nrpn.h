@@ -222,10 +222,10 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
-  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
   // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_AD5DZ);
+  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
   // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_ND7PA);
-  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_K1EL);
+  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_K1EL);
   nrpn_set(KYRP_AUTO_ILS, 1);
   nrpn_set(KYRP_AUTO_IWS, 0);
 
