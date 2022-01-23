@@ -14,6 +14,24 @@
 	put it back into the keyer timing
 [ ] implement key_out compensation.
 [ ] reimplement ptt_enable
+[x] put kyr_nrpn[] in a struct with kyr_msg[] and the eeprom headers
+	and the extended nrpns which have int32_t values so they can
+	hold the number of samples per element.  Then the eeprom can
+	be written and read with a few gets and puts.
+[x] rewrite get_nrpn and get_vox_nrpn to consider the range of nrpn
+	offered.  It already did, and they're inline so they can 
+	fold constant arguments, ie nrpn, into the code generation
+[ ] use get_nrpnx() for accessing the extended precision nrpn values.
+[ ] make nrpn_update_timing notice whether any nrpns are vox special
+	so it can write the computed timing to the vox special extended
+	storage rather than the default.
+[ ] HSMS/QRQ to supersize the speed control, HSMS goes up to 4000 
+	letter/minute, or 800 words/minute
+[x] QRSS to superlong the speed control.  Extreme QRSS goes to 0.0133 wpm
+	which is between 1/128 and 1/64 wpm, so a fraction numerator with
+	implicit denominator 128 will cover that with speed=0, also gets
+	fractional part of wpm speed >= 0, really need the extended
+	samples/element for this.
 [x] mixers as AudioMixer4 mixer[6];
 	doesn't work, what don't I understand?
 	do it as pointers and it works

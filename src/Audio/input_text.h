@@ -63,7 +63,7 @@ private:
   // send abs(value) samples of (value < 0) ? 0 : 1
   // return 0 if the value was successfully queued
   // return -1 if there is no room
-  int send(int16_t value) {
+  int send(int32_t value) {
     if (elements.can_put()) {
       elements.put(value);
       return 0;
@@ -137,12 +137,12 @@ private:
     uint8_t value = recv_text();
     if (value == ' ') {
       // send word space
-      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IWS)));
+      send(-get_vox_xnrpn(vox, KYRP_XPER_IWS));
       return 1;
     }
     if (value == '|') {
       // send half dit space
-      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_DIT))/2);
+      send(-get_vox_xnrpn(vox, KYRP_XPER_DIT)/2);
       return 1;
     }
     int sent = 0;
@@ -157,13 +157,13 @@ private:
     }
     uint8_t code = get_nrpn(KYRP_MORSE+value-33);
     while (code > 1) {
-      send(ms_to_samples(get_vox_nrpn(vox, code & 1 ? KYRP_PER_DAH : KYRP_PER_DIT)));
-      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IES)));
+      send(get_vox_xnrpn(vox, code & 1 ? KYRP_XPER_DAH : KYRP_XPER_DIT));
+      send(-get_vox_xnrpn(vox, KYRP_XPER_IES));
       code >>= 1;
       sent += 2;
     }
     if (code == 1 && ! prosign) {
-      send(-ms_to_samples(get_vox_nrpn(vox, KYRP_PER_ILS)-get_vox_nrpn(vox, KYRP_PER_IES)));
+      send(-get_vox_xnrpn(vox, KYRP_XPER_ILS)-get_vox_xnrpn(vox, KYRP_XPER_IES));
       sent += 1;
     }
     return sent > 0;
@@ -180,7 +180,7 @@ private:
   int element;
   audio_block_t *block;
   int16_t *wptr, n;
-  RingBuffer<int16_t, 32> elements;
+  RingBuffer<int32_t, 32> elements;
   RingBuffer<uint8_t, 64> chars;
 };
 

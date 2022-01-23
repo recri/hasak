@@ -109,7 +109,7 @@ private:
   bool dot_memory = 0;
   bool dash_memory = 0;
   int key_state = CHECK;
-  int kdelay = 0;
+  int32_t kdelay = 0;
 
 public:
  KeyerVk6ph(const int vox) : KeyerGeneric(vox) { }

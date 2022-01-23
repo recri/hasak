@@ -2,20 +2,37 @@
 ** NRPN (non-registered parameter) handling.
 ***************************************************************/
 /* array of persistent nrpn values */
-int16_t kyr_nrpn[KYRP_LAST];
-/* header for eeprom stored nrpn values */
-static uint16_t kyr_header[3] = { KYRC_MAGIC, sizeof(kyr_nrpn), KYRC_VERSION };
-/* array of bytes used for persistent messages */
-static int8_t kyr_msgs[EEPROM_BYTES-sizeof(kyr_nrpn)-sizeof(kyr_header)-sizeof(kyr_header)];
-/* index into kyr_msgs for reading and writing contents */
-static uint16_t kyr_index = 0;
+hasak_t hasak = {
+  { KYRC_MAGIC, sizeof(hasak.nrpn), KYRC_VERSION },
+  { 0 },
+  { 0 },
+  0 
+};
+
 /* forward reference */
 static void nrpn_set(const int16_t nrpn, const int16_t value);
 
-/* set a nrpn without */
+static void invalid_set_nrpn(const int16_t nrpn, const int16_t value) {
+  Serial.printf("invalid set_nrpn(%d, %d)\n", nrpn, value);
+}
+
+/* set a nrpn without echo */
 static inline void set_nrpn(const int16_t nrpn, const int16_t value) {
-  if (nrpn >= 0 && nrpn <= KYRP_LAST)
-    kyr_nrpn[nrpn] = value;
+  if ((unsigned)(nrpn-KYRP_FIRST) < KYRP_LAST)
+    hasak.nrpn[nrpn-KYRP_FIRST] = value;
+  else
+    invalid_set_nrpn(nrpn, value);
+}
+
+static void invalid_set_xnrpn(const int16_t nrpn, const int32_t value) {
+  Serial.printf("invalid set_xnrpn(%d, %ld)\n", nrpn, value);
+}
+
+static inline void set_xnrpn(const int16_t nrpn, const int32_t value) {
+  if ((unsigned)(nrpn-KYRP_XFIRST) < (KYRP_XLAST-KYRP_XFIRST))
+    hasak.xnrpn[nrpn-KYRP_XFIRST] = value;
+  else
+    invalid_set_xnrpn(nrpn, value);
 }
 
 /*
@@ -23,19 +40,37 @@ static inline void set_nrpn(const int16_t nrpn, const int16_t value) {
 ** keyer voices may have customized parameters, but
 ** fall back to the common parameter set when no
 ** customized parameter has been set.
-** So set_vox_nrpn() sets the bank of the kyr_nrpn that
+** So set_vox_nrpn() sets the bank of the hasak.nrpn that
 ** is vox specific, and get_vox_nrpn(vox, NRPN) looks in the vox
 ** specific bank and returns its value if it has been
 ** set, otherwise returns the value from the default bank.
 **
-** The value that marks a set parameter is kyr_nrpn[INDEX] >= 0
+** The value that marks a set parameter is hasak.nrpn[INDEX] >= 0
 ** because nrpn values are 14bit unsigned.
 */
 
+static void invalid_set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
+  Serial.printf("invalid_set_vox_nrpn(%d, %d, %d)\n", vox, nrpn, value);
+}
+
 /* set a vox specialized nrpn */
 static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
-  if (vox >= 0 && vox <= KYR_N_VOX && nrpn >= KYRP_KEYER && nrpn < KYRP_VOX_TUNE)
-    set_nrpn(nrpn+vox*KYRP_VOX_OFFSET, value);
+  if ((unsigned)vox <= KYR_N_VOX && (unsigned)(nrpn-KYRP_XKEYER) < KYRP_XVOX_OFFSET)
+    set_nrpn(nrpn-KYRP_XKEYER+vox*KYRP_VOX_OFFSET, value);
+  else
+    invalid_set_vox_nrpn(vox, nrpn, value);
+}
+
+static void invalid_set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const int32_t value) {
+  Serial.printf("invalid_set_vox_xnrpn(%d, %d, %ld)\n", vox, nrpn, value);
+}
+
+/* set a vox specialized nrpn */
+static inline void set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const int32_t value) {
+  if ((unsigned)vox <= KYR_N_VOX && (unsigned)(nrpn-KYRP_XKEYER) < (KYRP_XVOX_TUNE-KYRP_XKEYER))
+    hasak.xnrpn[(nrpn-KYRP_XKEYER)+vox*KYRP_VOX_OFFSET] = value;
+  else
+    invalid_set_vox_xnrpn(vox, nrpn, value);
 }
 
 /*
@@ -45,7 +80,7 @@ static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int
 static void nrpn_update_keyer_timing(const int16_t vox) {
   const float wordDits = 50;
   const float sampleRate = AUDIO_SAMPLE_RATE;
-  const float wpm = get_vox_nrpn(vox, KYRP_SPEED);
+  const float wpm = get_vox_nrpn(vox, KYRP_SPEED)+get_vox_nrpn(vox, KYRP_SPEED_FRAC)*7.8125e-3f;
   const float weight = get_vox_nrpn(vox, KYRP_WEIGHT);
   const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
   const float compensation = tenth_ms_to_ms(signed_value(get_vox_nrpn(vox, KYRP_COMP)));
@@ -55,12 +90,12 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   const float w = (weight-50)/100.0;
   const float c = compensation / ms_per_dit; /* ms/10 / ms_per_dit */ 
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
-  const unsigned ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
-  int ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
-  int ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
-  int ticksPerIes = (1  -w-c) * ticksPerBaseDit;
-  int ticksPerIls = (3  -w-c) * ticksPerBaseDit;
-  int ticksPerIws = (7  -w-c) * ticksPerBaseDit;
+  const uint32_t ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
+  const int32_t ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
+  const int32_t ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
+  const int32_t ticksPerIes = (1  -w-c) * ticksPerBaseDit;
+        int32_t ticksPerIls = (3  -w-c) * ticksPerBaseDit;
+        int32_t ticksPerIws = (7  -w-c) * ticksPerBaseDit;
     
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
@@ -72,18 +107,20 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
     ticksPerIls *= f;		// stretched inter-character pause
     ticksPerIws *= f;		// stretched inter-word pause
   }
-  /* test for overflow */
-  // ticksPerIws = min(ticksPerIws, 0x7fff);
-  /* Serial.printf("morse_keyer base dit %u, dit %u, dah %u, ies %u, ils %u, iws %u\n", 
+  // store the values
+  /* Serial.printf("morse_keyer base dit %ld, dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
-  /* storing msPerElement, because ticks gets too large */
   AudioNoInterrupts();
-  set_vox_nrpn(vox, KYRP_PER_DIT, samples_to_ms(ticksPerDit));
-  set_vox_nrpn(vox, KYRP_PER_DAH, samples_to_ms(ticksPerDah));
-  set_vox_nrpn(vox, KYRP_PER_IES, samples_to_ms(ticksPerIes));
-  set_vox_nrpn(vox, KYRP_PER_ILS, samples_to_ms(ticksPerIls));
-  set_vox_nrpn(vox, KYRP_PER_IWS, samples_to_ms(ticksPerIws));
+  set_vox_xnrpn(vox, KYRP_XPER_DIT, ticksPerDit);
+  set_vox_xnrpn(vox, KYRP_XPER_DAH, ticksPerDah);
+  set_vox_xnrpn(vox, KYRP_XPER_IES, ticksPerIes);
+  set_vox_xnrpn(vox, KYRP_XPER_ILS, ticksPerIls);
+  set_vox_xnrpn(vox, KYRP_XPER_IWS, ticksPerIws);
   AudioInterrupts();
+  /* Serial.printf("morse_keyer dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
+     get_vox_xnrpn(vox, KYRP_XPER_DIT), get_vox_xnrpn(vox, KYRP_XPER_DAH),
+     get_vox_xnrpn(vox, KYRP_XPER_IES), get_vox_xnrpn(vox, KYRP_XPER_ILS),
+     get_vox_xnrpn(vox, KYRP_XPER_IWS)); */
 }
 
 // echo the nprn settings back to the control echo channel
@@ -95,7 +132,7 @@ static void nrpn_update_mixer(const int16_t nrpn, const int16_t value) {
   if (nrpn == KYRP_OUT_ENABLE) {
     // Serial.printf("update_mixer(%d, 0x%03x)\n", nrpn, value);
     AudioNoInterrupts();
-    kyr_nrpn[nrpn] = value;
+    hasak.nrpn[nrpn] = value;
     for (int i = KYRP_MIX_USB_L0; i <= KYRP_MIX_HDW_R3; i += 1)
       nrpn_update_mixer(i, get_nrpn(i));
     AudioInterrupts();
@@ -144,7 +181,6 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_IQ_BALANCE, 0);
   nrpn_set(KYRP_ST_PAN, 0);
   nrpn_set(KYRP_DEBOUNCE, 50);
-  nrpn_set(KYRP_COMP,0);
   
   nrpn_set(KYRP_CHAN_RECV_CC, KYRC_CHAN_RECV_CC);
   nrpn_set(KYRP_CHAN_SEND_CC, KYRC_CHAN_SEND_CC);
@@ -186,7 +222,10 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
-  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
+  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
+  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_AD5DZ);
+  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_ND7PA);
+  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_K1EL);
   nrpn_set(KYRP_AUTO_ILS, 1);
   nrpn_set(KYRP_AUTO_IWS, 0);
 
@@ -194,56 +233,62 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_TONE, 600);
   nrpn_set(KYRP_LEVEL, 64);
   nrpn_set(KYRP_SPEED,18);
+  nrpn_set(KYRP_SPEED_FRAC, 0);
   nrpn_set(KYRP_WEIGHT,50);
   nrpn_set(KYRP_RATIO,50);
+  nrpn_set(KYRP_COMP,0);
   nrpn_set(KYRP_FARNS,0);
   
   /* voice specializations */
   for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
-    kyr_nrpn[i] = KYRV_NOT_SET;
+    hasak.nrpn[i] = KYRV_NOT_SET;
 }
 
 #include "EEPROM.h"
 
 static void nrpn_write_eeprom(void) {
-  EEPROM.put(0, kyr_header); /* header */
-  EEPROM.put(sizeof(kyr_header), kyr_nrpn); /* nrpns */
-  EEPROM.put(sizeof(kyr_header)+sizeof(kyr_nrpn), kyr_header); /* header */
-  EEPROM.put(sizeof(kyr_header)+sizeof(kyr_nrpn)+sizeof(kyr_header), kyr_msgs); /* stored messages */
+  EEPROM.put(0, hasak.header); /* header */
+  EEPROM.put(sizeof(hasak.header), hasak.nrpn); /* nrpns */
+  EEPROM.put(sizeof(hasak.header)+sizeof(hasak.nrpn), hasak.header); /* header */
+  EEPROM.put(sizeof(hasak.header)+sizeof(hasak.nrpn)+sizeof(hasak.header), hasak.msgs); /* stored messages */
 
   /* verify */
   for (int nrpn = 0; nrpn < KYRP_LAST; nrpn += 1) {
     int16_t value;
-    EEPROM.get(sizeof(kyr_header)+nrpn*sizeof(int16_t), value);
-    if (value != kyr_nrpn[nrpn])
-      Serial.printf("nrpn_write_eeprom kyr_nrpn[%d] == %d != %d\n", nrpn, value, kyr_nrpn[nrpn]);
+    EEPROM.get(sizeof(hasak.header)+nrpn*sizeof(int16_t), value);
+    if (value != hasak.nrpn[nrpn])
+      Serial.printf("nrpn_write_eeprom hasak.nrpn[%d] == %d != %d\n", nrpn, value, hasak.nrpn[nrpn]);
   }
-  for (unsigned i = 0; i < sizeof(kyr_msgs); i += 1) {
+  for (unsigned i = 0; i < sizeof(hasak.msgs); i += 1) {
     int8_t value;
-    EEPROM.get(sizeof(kyr_header)+sizeof(kyr_nrpn)+sizeof(kyr_header)+i, value);
-    if (value != kyr_msgs[i])
-      Serial.printf("nrpn_write_eeprom kyr_msgs[%d] == %d != %d\n", i, value, kyr_msgs[i]);
+    EEPROM.get(sizeof(hasak.header)+sizeof(hasak.nrpn)+sizeof(hasak.header)+i, value);
+    if (value != hasak.msgs[i])
+      Serial.printf("nrpn_write_eeprom hasak.msgs[%d] == %d != %d\n", i, value, hasak.msgs[i]);
   }
 }
 
 static int nrpn_read_eeprom(void) {
   uint16_t header[3];
   EEPROM.get(0, header);
-  if (header[0] != kyr_header[0] || header[1] != kyr_header[1] || header[2] != kyr_header[2]) return 0;
-  EEPROM.get(sizeof(header)+sizeof(kyr_nrpn), header);
-  if (header[0] != kyr_header[0] || header[1] != kyr_header[1] || header[2] != kyr_header[2]) return 0;
-  EEPROM.get(sizeof(header), kyr_nrpn);
-  EEPROM.get(sizeof(header)+sizeof(kyr_nrpn)+sizeof(header), kyr_msgs);
+  if (header[0] != hasak.header[0] || header[1] != hasak.header[1] || header[2] != hasak.header[2]) return 0;
+  EEPROM.get(sizeof(header)+sizeof(hasak.nrpn), header);
+  if (header[0] != hasak.header[0] || header[1] != hasak.header[1] || header[2] != hasak.header[2]) return 0;
+  EEPROM.get(sizeof(header), hasak.nrpn);
+  EEPROM.get(sizeof(header)+sizeof(hasak.nrpn)+sizeof(header), hasak.msgs);
   /* apply nrpns */
   for (int nrpn = 0; nrpn < KYRP_LAST; nrpn += 1)
-    if (kyr_nrpn[nrpn] != KYRV_NOT_SET)
-      nrpn_set(nrpn, kyr_nrpn[nrpn]);
+    if (hasak.nrpn[nrpn] != KYRV_NOT_SET)
+      nrpn_set(nrpn, hasak.nrpn[nrpn]);
   return 1;
+}
+
+static int nrpn_eeprom_length(void) {
+  return EEPROM.length();
 }
 
 /*
 ** set a NRPN value.
-** all are copied into the kyr_nrpn[] array.
+** all are copied into the hasak.nrpn[] array.
 ** some are transformed into sample unit timings.
 ** some trigger calls to the sgtl5000 control interface.
 ** none are sent into the audio library processing loop,
@@ -254,7 +299,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_VOLUME:
   case KYRP_INPUT_SELECT:
   case KYRP_INPUT_LEVEL:
-    codec_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+    codec_nrpn_set(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_BUTTON_0:
   case KYRP_BUTTON_1:
   case KYRP_BUTTON_2:
@@ -269,7 +314,6 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_ST_PAN:
 
   case KYRP_DEBOUNCE:
-  case KYRP_COMP:
   case KYRP_HEAD_TIME:
   case KYRP_TAIL_TIME:
   case KYRP_HANG_TIME:
@@ -296,15 +340,15 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_NOTE_EXT_PTT:
   case KYRP_NOTE_KEY_OUT:
   case KYRP_NOTE_PTT_OUT:
-    kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+    hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
   case KYRP_VOLUME_POT:
   case KYRP_ST_VOL_POT:
   case KYRP_ST_FREQ_POT:
   case KYRP_SPEED_POT:
-    input_nrpn_set(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+    input_nrpn_set(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     
   case KYRP_OUT_ENABLE:
-    nrpn_update_mixer(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
+    nrpn_update_mixer(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
 
     // case KYRP_MORSE+(0..63): see default case
     
@@ -313,9 +357,10 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     // keyer voice cases
 #define keyer_case(VOX, VOXP) \
   case VOXP+KYRP_TONE:	    case VOXP+KYRP_LEVEL: \
-    kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
+    hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
   case VOXP+KYRP_SPEED:     case VOXP+KYRP_WEIGHT:    case VOXP+KYRP_RATIO:     case VOXP+KYRP_FARNS: \
-    kyr_nrpn[nrpn] = value; nrpn_update_keyer_timing(VOX); nrpn_echo(nrpn, value); break;
+  case VOXP+KYRP_COMP:	    case VOXP+KYRP_SPEED_FRAC: \
+    hasak.nrpn[nrpn] = value; nrpn_update_keyer_timing(VOX); nrpn_echo(nrpn, value); break;
     
     keyer_case(KYR_VOX_NONE, KYRP_VOX_NONE-KYRP_KEYER); // default keyer params
     keyer_case(KYR_VOX_TUNE, KYRP_VOX_TUNE-KYRP_KEYER); // tune params
@@ -327,7 +372,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 
 #undef keyer_case    
     
-    /* commands, keep no state in kyr_nrpn */
+    /* commands, keep no state in hasak.nrpn */
   case KYRP_WRITE_EEPROM:
     nrpn_write_eeprom();
     nrpn_echo(nrpn, 1);
@@ -341,8 +386,8 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     break;
   case KYRP_ECHO_ALL:
     for (int i = 0; i < KYRP_LAST; i += 1) 
-      if (kyr_nrpn[i] != KYRV_NOT_SET) 
-	nrpn_echo(i, kyr_nrpn[i]);
+      if (hasak.nrpn[i] != KYRV_NOT_SET) 
+	nrpn_echo(i, hasak.nrpn[i]);
     nrpn_echo(nrpn, 0);
     break;
   case KYRP_SEND_WINK: 
@@ -354,17 +399,17 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     nrpn_echo(nrpn, value&127);
     break;
   case KYRP_MSG_INDEX: 
-    kyr_index = min(sizeof(kyr_msgs)-1, max(0, value));
-    nrpn_echo(nrpn, kyr_index);
+    hasak.index = value%sizeof(hasak.msgs);
+    nrpn_echo(nrpn, hasak.index);
     break;
   case KYRP_MSG_WRITE:
     nrpn_echo(nrpn, value&127);
-    kyr_msgs[kyr_index++] = value&127;
-    kyr_index = min(sizeof(kyr_msgs)-1, max(0, value));
+    hasak.msgs[hasak.index++] = value&127;
+    hasak.index %= sizeof(hasak.msgs);
     break;
   case KYRP_MSG_READ: 
-    nrpn_echo(nrpn, kyr_msgs[kyr_index++]);
-    kyr_index = min(sizeof(kyr_msgs)-1, max(0, value));
+    nrpn_echo(nrpn, hasak.msgs[hasak.index++]);
+    hasak.index %= sizeof(hasak.msgs);
     break;
   case KYRP_PLAY_WINK:
     nrpn_echo(nrpn, value);
@@ -375,17 +420,18 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 
     /* information only, cause no side effects */
   case KYRP_VERSION: nrpn_echo(nrpn, KYRC_VERSION); break;
-  case KYRP_NRPN_SIZE: nrpn_echo(nrpn, sizeof(kyr_nrpn)); break;
-  case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(kyr_msgs)); break;
+  case KYRP_NRPN_SIZE: nrpn_echo(nrpn, sizeof(hasak.nrpn)); break;
+  case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(hasak.msgs)); break;
   case KYRP_SAMPLE_RATE: nrpn_echo(nrpn, ((uint16_t)AUDIO_SAMPLE_RATE)/100); break;
+  case KYRP_EEPROM_LENGTH: nrpn_echo(nrpn, nrpn_eeprom_length()); break;
 				   
   default: 
     if (nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) {
-      kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value);
+      hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value);
       break;
     }
     if (nrpn >= KYRP_MIX_USB_L0 && nrpn <= KYRP_MIX_HDW_R3) {
-      nrpn_update_mixer(nrpn, value); kyr_nrpn[nrpn] = value; nrpn_echo(nrpn, value);
+      nrpn_update_mixer(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value);
       break;
     }
     Serial.printf("uncaught nrpn #%d with value %d\n", nrpn, value);

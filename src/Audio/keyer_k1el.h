@@ -89,7 +89,7 @@ private:
   static const int DAH_L = 0x02;     // Dah latch
   static const int DIT_PROC = 0x04;  // Dit is being processed
 
-  int _keyerDuration;		// ticks to next keyer state transition
+  int32_t _keyerDuration;		// ticks to next keyer state transition
 
   unsigned char       _keyerControl;
   unsigned char	      _keyerState;

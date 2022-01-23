@@ -46,7 +46,7 @@ class KeyerAd5dz : public KeyerGeneric {
   key_t key = KEY_OFF;		// input key didah state
   key_t memKey = KEY_OFF;	// memory of states seen since element began
   keyer_t keyerState;		// current keyer state
-  int keyerDuration;		// ticks to next keyer state transition
+  int32_t keyerDuration;	// ticks to next keyer state transition
 
   // mask the key memory to the appropriate bits
   void memToDit(void) { memKey = (key_t)(memKey & KEY_DIT); }
@@ -54,7 +54,7 @@ class KeyerAd5dz : public KeyerGeneric {
   void memToOff(void) { memKey = KEY_OFF; }
 
   // transition to the specified state, with the specified duration, and set the key out state
-  bool transitionTo(keyer_t newState, int newDuration) {
+  bool transitionTo(keyer_t newState, int32_t newDuration) {
     switch (newState) {
     case KEYER_OFF: break;
     case KEYER_DIT: keyOut = 1; memToOff(); break;
@@ -72,7 +72,7 @@ class KeyerAd5dz : public KeyerGeneric {
   bool startDit(void) { return ((key|memKey)&KEY_DIT) != 0 && transitionTo(KEYER_DIT, dit()); }
   bool startDah(void) { return ((key|memKey)&KEY_DAH) != 0 && transitionTo(KEYER_DAH, dah()); }
   bool startSpace(keyer_t newState) { return  transitionTo(newState, ies()); }
-  bool continueSpace(keyer_t newState, int newDuration) { return transitionTo(newState, newDuration); }
+  bool continueSpace(keyer_t newState, int32_t newDuration) { return transitionTo(newState, newDuration); }
   bool symbolSpace(void) { return (auto_ils() && continueSpace(KEYER_SYMBOL_SPACE, ils()-ies())) || finish(); }
   bool wordSpace(void) { return (auto_iws() && continueSpace(KEYER_WORD_SPACE, iws()-ils())) || finish(); }
   bool finish(void) { return transitionTo(KEYER_OFF, 0); }

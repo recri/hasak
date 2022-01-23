@@ -223,12 +223,14 @@
 #define KYRV_SIGN(v) ((((int16_t)(v))<<2)>>2) /* {type mac label {sign extend masked 14 bit to 16 bit twos complement}} */
 
 /* NRPN_GLOBAL_BLOCK - parameters controlling the entire keyer */
-#define KYRP_GLOBAL		0 /* {type rel label {base of nrpns}} */
+#define KYRP_FIRST		0 /* {type rel label {base of nrpns}} */
 
-#define KYRP_CODEC		(KYRP_GLOBAL) /* {type rel label {base of codec nrpns}} */
+#define KYRP_CODEC		(KYRP_FIRST) /* {type rel label {base of codec nrpns}} */
 
 #define KYRP_VOLUME		(KYRP_CODEC+0) /* {type par label {output volume} units {dB/2} range {0 127}} */
-#define KYRP_INPUT_SELECT	(KYRP_CODEC+1) /* {type par label {input select} values {0 microphone 1 {line in}}} */
+#define KYRP_INPUT_SELECT	(KYRP_CODEC+1) /* {type par label {input select} values KYRV_INPUT_*} */
+#define KYRV_INPUT_MIC		0	       /* {type val label {input select microphone} value-of KYRP_INPUT_SELECT} */
+#define KYRV_INPUT_LINE		1	       /* {type val label {input select line in} value-of KYRP_INPUT_SELECT} */
 #define KYRP_INPUT_LEVEL	(KYRP_CODEC+2) /* {type par label {input level} range {0 127} units pp127} */
 
 #define KYRP_SOFT		(KYRP_CODEC+3) /* {type rel label {base of soft params}} */
@@ -247,15 +249,14 @@
 #define KYRP_TX_ENABLE		(KYRP_SOFT+8) /* {type par label {soft enable TX} range {0 1}} */
 #define KYRP_ST_ENABLE		(KYRP_SOFT+9) /* {type par label {enable sidetone generation} range {0 1}} */
 #define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type par label {adjustment to IQ balance} range {-8192 8191} units pp8191 ignore 1} */
-#define KYRP_ST_PAN		(KYRP_SOFT+11) /* {type par label {sidetone pan left or right} values {-8192 8191} ignore 1} */
-#define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type par label {output mixer enable bits} values {0 4095}} */
+#define KYRP_ST_PAN		(KYRP_SOFT+11) /* {type par label {sidetone pan left or right} range {-8192 8191} ignore 1} */
+#define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type par label {output mixer enable bits} range {0 4095}} */
 
 #define KYRP_COMM		(KYRP_SOFT+13) /* {type rel label {keyer parameters shared across voices}} */
 
 #define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label {debounce period} range {0 127} units ms} */
-#define KYRP_COMP		(KYRP_COMM+1) /* {type par label {keyer compensation} range {-8192 8191} default 0 units ms/10} */
 
-#define KYRP_PTT		(KYRP_COMM+2) /* {type rel label {PTT timing parameters}} */
+#define KYRP_PTT		(KYRP_COMM+1) /* {type rel label {PTT timing parameters}} */
 
 #define KYRP_HEAD_TIME		(KYRP_PTT+0) /* {type par label {time ptt should lead key, key delay} range {0 127} unit ms} */
 #define KYRP_TAIL_TIME		(KYRP_PTT+1) /* {type par label {time ptt should linger after key} range {0 127} unit ms} */
@@ -273,6 +274,7 @@
 
 #define KYRP_PAD		(KYRP_RAMP+4) /* {type rel label {base of paddle keyer parameters}} */
 
+/* keyer parameters - for paddle keyers - this all could fit into one word 2+1+2+1+1+2 == 9 bits  */
 #define KYRP_PAD_MODE		(KYRP_PAD+0)	/* {type par label {iambic keyer mode A/B/S} values KYRV_MODE_* default KYRV_MODE_A} */
 #define KYRV_MODE_A		0 /* {type val label {paddle keyer iambic mode A} value-of {KYRP_PAD_MODE}} */
 #define KYRV_MODE_B		1 /* {type val label {paddle keyer iambic mode B} value-of {KYRP_PAD_MODE}} */
@@ -357,25 +359,18 @@
 #define KYRP_MIX_HDW_R2		(KYRP_MIXER+22) /* {type par label {IQ right to hdw_out right} range {0 127} unit {1/127th full scale}} */
 #define KYRP_MIX_HDW_R3		(KYRP_MIXER+23) /* {type par label {i2s_in right to hdw_out right} range {0 127} unit {1/127th full scale}} */
 
-#define KYRP_KEYER		(KYRP_MIXER+24) /* {type rel label {base of keyer parameters}} */
-/* keyer parameters - for all keys */
+#define KYRP_KEYER		(KYRP_MIXER+24) /* {type rel label {base of vox specialized keyer parameters}} */
+
 #define KYRP_TONE		(KYRP_KEYER+0) /* {type par label {sidetone and IQ oscillator frequency} range {0 16383} unit Hz} */
 #define KYRP_LEVEL		(KYRP_KEYER+1) /* {type par label {sidetone level} range {0 127} default 64 unit {1/127th full scale}} */
-#define KYRP_SPEED		(KYRP_KEYER+2)	/* {type par label {keyer speed control} range {0 127} units wpm} */
-#define KYRP_WEIGHT		(KYRP_KEYER+3)	/* {type par label {keyer mark/space weight} range {25 75} unit pct default 50} */
-#define KYRP_RATIO		(KYRP_KEYER+4)	/* {type par label {keyer dit/dah ratio} range {25 75} unit pct default 50} */
-#define KYRP_FARNS		(KYRP_KEYER+5)	/* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
+#define KYRP_SPEED		(KYRP_KEYER+2) /* {type par label {keyer speed control} range {0 16384} units wpm} */
+#define KYRP_WEIGHT		(KYRP_KEYER+3) /* {type par label {keyer mark/space weight} range {25 75} unit pct default 50} */
+#define KYRP_RATIO		(KYRP_KEYER+4) /* {type par label {keyer dit/dah ratio} range {25 75} unit pct default 50} */
+#define KYRP_FARNS		(KYRP_KEYER+5) /* {type par label {Farnsworth keying speed} range {0 127} default 0 units wpm} */
+#define KYRP_COMP		(KYRP_KEYER+6) /* {type par label {keyer compensation} range {-8192 8191} default 0 units ms/10} */
+#define KYRP_SPEED_FRAC		(KYRP_KEYER+7) /* {type par label {keyer speed fraction} range {0 127} default 0 units wpm/128} */
 
-/* keyer parameters - for paddle keyers - this all fits into one word 2+1+2+1+1+2 == 9 bits  */
-/* keyer timings in samples for paddle and text keyers - scratch values */
-#define KYRP_SPE		(KYRP_KEYER+6) /* {type rel label {base of per sample timing scratch block}} */
-#define KYRP_PER_DIT		(KYRP_SPE+0) /* {type scr label {ms per dit}} */
-#define KYRP_PER_DAH		(KYRP_SPE+2) /* {type scr label {ms per dah}} */
-#define KYRP_PER_IES		(KYRP_SPE+3) /* {type scr label {ms per inter element space}} */
-#define KYRP_PER_ILS		(KYRP_SPE+4) /* {type scr label {ms per inter letter space}} */
-#define KYRP_PER_IWS		(KYRP_SPE+5) /* {type scr label {ms per inter word space}} */
-
-#define KYRP_KEYER_LAST		(KYRP_SPE+6) /* {type rel label {end of keyer block}} */
+#define KYRP_KEYER_LAST		(KYRP_KEYER+8) /* {type rel label {end of keyer block}} */
 
 /* seven repetitions of the keyer block for per voice customizations */
 #define KYRP_VOX_OFFSET		(KYRP_KEYER_LAST-KYRP_KEYER) /* {type rel label {size of keyer parameter block}} */
@@ -387,28 +382,52 @@
 #define KYRP_VOX_KYR		(KYRP_KEYER+KYR_VOX_KYR*KYRP_VOX_OFFSET) /* {type rel label {base of text from hasak parameters}} */
 #define KYRP_VOX_BUT		(KYRP_KEYER+KYR_VOX_BUT*KYRP_VOX_OFFSET) /* {type rel label {base of headset button keyer parameters}} */
 
-#define KYRP_LAST		(KYRP_VOX_BUT+KYRP_VOX_OFFSET) /* {type rel label {end of stored keyer parameters}} */
+#define KYRP_LAST		(KYRP_VOX_BUT+KYRP_VOX_OFFSET) /* {type rel label {one past end of stored keyer parameters}} */
 
-#define KYRP_EXEC		(KYRP_LAST) /* {type rel label {base of command nrpns}} */
+#define KYRP_XFIRST		(KYRP_LAST) /* {type rel label {base of extended nrpn block}} */
 
-#define KYRP_WRITE_EEPROM	(KYRP_EXEC+0) /* {type cmd label {write kyr_nrpn to eeprom}} */
-#define KYRP_READ_EEPROM	(KYRP_EXEC+1) /* {type cmd label {read kyr_nrpn from eeprom}} */
-#define KYRP_SET_DEFAULT	(KYRP_EXEC+2) /* {type cmd label {load kyr_nrpn with default values}} */
+#define KYRP_XKEYER		(KYRP_XFIRST) /* {type rel label {base of extended keyer block}} */
+
+#define KYRP_XPER_DIT		(KYRP_XKEYER+0) /* {type scr label {samples per dit}} */
+#define KYRP_XPER_DAH		(KYRP_XKEYER+2) /* {type scr label {samples per dah}} */
+#define KYRP_XPER_IES		(KYRP_XKEYER+3) /* {type scr label {samples per inter element space}} */
+#define KYRP_XPER_ILS		(KYRP_XKEYER+4) /* {type scr label {samples per inter letter space}} */
+#define KYRP_XPER_IWS		(KYRP_XKEYER+5) /* {type scr label {samples per inter word space}} */
+
+#define KYRP_XKEYER_LAST	(KYRP_XKEYER+6) /* {type rel label {one past end of extended keyer block}} */
+
+#define KYRP_XVOX_OFFSET	(KYRP_XKEYER_LAST-KYRP_XKEYER) /* {type rel label {size of extended keyer parameter block}} */
+#define KYRP_XVOX_NONE		(KYRP_XKEYER+KYR_VOX_NONE*KYRP_XVOX_OFFSET) /* {type rel label {base of default keyer parameters}} */
+#define KYRP_XVOX_TUNE		(KYRP_XKEYER+KYR_VOX_TUNE*KYRP_XVOX_OFFSET) /* {type rel label {base of tune keyer parameters}} */
+#define KYRP_XVOX_S_KEY		(KYRP_XKEYER+KYR_VOX_S_KEY*KYRP_XVOX_OFFSET) /* {type rel label {base of straight key parameters}} */
+#define KYRP_XVOX_PAD		(KYRP_XKEYER+KYR_VOX_PAD*KYRP_XVOX_OFFSET) /* {type rel label {base of paddle keyer parameters}} */
+#define KYRP_XVOX_WINK		(KYRP_XKEYER+KYR_VOX_WINK*KYRP_XVOX_OFFSET) /* {type rel label {base of text from winkey parameters}} */
+#define KYRP_XVOX_KYR		(KYRP_XKEYER+KYR_VOX_KYR*KYRP_XVOX_OFFSET) /* {type rel label {base of text from hasak parameters}} */
+#define KYRP_XVOX_BUT		(KYRP_XKEYER+KYR_VOX_BUT*KYRP_XVOX_OFFSET) /* {type rel label {base of headset button keyer parameters}} */
+
+#define KYRP_XLAST		(KYRP_XVOX_BUT+KYRP_XVOX_OFFSET)
+
+#define KYRP_EXEC		(KYRP_XLAST) /* {type rel label {base of command nrpns}} */
+
+#define KYRP_WRITE_EEPROM	(KYRP_EXEC+0) /* {type cmd label {write nrpn+msgs to eeprom}} */
+#define KYRP_READ_EEPROM	(KYRP_EXEC+1) /* {type cmd label {read nrpn+msgs from eeprom}} */
+#define KYRP_SET_DEFAULT	(KYRP_EXEC+2) /* {type cmd label {load nrpn with default values}} */
 #define KYRP_ECHO_ALL		(KYRP_EXEC+3) /* {type cmd label {echo all set nrpns to midi}} */
 #define KYRP_SEND_WINK		(KYRP_EXEC+4) /* {type cmd label {send character value to wink vox}} */
 #define KYRP_SEND_KYR		(KYRP_EXEC+5) /* {type cmd label {send character value to kyr vox}} */
-#define KYRP_MSG_INDEX		(KYRP_EXEC+6) /* {type cmd label {set index into kyr_msgs}} */
-#define KYRP_MSG_WRITE		(KYRP_EXEC+7) /* {type cmd label {set kyr_msgs[index++]}} */
-#define KYRP_MSG_READ		(KYRP_EXEC+8) /* {type cmd label {read kyr_msgs[index++]}} */
+#define KYRP_MSG_INDEX		(KYRP_EXEC+6) /* {type cmd label {set index into msgs}} */
+#define KYRP_MSG_WRITE		(KYRP_EXEC+7) /* {type cmd label {set msgs[index++] to value}} */
+#define KYRP_MSG_READ		(KYRP_EXEC+8) /* {type cmd label {read msgs[index++] and echo the value}} */
 #define KYRP_PLAY_WINK		(KYRP_EXEC+9) /* {type cmd label {queue message by number through wink}} */
 #define KYRP_PLAY_KYR		(KYRP_EXEC+10) /* {type cmd label {queue message by number through kyr}} */ 
 
 #define KYRP_INFO		(KYRP_EXEC+11) /* {type rel label {base of information nrpns}} */
 
 #define KYRP_VERSION		(KYRP_INFO+0) /* {type inf label {version of hasak nrpn set}} */
-#define KYRP_NRPN_SIZE		(KYRP_INFO+1) /* {type inf label {size of kyr_nrpn}} */
-#define KYRP_MSG_SIZE		(KYRP_INFO+2) /* {type inf label {send the size of kyr_msgs}} */
+#define KYRP_NRPN_SIZE		(KYRP_INFO+1) /* {type inf label {size of nrpn array}} */
+#define KYRP_MSG_SIZE		(KYRP_INFO+2) /* {type inf label {send the size of msgs array}} */
 #define KYRP_SAMPLE_RATE	(KYRP_INFO+3) /* {type inf label {sample rate of audio library} units sps/100} */
+#define KYRP_EEPROM_LENGTH	(KYRP_INFO+4) /* {type inf label {result of EEPROM.length()} units bytes} */
 
 /* end of defined nrpns */
 /* end of config.h */

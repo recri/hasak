@@ -68,7 +68,7 @@ class KeyerNd7pa : public KeyerGeneric {
   int keyer_state;	// the keyer state 
   bool dit_pending;	// memory for dits  
   bool dah_pending;	// memory for dahs  
-  int timer;		// ticks counting down
+  int32_t timer;	// ticks counting down
 
 public:
  KeyerNd7pa(const int vox) : KeyerGeneric(vox), 

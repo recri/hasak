@@ -61,9 +61,10 @@ proc jsformat-rel {name table} {
 proc jsformat-any {name table} {
     set vals {}
     dict for {key value} $table {
+	if {$key in {orig-value value-of}} continue
 	lappend vals "$key: \"$value\""
     }
-    return $vals
+    return "$name: {[join $vals {, }]}"
 }
 
 proc jsformat-all {values} {

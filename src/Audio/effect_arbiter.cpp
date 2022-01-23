@@ -103,8 +103,8 @@ void AudioEffectArbiter::update(void)
 
     /* fetch current ptt parameters */
     int vox = get_active_vox();
-    int ptt_head = ms_to_samples(get_nrpn(KYRP_HEAD_TIME));
-    int ptt_tail = ms_to_samples(max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_vox_nrpn(vox, KYRP_PER_DIT)));
+    int32_t ptt_head = ms_to_samples(get_nrpn(KYRP_HEAD_TIME));
+    int32_t ptt_tail = ms_to_samples(max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_vox_xnrpn(vox, KYRP_XPER_DIT)));
 
     /* deal with actual change in active_delay, or a mismatch triggered by change_over */
     if (ptt_head != active_delay) {

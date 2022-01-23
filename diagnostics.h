@@ -35,9 +35,9 @@ elapsedMicros totalTime;
 
 /* summary report */
 static void sreport(void) {
-  float msPerIes = get_vox_nrpn(get_active_vox(), KYRP_PER_IES);
-  float msPerIls = get_vox_nrpn(get_active_vox(), KYRP_PER_ILS);
-  float msPerIws = get_vox_nrpn(get_active_vox(), KYRP_PER_IWS);
+  float msPerIes = get_vox_nrpn(get_active_vox(), KYRP_XPER_IES);
+  float msPerIls = get_vox_nrpn(get_active_vox(), KYRP_XPER_ILS);
+  float msPerIws = get_vox_nrpn(get_active_vox(), KYRP_XPER_IWS);
   Serial.printf("\t%f sample rate %f buffer size %d F_CPU %.1f MHz\n", totalTime/1e6, AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES, F_CPU/1e6f);
   Serial.printf("\tactive %d ies/ils/iws %.1f/%.1f/%.1f ms\n", get_active_vox(), msPerIes, msPerIls, msPerIws);
   Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
@@ -267,7 +267,6 @@ void diag_nrpn_report(void) {
   Serial.printf("KYRP_ST_PAN %d\n", get_nrpn(KYRP_ST_PAN));
 
   Serial.printf("KYRP_DEBOUNCE %d\n", get_nrpn(KYRP_DEBOUNCE));
-  Serial.printf("KYRP_COMP %d\n", get_nrpn(KYRP_COMP));
 
   Serial.printf("KYRP_HEAD_TIME %d\n", get_nrpn(KYRP_HEAD_TIME));
   Serial.printf("KYRP_TAIL_TIME %d\n", get_nrpn(KYRP_TAIL_TIME));
@@ -339,17 +338,18 @@ void diag_nrpn_report(void) {
     Serial.printf("VOX %d KYRP_TONE %d (%d)\n", vox, get_nrpn(KYRP_TONE+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_TONE));
     Serial.printf("VOX %d KYRP_LEVEL %d (%d)\n", vox, get_nrpn(KYRP_LEVEL+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_LEVEL));
     Serial.printf("VOX %d KYRP_SPEED %d (%d)\n", vox, get_nrpn(KYRP_SPEED+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_SPEED));
+    Serial.printf("VOX %d KYRP_SPEED_FRAC %d (%d)\n", vox, get_nrpn(KYRP_SPEED_FRAC+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_SPEED_FRAC));
+    Serial.printf("VOX %d KYRP_FARNS %d (%d)\n", vox, get_nrpn(KYRP_FARNS+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_FARNS));
     Serial.printf("VOX %d KYRP_WEIGHT %d (%d)\n", vox, get_nrpn(KYRP_WEIGHT+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_WEIGHT));
     Serial.printf("VOX %d KYRP_RATIO %d (%d)\n", vox, get_nrpn(KYRP_RATIO+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_RATIO));
-    Serial.printf("VOX %d KYRP_FARNS %d (%d)\n", vox, get_nrpn(KYRP_FARNS+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_FARNS));
+    Serial.printf("VOX %d KYRP_COMP %d (%d)\n", vox, get_nrpn(KYRP_COMP+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_COMP));
 
-    /* keyer parameters - for paddle keyers - this all fits into one word 2+1+2+1+1+2 == 9 bits  */
     /* keyer timings in samples for paddle and text keyers - scratch values */
-    Serial.printf("VOX %d KYRP_PER_DIT %d (%d)\n", vox, get_nrpn(KYRP_PER_DIT+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_PER_DIT));
-    Serial.printf("VOX %d KYRP_PER_DAH %d (%d)\n", vox, get_nrpn(KYRP_PER_DAH+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_PER_DAH));
-    Serial.printf("VOX %d KYRP_PER_IES %d (%d)\n", vox, get_nrpn(KYRP_PER_IES+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_PER_IES));
-    Serial.printf("VOX %d KYRP_PER_ILS %d (%d)\n", vox, get_nrpn(KYRP_PER_ILS+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_PER_ILS));
-    Serial.printf("VOX %d KYRP_PER_IWS %d (%d)\n", vox, get_nrpn(KYRP_PER_IWS+vox*KYRP_VOX_OFFSET), get_vox_nrpn(vox, KYRP_PER_IWS));
+    Serial.printf("VOX %d KYRP_XPER_DIT %ld (%ld)\n", vox, get_xnrpn(KYRP_XPER_DIT+vox*KYRP_XVOX_OFFSET), get_vox_xnrpn(vox, KYRP_XPER_DIT));
+    Serial.printf("VOX %d KYRP_XPER_DAH %ld (%ld)\n", vox, get_xnrpn(KYRP_XPER_DAH+vox*KYRP_XVOX_OFFSET), get_vox_xnrpn(vox, KYRP_XPER_DAH));
+    Serial.printf("VOX %d KYRP_XPER_IES %ld (%ld)\n", vox, get_xnrpn(KYRP_XPER_IES+vox*KYRP_XVOX_OFFSET), get_vox_xnrpn(vox, KYRP_XPER_IES));
+    Serial.printf("VOX %d KYRP_XPER_ILS %ld (%ld)\n", vox, get_xnrpn(KYRP_XPER_ILS+vox*KYRP_XVOX_OFFSET), get_vox_xnrpn(vox, KYRP_XPER_ILS));
+    Serial.printf("VOX %d KYRP_XPER_IWS %ld (%ld)\n", vox, get_xnrpn(KYRP_XPER_IWS+vox*KYRP_XVOX_OFFSET), get_vox_xnrpn(vox, KYRP_XPER_IWS));
   }
 }
 

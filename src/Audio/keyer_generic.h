@@ -31,11 +31,11 @@ class KeyerGeneric {
   void init(void) { }
   virtual int clock(int dit, int dah, int ticks) { return 0; }
   int pad_mode(void) { return get_nrpn(KYRP_PAD_MODE); }
-  int dit(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_DIT)); }
-  int dah(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_DAH)); }
-  int ies(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IES)); }
-  int ils(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_ILS)); }
-  int iws(void) { return ms_to_samples(get_vox_nrpn(vox, KYRP_PER_IWS)); }
+  int32_t dit(void) { return get_vox_xnrpn(vox, KYRP_XPER_DIT); }
+  int32_t dah(void) { return get_vox_xnrpn(vox, KYRP_XPER_DAH); }
+  int32_t ies(void) { return get_vox_xnrpn(vox, KYRP_XPER_IES); }
+  int32_t ils(void) { return get_vox_xnrpn(vox, KYRP_XPER_ILS); }
+  int32_t iws(void) { return get_vox_xnrpn(vox, KYRP_XPER_IWS); }
   int auto_ils(void) { return get_nrpn(KYRP_AUTO_ILS); }
   int auto_iws(void) { return get_nrpn(KYRP_AUTO_IWS); }
   
