@@ -83,12 +83,12 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   const float wpm = get_vox_nrpn(vox, KYRP_SPEED)+get_vox_nrpn(vox, KYRP_SPEED_FRAC)*7.8125e-3f;
   const float weight = get_vox_nrpn(vox, KYRP_WEIGHT);
   const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
-  const float compensation = samples_to_ms(signed_value(get_vox_nrpn(vox, KYRP_COMP)));
+  const float compensation = signed_value(get_vox_nrpn(vox, KYRP_COMP));
   const float farnsworth = get_vox_nrpn(vox, KYRP_FARNS);;
   const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
-  const float c = compensation / ms_per_dit; /* ms/10 / ms_per_dit */ 
+  const float c = compensation;
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
   const uint32_t ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
   const int32_t ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
@@ -212,12 +212,12 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_OUT_ENABLE, 0b001011001100); /* IQ to usb, usb+sidetone to i2s and hdw */
 
   /* keyer defaults - common */
-  nrpn_set(KYRP_RISE_TIME, 50);	// 5.0 ms
-  nrpn_set(KYRP_FALL_TIME, 50);	// 5.0 ms
+  nrpn_set(KYRP_RISE_TIME, tenth_ms_to_samples(50));	// 5.0 ms
+  nrpn_set(KYRP_FALL_TIME, tenth_ms_to_samples(50));	// 5.0 ms
   nrpn_set(KYRP_RISE_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_FALL_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(KYRP_HEAD_TIME, 0);	// 0 ms
-  nrpn_set(KYRP_TAIL_TIME, 0);	// 0 ms
+  nrpn_set(KYRP_HEAD_TIME, ms_to_samples(0));	// 0 ms
+  nrpn_set(KYRP_TAIL_TIME, ms_to_samples(0));	// 0 ms
   nrpn_set(KYRP_HANG_TIME, 8);	/* 8 dits */
   nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
@@ -230,14 +230,14 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_AUTO_IWS, 0);
 
   /* keyer defaults - per voice */
-  nrpn_set(KYRP_TONE, 600);
-  nrpn_set(KYRP_LEVEL, 64);
-  nrpn_set(KYRP_SPEED,18);
-  nrpn_set(KYRP_SPEED_FRAC, 0);
-  nrpn_set(KYRP_WEIGHT,50);
-  nrpn_set(KYRP_RATIO,50);
-  nrpn_set(KYRP_COMP,0);
-  nrpn_set(KYRP_FARNS,0);
+  nrpn_set(KYRP_TONE, 600);	/* Hz */
+  nrpn_set(KYRP_LEVEL, 64);	/* 1/127ths */
+  nrpn_set(KYRP_SPEED,18);	/* wpm */
+  nrpn_set(KYRP_SPEED_FRAC, 0);	/* wpm 1/128ths */
+  nrpn_set(KYRP_WEIGHT,50);	/* percent */
+  nrpn_set(KYRP_RATIO,50);	/* percent */
+  nrpn_set(KYRP_COMP,ms_to_samples(0));	/* 0 samples */
+  nrpn_set(KYRP_FARNS,0);	/* wpm */
   
   /* voice specializations */
   for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
