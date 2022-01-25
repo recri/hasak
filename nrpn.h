@@ -269,6 +269,11 @@ static void nrpn_write_eeprom(void) {
   }
 }
 
+static int nrpn_echo_index;
+static void nrpn_echo_all(void) {
+  nrpn_echo_index = 0;
+}
+
 static int nrpn_read_eeprom(void) {
   uint16_t header[3];
   EEPROM.get(0, header);
@@ -387,10 +392,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     nrpn_echo(nrpn, 1);
     break;
   case KYRP_ECHO_ALL:
-    for (int i = 0; i < KYRP_LAST; i += 1) 
-      if (hasak.nrpn[i] != KYRV_NOT_SET) 
-	nrpn_echo(i, hasak.nrpn[i]);
-    nrpn_echo(nrpn, 0);
+    nrpn_echo_all();
     break;
   case KYRP_SEND_WINK: 
     wink.send_text(value&127); 
@@ -463,4 +465,19 @@ static void nrpn_setup(void) {
   codec_enable();
   nrpn_set(KYRP_VOLUME, 64);
   nrpn_set_defaults();
+}
+
+static void nrpn_loop(void) {
+  static uint8_t delay = 0;
+  if (nrpn_echo_index >= 0) {
+    if ((delay++ & 15) != 0) return; 
+    if (nrpn_echo_index <= KYRP_LAST) {
+      if (hasak.nrpn[nrpn_echo_index] != KYRV_NOT_SET)
+	nrpn_echo(nrpn_echo_index, hasak.nrpn[nrpn_echo_index]);
+      nrpn_echo_index += 1;
+    } else {
+      nrpn_echo(KYRP_ECHO_ALL, 0);
+      nrpn_echo_index = -1;
+    }
+  }
 }

@@ -71,7 +71,9 @@ proc jsformat-all {values} {
     set js {}
     dict for {name table} $values {
 	if {[dict get $table type] in {rel par cmd inf val} ||
-	    [string match *VOX* $name]} {
+	    [string match *VOX* $name] ||
+	    [string match *_CC_* $name] 
+	} {
 	    lappend js [jsformat-any $name $table]
 	}
     }
@@ -84,7 +86,7 @@ proc jsformat {values} {
 }
 
 proc main {argv} {
-    array set options {output c}
+    array set options {output js}
     if {([llength $argv]%2) != 0 ||
 	[catch {array set options $argv} error]} {
 	puts {usage nrpn.tcl [output (c|js|gaps|size|dups)]}

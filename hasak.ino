@@ -272,6 +272,7 @@ static void pollatch() {
 ** forward references.
 */
 static void nrpn_setup(void);
+static void nrpn_loop(void);
 static void midi_setup(void);
 static void midi_loop(void);
 static void winkey_setup(void);
@@ -319,6 +320,7 @@ void loop(void) {
   midi_loop();
   winkey_loop();
   input_loop();
+  nrpn_loop();
   diagnostics_loop();
 }
 
