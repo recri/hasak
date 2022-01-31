@@ -123,7 +123,7 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
      get_vox_xnrpn(vox, KYRP_XPER_IWS)); */
 }
 
-// echo the nprn settings back to the control echo channel
+// echo the nrpn settings back to the control echo channel
 static void nrpn_echo(const int16_t nrpn, const int16_t value) {
   midi_send_nrpn(nrpn, value);
 }  
@@ -140,12 +140,12 @@ static void nrpn_update_mixer(const int16_t nrpn, const int16_t value) {
     uint16_t index = (nrpn-KYRP_MIXER)/4; /* index of mixer in mix_out */
     uint16_t chan = (nrpn-KYRP_MIXER)%4;  /* channel of the mixer */
     uint16_t mask = 1<<(11-(((index>>1)<<2)+chan)); /* bit enabling channel */
-    float gain = ((mask&get_nrpn(KYRP_OUT_ENABLE)) ? 1 : 0) * int_to_127ths(value);
+    float gain = ((mask&get_nrpn(KYRP_OUT_ENABLE)) ? 1 : 0) * qtrdbtolinear(signed_value(value));
     //Serial.printf("update_mixer(%d, %d) index %d chan %d mask %03x gain %f\n", 
     //		  nrpn, value, index, chan, mask, gain);
    mix_out[index]->gain(chan, gain);
   } else {
-    Serial.printf("unexpected nrpn %d in nprn_update_mixer\n", nrpn);
+    Serial.printf("unexpected nrpn %d in nrpn_update_mixer\n", nrpn);
   }
 }
 
@@ -163,9 +163,9 @@ static void nrpn_report(const char *name, const int16_t oldval, const int16_t ne
 static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_VERSION, KYRC_VERSION);
 
-  nrpn_set(KYRP_VOLUME, 64);
+  nrpn_set(KYRP_VOLUME, 0);
   nrpn_set(KYRP_INPUT_SELECT, 0);
-  nrpn_set(KYRP_INPUT_LEVEL, 64);
+  nrpn_set(KYRP_INPUT_LEVEL, 0);
 
   /* soft controls */
   nrpn_set(KYRP_BUTTON_0,  6800&KYRV_MASK); /* off */
@@ -182,13 +182,8 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_PAN, 0);
   nrpn_set(KYRP_DEBOUNCE, 50);
   
-  nrpn_set(KYRP_CHAN_RECV_CC, KYRC_CHAN_RECV_CC);
-  nrpn_set(KYRP_CHAN_SEND_CC, KYRC_CHAN_SEND_CC);
-  nrpn_set(KYRP_CHAN_SEND_NOTE_IN, KYRC_CHAN_SEND_NOTE_IN);
-  nrpn_set(KYRP_CHAN_SEND_NOTE_OUT, KYRC_CHAN_SEND_NOTE_OUT);
-  nrpn_set(KYRP_CHAN_RECV_NOTE_IN, KYRC_CHAN_RECV_NOTE_IN);
-  nrpn_set(KYRP_CHAN_RECV_NOTE_OUT, KYRC_CHAN_RECV_NOTE_OUT);
-
+  nrpn_set(KYRP_CHAN_CC, KYRC_CHAN_CC);
+  nrpn_set(KYRP_CHAN_NOTE, KYRC_CHAN_NOTE);
 
   nrpn_set(KYRP_NOTE_L_PAD, KYR_NOTE_L_PAD);
   nrpn_set(KYRP_NOTE_R_PAD, KYR_NOTE_R_PAD);
@@ -197,23 +192,25 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_NOTE_KEY_OUT, KYR_NOTE_KEY_OUT);
   nrpn_set(KYRP_NOTE_PTT_OUT, KYR_NOTE_PTT_OUT);
 
-  nrpn_set(KYRP_VOLUME_POT, KYR_VOLUME_POT);
-  nrpn_set(KYRP_ST_VOL_POT, KYR_ST_VOL_POT);
-  nrpn_set(KYRP_ST_FREQ_POT, KYR_ST_FREQ_POT);
-  nrpn_set(KYRP_SPEED_POT, KYR_SPEED_POT);
+  nrpn_set(KYRP_ADC_ENABLE, 0b01111);
+  nrpn_set(KYRP_ADC0_CONTROL, KYRP_NOTHING);
+  nrpn_set(KYRP_ADC1_CONTROL, KYRP_VOLUME);
+  nrpn_set(KYRP_ADC2_CONTROL, KYRP_LEVEL);
+  nrpn_set(KYRP_ADC3_CONTROL, KYRP_TONE);
+  nrpn_set(KYRP_ADC4_CONTROL, KYRP_SPEED);
 
   /* morse code table */
   for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
     nrpn_set(i, morse[i-KYRP_MORSE]);
 
   /* output mixers */
-  for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1) nrpn_set(i, 127);
-  /* output mixers enable */
   nrpn_set(KYRP_OUT_ENABLE, 0b001011001100); /* IQ to usb, usb+sidetone to i2s and hdw */
+  for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1) nrpn_set(i, 0); /* 0 dB */
+  /* output mixers enable */
 
   /* keyer defaults - common */
-  nrpn_set(KYRP_RISE_TIME, tenth_ms_to_samples(50));	// 5.0 ms
-  nrpn_set(KYRP_FALL_TIME, tenth_ms_to_samples(50));	// 5.0 ms
+  nrpn_set(KYRP_RISE_TIME, ms_to_samples(5));	// 5.0 ms
+  nrpn_set(KYRP_FALL_TIME, ms_to_samples(5));	// 5.0 ms
   nrpn_set(KYRP_RISE_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_FALL_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_HEAD_TIME, ms_to_samples(0));	// 0 ms
@@ -231,13 +228,13 @@ static void nrpn_set_defaults(void) {
 
   /* keyer defaults - per voice */
   nrpn_set(KYRP_TONE, 600);	/* Hz */
-  nrpn_set(KYRP_LEVEL, 64);	/* 1/127ths */
-  nrpn_set(KYRP_SPEED,18);	/* wpm */
+  nrpn_set(KYRP_LEVEL, 0);	/* db/4 */
+  nrpn_set(KYRP_SPEED, 18);	/* wpm */
   nrpn_set(KYRP_SPEED_FRAC, 0);	/* wpm 1/128ths */
-  nrpn_set(KYRP_WEIGHT,50);	/* percent */
-  nrpn_set(KYRP_RATIO,50);	/* percent */
+  nrpn_set(KYRP_WEIGHT, 50);	/* percent */
+  nrpn_set(KYRP_RATIO, 50);	/* percent */
   nrpn_set(KYRP_COMP,ms_to_samples(0));	/* 0 samples */
-  nrpn_set(KYRP_FARNS,0);	/* wpm */
+  nrpn_set(KYRP_FARNS, 0);	/* wpm */
   
   /* voice specializations */
   for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
@@ -335,24 +332,21 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_AUTO_IWS:
   case KYRP_PAD_KEYER:
 
-  case KYRP_CHAN_SEND_CC:
-  case KYRP_CHAN_RECV_CC:
-  case KYRP_CHAN_SEND_NOTE_IN:
-  case KYRP_CHAN_SEND_NOTE_OUT:
-  case KYRP_CHAN_RECV_NOTE_IN:
-  case KYRP_CHAN_RECV_NOTE_OUT:
+  case KYRP_CHAN_CC:
+  case KYRP_CHAN_NOTE:
   case KYRP_NOTE_L_PAD:
   case KYRP_NOTE_R_PAD:
   case KYRP_NOTE_S_KEY:
   case KYRP_NOTE_EXT_PTT:
   case KYRP_NOTE_KEY_OUT:
   case KYRP_NOTE_PTT_OUT:
+  case KYRP_ADC0_CONTROL:
+  case KYRP_ADC1_CONTROL:
+  case KYRP_ADC2_CONTROL:
+  case KYRP_ADC3_CONTROL:
+  case KYRP_ADC4_CONTROL:
+  case KYRP_ADC_ENABLE:
     hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
-  case KYRP_VOLUME_POT:
-  case KYRP_ST_VOL_POT:
-  case KYRP_ST_FREQ_POT:
-  case KYRP_SPEED_POT:
-    input_nrpn_set(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     
   case KYRP_OUT_ENABLE:
     nrpn_update_mixer(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
@@ -463,7 +457,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 
 static void nrpn_setup(void) {
   codec_enable();
-  nrpn_set(KYRP_VOLUME, 64);
+  nrpn_set(KYRP_VOLUME, -200);
   nrpn_set_defaults();
 }
 

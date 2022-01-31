@@ -284,12 +284,8 @@ void diag_nrpn_report(void) {
   Serial.printf("KYRP_AUTO_IWS %d\n", get_nrpn(KYRP_AUTO_IWS));
   Serial.printf("KYRP_PAD_KEYER %d\n", get_nrpn(KYRP_PAD_KEYER));
 
-  Serial.printf("KYRP_CHAN_SEND_CC %d\n", get_nrpn(KYRP_CHAN_SEND_CC));
-  Serial.printf("KYRP_CHAN_RECV_CC %d\n", get_nrpn(KYRP_CHAN_RECV_CC));
-  Serial.printf("KYRP_CHAN_SEND_NOTE_IN %d\n", get_nrpn(KYRP_CHAN_SEND_NOTE_IN));
-  Serial.printf("KYRP_CHAN_SEND_NOTE_OUT %d\n", get_nrpn(KYRP_CHAN_SEND_NOTE_OUT));
-  Serial.printf("KYRP_CHAN_RECV_NOTE_IN %d\n", get_nrpn(KYRP_CHAN_RECV_NOTE_IN));
-  Serial.printf("KYRP_CHAN_RECV_NOTE_OUT %d\n", get_nrpn(KYRP_CHAN_RECV_NOTE_OUT));
+  Serial.printf("KYRP_CHAN_CC %d\n", get_nrpn(KYRP_CHAN_CC));
+  Serial.printf("KYRP_CHAN_NOTE %d\n", get_nrpn(KYRP_CHAN_NOTE));
 
   Serial.printf("KYRP_NOTE_L_PAD %d\n", get_nrpn(KYRP_NOTE_L_PAD));
   Serial.printf("KYRP_NOTE_R_PAD %d\n", get_nrpn(KYRP_NOTE_R_PAD));
@@ -298,10 +294,12 @@ void diag_nrpn_report(void) {
   Serial.printf("KYRP_NOTE_KEY_OUT %d\n", get_nrpn(KYRP_NOTE_KEY_OUT));
   Serial.printf("KYRP_NOTE_PTT_OUT %d\n", get_nrpn(KYRP_NOTE_PTT_OUT));
 
-  Serial.printf("KYRP_VOLUME_POT %d\n", get_nrpn(KYRP_VOLUME_POT));
-  Serial.printf("KYRP_ST_VOL_POT %d\n", get_nrpn(KYRP_ST_VOL_POT));
-  Serial.printf("KYRP_ST_FREQ_POT %d\n", get_nrpn(KYRP_ST_FREQ_POT));
-  Serial.printf("KYRP_SPEED_POT %d\n", get_nrpn(KYRP_SPEED_POT));
+  Serial.printf("KYRP_ADC_ENABLE %d\n", get_nrpn(KYRP_ADC_ENABLE));
+  Serial.printf("KYRP_ADC0_CONTROL %d\n", get_nrpn(KYRP_ADC0_CONTROL));
+  Serial.printf("KYRP_ADC1_CONTROL %d\n", get_nrpn(KYRP_ADC1_CONTROL));
+  Serial.printf("KYRP_ADC2_CONTROL %d\n", get_nrpn(KYRP_ADC2_CONTROL));
+  Serial.printf("KYRP_ADC3_CONTROL %d\n", get_nrpn(KYRP_ADC3_CONTROL));
+  Serial.printf("KYRP_ADC4_CONTROL %d\n", get_nrpn(KYRP_ADC4_CONTROL));
 
   /* 64 morse code translations */
   Serial.printf("KYRP_MIX_USB_L0 %d\n", get_nrpn(KYRP_MIX_USB_L0));

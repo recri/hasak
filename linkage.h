@@ -80,6 +80,19 @@ static inline int tenth_ms_to_samples(const int16_t tenthms) { return tenthms * 
 static inline float samples_to_tenth_ms(const int32_t samples) { return samples / (AUDIO_SAMPLE_RATE*0.0001); }
 static inline float tenth_ms_to_ms(const int16_t tenthms) { return tenthms*0.1f; }
 static inline float int_to_127ths(const int16_t val) { return val*0.007874f; }
-static inline int16_t signed_value(const int16_t val) { return (val<<2)>>2; }
+static inline int16_t signed_value(const int16_t val) { return ((int16_t)(val<<2))>>2; }
+static inline float qtrdbtolinear(const int16_t val) { return powf(10.0f, val/4.0/20.0); } // qtrdb == db/4
+static const uint8_t qtrdbtolinearasbyte[] = {
+  127, 123, 119, 116, 113, 109, 106, 103, 100, 98, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63, 61, 60, 58, 56, 55, 53, 52, 50, 49,
+  47, 46, 45, 43, 42, 41, 40, 39, 37, 36, 35, 34, 33, 32, 31, 30, 30, 29, 28, 27, 26, 26, 25, 24, 23, 23, 22, 21, 21, 20, 20, 19, 19, 18, 17, 17,
+  16, 16, 15, 15, 15, 14, 14, 13, 13, 13, 12, 12, 11, 11, 11, 10, 10, 10, 10, 9, 9, 9, 8, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5,
+  5, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 0
+};
 
+static inline uint8_t qtrdbtolinear127(const int16_t val) {
+  if (val >= 0) return 127;
+  if (-val >= (int16_t)sizeof(qtrdbtolinearasbyte)) return 0;
+  return qtrdbtolinearasbyte[-val];
+}
 #endif

@@ -60,29 +60,48 @@ proc jsformat-rel {name table} {
 }
 proc jsformat-any {name table} {
     set vals {}
+    lappend vals "name: \"$name\""
     dict for {key value} $table {
 	if {$key in {orig-value value-of}} continue
 	lappend vals "$key: \"$value\""
     }
-    return "$name: {[join $vals {, }]}"
+    return "\"$name\": {[join $vals {, }]}"
 }
 
 proc jsformat-all {values} {
-    set js {}
-    dict for {name table} $values {
-	if {[dict get $table type] in {rel par cmd inf val} ||
-	    [string match *VOX* $name] ||
-	    [string match *_CC_* $name] 
-	} {
-	    lappend js [jsformat-any $name $table]
+    set kyrp {}
+    set prop {}
+    set nrpn {}
+    set pats [dict create]
+    dict for {key table} $values {
+	dict with table {
+	    # primary KYR* string -> Object table
+	    if {$type in {rel par cmd inf val opts} ||
+		[string match *VOX* $key] ||
+		[string match *_CC_* $key] ||
+		[string match KYRC_VERSION $key]
+	    } {
+		lappend kyrp [jsformat-any $key $table]
+	    }
+	    # property name -> KYR* table
+	    if {$type in {par opts}} {
+		lappend prop "$property: \"$key\""
+	    }
+	    # nrpn -> KYR* table
+	    if {$type in {par}} {
+		lappend nrpn "$value: \"$key\""
+	    }
 	}
     }
-    return $js
+    return [concat $kyrp $prop $nrpn]
 }
 proc jsformat {values} {
     set v [dict get $values KYRC_VERSION value]
     set d ",\n    "
-    return "const CWKeyerHasak$v = {\n  [join [jsformat-all $values] $d]\n};"
+    return "// parameter map for hasak 100
+// generated with .../hasak/doc/nrpn.tcl from .../hasak/config.h
+// do not edit, regenerated from .../hasak/config.h by .../hasak/doc/nrpn.tcl output js
+export const hasakProperties = {\n    [join [jsformat-all $values] $d]\n};"
 }
 
 proc main {argv} {
@@ -104,6 +123,7 @@ proc main {argv} {
     set size [dict create]
     set lines [dict create]
     set values [dict create]
+    set globs {}
     foreach line [split [string trim $data] \n] {
 	dict set lines [dict size $lines] $line
 	if { ! [regexp {^#define[ \t]+(KYR[A-Z]?_[A-Z0-9_]*)[ \t]+([^ \t]*)([ \t]+(.*))?$} $line all name value rest1 rest]} {
@@ -113,6 +133,7 @@ proc main {argv} {
 	set vwid [expr {max($vwid, [string length $name])}]
 	dict set values $name orig-value $value 
 	dict set values $name value [evaluate $value $values]
+	dict set values $name name $name
 	if { ! [regexp {/\*\s*{(.*)}\s*\*/} $rest all comment]} {
 	    puts "missing comment1 {$line}"
 	    continue
@@ -138,8 +159,26 @@ proc main {argv} {
 	if { ! [dict exists $values $name type]} {
 	    puts "missing type {$line}"
 	}
-	if { ! [dict exists $values $name label]} {
-	    puts "missing label {$line}"
+	if { ! [dict exists $values $name title]} {
+	    puts "missing title {$line}"
+	}
+	if {[dict exists $values $name lable]} {
+	    puts "found a  lable {$line}"
+	}
+	if {[dict exists $values $name values]} {
+	    set glob [dict get $values $name values]
+	    set prop [dict get $values $name property]
+	    if {[dict exists $values $name valuesProperty]} {
+		set vproperty [dict get $values $name valuesProperty]
+	    } else {
+		set vproperty "${prop}s"
+	    }
+
+	    dict set values $glob name $glob
+	    dict set values $glob type opts
+	    dict set values $glob property $vproperty
+	    dict set values $glob opts {}
+	    lappend globs $glob
 	}
 	#dict set values $name type [extract-type $rest]
 	# dict set values $name class [extract-class $rest]
@@ -159,6 +198,11 @@ proc main {argv} {
 		#dict incr size $t
 	    }
 	}
+    }
+    # add in the value globs
+    foreach glob $globs {
+	# the glob itself matches the glob, but it's inserted before the values
+	dict set values $glob opts [lrange [dict keys $values $glob] 1 end]
     }
     switch $options(output) {
 	{c} {
@@ -193,9 +237,66 @@ proc main {argv} {
 		}
 	    }
 	}
+	props {
+	    dict for {key table} $values {
+		if {[dict get $table type] eq {par}} {
+		    puts "$key [dict get $table property]"
+		}
+	    }
+	}
 	gaps {
+	    set cursor 0
+	    dict for {name table} $values {
+		dict with table {
+		    if {$type in {par rel}} {
+			if {$value < $cursor} {
+			    if {[string match KYRP_*VOX_OFFSET $name]} continue
+			    if {$name in {KYRP_VOX_NONE}} {
+				set cursor $value
+				continue
+			    }
+			    puts "back track at $name=$value when cursor=$cursor"
+			    continue
+			} elseif {$value <= $cursor + 1} {
+			    set cursor $value
+			    continue
+			} elseif {$value >= 1000} {
+			    continue
+			} else {
+			    if {$name in {KYRP_MORSE KYRP_MIXER KYRP_VOX_NONE}} {
+				set cursor $value
+			    } elseif {$name in {KYRP_VOX_TUNE KYRP_VOX_S_KEY KYRP_VOX_PAD KYRP_VOX_WINK KYRP_VOX_KYR KYRP_VOX_BUT KYRP_LAST} &&
+				      $value == $cursor+8} {
+				set cursor $value
+			    } else {
+				puts "jump forward at $name=$value when cursor=$cursor"
+			    }
+			}
+		    }
+		}
+	    }
 	}
 	none {
+	}
+	values {
+	    set patterns [dict create]
+	    dict for {key table} $values {
+		set type [dict get $table type]
+		if {$type eq {par} && [dict exists $table values]} {
+		    set vglob [dict get $table values]
+		    if {[dict exists $patterns $vglob]} continue
+		    dict set patterns $vglob true
+		    set property [dict get $table property]
+		    if {[dict exists $table valuesProperty]} {
+			set vproperty [dict get $table valuesProperty]
+		    } else {
+			set vproperty "${property}s"
+		    }
+		    set voptions [lrange [dict keys $values $vglob] 1 end]
+		    set vlabels [lmap x $voptions {dict get $values $x label}]
+		    puts "$vglob $vproperty {$voptions} {$vlabels}"
+		}
+	    }
 	}
 	default {
 	    dict for {name table} $values {

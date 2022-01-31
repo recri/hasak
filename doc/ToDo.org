@@ -21,8 +21,8 @@
 [x] rewrite get_nrpn and get_vox_nrpn to consider the range of nrpn
 	offered.  It already did, and they're inline so they can 
 	fold constant arguments, ie nrpn, into the code generation
-[ ] use get_nrpnx() for accessing the extended precision nrpn values.
-[ ] make nrpn_update_timing notice whether any nrpns are vox special
+[x] use get_nrpnx() for accessing the extended precision nrpn values.
+[x] make nrpn_update_timing notice whether any nrpns are vox special
 	so it can write the computed timing to the vox special extended
 	storage rather than the default.
 [ ] HSMS/QRQ to supersize the speed control, HSMS goes up to 4000 
@@ -35,7 +35,9 @@
 [x] mixers as AudioMixer4 mixer[6];
 	doesn't work, what don't I understand?
 	do it as pointers and it works
+[ ] expand VOX specific parameters to KYRP_<VOX>_<PARAM> definitions
 [-] rename KYR_ to KYRC_ if configurable
+[x] slow down echo all NRPNS to not overflow MIDI channel
 [-] make virtual NRPNs for
 [x]	load defaults, 
 [x]	load eeprom,
