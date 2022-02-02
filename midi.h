@@ -13,6 +13,10 @@ static int midi_valid_note(const int note) { return note >= 0 && note <= 127; }
 
 /*
 ** As written this doesn't work, and it complicated to make it work.
+** the values written get immediately overwritten by the value coming
+** out of the audio library.  To make it work would require a constant
+** source in the audio library that turns on and or's itself with the
+** normal source of bits.
 */
 /*
 ** receive a note on event and do something with it.

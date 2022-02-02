@@ -6,12 +6,12 @@
 
 #define RARSleep true
 #define RARSnap 0.001
-#define RARActive 4.0
-static ResponsiveAnalogRead input_adc0(KYR_ADC0, RARSleep, RARSnap); static short input_0;
-static ResponsiveAnalogRead input_adc1(KYR_ADC1, RARSleep, RARSnap); static short input_1;
-static ResponsiveAnalogRead input_adc2(KYR_ADC2, RARSleep, RARSnap); static short input_2;
-static ResponsiveAnalogRead input_adc3(KYR_ADC3, RARSleep, RARSnap); static short input_3;
-static ResponsiveAnalogRead input_adc4(KYR_ADC4, RARSleep, RARSnap); static short input_4;
+#define RARActive 8.0
+static ResponsiveAnalogRead input_adc0(KYR_ADC0, RARSleep, RARSnap);
+static ResponsiveAnalogRead input_adc1(KYR_ADC1, RARSleep, RARSnap);
+static ResponsiveAnalogRead input_adc2(KYR_ADC2, RARSleep, RARSnap);
+static ResponsiveAnalogRead input_adc3(KYR_ADC3, RARSleep, RARSnap);
+static ResponsiveAnalogRead input_adc4(KYR_ADC4, RARSleep, RARSnap);
 static ResponsiveAnalogRead *input_adc[5] = { &input_adc0, &input_adc1, &input_adc2, &input_adc3, &input_adc4 };
 #endif
 
@@ -38,10 +38,23 @@ static int16_t input_cook_value(const int16_t nrpn2, const int16_t value, int16_
   case KYRP_TONE:      /* decihertz 200.0 to 1200.0 */
     *cooked = (2500+10*value) & KYRV_MASK; return 1;
   case KYRP_SPEED:		/* WPM 5 .. 69 */
-  case KYRP_FARNS:
-    *cooked = (5+(45*value/1024)) & KYRV_MASK; return 1;
+  case KYRP_FARNS: {
+    /* a variable speed mapping that puts 20 WPM mid-range */
+    /* thanks to dl1ycf for the idea */
+    static const uint8_t SpeedTab[33] = {  
+       5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      21, 22, 23, 24, 26, 28, 30, 32, 34, 36, 38, 40, 43, 46, 49, 52, 55
+    };
+    const uint8_t i1 = value >> 5;
+    const uint8_t p1 = SpeedTab[i1];
+    const uint8_t p2 = SpeedTab[i1+1]; /* it's always there */
+    const uint8_t t1 = (p2-p1)*(value&31);
+    const uint8_t p3 = p1+t1/32;
+    // const uint8_t f3 = t1%32;
+    *cooked = p3 & KYRV_MASK; return 1;
+  }
   case KYRP_SPEED_FRAC:		/* 128th of a WPM */
-    *cooked = (value>>2) & KYRV_MASK; return 1;
+    *cooked = (value>>3) & KYRV_MASK; return 1;
   case KYRP_BUTTON_0:		/* -8192 .. +8191 arbitrary units */
   case KYRP_BUTTON_1:
   case KYRP_BUTTON_2:
@@ -62,9 +75,9 @@ static int16_t input_cook_value(const int16_t nrpn2, const int16_t value, int16_
   case KYRP_RATIO:
     *cooked = (25+50*value/1024) & KYRV_MASK; return 1;
   case KYRP_VOLUME:		  /* all these and the *_MIX_* are dB/4 */
-  case KYRP_LEVEL:		  /* -50*4 .. +6*4, -200 .. 24  */
+  case KYRP_LEVEL:		  /* -30*4 .. +0*4, -200 .. 24  */
   case KYRP_INPUT_LEVEL:
-    *cooked = (-200+225*value/1024) & KYRV_MASK; return 1;
+    *cooked = (-128+128*value/1024) & KYRV_MASK; return 1;
   default:
     if (nrpn2 >= KYRP_MIX_USB_L0 && nrpn2 <= KYRP_MIX_HDW_R3) {
       *cooked = (-200+225*value/1024) & KYRV_MASK; return 1;
@@ -98,15 +111,15 @@ static int input_update(const int16_t adc_number) {
 #endif
 
 static void input_loop(void) {
-  if (input_update(0)
-      + input_update(1)
-      + input_update(2)
-      + input_update(3)
-      + input_update(4) != 0)
-    Serial.printf("inputs 0 1 2 3 4 =  %d %d %d %d %d\n", 
-		  get_nrpn(get_nrpn(KYRP_ADC0_CONTROL)), 
-		  signed_value(get_nrpn(get_nrpn(KYRP_ADC1_CONTROL))),
-		  signed_value(get_nrpn(get_nrpn(KYRP_ADC2_CONTROL))),
-		  get_nrpn(get_nrpn(KYRP_ADC3_CONTROL)),
-		  get_nrpn(get_nrpn(KYRP_ADC4_CONTROL)));
+  static uint8_t count = 0;
+  if ((count++ & 0xF) == 0 && (count>>4) < 5)  {
+    if (input_update(count>>4) != 0)
+      /* Serial.printf("%3d: inputs 0 1 2 3 4 =  %d %d %d %d %d\n", 
+		    count,
+		    get_nrpn(get_nrpn(KYRP_ADC0_CONTROL)), 
+		    signed_value(get_nrpn(get_nrpn(KYRP_ADC1_CONTROL))),
+		    signed_value(get_nrpn(get_nrpn(KYRP_ADC2_CONTROL))),
+		    get_nrpn(get_nrpn(KYRP_ADC3_CONTROL)),
+		    get_nrpn(get_nrpn(KYRP_ADC4_CONTROL))) */;
+  }
 }

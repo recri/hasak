@@ -29,7 +29,9 @@ static void codec_sgtl5000_set(const int16_t nrpn, const int16_t value) {
 
 static void codec_wm8960_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
-  case KYRP_VOLUME: wm8960.volume(qtrdbtolinear(signed_value(value))); break;
+  case KYRP_VOLUME: 
+    // Serial.printf("set volume %d -> %f\n", signed_value(value), qtrdbtolinear127(signed_value(value))/127.0);
+    wm8960.volume(qtrdbtolinear127(signed_value(value))/127.0); break;
   case KYRP_INPUT_LEVEL: wm8960.inputLevel(qtrdbtolinear(signed_value(value))); break;
   case KYRP_INPUT_SELECT: wm8960.inputSelect(value); break;
   default: Serial.printf("uncaught wm8960 codec nrpn #%d with value %d\n", nrpn, value); break;

@@ -60,9 +60,12 @@ proc jsformat-rel {name table} {
 }
 proc jsformat-any {name table} {
     set vals {}
-    lappend vals "name: \"$name\""
     dict for {key value} $table {
-	if {$key in {orig-value value-of}} continue
+	switch $key {
+	    orig-value - value-of { continue }
+	    units { set key unit }
+	    value { set key nrpn }
+	}
 	lappend vals "$key: \"$value\""
     }
     return "\"$name\": {[join $vals {, }]}"
@@ -131,9 +134,9 @@ proc main {argv} {
 	    continue
 	}
 	set vwid [expr {max($vwid, [string length $name])}]
-	dict set values $name orig-value $value 
+	# dict set values $name name $name
 	dict set values $name value [evaluate $value $values]
-	dict set values $name name $name
+	dict set values $name orig-value $value 
 	if { ! [regexp {/\*\s*{(.*)}\s*\*/} $rest all comment]} {
 	    puts "missing comment1 {$line}"
 	    continue
@@ -207,7 +210,11 @@ proc main {argv} {
     switch $options(output) {
 	{c} {
 	    dict for {name table} $values {
-		puts [format "#define %-${vwid}s %3d %s" $name [dict get $table value] "/* {$table} */"]
+		if {! [dict exists $table value]} {
+		    puts [format "#define %-${vwid}s %s %s" $name {/* no value */} "/* {$table} */"]
+		} else {
+		    puts [format "#define %-${vwid}s %3d %s" $name [dict get $table value] "/* {$table} */"]
+		}
 	    }
 	}
 	{js} { puts [jsformat $values] }

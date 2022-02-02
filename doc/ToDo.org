@@ -1,4 +1,10 @@
 * Todo list as of 2022-01-18
+[ ] move all non-essential activity out of the MIDI control change
+	callback, mark altered controls in a bitmap and process the
+	changes in the loop.  Most especially, no nrpn_echo's inside
+	the control change callback.
+[ ] write a modified Mixer4 that polls for level and mute from the
+	nrpn array rather than needed explicit settings.
 [ ] make default serial monitor start winkey when needed
 [ ] rewrite winkey without second serial monitor
 [ ] verify bare Teensy3/4 and Teensy3/4+AudioAdapter
@@ -8,8 +14,13 @@
 	and the sidetone levels (6)
 	should happen in small steps over a period of time
 	rather than popping to the new value.
+[ ] mask specifying active high/low for digital inputs/outputs.
+[ ] 2nd rise and fall ramps for product ramp
+[ ] compute per sample ramp, build by interpolating precomputed
+	tables first, then filling in the real values.
 [x] add mixer output unmute bitmap nrpn, leaves mixer levels be.
 [ ] mixer set with left and right in same nrpn
+	127 does seem to be a reasonable level parameter
 [x] reimplement compensation
 	put it back into the keyer timing
 [ ] implement key_out compensation.
@@ -25,7 +36,7 @@
 [x] make nrpn_update_timing notice whether any nrpns are vox special
 	so it can write the computed timing to the vox special extended
 	storage rather than the default.
-[ ] HSMS/QRQ to supersize the speed control, HSMS goes up to 4000 
+[x] HSMS/QRQ to supersize the speed control, HSMS goes up to 4000 
 	letter/minute, or 800 words/minute
 [x] QRSS to superlong the speed control.  Extreme QRSS goes to 0.0133 wpm
 	which is between 1/128 and 1/64 wpm, so a fraction numerator with

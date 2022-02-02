@@ -266,34 +266,34 @@
 
 #define KYRP_CODEC		(KYRP_FIRST+1) /* {type rel title {base of codec nrpns}} */
 
-#define KYRP_VOLUME		(KYRP_CODEC+0) /* {type par label Vol title {output volume} units {dB/4} range {-128 24} property masterVolume} */
+#define KYRP_VOLUME		(KYRP_CODEC+0) /* {type par label Vol title {output volume} unit dB/4 range {-128 24} property masterVolume} */
 #define KYRP_INPUT_SELECT	(KYRP_CODEC+1) /* {type par label InSel title {input select} values KYRV_INPUT_* property inputSelect} */
 #define KYRV_INPUT_MIC		0	       /* {type val label Mic title {input select microphone} value-of KYRP_INPUT_SELECT property inputSelects} */
 #define KYRV_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of KYRP_INPUT_SELECT property inputSelects} */
-#define KYRP_INPUT_LEVEL	(KYRP_CODEC+2) /* {type par label InLvl title {input level} range {-128 24} units db/4 property inputLevel} */
+#define KYRP_INPUT_LEVEL	(KYRP_CODEC+2) /* {type par label InLvl title {input level} range {-128 24} unit dB/4 property inputLevel} */
 
 #define KYRP_SOFT		(KYRP_CODEC+3) /* {type rel title {base of soft params}} */
 
-#define KYRP_BUTTON_0		(KYRP_SOFT+0) /* {type par label But0 title {headset button 0 - none pressed} range {-8192 8191} units adc property buttonLevel0} */
-#define KYRP_BUTTON_1		(KYRP_SOFT+1) /* {type par label But1 title {headset button 1 - center or only pressed} range {-8192 8191} units adc property buttonLevel1} */
-#define KYRP_BUTTON_2		(KYRP_SOFT+2) /* {type par label But2 title {headset button 2 - up pressed} range {-8192 8191} units adc property buttonLevel2}  */
-#define KYRP_BUTTON_3		(KYRP_SOFT+3) /* {type par label But3 title {headset button 3 - down pressed} range {-8192 8191} units adc property buttonLevel3}  */
-#define KYRP_BUTTON_4		(KYRP_SOFT+4) /* {type par label But4 title {headset button 4 - hey pressed} range {-8192 8191} units adc property buttonLevel4}  */
+#define KYRP_BUTTON_0		(KYRP_SOFT+0) /* {type par label But0 title {headset button 0 - none pressed} range {-8192 8191} unit {} property buttonLevel0} */
+#define KYRP_BUTTON_1		(KYRP_SOFT+1) /* {type par label But1 title {headset button 1 - center or only pressed} range {-8192 8191} unit {} property buttonLevel1} */
+#define KYRP_BUTTON_2		(KYRP_SOFT+2) /* {type par label But2 title {headset button 2 - up pressed} range {-8192 8191} unit {} property buttonLevel2}  */
+#define KYRP_BUTTON_3		(KYRP_SOFT+3) /* {type par label But3 title {headset button 3 - down pressed} range {-8192 8191} unit {} property buttonLevel3}  */
+#define KYRP_BUTTON_4		(KYRP_SOFT+4) /* {type par label But4 title {headset button 4 - hey pressed} range {-8192 8191} unit {} property buttonLevel4}  */
 #define KYRP_PTT_ENABLE		(KYRP_SOFT+5) /* {type par label PTTReq title {require EXT_PTT to transmit} range {0 1} ignore 1 property externalPTTRequire} */
 #define KYRP_IQ_ENABLE		(KYRP_SOFT+6) /* {type par label {IQ mode} title {Mode of IQ sample generation} values KYRV_IQ_* property iqModeSelect} */
 #define KYRV_IQ_NONE		0 /* {type val label None title {no IQ} property iqModes value-of KYRP_IQ_ENABLE} */
 #define KYRV_IQ_LSB		1 /* {type val label LSB title {IQ for lower sideband} property iqModes value-of KYRP_IQ_ENABLE} */
 #define KYRV_IQ_USB		2 /* {type val label USB title {IQ for upper sideband} property iqModes value-of KYRP_IQ_ENABLE} */
-#define KYRP_IQ_ADJUST		(KYRP_SOFT+7) /* {type par label IQAdj title {adjustment to IQ phase} range {-8192 8191} units pp8191 ignore 1 property iqAdjustPhase} */
+#define KYRP_IQ_ADJUST		(KYRP_SOFT+7) /* {type par label IQAdj title {adjustment to IQ phase} range {-8192 8191} unit pp8191 ignore 1 property iqAdjustPhase} */
 #define KYRP_TX_ENABLE		(KYRP_SOFT+8) /* {type par label TXEn title {soft enable TX} range {0 1} property txEnable} */
 #define KYRP_ST_ENABLE		(KYRP_SOFT+9) /* {type par label STEn title {enable sidetone generation} range {0 1} property sidetoneEnable} */
-#define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type par label IQBal title {adjustment to IQ balance} range {-8192 8191} units pp8191 ignore 1 property iqAdjustBalance} */
-#define KYRP_ST_PAN		(KYRP_SOFT+11) /* {type par label STPan title {sidetone pan left or right} range {-8192 8191} ignore 1 property sidetonePan} */
+#define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type par label IQBal title {adjustment to IQ balance} range {-8192 8191} unit pp8191 ignore 1 property iqAdjustBalance} */
+#define KYRP_ST_PAN		(KYRP_SOFT+11) /* {type par label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 ignore 1 property sidetonePan} */
 #define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type par label OutMix title {output mixer enable bits} range {0 4095} property outputEnable} */
 
 #define KYRP_COMM		(KYRP_SOFT+13) /* {type rel title {keyer parameters shared across voices}} */
 
-#define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label Deb title {debounce period} range {0 16383} units samples property debouncePeriod} */
+#define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label Deb title {debounce period} range {0 16383} unit sample property debouncePeriod} */
 #define KYRP_VOICE		(KYRP_COMM+1) /* {type par label Voice title {Keyer voice selected for customization} values KYRV_VOX_* property voice} */
 #define KYRV_VOX_NONE		(KYR_VOX_NONE) /* {type val label None title {No voice} property voices} */
 #define KYRV_VOX_TUNE		(KYR_VOX_TUNE) /* {type val label Tune title {Voice used when tuning} property voices} */
@@ -305,14 +305,14 @@
 
 #define KYRP_PTT		(KYRP_COMM+2) /* {type rel title {PTT timing parameters}} */
 
-#define KYRP_HEAD_TIME		(KYRP_PTT+0) /* {type par label PTTHead title {time ptt should lead key, key delay} range {0 16383} unit samples property pttHeadTime} */
-#define KYRP_TAIL_TIME		(KYRP_PTT+1) /* {type par label PTTTail title {time ptt should linger after key} range {0 16383} unit samples property pttTailTime} */
-#define KYRP_HANG_TIME		(KYRP_PTT+2) /* {type par label PTTHang title {time in dits ptt should linger after key} range {0 127} units dits property pttHangTime} */
+#define KYRP_HEAD_TIME		(KYRP_PTT+0) /* {type par label PTTHead title {time ptt should lead key, key delay} range {0 16383} unit sample property pttHeadTime} */
+#define KYRP_TAIL_TIME		(KYRP_PTT+1) /* {type par label PTTTail title {time ptt should linger after key} range {0 16383} unit sample property pttTailTime} */
+#define KYRP_HANG_TIME		(KYRP_PTT+2) /* {type par label PTTHang title {time in dits ptt should linger after key} range {0 127} unit dit property pttHangTime} */
 
 #define KYRP_RAMP		(KYRP_PTT+3) /* {type rel title {base of the keyer ramp parameters}} */
 
-#define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par title {key rise ramp length} range {0 16383} units samples property keyerRiseTime} */
-#define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par title {key fall ramp length} range {0 16383} units samples property keyerFallTime} */
+#define KYRP_RISE_TIME		(KYRP_RAMP+0)	/* {type par title {key rise ramp length} range {0 16383} unit sample property keyerRiseTime} */
+#define KYRP_FALL_TIME		(KYRP_RAMP+1)	/* {type par title {key fall ramp length} range {0 16383} unit sample property keyerFallTime} */
 #define KYRP_RISE_RAMP		(KYRP_RAMP+2)	/* {type par title {key rise ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN property keyerRiseRamp valuesProperty keyerRamps} */
 #define KYRP_FALL_RAMP		(KYRP_RAMP+3)	/* {type par title {key fall ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
 #define KYRV_RAMP_HANN		0 /* {type val label Hann title {ramp from Hann window function, raised cosine} value-of {KYRP_*_RAMP} property keyerRamps} */
@@ -341,27 +341,27 @@
 
 #define KYRP_CHAN		(KYRP_PAD+6) /* {type rel title {base of midi channels}} */
 
-#define KYRP_CHAN_CC		(KYRP_CHAN+0) /* {type par title {midi channel for sending controls} range {0 16} property channelCC} */
-#define KYRP_CHAN_NOTE		(KYRP_CHAN+1) /* {type par title {midi channel for sending input notes} range {0 16} property channelNote} */
+#define KYRP_CHAN_CC		(KYRP_CHAN+0) /* {type par title {midi channel for sending controls} unit {} range {0 16} property channelCC} */
+#define KYRP_CHAN_NOTE		(KYRP_CHAN+1) /* {type par title {midi channel for sending input notes} unit {} range {0 16} property channelNote} */
 #define KYRV_CHAN_INVALID	0	       /* {type val title {invalid channel, used to disable midi channel}} */
 
 #define KYRP_NOTE		(KYRP_CHAN+2) /* {type rel title {base of midi notes}} */
 
-#define KYRP_NOTE_L_PAD		(KYRP_NOTE+0) /* {type par title {note for left paddle switch input} range {0 128}  property noteLeftPaddle} */
-#define KYRP_NOTE_R_PAD		(KYRP_NOTE+1) /* {type par title {note for right paddle switch input} range {0 128} property noteRightPaddle} */
-#define KYRP_NOTE_S_KEY		(KYRP_NOTE+2) /* {type par title {note for straight key switch input} range {0 128} property noteStraightKey} */
-#define KYRP_NOTE_EXT_PTT	(KYRP_NOTE+3) /* {type par title {note for external ptt switch input} range {0 128} property noteExternalPTT} */
-#define KYRP_NOTE_KEY_OUT	(KYRP_NOTE+4) /* {type par title {note for key/ptt key output} range {0 128} property noteKeyOut} */
-#define KYRP_NOTE_PTT_OUT	(KYRP_NOTE+5) /* {type par title {note for key/ptt ptt output} range {0 128} property notePTTOut} */
+#define KYRP_NOTE_L_PAD		(KYRP_NOTE+0) /* {type par title {note for left paddle switch input} unit {} range {0 128}  property noteLeftPaddle} */
+#define KYRP_NOTE_R_PAD		(KYRP_NOTE+1) /* {type par title {note for right paddle switch input} unit {} range {0 128} property noteRightPaddle} */
+#define KYRP_NOTE_S_KEY		(KYRP_NOTE+2) /* {type par title {note for straight key switch input} unit {} range {0 128} property noteStraightKey} */
+#define KYRP_NOTE_EXT_PTT	(KYRP_NOTE+3) /* {type par title {note for external ptt switch input} unit {} range {0 128} property noteExternalPTT} */
+#define KYRP_NOTE_KEY_OUT	(KYRP_NOTE+4) /* {type par title {note for key/ptt key output} unit {} range {0 128} property noteKeyOut} */
+#define KYRP_NOTE_PTT_OUT	(KYRP_NOTE+5) /* {type par title {note for key/ptt ptt output} unit {} range {0 128} property notePTTOut} */
 #define KYRV_NOTE_INVALID	128	       /* {type val title {invalid note, used to disable midi events}} */
 
 #define KYRP_PINS		(KYRP_NOTE+6) /* {type rel title {base of hardware pin assignments}} */
 
-#define KYRP_ADC0_CONTROL	(KYRP_PINS+0) /* {type par title {property for adc0 = A0} range {0 127} property adc0Control} */
-#define KYRP_ADC1_CONTROL	(KYRP_PINS+1) /* {type par title {property for adc1 = A1 (master volume on the CWKeyer)} values KYRV_ADC_* property adc1Control valuesProperty adcControls} */
-#define KYRP_ADC2_CONTROL	(KYRP_PINS+2) /* {type par title {property for adc2 = A2 (sidetone volume on the CWKeyer)} values KYRV_ADC_* property adc2Control valuesProperty adcControls} */
-#define KYRP_ADC3_CONTROL	(KYRP_PINS+3) /* {type par title {property for adc3 = A3 (sidetone frequency on the CWKeyer} values KYRV_ADC_* property adc3Control valuesProperty adcControls} */
-#define KYRP_ADC4_CONTROL	(KYRP_PINS+4) /* {type par title {property for adc4 = A8 (speed on the CWKeyer)} values KYRV_ADC_* property adc3Control valuesProperty adcControls} */
+#define KYRP_ADC0_CONTROL	(KYRP_PINS+0) /* {type par title {property for adc0 = A0} unit {} values KYRV_ADC_* property adc0Control valuesProperty adcControls} */
+#define KYRP_ADC1_CONTROL	(KYRP_PINS+1) /* {type par title {property for adc1 = A1 (master volume on the CWKeyer)} unit {} values KYRV_ADC_* property adc1Control valuesProperty adcControls} */
+#define KYRP_ADC2_CONTROL	(KYRP_PINS+2) /* {type par title {property for adc2 = A2 (sidetone volume on the CWKeyer)} unit {} values KYRV_ADC_* property adc2Control valuesProperty adcControls} */
+#define KYRP_ADC3_CONTROL	(KYRP_PINS+3) /* {type par title {property for adc3 = A3 (sidetone frequency on the CWKeyer} unit {} values KYRV_ADC_* property adc4Control valuesProperty adcControls} */
+#define KYRP_ADC4_CONTROL	(KYRP_PINS+4) /* {type par title {property for adc4 = A8 (speed on the CWKeyer)} unit {} values KYRV_ADC_* property adc3Control valuesProperty adcControls} */
 #define KYRP_ADC_ENABLE		(KYRP_PINS+5) /* {type par label {ADCEn} title {enable adc channels} property adcEnable} */
 
 /* 64 morse code translations */
@@ -378,46 +378,46 @@
 /* relocation base */
 #define KYRP_MIXER		(KYRP_MORSE+64) /* {type rel title {base of output mixer block}} */
 
-#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* {type par title {i2s_in left to usb_out left} range {-128 24} unit db/4 property outUSB0Left} */
-#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* {type par title {sidetone left to usb_out left} range {-128 24} unit db/4 property outUSB1Left} */
-#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* {type par title {IQ left to usb_out left} range {-128 24} unit db/4 property outUSB2Left} */
-#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)  /* {type par title {usb_in left to usb_out left} range {-128 24} unit db/4 property outUSB3Left} */
+#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* {type par title {i2s_in left to usb_out left} range {-128 24} unit dB/4 property outUSB0Left} */
+#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* {type par title {sidetone left to usb_out left} range {-128 24} unit dB/4 property outUSB1Left} */
+#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* {type par title {IQ left to usb_out left} range {-128 24} unit dB/4 property outUSB2Left} */
+#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)  /* {type par title {usb_in left to usb_out left} range {-128 24} unit dB/4 property outUSB3Left} */
 
-#define KYRP_MIX_USB_R0		(KYRP_MIXER+4)	/* {type par title {i2s_in right to usb_out right} range {-128 24} unit db/4 property outUSB0Right} */
-#define KYRP_MIX_USB_R1		(KYRP_MIXER+5)	/* {type par title {sidetone right to usb_out right} range {-128 24} unit db/4 property outUSB1Right} */
-#define KYRP_MIX_USB_R2		(KYRP_MIXER+6)	/* {type par title {IQ right to usb_out right} range {-128 24} unit db/4 property outUSB2Right} */
-#define KYRP_MIX_USB_R3		(KYRP_MIXER+7)  /* {type par title {usb_in right to usb_out right} range {-128 24} unit db/4 property outUSB3Right} */
+#define KYRP_MIX_USB_R0		(KYRP_MIXER+4)	/* {type par title {i2s_in right to usb_out right} range {-128 24} unit dB/4 property outUSB0Right} */
+#define KYRP_MIX_USB_R1		(KYRP_MIXER+5)	/* {type par title {sidetone right to usb_out right} range {-128 24} unit dB/4 property outUSB1Right} */
+#define KYRP_MIX_USB_R2		(KYRP_MIXER+6)	/* {type par title {IQ right to usb_out right} range {-128 24} unit dB/4 property outUSB2Right} */
+#define KYRP_MIX_USB_R3		(KYRP_MIXER+7)  /* {type par title {usb_in right to usb_out right} range {-128 24} unit dB/4 property outUSB3Right} */
 
-#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* {type par title {usb_in left to i2s_out left} range {-128 24} unit db/4 property outI2S0Left} */
-#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* {type par title {sidetone left to i2s_out left} range {-128 24} unit db/4 property outI2S1Left} */
-#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* {type par title {IQ left to i2s_out left} range {-128 24} unit db/4 property outI2S2Left} */
-#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit db/4 property outI2S3Left} */
+#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* {type par title {usb_in left to i2s_out left} range {-128 24} unit dB/4 property outI2S0Left} */
+#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* {type par title {sidetone left to i2s_out left} range {-128 24} unit dB/4 property outI2S1Left} */
+#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* {type par title {IQ left to i2s_out left} range {-128 24} unit dB/4 property outI2S2Left} */
+#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit dB/4 property outI2S3Left} */
 
-#define KYRP_MIX_I2S_R0		(KYRP_MIXER+12)	/* {type par title {usb_in right to i2s_out right} range {-128 24} unit db/4 property outI2S0Right} */
-#define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)	/* {type par title {sidetone right to i2s_out right} range {-128 24} unit db/4 property outI2S1Right} */
-#define KYRP_MIX_I2S_R2		(KYRP_MIXER+14) /* {type par title {IQ right to i2s_out right} range {-128 24} unit db/4 property outI2S2Right} */
-#define KYRP_MIX_I2S_R3		(KYRP_MIXER+15) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit db/4 property outI2S3Right} */
+#define KYRP_MIX_I2S_R0		(KYRP_MIXER+12)	/* {type par title {usb_in right to i2s_out right} range {-128 24} unit dB/4 property outI2S0Right} */
+#define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)	/* {type par title {sidetone right to i2s_out right} range {-128 24} unit dB/4 property outI2S1Right} */
+#define KYRP_MIX_I2S_R2		(KYRP_MIXER+14) /* {type par title {IQ right to i2s_out right} range {-128 24} unit dB/4 property outI2S2Right} */
+#define KYRP_MIX_I2S_R3		(KYRP_MIXER+15) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit dB/4 property outI2S3Right} */
 
-#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* {type par title {usb_in left to hdw_out left} range {-128 24} unit db/4 property outHDW0Left} */
-#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* {type par title {sidetone left to hdw_out left} range {-128 24} unit db/4 property outHDW1Left} */
-#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* {type par title {IQ left to hdw_out left} range {-128 24} unit db/4 property outHDW2Left} */
-#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19) /* {type par title {i2s_in left to hdw_out left} range {-128 24} unit db/4 property outHDW3Left} */
+#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* {type par title {usb_in left to hdw_out left} range {-128 24} unit dB/4 property outHDW0Left} */
+#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* {type par title {sidetone left to hdw_out left} range {-128 24} unit dB/4 property outHDW1Left} */
+#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* {type par title {IQ left to hdw_out left} range {-128 24} unit dB/4 property outHDW2Left} */
+#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19) /* {type par title {i2s_in left to hdw_out left} range {-128 24} unit dB/4 property outHDW3Left} */
 
-#define KYRP_MIX_HDW_R0		(KYRP_MIXER+20) /* {type par title {usb_in right to hdw_out right} range {-128 24} unit db/4 property outHDW0Right} */
-#define KYRP_MIX_HDW_R1		(KYRP_MIXER+21) /* {type par title {sidetone right to hdw_out right} range {-128 24} unit db/4 property outHDW1Right} */
-#define KYRP_MIX_HDW_R2		(KYRP_MIXER+22) /* {type par title {IQ right to hdw_out right} range {-128 24} unit db/4 property outHDW2Right} */
-#define KYRP_MIX_HDW_R3		(KYRP_MIXER+23) /* {type par title {i2s_in right to hdw_out right} range {-128 24} unit db/4 property outHDW3Right} */
+#define KYRP_MIX_HDW_R0		(KYRP_MIXER+20) /* {type par title {usb_in right to hdw_out right} range {-128 24} unit dB/4 property outHDW0Right} */
+#define KYRP_MIX_HDW_R1		(KYRP_MIXER+21) /* {type par title {sidetone right to hdw_out right} range {-128 24} unit dB/4 property outHDW1Right} */
+#define KYRP_MIX_HDW_R2		(KYRP_MIXER+22) /* {type par title {IQ right to hdw_out right} range {-128 24} unit dB/4 property outHDW2Right} */
+#define KYRP_MIX_HDW_R3		(KYRP_MIXER+23) /* {type par title {i2s_in right to hdw_out right} range {-128 24} unit dB/4 property outHDW3Right} */
 
 #define KYRP_KEYER		(KYRP_MIXER+24) /* {type rel title {base of vox specialized keyer parameters}} */
 
-#define KYRP_TONE		(KYRP_KEYER+0) /* {type par title {sidetone and IQ oscillator frequency} range {0 16383} unit Hz property keyerTone} */
-#define KYRP_LEVEL		(KYRP_KEYER+1) /* {type par title {sidetone level} range {-128 24} default 0 unit db/4 property keyerLevel} */
-#define KYRP_SPEED		(KYRP_KEYER+2) /* {type par title {keyer speed control} range {0 16384} units wpm property keyerSpeed} */
-#define KYRP_WEIGHT		(KYRP_KEYER+3) /* {type par title {keyer mark/space weight} range {25 75} unit pct default 50 property keyerWeight} */
-#define KYRP_RATIO		(KYRP_KEYER+4) /* {type par title {keyer dit/dah ratio} range {25 75} unit pct default 50 property keyerRatio} */
-#define KYRP_FARNS		(KYRP_KEYER+5) /* {type par title {Farnsworth keying speed} range {0 127} default 0 units wpm property keyerFarnsworth} */
-#define KYRP_COMP		(KYRP_KEYER+6) /* {type par title {keyer compensation} range {-8192 8191} default 0 units samples property keyerCompensation} */
-#define KYRP_SPEED_FRAC		(KYRP_KEYER+7) /* {type par title {keyer speed fraction} range {0 127} default 0 units wpm/128 property keyerSpeedFraction} */
+#define KYRP_TONE		(KYRP_KEYER+0) /* {type par title {sidetone and IQ oscillator frequency} range {0 16383} unit Hz/10 property keyerTone} */
+#define KYRP_LEVEL		(KYRP_KEYER+1) /* {type par title {sidetone level} range {-128 24} default 0 unit dB/4 property keyerLevel} */
+#define KYRP_SPEED		(KYRP_KEYER+2) /* {type par title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
+#define KYRP_WEIGHT		(KYRP_KEYER+3) /* {type par title {keyer mark/space weight} range {25 75} unit % default 50 property keyerWeight} */
+#define KYRP_RATIO		(KYRP_KEYER+4) /* {type par title {keyer dit/dah ratio} range {25 75} unit % default 50 property keyerRatio} */
+#define KYRP_FARNS		(KYRP_KEYER+5) /* {type par title {Farnsworth keying speed} range {0 127} default 0 unit WPM property keyerFarnsworth} */
+#define KYRP_COMP		(KYRP_KEYER+6) /* {type par title {keyer compensation} range {-8192 8191} default 0 unit sample property keyerCompensation} */
+#define KYRP_SPEED_FRAC		(KYRP_KEYER+7) /* {type par title {keyer speed fraction} range {0 127} default 0 unit WPM/128 property keyerSpeedFraction} */
 
 #define KYRP_KEYER_LAST		(KYRP_KEYER+8) /* {type rel title {end of keyer block}} */
 
@@ -445,12 +445,12 @@
 #define KYRP_XKEYER		(KYRP_XFIRST) /* {type rel title {base of extended keyer block}} */
 
 #define KYRP_XPER_DIT		(KYRP_XKEYER+0) /* {type scr title {samples per dit}} */
-#define KYRP_XPER_DAH		(KYRP_XKEYER+2) /* {type scr title {samples per dah}} */
-#define KYRP_XPER_IES		(KYRP_XKEYER+3) /* {type scr title {samples per inter element space}} */
-#define KYRP_XPER_ILS		(KYRP_XKEYER+4) /* {type scr title {samples per inter letter space}} */
-#define KYRP_XPER_IWS		(KYRP_XKEYER+5) /* {type scr title {samples per inter word space}} */
+#define KYRP_XPER_DAH		(KYRP_XKEYER+1) /* {type scr title {samples per dah}} */
+#define KYRP_XPER_IES		(KYRP_XKEYER+2) /* {type scr title {samples per inter element space}} */
+#define KYRP_XPER_ILS		(KYRP_XKEYER+3) /* {type scr title {samples per inter letter space}} */
+#define KYRP_XPER_IWS		(KYRP_XKEYER+4) /* {type scr title {samples per inter word space}} */
 
-#define KYRP_XKEYER_LAST	(KYRP_XKEYER+6) /* {type rel title {one past end of extended keyer block}} */
+#define KYRP_XKEYER_LAST	(KYRP_XKEYER+5) /* {type rel title {one past end of extended keyer block}} */
 
 #define KYRP_XVOX_OFFSET	(KYRP_XKEYER_LAST-KYRP_XKEYER) /* {type rel title {size of extended keyer parameter block}} */
 #define KYRP_XVOX_NONE		(KYRP_XKEYER+KYR_VOX_NONE*KYRP_XVOX_OFFSET) /* {type rel title {base of default keyer parameters}} */
@@ -482,8 +482,8 @@
 #define KYRP_VERSION		(KYRP_INFO+0) /* {type inf title {version of hasak nrpn set}} */
 #define KYRP_NRPN_SIZE		(KYRP_INFO+1) /* {type inf title {size of nrpn array}} */
 #define KYRP_MSG_SIZE		(KYRP_INFO+2) /* {type inf title {send the size of msgs array}} */
-#define KYRP_SAMPLE_RATE	(KYRP_INFO+3) /* {type inf title {sample rate of audio library} units sps/100} */
-#define KYRP_EEPROM_LENGTH	(KYRP_INFO+4) /* {type inf title {result of EEPROM.length()} units bytes} */
+#define KYRP_SAMPLE_RATE	(KYRP_INFO+3) /* {type inf title {sample rate of audio library} unit sps/100} */
+#define KYRP_EEPROM_LENGTH	(KYRP_INFO+4) /* {type inf title {result of EEPROM.length()} unit bytes} */
 #define KYRP_ID_CPU		(KYRP_INFO+5) /* {type inf title {which teensy microprocessor are we running}} */
 #define KYRP_ID_CODEC		(KYRP_INFO+6) /* {type inf title {which codec are we running}} */
 

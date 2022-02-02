@@ -85,17 +85,17 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
   const float compensation = signed_value(get_vox_nrpn(vox, KYRP_COMP));
   const float farnsworth = get_vox_nrpn(vox, KYRP_FARNS);;
-  const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
+  // const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
   const float c = compensation;
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
   const uint32_t ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
-  const int32_t ticksPerDit = (1+r+w+c) * ticksPerBaseDit;
-  const int32_t ticksPerDah = (3-r+w+c) * ticksPerBaseDit;
-  const int32_t ticksPerIes = (1  -w-c) * ticksPerBaseDit;
-        int32_t ticksPerIls = (3  -w-c) * ticksPerBaseDit;
-        int32_t ticksPerIws = (7  -w-c) * ticksPerBaseDit;
+  const int32_t ticksPerDit = (1+r+w) * ticksPerBaseDit+c;
+  const int32_t ticksPerDah = (3-r+w) * ticksPerBaseDit+c;
+  const int32_t ticksPerIes = (1  -w) * ticksPerBaseDit-c;
+        int32_t ticksPerIls = (3  -w) * ticksPerBaseDit-c;
+        int32_t ticksPerIws = (7  -w) * ticksPerBaseDit-c;
     
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
