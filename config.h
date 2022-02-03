@@ -378,35 +378,35 @@
 /* relocation base */
 #define KYRP_MIXER		(KYRP_MORSE+64) /* {type rel title {base of output mixer block}} */
 
-#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* {type par title {i2s_in left to usb_out left} range {-128 24} unit dB/4 property outUSB0Left} */
-#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* {type par title {sidetone left to usb_out left} range {-128 24} unit dB/4 property outUSB1Left} */
-#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* {type par title {IQ left to usb_out left} range {-128 24} unit dB/4 property outUSB2Left} */
-#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)  /* {type par title {usb_in left to usb_out left} range {-128 24} unit dB/4 property outUSB3Left} */
+#define KYRP_MIX_USB_L0		(KYRP_MIXER+0)	/* {type par title {i2s_in left to usb_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_USB_L1		(KYRP_MIXER+1)	/* {type par title {sidetone left to usb_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_USB_L2		(KYRP_MIXER+2)	/* {type par title {IQ left to usb_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_USB_L3		(KYRP_MIXER+3)  /* {type par title {usb_in left to usb_out left} range {-128 24} unit dB/4} */
 
-#define KYRP_MIX_USB_R0		(KYRP_MIXER+4)	/* {type par title {i2s_in right to usb_out right} range {-128 24} unit dB/4 property outUSB0Right} */
-#define KYRP_MIX_USB_R1		(KYRP_MIXER+5)	/* {type par title {sidetone right to usb_out right} range {-128 24} unit dB/4 property outUSB1Right} */
-#define KYRP_MIX_USB_R2		(KYRP_MIXER+6)	/* {type par title {IQ right to usb_out right} range {-128 24} unit dB/4 property outUSB2Right} */
-#define KYRP_MIX_USB_R3		(KYRP_MIXER+7)  /* {type par title {usb_in right to usb_out right} range {-128 24} unit dB/4 property outUSB3Right} */
+#define KYRP_MIX_USB_R0		(KYRP_MIXER+4)	/* {type par title {i2s_in right to usb_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_USB_R1		(KYRP_MIXER+5)	/* {type par title {sidetone right to usb_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_USB_R2		(KYRP_MIXER+6)	/* {type par title {IQ right to usb_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_USB_R3		(KYRP_MIXER+7)  /* {type par title {usb_in right to usb_out right} range {-128 24} unit dB/4} */
 
-#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* {type par title {usb_in left to i2s_out left} range {-128 24} unit dB/4 property outI2S0Left} */
-#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* {type par title {sidetone left to i2s_out left} range {-128 24} unit dB/4 property outI2S1Left} */
-#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* {type par title {IQ left to i2s_out left} range {-128 24} unit dB/4 property outI2S2Left} */
-#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit dB/4 property outI2S3Left} */
+#define KYRP_MIX_I2S_L0		(KYRP_MIXER+8)  /* {type par title {usb_in left to i2s_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_I2S_L1		(KYRP_MIXER+9)  /* {type par title {sidetone left to i2s_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_I2S_L2		(KYRP_MIXER+10) /* {type par title {IQ left to i2s_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_I2S_L3		(KYRP_MIXER+11) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit dB/4} */
 
-#define KYRP_MIX_I2S_R0		(KYRP_MIXER+12)	/* {type par title {usb_in right to i2s_out right} range {-128 24} unit dB/4 property outI2S0Right} */
-#define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)	/* {type par title {sidetone right to i2s_out right} range {-128 24} unit dB/4 property outI2S1Right} */
-#define KYRP_MIX_I2S_R2		(KYRP_MIXER+14) /* {type par title {IQ right to i2s_out right} range {-128 24} unit dB/4 property outI2S2Right} */
-#define KYRP_MIX_I2S_R3		(KYRP_MIXER+15) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit dB/4 property outI2S3Right} */
+#define KYRP_MIX_I2S_R0		(KYRP_MIXER+12)	/* {type par title {usb_in right to i2s_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_I2S_R1		(KYRP_MIXER+13)	/* {type par title {sidetone right to i2s_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_I2S_R2		(KYRP_MIXER+14) /* {type par title {IQ right to i2s_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_I2S_R3		(KYRP_MIXER+15) /* {type par title {i2s_in right to i2s_out right} range {-128 24} unit dB/4} */
 
-#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* {type par title {usb_in left to hdw_out left} range {-128 24} unit dB/4 property outHDW0Left} */
-#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* {type par title {sidetone left to hdw_out left} range {-128 24} unit dB/4 property outHDW1Left} */
-#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* {type par title {IQ left to hdw_out left} range {-128 24} unit dB/4 property outHDW2Left} */
-#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19) /* {type par title {i2s_in left to hdw_out left} range {-128 24} unit dB/4 property outHDW3Left} */
+#define KYRP_MIX_HDW_L0		(KYRP_MIXER+16) /* {type par title {usb_in left to hdw_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_HDW_L1		(KYRP_MIXER+17) /* {type par title {sidetone left to hdw_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_HDW_L2		(KYRP_MIXER+18) /* {type par title {IQ left to hdw_out left} range {-128 24} unit dB/4} */
+#define KYRP_MIX_HDW_L3		(KYRP_MIXER+19) /* {type par title {i2s_in left to hdw_out left} range {-128 24} unit dB/4} */
 
-#define KYRP_MIX_HDW_R0		(KYRP_MIXER+20) /* {type par title {usb_in right to hdw_out right} range {-128 24} unit dB/4 property outHDW0Right} */
-#define KYRP_MIX_HDW_R1		(KYRP_MIXER+21) /* {type par title {sidetone right to hdw_out right} range {-128 24} unit dB/4 property outHDW1Right} */
-#define KYRP_MIX_HDW_R2		(KYRP_MIXER+22) /* {type par title {IQ right to hdw_out right} range {-128 24} unit dB/4 property outHDW2Right} */
-#define KYRP_MIX_HDW_R3		(KYRP_MIXER+23) /* {type par title {i2s_in right to hdw_out right} range {-128 24} unit dB/4 property outHDW3Right} */
+#define KYRP_MIX_HDW_R0		(KYRP_MIXER+20) /* {type par title {usb_in right to hdw_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_HDW_R1		(KYRP_MIXER+21) /* {type par title {sidetone right to hdw_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_HDW_R2		(KYRP_MIXER+22) /* {type par title {IQ right to hdw_out right} range {-128 24} unit dB/4} */
+#define KYRP_MIX_HDW_R3		(KYRP_MIXER+23) /* {type par title {i2s_in right to hdw_out right} range {-128 24} unit dB/4} */
 
 #define KYRP_KEYER		(KYRP_MIXER+24) /* {type rel title {base of vox specialized keyer parameters}} */
 

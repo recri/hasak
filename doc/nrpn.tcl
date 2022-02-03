@@ -63,10 +63,10 @@ proc jsformat-any {name table} {
     dict for {key value} $table {
 	switch $key {
 	    orig-value - value-of { continue }
-	    units { set key unit }
-	    value { set key nrpn }
+	    units { lappend vals "unit: \"$value\"" }
+	    value { lappend vals "nrpn: $value" }
+	    default { lappend vals "$key: \"$value\"" }
 	}
-	lappend vals "$key: \"$value\""
     }
     return "\"$name\": {[join $vals {, }]}"
 }
@@ -78,6 +78,8 @@ proc jsformat-all {values} {
     set pats [dict create]
     dict for {key table} $values {
 	dict with table {
+	    # skip the extended NRPNs
+	    if {[string match KYRP_X* $key]} continue
 	    # primary KYR* string -> Object table
 	    if {$type in {rel par cmd inf val opts} ||
 		[string match *VOX* $key] ||
@@ -166,7 +168,7 @@ proc main {argv} {
 	    puts "missing title {$line}"
 	}
 	if {[dict exists $values $name lable]} {
-	    puts "found a  lable {$line}"
+	    puts "found a lable {$line}"
 	}
 	if {[dict exists $values $name values]} {
 	    set glob [dict get $values $name values]
