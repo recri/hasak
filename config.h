@@ -334,7 +334,7 @@
 #define KYRP_NOTE_EXT_PTT	(KYRP_NOTE+3) /* {type par title {note for external ptt switch input} unit {} range {0 128} property noteExternalPTT} */
 #define KYRP_NOTE_KEY_OUT	(KYRP_NOTE+4) /* {type par title {note for key/ptt key output} unit {} range {0 128} property noteKeyOut} */
 #define KYRP_NOTE_PTT_OUT	(KYRP_NOTE+5) /* {type par title {note for key/ptt ptt output} unit {} range {0 128} property notePTTOut} */
-#define KYRP_NOTE_TUNE		(KYRP_NOTE+6) /* {type par title {note to key tune signal} unit {} range {0 128} property notePTTOut} */
+#define KYRP_NOTE_TUNE		(KYRP_NOTE+6) /* {type par title {note to key tune signal} unit {} range {0 128} property noteTune} */
 #define KYRV_NOTE_INVALID	128	       /* {type val title {invalid note, used to disable midi events}} */
 
 #define KYRP_PINS		(KYRP_NOTE+6) /* {type rel title {base of hardware pin assignments}} */
