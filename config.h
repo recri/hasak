@@ -248,9 +248,9 @@
 /* NRPN_GLOBAL_BLOCK - parameters controlling the entire keyer */
 #define KYRP_FIRST		0 /* {type rel title {base of nrpns}} */
 
-#define KYRP_NOTHING		(KYRP_FIRST+0) /* {type rel title {nothng parameter value, zero is not a valid parameter} property nothing} */
-#define KYRP_ID_KEYER		(KYRP_FIRST+1) /* {type rel title {keyer unique identfier} property keyerIdentifier} */
-#define KYRP_ID_VERSION		(KYRP_FIRST+2) /* {type rel title {keyer version identfier} property keyerVersion} */
+#define KYRP_NOTHING		(KYRP_FIRST+0) /* {type par title {nothng parameter value, zero is not a valid parameter} property nothing} */
+#define KYRP_ID_KEYER		(KYRP_FIRST+1) /* {type cmd title {keyer unique identfier} property keyerIdentifier} */
+#define KYRP_ID_VERSION		(KYRP_FIRST+2) /* {type cmd title {keyer version identfier} property keyerVersion} */
 
 #define KYRP_CODEC		(KYRP_FIRST+3) /* {type rel title {base of codec nrpns}} */
 

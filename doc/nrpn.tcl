@@ -91,11 +91,11 @@ proc jsformat-all {values} {
 		lappend kyrp [jsformat-any $key $table]
 	    }
 	    # property name -> KYR* table
-	    if {$type in {par opts}} {
+	    if {$type in {par opts cmd inf}} {
 		lappend prop "$property: \"$key\""
 	    }
 	    # nrpn -> KYR* table
-	    if {$type in {par}} {
+	    if {$type in {par cmd inf}} {
 		lappend nrpn "$value: \"$key\""
 	    }
 	}
