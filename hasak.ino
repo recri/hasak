@@ -249,22 +249,19 @@ static float timing_percent_max(uint32_t cpuCyclesMax) {
 // loop which runs at lower priority than this
 // interrupt handler.
 //
-uint8_t _key_out, _ptt_out;
-uint8_t _up_out, _down_out;
-uint32_t _pollcount = 0;
 static void pollatch() {
   uint32_t cycles = ARM_DWT_CYCCNT;
-  _pollcount += 1;
-  l_pad.send(digitalReadFast(KYR_L_PAD_PIN)^1);
-  r_pad.send(digitalReadFast(KYR_R_PAD_PIN)^1);
-  s_key.send(digitalReadFast(KYR_S_KEY_PIN)^1);
-  ptt_sw.send(digitalReadFast(KYR_EXT_PTT_PIN)^1);
-  _key_out=key_out.recv();
-  _ptt_out=ptt_out.recv();
-  _up_out = up_out.recv();
-  _down_out = down_out.recv();
-  digitalWriteFast(KYR_KEY_OUT_PIN,_key_out);
-  digitalWriteFast(KYR_PTT_OUT_PIN,_ptt_out);
+  hasak._pollcount += 1;
+  l_pad.send((digitalReadFast(KYR_L_PAD_PIN)^1)); // pin active low, note active high
+  r_pad.send((digitalReadFast(KYR_R_PAD_PIN)^1));
+  s_key.send((digitalReadFast(KYR_S_KEY_PIN)^1));
+  ptt_sw.send((digitalReadFast(KYR_EXT_PTT_PIN)^1));
+  hasak._key_out=key_out.recv();
+  hasak._ptt_out=ptt_out.recv();
+  hasak._up_out = up_out.recv();
+  hasak._down_out = down_out.recv();
+  digitalWriteFast(KYR_KEY_OUT_PIN,hasak._key_out); // note active high, is pin active high or low?
+  digitalWriteFast(KYR_PTT_OUT_PIN,hasak._ptt_out);
   isrCpuCyclesRaw += ARM_DWT_CYCCNT - cycles;
 }
 
@@ -316,6 +313,8 @@ void setup(void) {
 
 void loop(void) {
   // accumulate cycle count to normalize audio library usage
+  if ((tune.read() != 0) != (hasak._tune_note_on != 0))
+    tune.amplitude(hasak._tune_note_on ? 1.0 : 0);
   timing_loop();
   midi_loop();
   winkey_loop();

@@ -1,4 +1,21 @@
 * Todo list as of 2022-01-18
+[x] inject midi note states into pollatch
+[x] save midi note states in midi_note_on
+[x] move latch variables into hasak structure
+[x] define KYRP_KEY_REMOTE to enable remote keying
+[x] reduce ADC_ENABLE to boolean
+[ ] make ADC?_INVERT a settable parameter
+[ ] change extPTT to options { none, ptt-rto, ttt-tto }
+	needs title on select option element
+[x] change to dB/10 for easier UI display
+[-] change to Hz/100 for precision tuning guitars ;)
+	can't do that, range would be 0 .. 163.84
+[ ] write an audio library component to inject MIDI note states
+	into the sample stream to implement programmatic control
+	of LPAD, RPAD, SKEY, TUNE, BUTTON, KEYOUT, and PTTOUT.
+[ ] add extension interface for using hasak as a framework for other
+	keyer implementations.  Keep Chuck Broadwell W5UXH
+	chuck.broadwell@gmail.com informed.
 [ ] move all non-essential activity out of the MIDI control change
 	callback, mark altered controls in a bitmap and process the
 	changes in the loop.  Most especially, no nrpn_echo's inside

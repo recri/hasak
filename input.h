@@ -15,7 +15,7 @@ static ResponsiveAnalogRead input_adc4(KYR_ADC4, RARSleep, RARSnap);
 static ResponsiveAnalogRead *input_adc[5] = { &input_adc0, &input_adc1, &input_adc2, &input_adc3, &input_adc4 };
 #endif
 
-static const uint8_t input_enable[5] = { 0b10000, 0b01000, 0b00100, 0b00010, 0b00001 };
+// static const uint8_t input_enable[5] = { 0b10000, 0b01000, 0b00100, 0b00010, 0b00001 };
 static const int16_t input_nrpn[5] = {
   KYRP_ADC0_CONTROL, KYRP_ADC1_CONTROL, KYRP_ADC2_CONTROL, KYRP_ADC3_CONTROL, KYRP_ADC4_CONTROL
 };
@@ -77,7 +77,7 @@ static int16_t input_cook_value(const int16_t nrpn2, const int16_t value, int16_
   case KYRP_VOLUME:		  /* all these and the *_MIX_* are dB/4 */
   case KYRP_LEVEL:		  /* -30*4 .. +0*4, -200 .. 24  */
   case KYRP_INPUT_LEVEL:
-    *cooked = (-128+128*value/1024) & KYRV_MASK; return 1;
+    *cooked = (-320+320*value/1024) & KYRV_MASK; return 1;
   default:
     if (nrpn2 >= KYRP_MIX_USB_L0 && nrpn2 <= KYRP_MIX_HDW_R3) {
       *cooked = (-200+225*value/1024) & KYRV_MASK; return 1;
@@ -91,12 +91,10 @@ static int16_t input_cook_value(const int16_t nrpn2, const int16_t value, int16_
 # if defined(KYRC_USE_RESPAR)
 static int input_update(const int16_t adc_number) {
   int16_t nrpn = input_nrpn[adc_number];
-  bool enable = (get_nrpn(KYRP_ADC_ENABLE) & input_enable[adc_number]) != 0;
   ResponsiveAnalogRead *adc = input_adc[adc_number];
   int16_t *valuep = &input_value[adc_number];
   bool invert = input_invert[adc_number];
   int16_t nrpn2, raw_value, cooked_value;
-  if ( ! enable) return 0; /* if this input is not enabled */
   nrpn2 = get_nrpn(nrpn);  /* fetch the nrpn controlled by this adc */
   if (nrpn2 == 0) return 0; /* if this input is not attached to anything */
   adc->update();		    /* update the reader */
@@ -112,8 +110,10 @@ static int input_update(const int16_t adc_number) {
 
 static void input_loop(void) {
   static uint8_t count = 0;
-  if ((count++ & 0xF) == 0 && (count>>4) < 5)  {
-    if (input_update(count>>4) != 0)
+  if (get_nrpn(KYRP_ADC_ENABLE) && 
+      (count++ & 0xF) == 0 && 
+      (count>>4) < 5 &&
+      input_update(count>>4) != 0) {
       /* Serial.printf("%3d: inputs 0 1 2 3 4 =  %d %d %d %d %d\n", 
 		    count,
 		    get_nrpn(get_nrpn(KYRP_ADC0_CONTROL)), 

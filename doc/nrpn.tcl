@@ -80,6 +80,8 @@ proc jsformat-all {values} {
 	dict with table {
 	    # skip the extended NRPNs
 	    if {[string match KYRP_X* $key]} continue
+	    # skip the output mixers
+	    if {[string match KYRP_MIX_* $key]} continue
 	    # primary KYR* string -> Object table
 	    if {$type in {rel par cmd inf val opts} ||
 		[string match *VOX* $key] ||

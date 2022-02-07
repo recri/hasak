@@ -1,7 +1,7 @@
 * want to specify volumes and signal levels as decibel ratios to full scale
 	proc dbtolinear {dB} { expr {pow(10.0, $dB / 20.0)} }
 * It strikes me that that if this is converted to a fixed point multiplier
-	there will be a pattern in the bits of the multiplier
+	there should be a pattern in the bits of the multiplier
 	corresponding to shifting the pattern 
 * Let's try it:
 	for {set dB 0} {$dB >= -18} {incr dB -1} { 

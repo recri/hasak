@@ -44,7 +44,7 @@ static void sreport(void) {
   report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
   Serial.printf("%16s %2d %2d", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
-  Serial.printf("pollcount %ld\n", _pollcount);
+  Serial.printf("pollcount %ld\n", hasak._pollcount);
 }
 
 static void treport(const char *p) {

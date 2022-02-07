@@ -26,28 +26,28 @@ static void midi_note_on(byte channel, byte note, byte velocity) {
   kyr_recv_note += 1;
   if (channel == get_nrpn(KYRP_CHAN_NOTE)) {
     /* 
-       none of these work, they need a constant source 
-       to be keyed on and off and or'ed into the normal
-       stream
+       I just rewrote the pollatch to include these
     */
     if (note == get_nrpn(KYRP_NOTE_L_PAD)) {
-      /* note used to report raw left paddle switch */
-      digitalWrite(KYR_L_PAD_PIN, velocity == 0);
+      /* note for raw left paddle switch */
+      hasak._l_pad_note_on = velocity == 0;
     } else if (note == get_nrpn(KYRP_NOTE_R_PAD)) {
-      /* note used to report raw right paddle switch */
-      digitalWrite(KYR_R_PAD_PIN, velocity == 0);
+      /* note for raw right paddle switch */
+      hasak._r_pad_note_on = velocity == 0;
     } else if (note == get_nrpn(KYRP_NOTE_S_KEY)) {
-      /* note used to report raw straight key switch */
-      digitalWrite(KYR_S_KEY_PIN, velocity == 0);
+      /* note for raw straight key switch */
+      hasak._s_key_note_on = velocity == 0;
     } else if (note == get_nrpn(KYRP_NOTE_EXT_PTT)) {
       /* note used to report raw ptt switch */
-      digitalWrite(KYR_EXT_PTT_PIN, velocity == 0);
+      hasak._ptt_sw_note_on =  velocity == 0;
     } else if (note == get_nrpn(KYRP_NOTE_KEY_OUT)) {
       /* note used to send external key signal */
-      digitalWrite(KYR_KEY_OUT_PIN, velocity == 0);
+      hasak._key_out_note_on = (velocity == 0);
     } else if (note == get_nrpn(KYRP_NOTE_PTT_OUT)) {
       /* note used to send external ptt signal */
-      digitalWrite(KYR_PTT_OUT_PIN, velocity == 0);
+      hasak._ptt_out_note_on = (velocity == 0);
+    } else if (note == get_nrpn(KYRP_NOTE_TUNE)) {
+      hasak._tune_note_on = (velocity == 0)&get_nrpn(KYRP_REMOTE_KEY);
     }
   }
 }
@@ -125,8 +125,8 @@ static void midi_loop(void) {
   if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_NOTE_R_PAD, channel, 0);
   if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_NOTE_S_KEY, channel, 0);
   if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_NOTE_EXT_PTT, channel, 0);
-  if (_key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_NOTE_KEY_OUT, channel, get_active_vox());
-  if (_ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_NOTE_PTT_OUT, channel, get_active_vox());
+  if (hasak._key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_NOTE_KEY_OUT, channel, get_active_vox());
+  if (hasak._ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_NOTE_PTT_OUT, channel, get_active_vox());
   while (usbMIDI.read());
 }
 

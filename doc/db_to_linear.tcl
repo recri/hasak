@@ -22,5 +22,12 @@ proc qtr_db_to_linear {qdb} {
     expr {[lindex $::one_octave $inoctave]*pow(2,$octave)}
 }    
     
-foreach db [range -50 0.25 6] { puts [format {%4f %4f %4f} $db [qtr_db_to_linear [expr {int(4*$db)}]] [db_to_linear $db]] }
-    
+# foreach db [range -50 0.25 6] { puts [format {%4f %4f %4f} $db [qtr_db_to_linear [expr {int(4*$db)}]] [db_to_linear $db]] }
+## puts [lmap db [range 0 -0.1 -60] {expr {int(127*[db_to_linear $db])}}]    
+# generate tenthdbtolinearasbyte
+set results {}
+for {set db 0} {1} {set db [expr {$db-0.1}]} { 
+    lappend results [expr {int(127*[db_to_linear $db])}]
+    if {[lindex $results end] == 0} break
+}
+puts [join $results ", "]

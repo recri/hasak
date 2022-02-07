@@ -140,7 +140,7 @@ static void nrpn_update_mixer(const int16_t nrpn, const int16_t value) {
     uint16_t index = (nrpn-KYRP_MIXER)/4; /* index of mixer in mix_out */
     uint16_t chan = (nrpn-KYRP_MIXER)%4;  /* channel of the mixer */
     uint16_t mask = 1<<(11-(((index>>1)<<2)+chan)); /* bit enabling channel */
-    float gain = ((mask&get_nrpn(KYRP_OUT_ENABLE)) ? 1 : 0) * qtrdbtolinear(signed_value(value));
+    float gain = ((mask&get_nrpn(KYRP_OUT_ENABLE)) ? 1 : 0) * tenthdbtolinear(signed_value(value));
     //Serial.printf("update_mixer(%d, %d) index %d chan %d mask %03x gain %f\n", 
     //		  nrpn, value, index, chan, mask, gain);
    mix_out[index]->gain(chan, gain);
@@ -161,7 +161,8 @@ static void nrpn_report(const char *name, const int16_t oldval, const int16_t ne
 #include "morse_table.h"
 
 static void nrpn_set_defaults(void) {
-  nrpn_set(KYRP_VERSION, KYRC_VERSION);
+  nrpn_set(KYRP_ID_KEYER, KYRC_IDENT);
+  nrpn_set(KYRP_ID_VERSION, KYRC_VERSION);
 
   nrpn_set(KYRP_VOLUME, 0);
   nrpn_set(KYRP_INPUT_SELECT, 0);
@@ -180,7 +181,8 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_ENABLE, 1);
   nrpn_set(KYRP_IQ_BALANCE, 0);
   nrpn_set(KYRP_ST_PAN, 0);
-  nrpn_set(KYRP_DEBOUNCE, 50);
+  nrpn_set(KYRP_DEBOUNCE, ms_to_samples(50));
+  nrpn_set(KYRP_REMOTE_KEY, 0);
   
   nrpn_set(KYRP_CHAN_CC, KYRC_CHAN_CC);
   nrpn_set(KYRP_CHAN_NOTE, KYRC_CHAN_NOTE);
@@ -192,7 +194,7 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_NOTE_KEY_OUT, KYR_NOTE_KEY_OUT);
   nrpn_set(KYRP_NOTE_PTT_OUT, KYR_NOTE_PTT_OUT);
 
-  nrpn_set(KYRP_ADC_ENABLE, 0b01111);
+  nrpn_set(KYRP_ADC_ENABLE, 1);
   nrpn_set(KYRP_ADC0_CONTROL, KYRP_NOTHING);
   nrpn_set(KYRP_ADC1_CONTROL, KYRP_VOLUME);
   nrpn_set(KYRP_ADC2_CONTROL, KYRP_LEVEL);
@@ -346,6 +348,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_ADC3_CONTROL:
   case KYRP_ADC4_CONTROL:
   case KYRP_ADC_ENABLE:
+  case KYRP_REMOTE_KEY:
     hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     
   case KYRP_OUT_ENABLE:
@@ -409,15 +412,10 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     nrpn_echo(nrpn, hasak.msgs[hasak.index++]);
     hasak.index %= sizeof(hasak.msgs);
     break;
-  case KYRP_PLAY_WINK:
-    nrpn_echo(nrpn, value);
-    break;
-  case KYRP_PLAY_KYR:
-    nrpn_echo(nrpn, value);
-    break;
 
     /* information only, cause no side effects */
-  case KYRP_VERSION: nrpn_echo(nrpn, KYRC_VERSION); break;
+  case KYRP_ID_KEYER: nrpn_echo(nrpn, KYRC_IDENT); break;
+  case KYRP_ID_VERSION: nrpn_echo(nrpn, KYRC_VERSION); break;
   case KYRP_NRPN_SIZE: nrpn_echo(nrpn, sizeof(hasak.nrpn)); break;
   case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(hasak.msgs)); break;
   case KYRP_SAMPLE_RATE: nrpn_echo(nrpn, ((uint16_t)AUDIO_SAMPLE_RATE)/100); break;
