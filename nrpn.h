@@ -202,12 +202,12 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ADC4_CONTROL, KYRP_SPEED);
 
   /* morse code table */
-  for (int i = KYRP_MORSE; i < KYRP_MIXER; i += 1) 
+  for (int i = KYRP_MORSE; i < KYRP_MORSE+64; i += 1) 
     nrpn_set(i, morse[i-KYRP_MORSE]);
 
   /* output mixers */
   nrpn_set(KYRP_OUT_ENABLE, 0b001011001100); /* IQ to usb, usb+sidetone to i2s and hdw */
-  for (int i = KYRP_MIXER; i < KYRP_KEYER; i += 1) nrpn_set(i, 0); /* 0 dB */
+  for (int i = KYRP_MIXER; i < KYRP_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
   /* output mixers enable */
 
   /* keyer defaults - common */
@@ -444,7 +444,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
       hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value);
       break;
     }
-    if (nrpn >= KYRP_MIX_USB_L0 && nrpn <= KYRP_MIX_HDW_R3) {
+    if (nrpn >= KYRP_MIXER && nrpn < KYRP_MIXER+24) {
       nrpn_update_mixer(nrpn, value); hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value);
       break;
     }

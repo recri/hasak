@@ -278,7 +278,7 @@
 #define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type par label IQBal title {adjustment to IQ balance} range {-8192 8191} unit pp8191 ignore 1 property iqAdjustBalance} */
 #define KYRP_ST_PAN		(KYRP_SOFT+11) /* {type par label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 ignore 1 property sidetonePan} */
 #define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type par label OutMix title {output mixer enable bits} range {0 4095} property outputEnable} */
-#define KYRP_REMOTE_KEY		(KYRP_SOFT+13) /* {type par label Remote title {enable direct remote control of key_out and ptt_out by midi note} property remoteKey} */
+#define KYRP_REMOTE_KEY		(KYRP_SOFT+13) /* {type par label Remote title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
 
 #define KYRP_COMM		(KYRP_SOFT+14) /* {type rel title {keyer parameters shared across voices}} */
 
