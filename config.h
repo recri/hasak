@@ -337,7 +337,7 @@
 #define KYRP_NOTE_TUNE		(KYRP_NOTE+6) /* {type par title {note to key tune signal} unit {} range {0 128} property noteTune} */
 #define KYRV_NOTE_INVALID	128	       /* {type val title {invalid note, used to disable midi events}} */
 
-#define KYRP_PINS		(KYRP_NOTE+6) /* {type rel title {base of hardware pin assignments}} */
+#define KYRP_PINS		(KYRP_NOTE+7) /* {type rel title {base of hardware pin assignments}} */
 
 #define KYRP_ADC0_CONTROL	(KYRP_PINS+0) /* {type par title {property for adc0 = A0} unit {} values KYRV_ADC_* property adc0Control valuesProperty adcControls} */
 #define KYRP_ADC1_CONTROL	(KYRP_PINS+1) /* {type par title {property for adc1 = A1 (master volume on the CWKeyer)} unit {} values KYRV_ADC_* property adc1Control valuesProperty adcControls} */
