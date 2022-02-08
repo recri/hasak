@@ -125,7 +125,7 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
 
 // echo the nrpn settings back to the control echo channel
 static void nrpn_echo(const int16_t nrpn, const int16_t value) {
-  if (nrpn == KYRP_MIXER+23) Serial.printf("nrpn_echo sets MIXER[23] to %d\n", value);
+  /* if (nrpn == 193) Serial.printf("nrpn_echo sets nrpn[193] to %d\n", value); */
   midi_send_nrpn(nrpn, value);
 }  
 
@@ -464,7 +464,7 @@ static void nrpn_loop(void) {
   static uint8_t delay = 0;
   if (nrpn_echo_index >= 0) {
     if ((delay++ & 15) != 0) return; 
-    if (nrpn_echo_index <= KYRP_LAST) {
+    if (nrpn_echo_index < KYRP_LAST) {
       if (hasak.nrpn[nrpn_echo_index] != KYRV_NOT_SET)
 	nrpn_echo(nrpn_echo_index, hasak.nrpn[nrpn_echo_index]);
       nrpn_echo_index += 1;

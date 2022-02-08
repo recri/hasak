@@ -447,24 +447,24 @@
 
 #define KYRP_EXEC		(2000) /* {type rel title {base of command nrpns}} */
 
-#define KYRP_WRITE_EEPROM	(KYRP_EXEC+0) /* {type cmd label {Write EEPROM} title {write nrpn+msgs to eeprom}} */
-#define KYRP_READ_EEPROM	(KYRP_EXEC+1) /* {type cmd label {Read EEPROM} title {read nrpn+msgs from eeprom}} */
-#define KYRP_SET_DEFAULT	(KYRP_EXEC+2) /* {type cmd label {Reset to default} title {load nrpn with default values}} */
-#define KYRP_ECHO_ALL		(KYRP_EXEC+3) /* {type cmd label {Echo all} title {echo all set nrpns to midi}} */
-#define KYRP_SEND_WINK		(KYRP_EXEC+4) /* {type cmd label {Send to Winkey} title {send character value to wink vox}} */
-#define KYRP_SEND_KYR		(KYRP_EXEC+5) /* {type cmd label {Send to Keyer} title {send character value to kyr vox}} */
-#define KYRP_MSG_INDEX		(KYRP_EXEC+6) /* {type cmd label {Message byte index} title {set index into msgs}} */
-#define KYRP_MSG_WRITE		(KYRP_EXEC+7) /* {type cmd label {Message write byte} title {set msgs[index++] to value}} */
-#define KYRP_MSG_READ		(KYRP_EXEC+8) /* {type cmd label {Message reqd byte} title {read msgs[index++] and echo the value}} */
+#define KYRP_WRITE_EEPROM	(KYRP_EXEC+0) /* {type cmd label {Write EEPROM} title {write nrpn+msgs to eeprom} property writeEEPROM} */
+#define KYRP_READ_EEPROM	(KYRP_EXEC+1) /* {type cmd label {Read EEPROM} title {read nrpn+msgs from eeprom} property loadEEPROM} */
+#define KYRP_SET_DEFAULT	(KYRP_EXEC+2) /* {type cmd label {Reset to default} title {load nrpn with default values} property loadDefaults} */
+#define KYRP_ECHO_ALL		(KYRP_EXEC+3) /* {type cmd label {Echo all} title {echo all set nrpns to midi} property echoAll} */
+#define KYRP_SEND_WINK		(KYRP_EXEC+4) /* {type cmd label {Send to Winkey} title {send character value to wink vox} property sendWinkey} */
+#define KYRP_SEND_KYR		(KYRP_EXEC+5) /* {type cmd label {Send to Keyer} title {send character value to kyr vox} property sendKeyer} */
+#define KYRP_MSG_INDEX		(KYRP_EXEC+6) /* {type cmd label {Message byte index} title {set index into msgs} property messageIndex} */
+#define KYRP_MSG_WRITE		(KYRP_EXEC+7) /* {type cmd label {Message write byte} title {set msgs[index++] to value} property messageWrite} */
+#define KYRP_MSG_READ		(KYRP_EXEC+8) /* {type cmd label {Message reqd byte} title {read msgs[index++] and echo the value} property messageRead} */
 
 #define KYRP_INFO		(3000) /* {type rel title {base of information nrpns}} */
 
-#define KYRP_NRPN_SIZE		(KYRP_INFO+0) /* {type inf title {size of nrpn array}} */
-#define KYRP_MSG_SIZE		(KYRP_INFO+1) /* {type inf title {send the size of msgs array}} */
-#define KYRP_SAMPLE_RATE	(KYRP_INFO+2) /* {type inf title {sample rate of audio library} unit sps/100} */
-#define KYRP_EEPROM_LENGTH	(KYRP_INFO+3) /* {type inf title {result of EEPROM.length()} unit bytes} */
-#define KYRP_ID_CPU		(KYRP_INFO+4) /* {type inf title {which teensy microprocessor are we running}} */
-#define KYRP_ID_CODEC		(KYRP_INFO+5) /* {type inf title {which codec are we running}} */
+#define KYRP_NRPN_SIZE		(KYRP_INFO+0) /* {type inf title {size of nrpn array} property nrpnSize} */
+#define KYRP_MSG_SIZE		(KYRP_INFO+1) /* {type inf title {send the size of msgs array} property messageSize} */
+#define KYRP_SAMPLE_RATE	(KYRP_INFO+2) /* {type inf title {sample rate of audio library} unit sps/100 property sampleRate} */
+#define KYRP_EEPROM_LENGTH	(KYRP_INFO+3) /* {type inf title {result of EEPROM.length()} unit bytes property eepromSize} */
+#define KYRP_ID_CPU		(KYRP_INFO+4) /* {type inf title {which teensy microprocessor are we running} property identifyCPU} */
+#define KYRP_ID_CODEC		(KYRP_INFO+5) /* {type inf title {which codec are we running} property identifyCodec} */
 
 /* end of defined nrpns */
 /* end of config.h */
