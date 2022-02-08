@@ -1,15 +1,7 @@
-* Todo list as of 2022-01-18
-[x] inject midi note states into pollatch
-[x] save midi note states in midi_note_on
-[x] move latch variables into hasak structure
-[x] define KYRP_KEY_REMOTE to enable remote keying
-[x] reduce ADC_ENABLE to boolean
+* Todo list as of 2020-02-07
 [ ] make ADC?_INVERT a settable parameter
 [ ] change extPTT to options { none, ptt-rto, ttt-tto }
 	needs title on select option element
-[x] change to dB/10 for easier UI display
-[-] change to Hz/100 for precision tuning guitars ;)
-	can't do that, range would be 0 .. 163.84
 [ ] write an audio library component to inject MIDI note states
 	into the sample stream to implement programmatic control
 	of LPAD, RPAD, SKEY, TUNE, BUTTON, KEYOUT, and PTTOUT.
@@ -35,13 +27,32 @@
 [ ] 2nd rise and fall ramps for product ramp
 [ ] compute per sample ramp, build by interpolating precomputed
 	tables first, then filling in the real values.
-[x] add mixer output unmute bitmap nrpn, leaves mixer levels be.
+[ ] implement key_out compensation.
+	the purpose of compensation is to make the keyed signal
+	match the sidetone when the transmitter clips or stretches
+	keying pulses. So key out compensation stretches or clips
+	the keying pulses by a specified time.
+[ ] reimplement ptt_enable
+[ ] solve the initialization bug
+	still mysterious, same nrpn values except for gaps,
+	but keyer still broken.
+[ ] make a key/ptt led indicator for the key/ptt output jack
 [ ] mixer set with left and right in same nrpn
 	127 does seem to be a reasonable level parameter
+* Todo list as of 2022-01-18
+[-] inject midi note states into pollatch
+	backed out
+[-] save midi note states in midi_note_on
+	don't see it
+[x] move latch variables into hasak structure
+[x] define KYRP_KEY_REMOTE to enable remote keying
+[x] reduce ADC_ENABLE to boolean
+[x] change to dB/10 for easier UI display
+[-] change to Hz/100 for precision tuning guitars ;)
+	can't do that, range would be 0 .. 163.84
+[x] add mixer output unmute bitmap nrpn, leaves mixer levels be.
 [x] reimplement compensation
 	put it back into the keyer timing
-[ ] implement key_out compensation.
-[ ] reimplement ptt_enable
 [x] put kyr_nrpn[] in a struct with kyr_msg[] and the eeprom headers
 	and the extended nrpns which have int32_t values so they can
 	hold the number of samples per element.  Then the eeprom can
@@ -63,8 +74,10 @@
 [x] mixers as AudioMixer4 mixer[6];
 	doesn't work, what don't I understand?
 	do it as pointers and it works
-[ ] expand VOX specific parameters to KYRP_<VOX>_<PARAM> definitions
+[-] expand VOX specific parameters to KYRP_<VOX>_<PARAM> definitions
+	too much information
 [-] rename KYR_ to KYRC_ if configurable
+	did some
 [x] slow down echo all NRPNS to not overflow MIDI channel
 [-] make virtual NRPNs for
 [x]	load defaults, 
@@ -80,19 +93,11 @@
 [-]	for storing a byte into kyr_msgs
 [-]	for reading a byte from kyr_msgs
 [x] annotate config.h for postprocessing into javascript
-[ ] solve the initialization bug
-	still mysterious, same nrpn values except for gaps,
-	but keyer still broken.
 [-] add named stored messages, with named interpolations,
 	saved to and restored from eeprom
 [-] plug a phone headset into a splitter and into microphone jack
 	and see if you read ExT_PTT
-[ ] make a key/ptt led indicator for the key/ptt output jack
 [-] write cwkeyer.js progressive web app controller
-[ ] find/make nice web components for pwa
-[ ] replace diagnostics with PWA functions.
-[ ] implement mouse wheel on spinner value change behavior
-[ ] implement drag mouse out of spinner value change behvior
 [x] move COMP into vox independent parameters
 [x] move PTT timing into vox independent parameters
 [x] move PAD config into vox independent parameters
