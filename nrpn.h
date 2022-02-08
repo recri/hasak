@@ -126,6 +126,7 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
 // echo the nrpn settings back to the control echo channel
 static void nrpn_echo(const int16_t nrpn, const int16_t value) {
   /* if (nrpn == 193) Serial.printf("nrpn_echo sets nrpn[193] to %d\n", value); */
+  /* if (nrpn == KYRP_ID_KEYER || nrpn == KYRP_ID_VERSION) Serial.printf("nrpn_echo sends nrpn[%d] as %d\n", nrpn, value); */
   midi_send_nrpn(nrpn, value);
 }  
 
@@ -293,6 +294,26 @@ static int nrpn_eeprom_length(void) {
   return EEPROM.length();
 }
 
+static int identifyCPU(void) {
+#if defined(TEENSY30)
+  return 30;
+#elif defined(TEENSY31)
+  return 31;
+#elif defined(TEENSY32)
+  return 32;
+#elif defined(TEENSY35)
+  return 35;
+#elif defined(TEENSY36)
+  return 36;
+#elif defined(TEENSY40)
+  return 40;
+#elif defined(TEENSY41)
+  return 41;
+#else
+  return 0;
+#endif
+}
+  
 /*
 ** set a NRPN value.
 ** all are copied into the hasak.nrpn[] array.
@@ -414,32 +435,18 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     hasak.index %= sizeof(hasak.msgs);
     break;
 
+    /* information only, but set the nrpn array */
+  case KYRP_ID_KEYER: hasak.nrpn[nrpn] = KYRC_IDENT; nrpn_echo(nrpn, KYRC_IDENT); break;
+  case KYRP_ID_VERSION: hasak.nrpn[nrpn] = KYRC_VERSION; nrpn_echo(nrpn, KYRC_VERSION); break;
+
     /* information only, cause no side effects */
-  case KYRP_ID_KEYER: nrpn_echo(nrpn, KYRC_IDENT); break;
-  case KYRP_ID_VERSION: nrpn_echo(nrpn, KYRC_VERSION); break;
   case KYRP_NRPN_SIZE: nrpn_echo(nrpn, sizeof(hasak.nrpn)); break;
   case KYRP_MSG_SIZE: nrpn_echo(nrpn, sizeof(hasak.msgs)); break;
   case KYRP_SAMPLE_RATE: nrpn_echo(nrpn, ((uint16_t)AUDIO_SAMPLE_RATE)/100); break;
   case KYRP_EEPROM_LENGTH: nrpn_echo(nrpn, nrpn_eeprom_length()); break;
-  case KYRP_ID_CPU:
-#if defined(TEENSY30)
-    nrpn_echo(nrpn, 30); break;
-#elif defined(TEENSY31)
-    nrpn_echo(nrpn, 31); break;
-#elif defined(TEENSY32)
-    nrpn_echo(nrpn, 32); break;
-#elif defined(TEENSY35)
-    nrpn_echo(nrpn, 35); break;
-#elif defined(TEENSY36)
-    nrpn_echo(nrpn, 36); break;
-#elif defined(TEENSY40)
-    nrpn_echo(nrpn, 40); break;
-#elif defined(TEENSY41)
-    nrpn_echo(nrpn, 41); break;
-#else
-    nrpn_echo(nrpn, 0); break;
-#endif
+  case KYRP_ID_CPU: nrpn_echo(nrpn, identifyCPU()); break;
   case KYRP_ID_CODEC: nrpn_echo(nrpn, codec_identify()); break;
+
   default: 
     if (nrpn >= KYRP_MORSE && nrpn < KYRP_MORSE+64) {
       hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value);
