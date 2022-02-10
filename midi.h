@@ -82,7 +82,7 @@ static void midi_setup(void) {
   usbMIDI.setHandleControlChange(midi_receive_nrpn);
 }
 
-static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrpn, int16_t channel, int16_t vox) {
+static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrpn, int16_t channel) {
   // if the pinvalue was high, then it went low, and is now active, so send velocity 1
   // if the pinvalue was low, then it went high, and is now off, so send velocity 0
   const int note = get_nrpn(note_nrpn);
@@ -92,7 +92,7 @@ static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrp
   if ( ! midi_valid_note(note)) return pinvalue ^ 1; 
   /* Serial.printf("midi_send_toggle(%d, %d, %d, %d) to note %d\n", pinvalue, note_nrpn, channel, vox, note); */
   kyr_send_note += 1;
-  usbMIDI.sendNoteOn(note, pinvalue ? KYRD_NOTE_ON : KYRD_NOTE_OFF, channel);
+  usbMIDI.sendNoteOn(note, pinvalue ? KYRD_NOTE_OFF : KYRD_NOTE_ON, channel);
   usbMIDI.send_now();		// send it now
   return pinvalue ^ 1;		// invert the pin
 }
@@ -100,12 +100,12 @@ static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrp
 static void midi_loop(void) {
   static uint8_t l_pad, r_pad, s_key, ptt_sw, key_out, ptt_out;
   int channel = get_nrpn(KYRP_CHAN_NOTE);
-  if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYRP_NOTE_L_PAD, channel, 0);
-  if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_NOTE_R_PAD, channel, 0);
-  if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_NOTE_S_KEY, channel, 0);
-  if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_NOTE_EXT_PTT, channel, 0);
-  if (hasak._key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_NOTE_KEY_OUT, channel, get_active_vox());
-  if (hasak._ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_NOTE_PTT_OUT, channel, get_active_vox());
+  if (digitalRead(KYR_L_PAD_PIN) != l_pad) l_pad = midi_send_toggle(l_pad, KYRP_NOTE_L_PAD, channel);
+  if (digitalRead(KYR_R_PAD_PIN) != r_pad) r_pad = midi_send_toggle(r_pad, KYRP_NOTE_R_PAD, channel);
+  if (digitalRead(KYR_S_KEY_PIN) != s_key) s_key = midi_send_toggle(s_key, KYRP_NOTE_S_KEY, channel);
+  if (digitalRead(KYR_EXT_PTT_PIN) != ptt_sw) ptt_sw = midi_send_toggle(ptt_sw, KYRP_NOTE_EXT_PTT, channel);
+  if (hasak._key_out != key_out) key_out = midi_send_toggle(key_out, KYRP_NOTE_KEY_OUT, channel);
+  if (hasak._ptt_out != ptt_out) ptt_out = midi_send_toggle(ptt_out, KYRP_NOTE_PTT_OUT, channel);
   while (usbMIDI.read());
 }
 

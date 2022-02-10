@@ -1,0 +1,8 @@
+a) bring the <submodule> repo to desired state
+b) cd ~/CWKeyer
+c) git pull --recurse-submodules
+d) cd ~/CWKeyer/<submodule-root-directory-fragment>
+e) git pull origin main
+f) cd ~/CWKeyer
+g) git commit <submodule-root-directory-fragment>
+h) git push origin main

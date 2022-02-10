@@ -215,7 +215,7 @@
 #define KYRD_NOTE_EXT_PTT	6      /* {type def title {note used to report raw external ptt switch}} */
 #define KYRD_NOTE_OFF		0	 /* {type def title {note off velocity}} */
 #define KYRD_NOTE_ON		127	 /* {type def title {note on velocity}} */
-#define KYRD_NOTE_ENABLE	0b111	 /* {type def title {default enabled notes, keyout,pttout,tune}} */
+#define KYRD_NOTE_ENABLE	0b101	 /* {type def title {default enabled notes, keyout,pttout,tune}} */
 
 /*
 ** midi control change usage.
