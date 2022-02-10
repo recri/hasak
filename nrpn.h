@@ -179,31 +179,39 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_PTT_ENABLE, 0);
   nrpn_set(KYRP_IQ_ENABLE, 0);
   nrpn_set(KYRP_IQ_ADJUST, 0);
+#if defined(KYRC_ENABLE_TX)
+  nrpn_set(KYRP_TX_ENABLE, 1);
+#else
   nrpn_set(KYRP_TX_ENABLE, 0);
+#endif
   nrpn_set(KYRP_ST_ENABLE, 1);
   nrpn_set(KYRP_IQ_BALANCE, 0);
   nrpn_set(KYRP_ST_PAN, 0);
-  nrpn_set(KYRP_DEBOUNCE, ms_to_samples(50));
-  nrpn_set(KYRP_REMOTE_KEY, 0);
+  nrpn_set(KYRP_DEBOUNCE, ms_to_samples(5));
+  nrpn_set(KYRP_REMOTE_KEY, 1);
   
-  nrpn_set(KYRP_CHAN_CC, KYRC_CHAN_CC);
-  nrpn_set(KYRP_CHAN_NOTE, KYRC_CHAN_NOTE);
+  nrpn_set(KYRP_CHAN_CC, KYRD_CHAN_CC);
+  nrpn_set(KYRP_CHAN_NOTE, KYRD_CHAN_NOTE);
+  nrpn_set(KYRP_CHAN_NRPN, KYRD_CHAN_NRPN);
 
-  nrpn_set(KYRP_NOTE_L_PAD, KYR_NOTE_L_PAD);
-  nrpn_set(KYRP_NOTE_R_PAD, KYR_NOTE_R_PAD);
-  nrpn_set(KYRP_NOTE_S_KEY, KYR_NOTE_S_KEY);
-  nrpn_set(KYRP_NOTE_EXT_PTT, KYR_NOTE_EXT_PTT);
-  nrpn_set(KYRP_NOTE_KEY_OUT, KYR_NOTE_KEY_OUT);
-  nrpn_set(KYRP_NOTE_PTT_OUT, KYR_NOTE_PTT_OUT);
+  nrpn_set(KYRP_NOTE_KEY_OUT, KYRD_NOTE_KEY_OUT);
+  nrpn_set(KYRP_NOTE_PTT_OUT, KYRD_NOTE_PTT_OUT);
+  nrpn_set(KYRP_NOTE_TUNE, KYRD_NOTE_TUNE);
+  nrpn_set(KYRP_NOTE_L_PAD, KYRD_NOTE_L_PAD);
+  nrpn_set(KYRP_NOTE_R_PAD, KYRD_NOTE_R_PAD);
+  nrpn_set(KYRP_NOTE_S_KEY, KYRD_NOTE_S_KEY);
+  nrpn_set(KYRP_NOTE_EXT_PTT, KYRD_NOTE_EXT_PTT);
+  nrpn_set(KYRP_NOTE_ENABLE, KYRD_NOTE_ENABLE);
 
   nrpn_set(KYRP_ADC_ENABLE, 1);
-  nrpn_set(KYRP_ADC0_CONTROL, KYRP_NOTHING);
-  nrpn_set(KYRP_ADC1_CONTROL, KYRP_VOLUME);
-  nrpn_set(KYRP_ADC2_CONTROL, KYRP_LEVEL);
-  nrpn_set(KYRP_ADC3_CONTROL, KYRP_TONE);
-  nrpn_set(KYRP_ADC4_CONTROL, KYRP_SPEED);
+  nrpn_set(KYRP_ADC0_CONTROL, KYRV_ADC_NOTHING);
+  nrpn_set(KYRP_ADC1_CONTROL, KYRV_ADC_VOLUME);
+  nrpn_set(KYRP_ADC2_CONTROL, KYRV_ADC_LEVEL);
+  nrpn_set(KYRP_ADC3_CONTROL, KYRV_ADC_TONE);
+  nrpn_set(KYRP_ADC4_CONTROL, KYRV_ADC_SPEED);
 
   /* morse code table */
+  /* change this to NOTSET, pull NOTSET values from morse[i-KYRP_MORSE] */
   for (int i = KYRP_MORSE; i < KYRP_MORSE+64; i += 1) 
     nrpn_set(i, morse[i-KYRP_MORSE]);
 
@@ -323,6 +331,7 @@ static int identifyCPU(void) {
 ** it pulls parameters as necessary.
 */
 static void nrpn_set(const int16_t nrpn, const int16_t value) {
+  /* Serial.printf("nprn_set(%d, %d)\n", nrpn, value); */
   switch (nrpn) {
   case KYRP_VOLUME:
   case KYRP_INPUT_SELECT:
@@ -358,12 +367,14 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
 
   case KYRP_CHAN_CC:
   case KYRP_CHAN_NOTE:
+  case KYRP_CHAN_NRPN:
   case KYRP_NOTE_L_PAD:
   case KYRP_NOTE_R_PAD:
   case KYRP_NOTE_S_KEY:
   case KYRP_NOTE_EXT_PTT:
   case KYRP_NOTE_KEY_OUT:
   case KYRP_NOTE_PTT_OUT:
+  case KYRP_NOTE_TUNE:
   case KYRP_ADC0_CONTROL:
   case KYRP_ADC1_CONTROL:
   case KYRP_ADC2_CONTROL:

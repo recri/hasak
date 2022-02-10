@@ -1,7 +1,7 @@
 /* -*- mode: c++; tab-width: 8 -*- */
 /*
  * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
- * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * Copyright (c) 2021,2022 by Roger Critchlow, Charlestown, MA, USA
  * ad5dz, rec@elf.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,6 +38,9 @@
 
 /* Magic number to identify valid eeprom contents */
 #define KYRC_MAGIC   0xad5d	/* {type def title {magic number to identify valid EEPROM contents}} */
+
+/* start hot */
+#define KYRC_ENABLE_TX	1	/* {type conf title {Should we start with TX_ENABLE true}} */
 
 /* potentiometer input */
 #define KYRC_ENABLE_POTS 1	/* {type conf title {Should we read potentiometers for volume, pitch, and speed}} */
@@ -193,21 +196,26 @@
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYRC_CHAN_CC		1	/* {type def title {default channel for keyer control change}} */
-#define KYRC_CHAN_NOTE		1	/* {type def title {default channel for keyer notes}} */
+#define KYRD_CHAN_CC		1	/* {type def title {default channel for keyer control change}} */
+#define KYRD_CHAN_NOTE		1	/* {type def title {default channel for keyer notes}} */
+#define KYRD_CHAN_NRPN		1	/* {type def title {default channel for NRPN control}} */
 
 /*
 ** midi note usage
-** by default we send notes for the following input keys
-** and transmit key events.
+** these are the internal note numbers for the events
+** these can be changed to any note numbers with KYRP_NOTE_*
+** any set of these can be enabled for MIDI transmission with KYRP_NOTE_ENABLE
 */
-#define KYR_NOTE_L_PAD		0      /* {type def title {note used to report raw left paddle switch}} */
-#define KYR_NOTE_R_PAD		1      /* {type def title {note used to report raw right paddle switch}} */
-#define KYR_NOTE_S_KEY		2      /* {type def title {note used to report raw straight key switch}} */
-#define KYR_NOTE_EXT_PTT	3      /* {type def title {note used to report raw external ptt switch}} */
-#define KYR_NOTE_KEY_OUT	4      /* {type def title {note used to send transmitted key out signal}} */
-#define KYR_NOTE_PTT_OUT	5      /* {type def title {note used to send transmitted ptt out signal}} */
-#define KYR_NOTE_TUNE		6      /* {type def title {note used to key the tune channel}} */
+#define KYRD_NOTE_KEY_OUT	0      /* {type def title {note used to send transmitted key out signal}} */
+#define KYRD_NOTE_PTT_OUT	1      /* {type def title {note used to send transmitted ptt out signal}} */
+#define KYRD_NOTE_TUNE		2      /* {type def title {note used to key the tune channel}} */
+#define KYRD_NOTE_L_PAD		3      /* {type def title {note used to report raw left paddle switch}} */
+#define KYRD_NOTE_R_PAD		4      /* {type def title {note used to report raw right paddle switch}} */
+#define KYRD_NOTE_S_KEY		5      /* {type def title {note used to report raw straight key switch}} */
+#define KYRD_NOTE_EXT_PTT	6      /* {type def title {note used to report raw external ptt switch}} */
+#define KYRD_NOTE_OFF		0	 /* {type def title {note off velocity}} */
+#define KYRD_NOTE_ON		127	 /* {type def title {note on velocity}} */
+#define KYRD_NOTE_ENABLE	0b111	 /* {type def title {default enabled notes, keyout,pttout,tune}} */
 
 /*
 ** midi control change usage.
@@ -322,22 +330,30 @@
 
 #define KYRP_CHAN		(KYRP_PAD+6) /* {type rel title {base of midi channels}} */
 
-#define KYRP_CHAN_CC		(KYRP_CHAN+0) /* {type par title {midi channel for sending controls} unit {} range {0 16} property channelCC} */
-#define KYRP_CHAN_NOTE		(KYRP_CHAN+1) /* {type par title {midi channel for sending input notes} unit {} range {0 16} property channelNote} */
+#define KYRP_CHAN_CC		(KYRP_CHAN+0) /* {type par title {midi channel for simple controls} unit {} range {0 16} property channelCC} */
+#define KYRP_CHAN_NOTE		(KYRP_CHAN+1) /* {type par title {midi channel for notes} unit {} range {0 16} property channelNote} */
+#define KYRP_CHAN_NRPN		(KYRP_CHAN+2) /* {type par title {midi channel for NRPN format controls} unit {} range {0 16} property channelNrpn} */
 #define KYRV_CHAN_INVALID	0	       /* {type val title {invalid channel, used to disable midi channel}} */
 
-#define KYRP_NOTE		(KYRP_CHAN+2) /* {type rel title {base of midi notes}} */
+#define KYRP_NOTE		(KYRP_CHAN+3) /* {type rel title {base of midi notes}} */
 
-#define KYRP_NOTE_L_PAD		(KYRP_NOTE+0) /* {type par title {note for left paddle switch input} unit {} range {0 128}  property noteLeftPaddle} */
-#define KYRP_NOTE_R_PAD		(KYRP_NOTE+1) /* {type par title {note for right paddle switch input} unit {} range {0 128} property noteRightPaddle} */
-#define KYRP_NOTE_S_KEY		(KYRP_NOTE+2) /* {type par title {note for straight key switch input} unit {} range {0 128} property noteStraightKey} */
-#define KYRP_NOTE_EXT_PTT	(KYRP_NOTE+3) /* {type par title {note for external ptt switch input} unit {} range {0 128} property noteExternalPTT} */
-#define KYRP_NOTE_KEY_OUT	(KYRP_NOTE+4) /* {type par title {note for key/ptt key output} unit {} range {0 128} property noteKeyOut} */
-#define KYRP_NOTE_PTT_OUT	(KYRP_NOTE+5) /* {type par title {note for key/ptt ptt output} unit {} range {0 128} property notePTTOut} */
-#define KYRP_NOTE_TUNE		(KYRP_NOTE+6) /* {type par title {note to key tune signal} unit {} range {0 128} property noteTune} */
-#define KYRV_NOTE_INVALID	128	       /* {type val title {invalid note, used to disable midi events}} */
+#define KYRP_NOTE_KEY_OUT	(KYRP_NOTE+0) /* {type par title {note for key output signal} unit {} range {0 128} property noteKeyOut} */
+#define KYRP_NOTE_PTT_OUT	(KYRP_NOTE+1) /* {type par title {note for ptt output signal} unit {} range {0 128} property notePTTOut} */
+#define KYRP_NOTE_TUNE		(KYRP_NOTE+2) /* {type par title {note to key tune signal input} unit {} range {0 128} property noteTune} */
+#define KYRP_NOTE_L_PAD		(KYRP_NOTE+3) /* {type par title {note for left paddle switch} unit {} range {0 128}  property noteLeftPaddle} */
+#define KYRP_NOTE_R_PAD		(KYRP_NOTE+4) /* {type par title {note for right paddle switch} unit {} range {0 128} property noteRightPaddle} */
+#define KYRP_NOTE_S_KEY		(KYRP_NOTE+5) /* {type par title {note for straight key switch} unit {} range {0 128} property noteStraightKey} */
+#define KYRP_NOTE_EXT_PTT	(KYRP_NOTE+6) /* {type par title {note for external ptt switch} unit {} range {0 128} property noteExternalPTT} */
+#define KYRP_NOTE_ENABLE	(KYRP_NOTE+7)  /* {type par title {bit mask which enables notes to be sent over usbMIDI} values KYRV_NOTE_* property noteEnable valuesProperty noteEnables} */
+#define KYRV_NOTE_KEY_OUT	(0) /* {type val label KeyOut title {note for key/ptt key output} property noteEnables} */
+#define KYRV_NOTE_PTT_OUT	(1) /* {type val label PttOut title {note for key/ptt ptt output} property noteEnables} */
+#define KYRV_NOTE_TUNE		(2) /* {type val label Tune title {note to key tune signal} property noteEnables} */
+#define KYRV_NOTE_L_PAD		(3) /* {type val label LPad title {note for left paddle switch input} property noteEnables} */
+#define KYRV_NOTE_R_PAD		(4) /* {type val label RPad title {note for right paddle switch input} property noteEnables} */
+#define KYRV_NOTE_S_KEY		(5) /* {type val label SKey title {note for straight key switch input} property noteEnables} */
+#define KYRV_NOTE_EXT_PTT	(6) /* {type val label ExtPtt title {note for external ptt switch input} property noteEnables} */
 
-#define KYRP_PINS		(KYRP_NOTE+7) /* {type rel title {base of hardware pin assignments}} */
+#define KYRP_PINS		(KYRP_NOTE+8) /* {type rel title {base of hardware pin assignments}} */
 
 #define KYRP_ADC0_CONTROL	(KYRP_PINS+0) /* {type par title {property for adc0 = A0} unit {} values KYRV_ADC_* property adc0Control valuesProperty adcControls} */
 #define KYRP_ADC1_CONTROL	(KYRP_PINS+1) /* {type par title {property for adc1 = A1 (master volume on the CWKeyer)} unit {} values KYRV_ADC_* property adc1Control valuesProperty adcControls} */
@@ -416,9 +432,9 @@
 /* definitions of ADC targets, these had undefined symbols when placed immediately after KYRP_ADC* */
 #define KYRV_ADC_NOTHING	(KYRP_NOTHING) /* {type val label None title {pot controls nothing} value-of KYRP_ADC*_CONTROL property adcControls} */
 #define KYRV_ADC_VOLUME		(KYRP_VOLUME) /* {type val label Volume title {pot controls master volume} value-of KYRP_ADC*_CONTROL property adcControls} */
-#define KYRV_ADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_ADC*_CONTROL property adcControls} */
 #define KYRV_ADC_LEVEL		(KYRP_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of KYRP_ADC*_CONTROL property adcControls} */
 #define KYRV_ADC_TONE		(KYRP_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of KYRP_ADC*_CONTROL property adcControls} */
+#define KYRV_ADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_ADC*_CONTROL property adcControls} */
 
 #define KYRP_LAST		(KYRP_VOX_BUT+KYRP_VOX_OFFSET) /* {type rel title {one past end of stored keyer parameters}} */
 

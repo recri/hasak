@@ -1,10 +1,19 @@
 * Todo list as of 2020-02-07
+[ ] move nrpn.tcl to scripts directory
+[ ] separate NRPN, Control Change, and Notes channels
+	receive on any, but only send on designated
+	channel.
+[x] reorder the built in notes so key out, ptt out, and tune 
+	come first
+[x] default TX_ENABLE true
+[x] enable notes bitmap
 [ ] make ADC?_INVERT a settable parameter
 [ ] change extPTT to options { none, ptt-rto, ttt-tto }
 	needs title on select option element
-[ ] write an audio library component to inject MIDI note states
+[-] write an audio library component to inject MIDI note states
 	into the sample stream to implement programmatic control
 	of LPAD, RPAD, SKEY, TUNE, BUTTON, KEYOUT, and PTTOUT.
+	no, don't do that.
 [ ] add extension interface for using hasak as a framework for other
 	keyer implementations.  Keep Chuck Broadwell W5UXH
 	chuck.broadwell@gmail.com informed.
