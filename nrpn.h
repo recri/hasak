@@ -382,6 +382,7 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
   case KYRP_ADC4_CONTROL:
   case KYRP_ADC_ENABLE:
   case KYRP_REMOTE_KEY:
+  case KYRP_NOTE_ENABLE:
     hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break;
     
   case KYRP_OUT_ENABLE:

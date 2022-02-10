@@ -1,5 +1,6 @@
 * Todo list as of 2020-02-07
-[ ] move nrpn.tcl to scripts directory
+[x] KYRP_NOTE_ENABLE wasn't handled in nrpn_set(), reworked midi_send_toggle
+[x] move nrpn.tcl to scripts directory
 [ ] separate NRPN, Control Change, and Notes channels
 	receive on any, but only send on designated
 	channel.

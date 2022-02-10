@@ -85,16 +85,15 @@ static void midi_setup(void) {
 static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrpn, int16_t channel, int16_t vox) {
   // if the pinvalue was high, then it went low, and is now active, so send velocity 1
   // if the pinvalue was low, then it went high, and is now off, so send velocity 0
+  const int note = get_nrpn(note_nrpn);
 
-  if (midi_valid_channel(channel) &&
-      get_nrpn(KYRP_NOTE_ENABLE)&(1<<(note_nrpn-KYRP_NOTE))) {
-    const int note = get_nrpn(note_nrpn);
-    if ( midi_valid_note(note)) {
-      kyr_send_note += 1;
-      usbMIDI.sendNoteOn(note, pinvalue ? KYRD_NOTE_ON : KYRD_NOTE_OFF, channel);
-      usbMIDI.send_now();		// send it now
-    }
-  }
+  if ( ! midi_valid_channel(channel)) return pinvalue ^ 1;
+  if ( ! (get_nrpn(KYRP_NOTE_ENABLE)&(1<<(note_nrpn-KYRP_NOTE)))) return pinvalue ^ 1; 
+  if ( ! midi_valid_note(note)) return pinvalue ^ 1; 
+  /* Serial.printf("midi_send_toggle(%d, %d, %d, %d) to note %d\n", pinvalue, note_nrpn, channel, vox, note); */
+  kyr_send_note += 1;
+  usbMIDI.sendNoteOn(note, pinvalue ? KYRD_NOTE_ON : KYRD_NOTE_OFF, channel);
+  usbMIDI.send_now();		// send it now
   return pinvalue ^ 1;		// invert the pin
 }
 
