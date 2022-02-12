@@ -1,4 +1,6 @@
 * Todo list as of 2020-02-07
+[x] set PTT_HANG_TIME to 0
+[x] generate JSON format of config.h
 [x] correct inverted note sense, no pttout by default.
 [x] KYRP_NOTE_ENABLE wasn't handled in nrpn_set(), reworked midi_send_toggle
 [x] move nrpn.tcl to scripts directory

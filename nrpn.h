@@ -227,7 +227,7 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_FALL_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_HEAD_TIME, ms_to_samples(0));	// 0 ms
   nrpn_set(KYRP_TAIL_TIME, ms_to_samples(0));	// 0 ms
-  nrpn_set(KYRP_HANG_TIME, 8);	/* 8 dits */
+  nrpn_set(KYRP_HANG_TIME, 0);	/* 0 dits */
   nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
   nrpn_set(KYRP_PAD_SWAP, 0);
   nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
