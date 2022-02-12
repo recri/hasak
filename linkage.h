@@ -39,6 +39,8 @@ typedef struct {
   int32_t xnrpn[KYRP_XLAST-KYRP_XFIRST];
   /* index for reading and writing message bytes */
   uint16_t index;
+  /* note latches */
+  uint8_t notes[KYRC_NNOTE];
   /* output latches */
   uint8_t _key_out, _ptt_out;
   uint8_t _up_out, _down_out;

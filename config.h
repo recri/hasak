@@ -213,9 +213,11 @@
 #define KYRD_NOTE_R_PAD		4      /* {type def title {note used to report raw right paddle switch}} */
 #define KYRD_NOTE_S_KEY		5      /* {type def title {note used to report raw straight key switch}} */
 #define KYRD_NOTE_EXT_PTT	6      /* {type def title {note used to report raw external ptt switch}} */
-#define KYRD_NOTE_OFF		0	 /* {type def title {note off velocity}} */
-#define KYRD_NOTE_ON		127	 /* {type def title {note on velocity}} */
+#define KYRD_NOTE_EXT_OFF	0	 /* {type def title {external note off velocity}} */
+#define KYRD_NOTE_EXT_ON	127	 /* {type def title {external note on velocity}} */
 #define KYRD_NOTE_ENABLE	0b101	 /* {type def title {default enabled notes, keyout,pttout,tune}} */
+
+#define KYRC_NNOTE		32 /* {type def title {number of note states maintained in the keyer}} */
 
 /*
 ** midi control change usage.
@@ -290,7 +292,7 @@
 
 #define KYRP_COMM		(KYRP_SOFT+14) /* {type rel title {keyer parameters shared across voices}} */
 
-#define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label Deb title {debounce period} range {0 16383} unit sample property debouncePeriod} */
+#define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label Deb title {debounce period} range {0 16383} unit µs property debouncePeriod} */
 
 #define KYRP_PTT		(KYRP_COMM+1) /* {type rel title {PTT timing parameters}} */
 

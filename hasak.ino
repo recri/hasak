@@ -276,16 +276,16 @@ static void winkey_setup(void);
 static void winkey_loop(void);
 static void input_setup(void);
 static void input_loop(void);
+static void inpin_setup(void);
+static void inpin_loop(void);
+static void note_setup(void);
+static void note_loop(void);
 static void diagnostics_setup(void);
 static void diagnostics_loop(void);
 
 void setup(void) {
   Serial.begin(115200);
 
-  pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
-  pinMode(KYR_R_PAD_PIN, INPUT_PULLUP);
-  pinMode(KYR_S_KEY_PIN, INPUT_PULLUP);
-  pinMode(KYR_EXT_PTT_PIN, INPUT_PULLUP);
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
 
@@ -308,6 +308,8 @@ void setup(void) {
   midi_setup();
   winkey_setup();
   input_setup();
+  inpin_setup();
+  note_setup();
   diagnostics_setup();
 }
 
@@ -317,8 +319,10 @@ void loop(void) {
     tune.amplitude(hasak._tune_note_on ? 1.0 : 0);
   timing_loop();
   midi_loop();
-  winkey_loop();
+  inpin_loop();
   input_loop();
+  note_loop();
+  winkey_loop();
   nrpn_loop();
   diagnostics_loop();
 }
@@ -334,7 +338,9 @@ static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 #include "nrpn.h"
 #include "codec.h"
 #include "midi.h"
+#include "note.h"
 #include "input.h"
+#include "inpin.h"
 #include "winkey.h"
 #include "diagnostics.h"
 

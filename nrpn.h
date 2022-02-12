@@ -187,7 +187,7 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_ENABLE, 1);
   nrpn_set(KYRP_IQ_BALANCE, 0);
   nrpn_set(KYRP_ST_PAN, 0);
-  nrpn_set(KYRP_DEBOUNCE, ms_to_samples(5));
+  nrpn_set(KYRP_DEBOUNCE, 5000);
   nrpn_set(KYRP_REMOTE_KEY, 1);
   
   nrpn_set(KYRP_CHAN_CC, KYRD_CHAN_CC);
