@@ -213,15 +213,16 @@
 #define KYR_NOTE_R_PAD		4      /* {type def title {note for raw right paddle switch}} */
 #define KYR_NOTE_S_KEY		5      /* {type def title {note for raw straight key switch}} */
 #define KYR_NOTE_EXT_PTT	6      /* {type def title {note for raw external ptt switch}} */
-#define KYR_NOTE_TUNE_ST	7      /* {type def title {note for tune keyed sidetone}} */
-#define KYR_NOTE_S_KEY_ST	8      /* {type def title {note for straight keyed sidetone}} */
-#define KYR_NOTE_PAD_ST		9      /* {type def title {note for paddle keyed sidetone}} */
-#define KYR_NOTE_WINK_ST	10     /* {type def title {note for winkey keyed sidetone}} */
-#define KYR_NOTE_KEYER_ST	11     /* {type def title {note for keyer keyed sidetone}} */
-#define KYR_NOTE_BUT_ST		12     /* {type def title {note for button keyed sidetone}} */
-#define KYR_NOTE_KEY_ST		13     /* {type def title {note for actual keyed sidetone}} */
-#define KYR_NOTE_KEY_TX		14     /* {type def title {note for actual keyed transmitter}} */
-#define KYR_NOTE_PTT_TX		15     /* {type def title {note for actual keyed transmitter ptt}} */
+#define KYR_NOTE_BUT		7      /* {type def title {note for raw button key}} */
+#define KYR_NOTE_TUNE_ST	8      /* {type def title {note for tune keyed sidetone}} */
+#define KYR_NOTE_S_KEY_ST	9      /* {type def title {note for straight keyed sidetone}} */
+#define KYR_NOTE_PAD_ST		10      /* {type def title {note for paddle keyed sidetone}} */
+#define KYR_NOTE_WINK_ST	11     /* {type def title {note for winkey keyed sidetone}} */
+#define KYR_NOTE_KEYER_ST	12     /* {type def title {note for keyer keyed sidetone}} */
+#define KYR_NOTE_BUT_ST		13     /* {type def title {note for button keyed sidetone}} */
+#define KYR_NOTE_KEY_ST		14     /* {type def title {note for actual keyed sidetone}} */
+#define KYR_NOTE_KEY_TX		15     /* {type def title {note for actual keyed transmitter}} */
+#define KYR_NOTE_PTT_TX		16     /* {type def title {note for actual keyed transmitter ptt}} */
 
 #define KYR_NOTE_EXT_OFF	0	 /* {type def title {external note off velocity}} */
 #define KYR_NOTE_EXT_ON		127	 /* {type def title {external note on velocity}} */

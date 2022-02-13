@@ -40,5 +40,6 @@ static void keyer_loop(void) {
   const int key = keyer_paddle.clock(hasak.notes[KYR_NOTE_L_PAD], hasak.notes[KYR_NOTE_R_PAD], keyer_timer);
   keyer_timer = 0;
   if (key != hasak.notes[KYR_NOTE_PAD_ST]) note_toggle(KYR_NOTE_PAD_ST);
+  if (hasak.notes[KYR_NOTE_BUT] != hasak.notes[KYR_NOTE_BUT_ST]) note_toggle(KYR_NOTE_BUT_ST);
 }
 
