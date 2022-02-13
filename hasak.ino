@@ -284,6 +284,8 @@ static void keyer_setup(void);
 static void keyer_loop(void);
 static void arbiter2_setup(void);
 static void arbiter2_loop(void);
+static void ptt_timing_setup(void);
+static void ptt_timing_loop(void);
 static void diagnostics_setup(void);
 static void diagnostics_loop(void);
 
@@ -316,6 +318,7 @@ void setup(void) {
   note_setup();
   keyer_setup();
   arbiter2_setup();
+  ptt_timing_setup();
   diagnostics_setup();
 }
 
@@ -330,6 +333,7 @@ void loop(void) {
   note_loop();
   keyer_loop();
   arbiter2_loop();
+  ptt_timing_loop();
   winkey_loop();
   nrpn_loop();
   diagnostics_loop();
@@ -349,6 +353,7 @@ static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 #include "note.h"
 #include "keyer.h"
 #include "arbiter2.h"
+#include "ptt_timing.h"
 #include "input.h"
 #include "inpin.h"
 #include "winkey.h"
