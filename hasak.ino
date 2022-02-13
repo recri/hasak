@@ -63,11 +63,11 @@ AudioInputByte		s_key;	// straight key in
 AudioInputByte		l_pad;	// left paddle in
 AudioInputByte		r_pad;	// right paddle in
 AudioInputByte		ptt_sw;	// ptt switch
-AudioInputText		wink(KYR_VOX_WINK);	// winkey text in
-AudioInputText		kyr(KYR_VOX_KYR);	// kyr text in for op
+AudioInputText		wink(KYRF_WINK);	// winkey text in
+AudioInputText		kyr(KYRF_KYR);	// kyr text in for op
 
 // paddle keyer logic
-AudioEffectPaddle	paddle(KYR_VOX_PAD);	// 
+AudioEffectPaddle	paddle(KYRF_PAD);	// 
 AudioConnection         patchCord1a(l_pad, 0, paddle, 0);
 AudioConnection         patchCord1b(r_pad, 0, paddle, 1);
 
@@ -87,14 +87,14 @@ AudioConnection		patchCord2d(kyr, 0, arbiter, 4);
 AudioConnection		patchCord2e(button, 0, arbiter, 5);
 
 static void arbiter_setup(void) {
-  // define the voices the arbiter sees on input channels
+  // define the fists the arbiter sees on input channels
   // changing to let their identity be their priority
-  arbiter.define_vox(0, KYR_VOX_TUNE, KYR_VOX_TUNE, 0);
-  arbiter.define_vox(1, KYR_VOX_S_KEY, KYR_VOX_S_KEY, 0);
-  arbiter.define_vox(2, KYR_VOX_PAD, KYR_VOX_PAD, 0);
-  arbiter.define_vox(3, KYR_VOX_WINK, KYR_VOX_WINK, 0);
-  arbiter.define_vox(4, KYR_VOX_KYR, KYR_VOX_KYR, 1);
-  arbiter.define_vox(5, KYR_VOX_BUT, KYR_VOX_BUT, 1);
+  arbiter.define_vox(0, KYRF_TUNE, KYRF_TUNE, 0);
+  arbiter.define_vox(1, KYRF_S_KEY, KYRF_S_KEY, 0);
+  arbiter.define_vox(2, KYRF_PAD, KYRF_PAD, 0);
+  arbiter.define_vox(3, KYRF_WINK, KYRF_WINK, 0);
+  arbiter.define_vox(4, KYRF_KYR, KYRF_KYR, 1);
+  arbiter.define_vox(5, KYRF_BUT, KYRF_BUT, 1);
 }
 
 int16_t get_active_vox(void) { return arbiter.get_active_vox(); }

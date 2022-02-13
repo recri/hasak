@@ -176,21 +176,22 @@
 #define KYR_SPEED_POT	22	/* {type pin title {keyer speed pot input pin} analog A8} */
 
 /*
-** keyer voices
-** A keyer vox is a key or paddle or text input that can produce
+** keyer fists
+** A keyer fist is a key or paddle or text input that can produce
 ** a sidetone and a transmit output.
-** Six default voices.
-** Voices can have priority, lowest wins, and can be local, never transmitted,
+** Six default fists.
+** Fists can have priority, lowest wins, and can be local, never transmitted,
 ** and can have their own keyer properties.
+** Fist identifiers are named with the KYRF_ prefix
 */
-#define KYR_N_VOX 6		/* {type def title {number of keyer voices}} */
-#define KYR_VOX_NONE	0	/* {type def title {no active voice, default parameters for other voices}} */
-#define KYR_VOX_TUNE	1	/* {type def title {tune switch}} */
-#define KYR_VOX_S_KEY	2	/* {type def title {Straight Key}} */
-#define KYR_VOX_PAD	3	/* {type def title {Paddle}} */
-#define KYR_VOX_WINK	4	/* {type def title {Winkey Key}} */
-#define KYR_VOX_KYR	5	/* {type def title {Kyr Key}} */
-#define KYR_VOX_BUT	6	/* {type def title {headset button straight key}} */
+#define KYR_N_FIST 6		/* {type def title {number of keyer fists}} */
+#define KYRF_NONE	0	/* {type def title {no active fist, default parameters for other fist}} */
+#define KYRF_TUNE	1	/* {type def title {tune switch}} */
+#define KYRF_S_KEY	2	/* {type def title {Straight Key}} */
+#define KYRF_PAD	3	/* {type def title {Paddle}} */
+#define KYRF_WINK	4	/* {type def title {Winkey Key}} */
+#define KYRF_KYR	5	/* {type def title {Kyr Key}} */
+#define KYRF_BUT	6	/* {type def title {headset button straight key}} */
 
 /* 
 ** MIDI usage
@@ -260,7 +261,7 @@
 ** KYRP_MORSE - the 64 character morse code table
 ** KYRP_MIXER - the 24 output mixer levels
 ** KYRP_KEYER - the default keyer parameters
-** KYRP_VOX_* - the voice specific keyer parameters
+** KYRP_FIST_* - the fist specific keyer parameters
 */
 #define KYRV_NOT_SET -1		/* {type val title {16 bit not set value}} */
 #define KYRV_MASK    0x3fff	/* {type val title {14 bit mask}} */
@@ -301,7 +302,7 @@
 #define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type par label OutMix title {output mixer enable bits} range {0 4095} property outputEnable} */
 #define KYRP_REMOTE_KEY		(KYRP_SOFT+13) /* {type par label Remote title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
 
-#define KYRP_COMM		(KYRP_SOFT+14) /* {type rel title {keyer parameters shared across voices}} */
+#define KYRP_COMM		(KYRP_SOFT+14) /* {type rel title {keyer parameters shared across fists}} */
 
 #define KYRP_DEBOUNCE		(KYRP_COMM+0) /* {type par label Deb title {debounce period} range {0 16383} unit µs property debouncePeriod} */
 
@@ -432,15 +433,15 @@
 
 #define KYRP_KEYER_LAST		(KYRP_KEYER+8) /* {type rel title {end of keyer block}} */
 
-/* seven repetitions of the keyer block for per voice customizations */
-#define KYRP_VOX_OFFSET		(KYRP_KEYER_LAST-KYRP_KEYER) /* {type rel title {size of keyer parameter block}} */
-#define KYRP_VOX_NONE		(KYRP_KEYER+KYR_VOX_NONE*KYRP_VOX_OFFSET) /* {type rel title {base of default keyer parameters}} */
-#define KYRP_VOX_TUNE		(KYRP_KEYER+KYR_VOX_TUNE*KYRP_VOX_OFFSET) /* {type rel title {base of tune keyer parameters}} */
-#define KYRP_VOX_S_KEY		(KYRP_KEYER+KYR_VOX_S_KEY*KYRP_VOX_OFFSET) /* {type rel title {base of straight key parameters}} */
-#define KYRP_VOX_PAD		(KYRP_KEYER+KYR_VOX_PAD*KYRP_VOX_OFFSET) /* {type rel title {base of paddle keyer parameters}} */
-#define KYRP_VOX_WINK		(KYRP_KEYER+KYR_VOX_WINK*KYRP_VOX_OFFSET) /* {type rel title {base of text from winkey parameters}} */
-#define KYRP_VOX_KYR		(KYRP_KEYER+KYR_VOX_KYR*KYRP_VOX_OFFSET) /* {type rel title {base of text from hasak parameters}} */
-#define KYRP_VOX_BUT		(KYRP_KEYER+KYR_VOX_BUT*KYRP_VOX_OFFSET) /* {type rel title {base of headset button keyer parameters}} */
+/* seven repetitions of the keyer block for per fist customizations */
+#define KYRP_FIST_OFFSET	(KYRP_KEYER_LAST-KYRP_KEYER) /* {type rel title {size of keyer parameter block}} */
+#define KYRP_FIST_NONE		(KYRP_KEYER+KYRF_NONE*KYRP_FIST_OFFSET) /* {type rel title {base of default keyer parameters}} */
+#define KYRP_FIST_TUNE		(KYRP_KEYER+KYRF_TUNE*KYRP_FIST_OFFSET) /* {type rel title {base of tune keyer parameters}} */
+#define KYRP_FIST_S_KEY		(KYRP_KEYER+KYRF_S_KEY*KYRP_FIST_OFFSET) /* {type rel title {base of straight key parameters}} */
+#define KYRP_FIST_PAD		(KYRP_KEYER+KYRF_PAD*KYRP_FIST_OFFSET) /* {type rel title {base of paddle keyer parameters}} */
+#define KYRP_FIST_WINK		(KYRP_KEYER+KYRF_WINK*KYRP_FIST_OFFSET) /* {type rel title {base of text from winkey parameters}} */
+#define KYRP_FIST_KYR		(KYRP_KEYER+KYRF_KYR*KYRP_FIST_OFFSET) /* {type rel title {base of text from hasak parameters}} */
+#define KYRP_FIST_BUT		(KYRP_KEYER+KYRF_BUT*KYRP_FIST_OFFSET) /* {type rel title {base of headset button keyer parameters}} */
 
 /* definitions of ADC targets, these had undefined symbols when placed immediately after KYRP_ADC* */
 #define KYRV_ADC_NOTHING	(KYRP_NOTHING) /* {type val label None title {pot controls nothing} value-of KYRP_ADC*_CONTROL property adcControls} */
@@ -449,7 +450,7 @@
 #define KYRV_ADC_TONE		(KYRP_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of KYRP_ADC*_CONTROL property adcControls} */
 #define KYRV_ADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_ADC*_CONTROL property adcControls} */
 
-#define KYRP_LAST		(KYRP_VOX_BUT+KYRP_VOX_OFFSET) /* {type rel title {one past end of stored keyer parameters}} */
+#define KYRP_LAST		(KYRP_FIST_BUT+KYRP_FIST_OFFSET) /* {type rel title {one past end of stored keyer parameters}} */
 
 #define KYRP_XFIRST		(1000) /* {type rel title {base of extended nrpn block}} */
 
@@ -463,16 +464,16 @@
 
 #define KYRP_XKEYER_LAST	(KYRP_XKEYER+5) /* {type rel title {one past end of extended keyer block}} */
 
-#define KYRP_XVOX_OFFSET	(KYRP_XKEYER_LAST-KYRP_XKEYER) /* {type rel title {size of extended keyer parameter block}} */
-#define KYRP_XVOX_NONE		(KYRP_XKEYER+KYR_VOX_NONE*KYRP_XVOX_OFFSET) /* {type rel title {base of default keyer parameters}} */
-#define KYRP_XVOX_TUNE		(KYRP_XKEYER+KYR_VOX_TUNE*KYRP_XVOX_OFFSET) /* {type rel title {base of tune keyer parameters}} */
-#define KYRP_XVOX_S_KEY		(KYRP_XKEYER+KYR_VOX_S_KEY*KYRP_XVOX_OFFSET) /* {type rel title {base of straight key parameters}} */
-#define KYRP_XVOX_PAD		(KYRP_XKEYER+KYR_VOX_PAD*KYRP_XVOX_OFFSET) /* {type rel title {base of paddle keyer parameters}} */
-#define KYRP_XVOX_WINK		(KYRP_XKEYER+KYR_VOX_WINK*KYRP_XVOX_OFFSET) /* {type rel title {base of text from winkey parameters}} */
-#define KYRP_XVOX_KYR		(KYRP_XKEYER+KYR_VOX_KYR*KYRP_XVOX_OFFSET) /* {type rel title {base of text from hasak parameters}} */
-#define KYRP_XVOX_BUT		(KYRP_XKEYER+KYR_VOX_BUT*KYRP_XVOX_OFFSET) /* {type rel title {base of headset button keyer parameters}} */
+#define KYRP_XFIST_OFFSET	(KYRP_XKEYER_LAST-KYRP_XKEYER) /* {type rel title {size of extended keyer parameter block}} */
+#define KYRP_XFIST_NONE		(KYRP_XKEYER+KYRF_NONE*KYRP_XFIST_OFFSET) /* {type rel title {base of default keyer parameters}} */
+#define KYRP_XFIST_TUNE		(KYRP_XKEYER+KYRF_TUNE*KYRP_XFIST_OFFSET) /* {type rel title {base of tune keyer parameters}} */
+#define KYRP_XFIST_S_KEY		(KYRP_XKEYER+KYRF_S_KEY*KYRP_XFIST_OFFSET) /* {type rel title {base of straight key parameters}} */
+#define KYRP_XFIST_PAD		(KYRP_XKEYER+KYRF_PAD*KYRP_XFIST_OFFSET) /* {type rel title {base of paddle keyer parameters}} */
+#define KYRP_XFIST_WINK		(KYRP_XKEYER+KYRF_WINK*KYRP_XFIST_OFFSET) /* {type rel title {base of text from winkey parameters}} */
+#define KYRP_XFIST_KYR		(KYRP_XKEYER+KYRF_KYR*KYRP_XFIST_OFFSET) /* {type rel title {base of text from hasak parameters}} */
+#define KYRP_XFIST_BUT		(KYRP_XKEYER+KYRF_BUT*KYRP_XFIST_OFFSET) /* {type rel title {base of headset button keyer parameters}} */
 
-#define KYRP_XLAST		(KYRP_XVOX_BUT+KYRP_XVOX_OFFSET) /* {type rel title {end+1 of extended keyer block}} */
+#define KYRP_XLAST		(KYRP_XFIST_BUT+KYRP_XFIST_OFFSET) /* {type rel title {end+1 of extended keyer block}} */
 
 #define KYRP_EXEC		(2000) /* {type rel title {base of command nrpns}} */
 

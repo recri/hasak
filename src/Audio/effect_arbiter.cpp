@@ -34,12 +34,12 @@
 */
 void AudioEffectArbiter::update(void)
 {
-  audio_block_t *block[KYR_N_VOX];
+  audio_block_t *block[KYR_N_FIST];
   int16_t i, n_active = 0, ibest = -1, send = 0, change_over = 0;
 
   /* scan incoming streams for activity */
   /* find highest priority stream among those */
-  for (i = 0; i < KYR_N_VOX; i += 1) {
+  for (i = 0; i < KYR_N_FIST; i += 1) {
     block[i] = receiveReadOnly(i);
     if (run_length(block[i]) != -AUDIO_BLOCK_SAMPLES) {
       n_active += 1;	// active if keyed
@@ -175,6 +175,6 @@ void AudioEffectArbiter::update(void)
     if (pttout) release(pttout);
   }
 
-  for (i = 0; i < KYR_N_VOX; i += 1) 
+  for (i = 0; i < KYR_N_FIST; i += 1) 
     if (block[i]) release(block[i]);
 }

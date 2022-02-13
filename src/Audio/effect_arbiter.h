@@ -34,7 +34,7 @@
 
 class AudioEffectArbiter : public AudioStream {
 public:
-  AudioEffectArbiter() : AudioStream(KYR_N_VOX, inputQueueArray) {
+  AudioEffectArbiter() : AudioStream(KYR_N_FIST, inputQueueArray) {
     active_stream = -1;
     active_tail = 0;
     active_head = 0;
@@ -44,14 +44,14 @@ public:
   virtual void update(void);
 
   void define_vox(int index, int _vox, int _priority, int _local=0) {
-    if (index >= 0 && index < KYR_N_VOX) {
+    if (index >= 0 && index < KYR_N_FIST) {
       vox[index] = _vox;
       priority[index] = _priority;
       local[index] = _local;
     }
   }
 
-  uint8_t get_active_vox(void) { return active_stream < 0 ? KYR_VOX_NONE : vox[active_stream]; }
+  uint8_t get_active_vox(void) { return active_stream < 0 ? KYRF_NONE : vox[active_stream]; }
 
   bool is_not_local(void) { return active_stream >= 0 && ! local[active_stream]; }
   
@@ -77,9 +77,9 @@ public:
     
   int16_t active_stream, active_tail, active_head, active_delay;
   RunLengthQueue keyq, pttq;
-  uint8_t vox[KYR_N_VOX], priority[KYR_N_VOX], local[KYR_N_VOX];
+  uint8_t vox[KYR_N_FIST], priority[KYR_N_FIST], local[KYR_N_FIST];
 private:
-  audio_block_t *inputQueueArray[KYR_N_VOX];
+  audio_block_t *inputQueueArray[KYR_N_FIST];
 };
 
 #endif

@@ -79,8 +79,8 @@ static void invalid_set_vox_nrpn(const int16_t vox, const int16_t nrpn, const in
 
 /* set a vox specialized nrpn */
 static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
-  if ((unsigned)vox <= KYR_N_VOX && (unsigned)(nrpn-KYRP_XKEYER) < KYRP_XVOX_OFFSET)
-    set_nrpn(nrpn-KYRP_XKEYER+vox*KYRP_VOX_OFFSET, value);
+  if ((unsigned)vox <= KYR_N_FIST && (unsigned)(nrpn-KYRP_XKEYER) < KYRP_XFIST_OFFSET)
+    set_nrpn(nrpn-KYRP_XKEYER+vox*KYRP_FIST_OFFSET, value);
   else
     invalid_set_vox_nrpn(vox, nrpn, value);
 }
@@ -91,8 +91,8 @@ static void invalid_set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const i
 
 /* set a vox specialized nrpn */
 static inline void set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const int32_t value) {
-  if ((unsigned)vox <= KYR_N_VOX && (unsigned)(nrpn-KYRP_XKEYER) < (KYRP_XVOX_TUNE-KYRP_XKEYER))
-    hasak.xnrpn[(nrpn-KYRP_XKEYER)+vox*KYRP_VOX_OFFSET] = value;
+  if ((unsigned)vox <= KYR_N_FIST && (unsigned)(nrpn-KYRP_XKEYER) < (KYRP_XFIST_TUNE-KYRP_XKEYER))
+    hasak.xnrpn[(nrpn-KYRP_XKEYER)+vox*KYRP_FIST_OFFSET] = value;
   else
     invalid_set_vox_xnrpn(vox, nrpn, value);
 }
@@ -273,9 +273,9 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_FARNS, 0);	/* wpm */
   
   /* voice specializations */
-  for (int i = KYRP_VOX_TUNE; i < KYRP_LAST; i += 1)
+  for (int i = KYRP_FIST_TUNE; i < KYRP_LAST; i += 1)
     hasak.nrpn[i] = KYRV_NOT_SET;
-  for (int i = KYRP_XVOX_TUNE; i < KYRP_XLAST; i += 1)
+  for (int i = KYRP_XFIST_TUNE; i < KYRP_XLAST; i += 1)
     hasak.xnrpn[i-KYRP_XKEYER] = KYRV_NOT_SET;
 }
 
@@ -416,21 +416,21 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     
     // case KYRP_MIXER+(0..23): see default case
 
-    // keyer voice cases
-#define keyer_case(VOX, VOXP) \
-  case VOXP+KYRP_TONE:	    case VOXP+KYRP_LEVEL: \
+    // keyer fist cases
+#define keyer_case(FIST, FISTP) \
+  case FISTP+KYRP_TONE:	    case FISTP+KYRP_LEVEL: \
     hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
-  case VOXP+KYRP_SPEED:     case VOXP+KYRP_WEIGHT:    case VOXP+KYRP_RATIO:     case VOXP+KYRP_FARNS: \
-  case VOXP+KYRP_COMP:	    case VOXP+KYRP_SPEED_FRAC: \
-    hasak.nrpn[nrpn] = value; nrpn_update_keyer_timing(VOX); nrpn_echo(nrpn, value); break;
+  case FISTP+KYRP_SPEED:    case FISTP+KYRP_WEIGHT:    case FISTP+KYRP_RATIO:     case FISTP+KYRP_FARNS: \
+  case FISTP+KYRP_COMP:	    case FISTP+KYRP_SPEED_FRAC: \
+    hasak.nrpn[nrpn] = value; nrpn_update_keyer_timing(FIST); nrpn_echo(nrpn, value); break;
     
-    keyer_case(KYR_VOX_NONE, KYRP_VOX_NONE-KYRP_KEYER); // default keyer params
-    keyer_case(KYR_VOX_TUNE, KYRP_VOX_TUNE-KYRP_KEYER); // tune params
-    keyer_case(KYR_VOX_S_KEY, KYRP_VOX_S_KEY-KYRP_KEYER); // straight key keyer params
-    keyer_case(KYR_VOX_PAD, KYRP_VOX_PAD-KYRP_KEYER);     // paddle keyer params
-    keyer_case(KYR_VOX_WINK, KYRP_VOX_WINK-KYRP_KEYER); // winkey text keyer params
-    keyer_case(KYR_VOX_KYR, KYRP_VOX_KYR-KYRP_KEYER);   // kyr text keyer params
-    keyer_case(KYR_VOX_KYR, KYRP_VOX_BUT-KYRP_KEYER);   // button key params
+    keyer_case(KYRF_NONE, KYRP_FIST_NONE-KYRP_KEYER); // default keyer params
+    keyer_case(KYRF_TUNE, KYRP_FIST_TUNE-KYRP_KEYER); // tune params
+    keyer_case(KYRF_S_KEY, KYRP_FIST_S_KEY-KYRP_KEYER); // straight key keyer params
+    keyer_case(KYRF_PAD, KYRP_FIST_PAD-KYRP_KEYER);     // paddle keyer params
+    keyer_case(KYRF_WINK, KYRP_FIST_WINK-KYRP_KEYER); // winkey text keyer params
+    keyer_case(KYRF_KYR, KYRP_FIST_KYR-KYRP_KEYER);   // kyr text keyer params
+    keyer_case(KYRF_KYR, KYRP_FIST_BUT-KYRP_KEYER);   // button key params
 
 #undef keyer_case    
     

@@ -78,7 +78,7 @@ public:
   // valid vox returns true if we are allowed to send
   int valid_vox(void) {
     uint8_t active = get_active_vox();
-    return active == KYR_VOX_NONE || active == vox;
+    return active == KYRF_NONE || active == vox;
   }
   // valid vox or abort
   int valid_vox_or_abort(void) {

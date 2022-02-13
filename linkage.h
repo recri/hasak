@@ -75,13 +75,13 @@ static inline int32_t get_xnrpn(const int16_t nrpn) {
 
 /* fetch a vox specialized nrpn */
 static inline int16_t get_vox_nrpn(const int16_t vox, const int16_t nrpn) {
-  const int16_t value = get_nrpn(KYRP_KEYER+vox*KYRP_VOX_OFFSET+(nrpn-KYRP_KEYER));
+  const int16_t value = get_nrpn(KYRP_KEYER+vox*KYRP_FIST_OFFSET+(nrpn-KYRP_KEYER));
   return (value >= 0) ? value : get_nrpn(nrpn);
 }
 
 /* fetch a vox specialized xnrpn */
 static inline int32_t get_vox_xnrpn(const int16_t vox, const int16_t nrpn) {
-  const int32_t value = get_xnrpn(KYRP_XKEYER+vox*KYRP_XVOX_OFFSET+(nrpn-KYRP_XKEYER));
+  const int32_t value = get_xnrpn(KYRP_XKEYER+vox*KYRP_XFIST_OFFSET+(nrpn-KYRP_XKEYER));
   return (value >= 0) ? value : get_xnrpn(nrpn);
 }
 

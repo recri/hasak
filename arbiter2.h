@@ -47,25 +47,25 @@ class Arbiter2 {
   elapsedMicros countup;
   struct {
     int note, vox;
-  } line[KYR_N_VOX];
+  } line[KYR_N_FIST];
   void define_vox(int index, int note, int vox) {
-    if (index >= 0 && index < KYR_N_VOX) {
+    if (index >= 0 && index < KYR_N_FIST) {
       line[index].note = note;
       line[index].vox = vox;
     }
   }
   int get_active_vox(void) {
-    return active < 0 ? KYR_VOX_NONE : line[active].vox;
+    return active < 0 ? KYRF_NONE : line[active].vox;
   }
   void setup(void) {
     // define the voices the arbiter sees on input channels
     // changing to let their identity be their priority
-    define_vox(0, KYR_NOTE_S_KEY_ST, KYR_VOX_S_KEY);
-    define_vox(1, KYR_NOTE_PAD_ST, KYR_VOX_PAD);
-    define_vox(2, KYR_NOTE_TUNE_ST, KYR_VOX_TUNE);
-    define_vox(3, KYR_NOTE_WINK_ST, KYR_VOX_WINK);
-    define_vox(4, KYR_NOTE_KEYER_ST, KYR_VOX_KYR);
-    define_vox(5, KYR_NOTE_BUT_ST, KYR_VOX_BUT);
+    define_vox(0, KYR_NOTE_S_KEY_ST, KYRF_S_KEY);
+    define_vox(1, KYR_NOTE_PAD_ST, KYRF_PAD);
+    define_vox(2, KYR_NOTE_TUNE_ST, KYRF_TUNE);
+    define_vox(3, KYR_NOTE_WINK_ST, KYRF_WINK);
+    define_vox(4, KYR_NOTE_KEYER_ST, KYRF_KYR);
+    define_vox(5, KYR_NOTE_BUT_ST, KYRF_BUT);
   }
   void loop(void) {
     int n_active = 0, best = -1, send = 0;
@@ -79,7 +79,7 @@ class Arbiter2 {
     }
     
     /* find highest priority active stream */
-    for (int i = 0; i < KYR_N_VOX; i += 1) {
+    for (int i = 0; i < KYR_N_FIST; i += 1) {
       if (hasak.notes[line[i].note]) {
 	n_active += 1;	// active if keyed
 	/* remember the highest priority active stream */

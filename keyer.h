@@ -31,7 +31,7 @@
 static void keyer_setup(void) {
 }
 
-static KeyerPaddle keyer_paddle(KYR_VOX_PAD);
+static KeyerPaddle keyer_paddle(KYRF_PAD);
 static elapsedMicros keyer_timer;
 
 static void keyer_loop(void) {
