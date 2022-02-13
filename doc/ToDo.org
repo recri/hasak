@@ -1,4 +1,20 @@
 * Todo list as of 2020-02-07
+[ ] digital pins - add slots for second
+	straight key, paddle, ptt switch, tx out, tx ptt out.
+[ ] make all digital pins NRPN configurable off or on PIN
+[ ] make all digital pins NRPN configurable for notes
+[ ] make all digital pins NRPN configurable for debounce
+[ ] make all digital pins NRPN configurable for sample rate
+[ ] analog pins - add slots for additional adcs
+[ ] make all analog pins NRPN configurable for off or PIN
+[ ] make all analog pins NRPN configurable for NRPN
+[ ] make all analog pins NRPN configurable for sample rate
+[ ] make voices into fists, named KYRF_*
+[ ] make notes named KYRN_*
+[ ] make all notes and controls and NRPNs listenable, up to
+	255 listener channels identified by non-zero byte
+[ ] queue events generated during usbMIDI.read() to fire
+	during loop time.	
 [ ] rewrite the keyer timings to µs
 [ ] rewrite the key to arbiter logic using notes.
 [x]   inpin.h - digital read pins, debounce, update notes
