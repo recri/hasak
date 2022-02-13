@@ -42,27 +42,27 @@ elapsedMicros inpin_ext_ptt_debounce;
 void inpin_loop(void) {
   // ah, inverted logic, pins are active low, notes are active high
   // debounce by ignoring changes for a period of time
-  if (digitalReadFast(KYR_L_PAD_PIN) == hasak.notes[KYRD_NOTE_L_PAD]) {
+  if (digitalReadFast(KYR_L_PAD_PIN) == hasak.notes[KYR_NOTE_L_PAD]) {
     if (inpin_l_pad_debounce < (unsigned)get_nrpn(KYRP_DEBOUNCE)) {
-      note_toggle(KYRD_NOTE_L_PAD);
+      note_toggle(KYR_NOTE_L_PAD);
       inpin_l_pad_debounce = 0;
     }
   }
-  if (digitalReadFast(KYR_R_PAD_PIN) == hasak.notes[KYRD_NOTE_L_PAD]) {
+  if (digitalReadFast(KYR_R_PAD_PIN) == hasak.notes[KYR_NOTE_L_PAD]) {
     if (inpin_r_pad_debounce < (unsigned)get_nrpn(KYRP_DEBOUNCE)) {
-      note_toggle(KYRD_NOTE_R_PAD);
+      note_toggle(KYR_NOTE_R_PAD);
       inpin_r_pad_debounce = 0;
     }
   }
-  if (digitalReadFast(KYR_S_KEY_PIN) == hasak.notes[KYRD_NOTE_S_KEY]) {
+  if (digitalReadFast(KYR_S_KEY_PIN) == hasak.notes[KYR_NOTE_S_KEY]) {
     if (inpin_s_key_debounce < (unsigned)get_nrpn(KYRP_DEBOUNCE)) {
-      note_toggle(KYRD_NOTE_S_KEY);
+      note_toggle(KYR_NOTE_S_KEY);
       inpin_s_key_debounce = 0;
     }
   }
-  if (digitalReadFast(KYR_EXT_PTT_PIN) == hasak.notes[KYRD_NOTE_EXT_PTT]) {
+  if (digitalReadFast(KYR_EXT_PTT_PIN) == hasak.notes[KYR_NOTE_EXT_PTT]) {
     if (inpin_ext_ptt_debounce < (unsigned)get_nrpn(KYRP_DEBOUNCE)) {
-      note_toggle(KYRD_NOTE_EXT_PTT);
+      note_toggle(KYR_NOTE_EXT_PTT);
       inpin_ext_ptt_debounce = 0;
     }
   }

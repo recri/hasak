@@ -1,4 +1,12 @@
 * Todo list as of 2020-02-07
+[ ] rewrite the keyer timings to µs
+[ ] rewrite the key to arbiter logic using notes.
+[x]   inpin.h - digital read pins, debounce, update notes
+[x]   note.h - toggle note, send
+[x]   keyer.h and keyer_paddle.h, straight key and iambic keyers.
+	iambic and adapters almost entirely done with existing
+	sources, yay reuse.
+[x] get the license into all the source files
 [x] set PTT_HANG_TIME to 0
 [x] generate JSON format of config.h
 [x] correct inverted note sense, no pttout by default.

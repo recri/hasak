@@ -280,6 +280,8 @@ static void inpin_setup(void);
 static void inpin_loop(void);
 static void note_setup(void);
 static void note_loop(void);
+static void keyer_setup(void);
+static void keyer_loop(void);
 static void diagnostics_setup(void);
 static void diagnostics_loop(void);
 
@@ -310,6 +312,7 @@ void setup(void) {
   input_setup();
   inpin_setup();
   note_setup();
+  keyer_setup();
   diagnostics_setup();
 }
 
@@ -322,6 +325,7 @@ void loop(void) {
   inpin_loop();
   input_loop();
   note_loop();
+  keyer_loop();
   winkey_loop();
   nrpn_loop();
   diagnostics_loop();
@@ -339,6 +343,7 @@ static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 #include "codec.h"
 #include "midi.h"
 #include "note.h"
+#include "keyer.h"
 #include "input.h"
 #include "inpin.h"
 #include "winkey.h"
