@@ -60,12 +60,12 @@ class Arbiter2 {
   void setup(void) {
     // define the voices the arbiter sees on input channels
     // changing to let their identity be their priority
-    define_vox(0, KYR_NOTE_S_KEY_ST, KYRF_S_KEY);
-    define_vox(1, KYR_NOTE_PAD_ST, KYRF_PAD);
-    define_vox(2, KYR_NOTE_TUNE_ST, KYRF_TUNE);
-    define_vox(3, KYR_NOTE_WINK_ST, KYRF_WINK);
-    define_vox(4, KYR_NOTE_KEYER_ST, KYRF_KYR);
-    define_vox(5, KYR_NOTE_BUT_ST, KYRF_BUT);
+    define_vox(0, KYRN_S_KEY_ST, KYRF_S_KEY);
+    define_vox(1, KYRN_PAD_ST, KYRF_PAD);
+    define_vox(2, KYRN_TUNE_ST, KYRF_TUNE);
+    define_vox(3, KYRN_WINK_ST, KYRF_WINK);
+    define_vox(4, KYRN_KEYER_ST, KYRF_KYR);
+    define_vox(5, KYRN_BUT_ST, KYRF_BUT);
   }
   void loop(void) {
     int n_active = 0, best = -1, send = 0;
@@ -111,7 +111,7 @@ class Arbiter2 {
 	send = 1;
       } else {
 	/* pre-empt active stream */
-	if (hasak.notes[KYR_NOTE_KEY_ST]) note_toggle(KYR_NOTE_KEY_ST);
+	if (hasak.notes[KYRN_KEY_ST]) note_toggle(KYRN_KEY_ST);
 	/* set the new active stream */
 	active = best;
 	/* start the new active stream on the next loop */
@@ -121,15 +121,15 @@ class Arbiter2 {
     }
     if (send) {
       const uint8_t note = line[active].note;
-      if (hasak.notes[KYR_NOTE_KEY_ST] != hasak.notes[note]) {
-	if (hasak.notes[KYR_NOTE_KEY_ST])
+      if (hasak.notes[KYRN_KEY_ST] != hasak.notes[note]) {
+	if (hasak.notes[KYRN_KEY_ST])
 	  timeon = countup;
 	else
 	  timeoff = countup;
-	note_toggle(KYR_NOTE_KEY_ST);
+	note_toggle(KYRN_KEY_ST);
 	countup = 0;
       } else {
-	if (hasak.notes[KYR_NOTE_KEY_ST]) {
+	if (hasak.notes[KYRN_KEY_ST]) {
 	  /* stuck on? */
 	  ;
 	} else {

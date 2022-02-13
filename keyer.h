@@ -35,11 +35,11 @@ static KeyerPaddle keyer_paddle(KYRF_PAD);
 static elapsedMicros keyer_timer;
 
 static void keyer_loop(void) {
-  if (hasak.notes[KYR_NOTE_S_KEY] != hasak.notes[KYR_NOTE_S_KEY_ST]) note_toggle(KYR_NOTE_S_KEY_ST);
-  if (hasak.notes[KYR_NOTE_TUNE] != hasak.notes[KYR_NOTE_TUNE_ST]) note_toggle(KYR_NOTE_TUNE_ST);
-  const int key = keyer_paddle.clock(hasak.notes[KYR_NOTE_L_PAD], hasak.notes[KYR_NOTE_R_PAD], keyer_timer);
+  if (hasak.notes[KYRN_S_KEY] != hasak.notes[KYRN_S_KEY_ST]) note_toggle(KYRN_S_KEY_ST);
+  if (hasak.notes[KYRN_TUNE] != hasak.notes[KYRN_TUNE_ST]) note_toggle(KYRN_TUNE_ST);
+  const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], keyer_timer);
   keyer_timer = 0;
-  if (key != hasak.notes[KYR_NOTE_PAD_ST]) note_toggle(KYR_NOTE_PAD_ST);
-  if (hasak.notes[KYR_NOTE_BUT] != hasak.notes[KYR_NOTE_BUT_ST]) note_toggle(KYR_NOTE_BUT_ST);
+  if (key != hasak.notes[KYRN_PAD_ST]) note_toggle(KYRN_PAD_ST);
+  if (hasak.notes[KYRN_BUT] != hasak.notes[KYRN_BUT_ST]) note_toggle(KYRN_BUT_ST);
 }
 
