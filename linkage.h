@@ -40,7 +40,11 @@ typedef struct {
   /* index for reading and writing message bytes */
   uint16_t index;
   /* note latches */
-  uint8_t notes[KYRC_NNOTE];
+  uint8_t notes[KYR_N_NOTE];
+  // count invocations of sampleInterrupt()  
+  uint32_t sampleCount;
+  // count invocations of loop()
+  uint32_t loopCount;
   /* output latches */
   uint8_t _key_out, _ptt_out;
   uint8_t _up_out, _down_out;
@@ -49,11 +53,14 @@ typedef struct {
   uint8_t _key_out_note_on, _ptt_out_note_on;
   uint8_t _tune_note_on;
   /* statistics */
-  uint32_t _pollcount;		// count invocations of pollatch()
   
 }  hasak_t;
 
 extern hasak_t hasak;
+
+static uint32_t samples() { return hasak.sampleCount; }
+
+#include "elapsedSamples.h"
 
 static int16_t invalid_get_nrpn(const int16_t nrpn) {
   Serial.printf("invalid get_nrpn(%d)\n", nrpn);

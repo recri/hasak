@@ -23,6 +23,13 @@
  * THE SOFTWARE.
  */
 
+
+/*
+** crossing over from old to new
+*/
+//#define OLD_AUDIO_GRAPH 1
+#define NEW_AUDIO_GRAPH 1
+
 /*
 ** config.h contains preprocessor defined constants.
 ** linkage.h contains functions that fetch parameters.
@@ -38,10 +45,12 @@
 #include <Audio.h>
 // custom audio modules
 #include "src/Audio/input_byte.h"
+#if defined(OLD_AUDIO_GRAPH)
 #include "src/Audio/input_text.h"
 #include "src/Audio/effect_paddle.h"
 #include "src/Audio/effect_button.h"
 #include "src/Audio/effect_arbiter.h"
+#endif
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/output_byte.h"
 
@@ -58,6 +67,8 @@ AudioInputI2S           i2s_in;	// i2s audio in
 #if defined(KYRC_ENABLE_ADC_IN)
 AudioInputAnalog	adc_in;	// headset switch detect
 #endif
+
+#if defined(OLD_AUDIO_GRAPH)
 AudioSynthWaveformDc	tune;	// tune switch
 AudioInputByte		s_key;	// straight key in
 AudioInputByte		l_pad;	// left paddle in
@@ -65,7 +76,13 @@ AudioInputByte		r_pad;	// right paddle in
 AudioInputByte		ptt_sw;	// ptt switch
 AudioInputText		wink(KYRF_WINK);	// winkey text in
 AudioInputText		kyr(KYRF_KYR);	// kyr text in for op
+#endif
 
+// revised inputs
+AudioInputByte		st_key;		  // sidetone key line
+AudioInputByte		tx_key;		  // transmitter key line
+
+#if defined(OLD_AUDIO_GRAPH)
 // paddle keyer logic
 AudioEffectPaddle	paddle(KYRF_PAD);	// 
 AudioConnection         patchCord1a(l_pad, 0, paddle, 0);
@@ -98,12 +115,19 @@ static void arbiter_setup(void) {
 }
 
 int16_t get_active_vox(void) { return arbiter.get_active_vox(); }
+#endif
 
 // shaped key waveform
 AudioSynthKeyedTone	tone_ramp(1); // one channel sidetone ramp
 AudioSynthKeyedTone	key_ramp(2);  // two channel IQ tone ramp
+#if defined(OLD_AUDIO_GRAPH)
 AudioConnection		patchCord3a(arbiter, 0, tone_ramp, 0); // sidetone key line
 AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);  // transmit key line
+#endif
+#if defined(NEW_AUDIO_GRAPH)
+AudioConnection		patchCord3a(st_key, 0, tone_ramp, 0); // sidetone key line
+AudioConnection		patchCord3b(tx_key, 1, key_ramp, 0);  // transmit key line
+#endif
 
 // 
 // output mixers
@@ -160,6 +184,7 @@ AudioConnection		patchCord933(i2s_in, 1, r_i2s_out, 3);
 AudioConnection		patchCord943(i2s_in, 0, l_hdw_out, 3);
 AudioConnection		patchCord953(i2s_in, 1, r_hdw_out, 3);
 
+#if defined(OLD_AUDIO_GRAPH)
 // outputs
 AudioOutputByte		key_out;
 AudioOutputByte		ptt_out;
@@ -172,6 +197,7 @@ AudioOutputByte		down_out;
 
 AudioConnection		patchCord10d(button, 1, up_out, 0);
 AudioConnection		patchCord10e(button, 2, down_out, 0);
+#endif
 
 AudioOutputUSB          usb_out;
 AudioConnection		patchCord11a(l_usb_out, 0, usb_out, 0);
@@ -240,6 +266,29 @@ static float timing_percent_max(uint32_t cpuCyclesMax) {
   return 100*(float)cpuCyclesMax/(float)cpuCyclesPerAudioBufferMax;
 }
 
+/*
+** forward references.
+*/
+/* valid teensy pin number, from teensy core sources */
+static int valid_pin(int pin) { return pin >= 0 && pin < CORE_NUM_TOTAL_PINS; }
+
+static void codec_enable(void);
+static int16_t codec_identify(void);
+static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
+static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
+
+#include "nrpn.h"
+#include "codec.h"
+#include "midi.h"
+#include "note.h"
+#include "keyptt.h"
+#include "arbiter2.h"
+#include "keyer.h"
+#include "input.h"
+#include "inpin.h"
+#include "winkey.h"
+#include "diagnostics.h"
+
 //
 // poll input pins at sample rate
 // latch output pins at sample rate
@@ -249,45 +298,29 @@ static float timing_percent_max(uint32_t cpuCyclesMax) {
 // loop which runs at lower priority than this
 // interrupt handler.
 //
-static void pollatch() {
+static void interrupt() {
   uint32_t cycles = ARM_DWT_CYCCNT;
-  hasak._pollcount += 1;
+  hasak.sampleCount += 1;
+#if defined(OLD_AUDIO_GRAPH)
   l_pad.send((digitalReadFast(KYR_L_PAD_PIN)^1)); // pin active low, note active high
   r_pad.send((digitalReadFast(KYR_R_PAD_PIN)^1));
   s_key.send((digitalReadFast(KYR_S_KEY_PIN)^1));
   ptt_sw.send((digitalReadFast(KYR_EXT_PTT_PIN)^1));
+#endif
+#if defined(NEW_AUDIO_GRAPH)
+  st_key.send(hasak.notes[KYRN_KEY_ST]);
+  tx_key.send(hasak.notes[KYRN_KEY_TX]);
+#endif
+#if defined(OLD_AUDIO_GRAPH)
   hasak._key_out=key_out.recv();
   hasak._ptt_out=ptt_out.recv();
   hasak._up_out = up_out.recv();
   hasak._down_out = down_out.recv();
+#endif
   digitalWriteFast(KYR_KEY_OUT_PIN,hasak._key_out); // note active high, is pin active high or low?
   digitalWriteFast(KYR_PTT_OUT_PIN,hasak._ptt_out);
   isrCpuCyclesRaw += ARM_DWT_CYCCNT - cycles;
 }
-
-/*
-** forward references.
-*/
-static void nrpn_setup(void);
-static void nrpn_loop(void);
-static void midi_setup(void);
-static void midi_loop(void);
-static void winkey_setup(void);
-static void winkey_loop(void);
-static void input_setup(void);
-static void input_loop(void);
-static void inpin_setup(void);
-static void inpin_loop(void);
-static void note_setup(void);
-static void note_loop(void);
-static void keyer_setup(void);
-static void keyer_loop(void);
-static void arbiter2_setup(void);
-static void arbiter2_loop(void);
-static void ptt_timing_setup(void);
-static void ptt_timing_loop(void);
-static void diagnostics_setup(void);
-static void diagnostics_loop(void);
 
 void setup(void) {
   Serial.begin(115200);
@@ -295,7 +328,9 @@ void setup(void) {
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
 
+#if defined(OLD_AUDIO_GRAPH)
   arbiter_setup();
+#endif
   AudioMemory(40);
   nrpn_setup();
 
@@ -309,7 +344,7 @@ void setup(void) {
    */
   static IntervalTimer timer;
   timer.priority(96);
-  timer.begin(pollatch, 1e6/AUDIO_SAMPLE_RATE_EXACT);
+  timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 
   midi_setup();
   winkey_setup();
@@ -318,44 +353,23 @@ void setup(void) {
   note_setup();
   keyer_setup();
   arbiter2_setup();
-  ptt_timing_setup();
+  keyptt_setup();
   diagnostics_setup();
 }
 
 void loop(void) {
-  // accumulate cycle count to normalize audio library usage
-  if ((tune.read() != 0) != (hasak._tune_note_on != 0))
-    tune.amplitude(hasak._tune_note_on ? 1.0 : 0);
-  timing_loop();
-  midi_loop();
-  inpin_loop();
-  input_loop();
-  note_loop();
-  keyer_loop();
-  arbiter2_loop();
-  ptt_timing_loop();
-  winkey_loop();
-  nrpn_loop();
-  diagnostics_loop();
+  hasak.loopCount += 1;		// count loops for statistics
+  timing_loop();		// accumulate cycle count to normalize audio library usage
+  midi_loop();			// drain midi input
+  inpin_loop();			// poll digital input pins
+  input_loop();			// poll analog input pins
+  note_loop();			// note manager
+  keyer_loop();			// keyer events
+  arbiter2_loop();		// arbitration of keyer events
+  keyptt_loop();		// key generated ptt
+  winkey_loop();		// winkey
+  nrpn_loop();			// nrpn management 
+  diagnostics_loop();		// console
 }
 
-/* valid teensy pin number, from teensy core sources */
-static int valid_pin(int pin) { return pin >= 0 && pin < CORE_NUM_TOTAL_PINS; }
-
-static void codec_enable(void);
-static int16_t codec_identify(void);
-static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
-static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
-
-#include "nrpn.h"
-#include "codec.h"
-#include "midi.h"
-#include "note.h"
-#include "ptt_timing.h"
-#include "arbiter2.h"
-#include "keyer.h"
-#include "input.h"
-#include "inpin.h"
-#include "winkey.h"
-#include "diagnostics.h"
 

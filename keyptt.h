@@ -27,36 +27,36 @@
 ** ptt timing shim
 */
 
-static elapsedSamples ptt_timingCounter;
-static uint32_t ptt_timing_head; /*  */
-static uint32_t ptt_timing_tail; /*  */
+static elapsedSamples keypttCounter;
+static uint32_t keyptt_head; /*  */
+static uint32_t keyptt_tail; /*  */
 
-static void ptt_timing_st(int note) {
+static void keyptt_listener(int note) {
   if (note == KYRN_KEY_ST) {	/* sidetone transition */
     if (note_get(KYRN_KEY_ST)) { /* sidetone is on */
       if ( ! note_get(KYRN_PTT_TX)) {
 	note_toggle(KYRN_PTT_TX);
-	ptt_timing_head = get_nrpn(KYRP_HEAD_TIME);
-	ptt_timing_tail = max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_xnrpn(KYRP_XPER_DIT));
+	keyptt_head = get_nrpn(KYRP_HEAD_TIME);
+	keyptt_tail = max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_xnrpn(KYRP_XPER_DIT));
       }
-      note_after(ptt_timing_head, KYRN_KEY_TX, 1);
+      note_after(keyptt_head, KYRN_KEY_TX, 1);
     } else {			/* sidetone is off */
-      note_after(ptt_timing_head, KYRN_KEY_TX, 0);
+      note_after(keyptt_head, KYRN_KEY_TX, 0);
     }
   } else if (note == KYRN_KEY_TX) { /* tx keying transition */
-    ptt_timingCounter = 0;	/* time the element */
+    keypttCounter = 0;	/* time the element */
   }
 }
 
-static void ptt_timing_setup(void) {
-  note_listen(KYRN_KEY_ST, ptt_timing_listener);
-  note_listen(KYRN_KEY_TX, ptt_timing_listener);
-  note_listen(KYRN_PTT_TX, ptt_timing_listener);
+static void keyptt_setup(void) {
+  note_listen(KYRN_KEY_ST, keyptt_listener);
+  note_listen(KYRN_KEY_TX, keyptt_listener);
+  note_listen(KYRN_PTT_TX, keyptt_listener);
 }
 
-static void ptt_timing_loop(void) {
+static void keyptt_loop(void) {
   if (note_get(KYRN_PTT_TX) &&		      /* ptt tx is on */
       note_get(KYRN_KEY_TX) == 0 &&	      /* key tx is off */
-      ptt_timingCounter > ptt_timing_tail)    /* tail has expired */
+      keypttCounter > keyptt_tail)	      /* tail has expired */
     note_toggle(KYRN_PTT_TX);		      /* ptt off */
 }

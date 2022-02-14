@@ -1,4 +1,8 @@
-* Todo list as of 2020-02-07
+* Todo list as of 2020-02-14
+[ ] move text keyer into the event loop
+[ ] implement common core functions
+[ ] implement JSON function
+[ ] implement string passing proposal
 [ ] digital pins - add slots for second
 	straight key, paddle, ptt switch, tx out, tx ptt out.
 [ ] make all digital pins NRPN configurable off or on PIN
@@ -9,39 +13,13 @@
 [ ] make all analog pins NRPN configurable for off or PIN
 [ ] make all analog pins NRPN configurable for NRPN
 [ ] make all analog pins NRPN configurable for sample rate
-[ ] make voices into fists, named KYRF_*
-[ ] make notes named KYRN_*
-[ ] make all notes and controls and NRPNs listenable, up to
-	255 listener channels identified by non-zero byte
-[ ] queue events generated during usbMIDI.read() to fire
-	during loop time.	
-[ ] rewrite the keyer timings to µs
-[ ] rewrite the key to arbiter logic using notes.
-[x]   inpin.h - digital read pins, debounce, update notes
-[x]   note.h - toggle note, send
-[x]   keyer.h and keyer_paddle.h, straight key and iambic keyers.
-	iambic and adapters almost entirely done with existing
-	sources, yay reuse.
-[x] get the license into all the source files
-[x] set PTT_HANG_TIME to 0
-[x] generate JSON format of config.h
-[x] correct inverted note sense, no pttout by default.
-[x] KYRP_NOTE_ENABLE wasn't handled in nrpn_set(), reworked midi_send_toggle
-[x] move nrpn.tcl to scripts directory
-[ ] separate NRPN, Control Change, and Notes channels
-	receive on any, but only send on designated
-	channel.
-[x] reorder the built in notes so key out, ptt out, and tune 
-	come first
-[x] default TX_ENABLE true
-[x] enable notes bitmap
-[ ] make ADC?_INVERT a settable parameter
-[ ] change extPTT to options { none, ptt-rto, ttt-tto }
-	needs title on select option element
-[-] write an audio library component to inject MIDI note states
-	into the sample stream to implement programmatic control
-	of LPAD, RPAD, SKEY, TUNE, BUTTON, KEYOUT, and PTTOUT.
-	no, don't do that.
+[ ] map notes, controls, and NRPNs into a unified range of tokens,
+[ ] separate arrays of storage slots for notes, controls, and nrpns
+[ ] make all notes and controls and nrpns listenable,
+	use a byte array to store the index into a listener
+	head array.
+[ ] make all notes, controls, and nrpns delayable, general
+	timing mechanism.
 [ ] add extension interface for using hasak as a framework for other
 	keyer implementations.  Keep Chuck Broadwell W5UXH
 	chuck.broadwell@gmail.com informed.
@@ -52,7 +30,6 @@
 [ ] write a modified Mixer4 that polls for level and mute from the
 	nrpn array rather than needed explicit settings.
 [ ] make default serial monitor start winkey when needed
-[ ] rewrite winkey without second serial monitor
 [ ] verify bare Teensy3/4 and Teensy3/4+AudioAdapter
 [ ] transition tweening, changing the internal levels and mutes
 	so output mixer gains (24) 
@@ -74,8 +51,59 @@
 	still mysterious, same nrpn values except for gaps,
 	but keyer still broken.
 [ ] make a key/ptt led indicator for the key/ptt output jack
-[ ] mixer set with left and right in same nrpn
+* Todo list as of 2020-02-07
+[x] make voices into fists, named KYRF_*
+[x] make notes named KYRN_*
+[-] queue events generated during usbMIDI.read() to fire
+	during loop time.  Better to just do it immediately,
+	the listener can queue time consuming tasks for the
+	loop.
+[-] provide a queue for usbMIDI send during usbMIDI read.
+	ah, just send them, I don't yet know that the initial
+	write doesn't get through, or that writes during read
+	are actually harmful.
+[x] maintain listener and after used counts	
+[x] #if'ed out the old audio graph
+[x] added elapsedSamples.h for easy sample count timing.
+[x] implemeted note listeners
+[x] implemented note after timeouts
+[-] rewrite the keyer timings to µs
+	no, use the sampleInterrupt counter to time by samples
+[x]   inpin.h - digital read pins, debounce, update notes
+[x]   note.h - toggle note, not sending midi, that's a listener job
+[x]   keyer.h and keyer_paddle.h, straight key and iambic keyers.
+	iambic and adapters almost entirely done with existing
+	sources, yay reuse.
+[x]   arbiter2.h, give the key to the highest priority input.
+[x]   keyptt.h, generate tx key and tx ptt from sidetone key
+[x] get the license into all the source files
+[x] set PTT_HANG_TIME to 0
+[x] generate JSON format of config.h
+[x] correct inverted note sense, no pttout by default.
+[x] KYRP_NOTE_ENABLE wasn't handled in nrpn_set(), reworked midi_send_toggle
+[x] move nrpn.tcl to scripts directory
+[-] separate NRPN, Control Change, and Notes channels
+	receive on any, but only send on designated
+	channel.  No, one channel is enough.
+[x] reorder the built in notes so key out, ptt out, and tune 
+	come first
+[x] default TX_ENABLE true
+[x] enable notes bitmap
+[-] make ADC?_INVERT a settable parameter
+	No, interpolate endpoints for mapping ADC values into NRPN values,
+	correct inverted by swapping the endpoints
+[-] change extPTT to options { none, ptt-rto, ttt-tto }
+	needs title on select option element.
+	No, it's more complicated than that.
+[-] write an audio library component to inject MIDI note states
+	into the sample stream to implement programmatic control
+	of LPAD, RPAD, SKEY, TUNE, BUTTON, KEYOUT, and PTTOUT.
+	no, don't do that.
+[-] rewrite winkey without second serial monitor
+	rewrite winkey some day.
+[-] mixer set with left and right in same nrpn
 	127 does seem to be a reasonable level parameter
+	Oh, maybe something like that.
 * Todo list as of 2022-01-18
 [-] inject midi note states into pollatch
 	backed out

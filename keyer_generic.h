@@ -22,41 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef keyer_generic_h_
+#define keyer_generic_h_
 
-/*
-** ptt timing shim
-*/
+class KeyerGeneric {
+ public:
+ KeyerGeneric(const int vox) : vox(vox) { }
+  void init(void) { }
+  virtual int clock(int dit, int dah, int ticks) { return 0; }
+  int pad_mode(void) { return get_nrpn(KYRP_PAD_MODE); }
+  int32_t dit(void) { return get_xnrpn(KYRP_XPER_DIT); }
+  int32_t dah(void) { return get_xnrpn(KYRP_XPER_DAH); }
+  int32_t ies(void) { return get_xnrpn(KYRP_XPER_IES); }
+  int32_t ils(void) { return get_xnrpn(KYRP_XPER_ILS); }
+  int32_t iws(void) { return get_xnrpn(KYRP_XPER_IWS); }
+  int auto_ils(void) { return get_nrpn(KYRP_AUTO_ILS); }
+  int auto_iws(void) { return get_nrpn(KYRP_AUTO_IWS); }
+  
+ private:
+  const int vox;
+};
 
-static elapsedSamples ptt_timingCounter;
-static uint32_t ptt_timing_head; /*  */
-static uint32_t ptt_timing_tail; /*  */
-
-static void ptt_timing_st(int note) {
-  if (note == KYRN_KEY_ST) {	/* sidetone transition */
-    if (note_get(KYRN_KEY_ST)) { /* sidetone is on */
-      if ( ! note_get(KYRN_PTT_TX)) {
-	note_toggle(KYRN_PTT_TX);
-	ptt_timing_head = get_nrpn(KYRP_HEAD_TIME);
-	ptt_timing_tail = max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_xnrpn(KYRP_XPER_DIT));
-      }
-      note_after(ptt_timing_head, KYRN_KEY_TX, 1);
-    } else {			/* sidetone is off */
-      note_after(ptt_timing_head, KYRN_KEY_TX, 0);
-    }
-  } else if (note == KYRN_KEY_TX) { /* tx keying transition */
-    ptt_timingCounter = 0;	/* time the element */
-  }
-}
-
-static void ptt_timing_setup(void) {
-  note_listen(KYRN_KEY_ST, ptt_timing_listener);
-  note_listen(KYRN_KEY_TX, ptt_timing_listener);
-  note_listen(KYRN_PTT_TX, ptt_timing_listener);
-}
-
-static void ptt_timing_loop(void) {
-  if (note_get(KYRN_PTT_TX) &&		      /* ptt tx is on */
-      note_get(KYRN_KEY_TX) == 0 &&	      /* key tx is off */
-      ptt_timingCounter > ptt_timing_tail)    /* tail has expired */
-    note_toggle(KYRN_PTT_TX);		      /* ptt off */
-}
+#endif

@@ -23,6 +23,12 @@
  * THE SOFTWARE.
  */
 
+#include "keyer_generic.h"
+#include "keyer_ad5dz.h"
+#include "keyer_k1el.h"
+#include "keyer_nd7pa.h"
+#include "keyer_vk6ph.h"
+
 /*
 ** paddle keyer is a choice of adapter and choice of iambic keyer
 **

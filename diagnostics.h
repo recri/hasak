@@ -43,8 +43,9 @@ static void sreport(void) {
   Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
   report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
-  Serial.printf("%16s %2d %2d", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
-  Serial.printf("pollcount %ld\n", hasak._pollcount);
+  Serial.printf("%16s %2d %2d\n", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
+  Serial.printf("\tsampleCount %ld, loopCount %ld, loop/sample %f\n",
+		hasak.sampleCount, hasak.loopCount, (float)hasak.loopCount/hasak.sampleCount);
 }
 
 static void treport(const char *p) {
@@ -71,15 +72,19 @@ static void Sreport(void) {
 #else
   mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);	    Serial.println();
 #endif
+#if defined(OLD_AUDIO_GRAPH)
   mreport("l_pad", l_pad);         mreport("r_pad", r_pad);         mreport("s_key", s_key);     Serial.println();
   mreport("ptt sw", ptt_sw);       mreport("winkey", wink);         mreport("kyr", kyr);         Serial.println();
   mreport("paddle", paddle);       mreport("button", button);       mreport("arbiter", arbiter); Serial.println();
+#endif
   mreport("tone_ramp", tone_ramp); mreport("key_ramp", key_ramp);   Serial.println();
   mreport("l_i2s_out", l_i2s_out); mreport("r_i2s_out", r_i2s_out); Serial.println();
   mreport("l_usb_out", l_usb_out); mreport("r_usb_out", r_usb_out); Serial.println();
   mreport("l_hdw_out", l_hdw_out); mreport("r_hdw_out", r_hdw_out); Serial.println();
+#if defined(OLD_AUDIO_GRAPH)
   mreport("key_out", key_out);     mreport("ptt out", ptt_out);     Serial.println();
   mreport("up out", up_out);      mreport("down out", down_out);    Serial.println();
+#endif
 }
 
 /* summary reset */
@@ -101,6 +106,7 @@ static void Sreset(void) {
 #if defined(KYRC_ENABLE_ADC_IN)
   mreset(adc_in);
 #endif
+#if defined(OLD_AUDIO_GRAPH)
   mreset(l_pad);
   mreset(r_pad);
   mreset(s_key);
@@ -110,6 +116,7 @@ static void Sreset(void) {
   mreset(paddle);
   mreset(button);
   mreset(arbiter);
+#endif
   mreset(tone_ramp);
   mreset(key_ramp);
   mreset(l_i2s_out);
@@ -118,16 +125,22 @@ static void Sreset(void) {
   mreset(r_usb_out);
   mreset(l_hdw_out);
   mreset(r_hdw_out);
+#if defined(OLD_AUDIO_GRAPH)
   mreset(key_out);
   mreset(ptt_out);
   mreset(up_out);
   mreset(down_out);
+#endif
   mreset(i2s_out);
   mreset(usb_out);
 }
 
 /* arbiter details */
 static void areport(void) {
+#if defined(NEW_AUDIO_GRAPH)
+  Serial.printf("arbiter fixt %d\n", get_active_vox());
+#endif
+#if defined(OLD_AUDIO_GRAPH)
   Serial.printf("arbiter vox %d, stream %d, tail %d, head %d, delay %d\n",
 		get_active_vox(), arbiter.active_stream, arbiter.active_tail, 
 		arbiter.active_head, arbiter.active_delay);
@@ -140,6 +153,7 @@ static void areport(void) {
   Serial.printf("pttq in %d items %d out %d, overrun %d, underrun %d, maxusage %d\n",
 		arbiter.pttq.in, arbiter.pttq.items(), arbiter.pttq.out,
 		arbiter.pttq.overrun, arbiter.pttq.underrun, arbiter.pttq.maxusage);
+#endif
 }
 
 /* button details */
@@ -225,6 +239,7 @@ static int16_t diag_any_vox_set(const int16_t vox) {
     (get_xnrpn(KYRP_XPER_IWS+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET);
 }
 
+#if defined(OLD_AUDIO_GRAPH)
 static char random_char(void) {
   char c;
   do c = random(0,128); while ( ! wink.valid_text(c)); 
@@ -238,7 +253,8 @@ static char *random_text(void) {
   buff[255] = 0;
   return buff;
 }
-    
+#endif
+
 static char *read_line() {
   static char buff[256];
   unsigned i = 0;
@@ -249,6 +265,7 @@ static char *read_line() {
   return buff;
 }
 
+#if defined(OLD_AUDIO_GRAPH)
 static const char *wink_send_ptr = NULL;
 static const char *kyr_send_ptr = NULL;
 
@@ -259,6 +276,7 @@ static int send_some_text(const char *text, AudioInputText& input) {
   while (*text != 0 && input.can_send_text()) input.send_text(*text++);
   return *text != 0 && input.valid_vox();
 }
+#endif
 
 static uint8_t logging = 0;
 
@@ -410,8 +428,10 @@ void diagnostics_loop() {
 	Serial.printf("%s\n", debug_buffer[i]);
 	debug_buffer[i][0] = 0;
       }
+#if defined(OLD_AUDIO_GRAPH)
   if ( ! send_some_text(wink_send_ptr, wink)) wink_send_ptr = NULL;
   if ( ! send_some_text(kyr_send_ptr, kyr)) kyr_send_ptr = NULL;
+#endif
   if (Serial.available()) {
     char *p = read_line();
     // Serial.printf("diag read '%s'\n", p);
@@ -429,11 +449,13 @@ void diagnostics_loop() {
 		    " b -> button diagnostics\n"
 		    " d -> debounce diagnostics\n"
 		    " l -> logging toggle\n"
+#if defined(OLD_AUDIO_GRAPH)
 		    " w... -> send ... up to newline to wink keyer\n"
 		    " k... -> send ... up to newline to kyr keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
 		    " K -> send lorem ipsum to kyr keyer\n"
 		    " Z -> send random to wink keyer\n"
+#endif
 		    " e -> default mixers\n"
 		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
 		    " i#### | il#### | ir#### -> set (both | left | right) i2s out mixers, # is 0|1\n"
@@ -450,11 +472,13 @@ void diagnostics_loop() {
     case 'b': breport(); break; /* button stats */
     case 'd': dreport(); break; /* debounce stats */
     case 'l': logging ^= 1; Serial.printf("logging %s\n", logging?"on":"off"); break;
+#if defined(OLD_AUDIO_GRAPH)
     case 'w': wink_send_ptr = p+1; break;
     case 'k': kyr_send_ptr = p+1; break;
     case 'W': wink_send_ptr = lorem; break;
     case 'K': kyr_send_ptr = lorem; break;
     case 'Z': wink_send_ptr = random_text(); break;
+#endif
     case 'e': mixer_set("i1100"); mixer_set("h1100"); mixer_set("u0010"); break;
     case 'h': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'i': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;

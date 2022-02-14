@@ -211,12 +211,12 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_ST_ENABLE, 1);
   nrpn_set(KYRP_IQ_BALANCE, 0);
   nrpn_set(KYRP_ST_PAN, 0);
-  nrpn_set(KYRP_DEBOUNCE, 5000);
+  nrpn_set(KYRP_DEBOUNCE, 1000);
   nrpn_set(KYRP_REMOTE_KEY, 1);
   
-  nrpn_set(KYRP_CHAN_CC, KYRD_CHAN_CC);
-  nrpn_set(KYRP_CHAN_NOTE, KYRD_CHAN_NOTE);
-  nrpn_set(KYRP_CHAN_NRPN, KYRD_CHAN_NRPN);
+  nrpn_set(KYRP_CHAN_CC, KYRD_CHANNEL);
+  nrpn_set(KYRP_CHAN_NOTE, KYRD_CHANNEL);
+  nrpn_set(KYRP_CHAN_NRPN, KYRD_CHANNEL);
 
   nrpn_set(KYRP_NOTE_KEY_OUT, KYRN_KEY_OUT);
   nrpn_set(KYRP_NOTE_PTT_OUT, KYRN_PTT_OUT);
@@ -450,12 +450,16 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     nrpn_echo_all();
     break;
   case KYRP_SEND_WINK: 
+#if defined(OLD_AUDIO_GRAPH)
     wink.send_text(value&127); 
     nrpn_echo(nrpn, value&127);
+#endif
     break;
   case KYRP_SEND_KYR: 
+#if defined(OLD_AUDIO_GRAPH)
     kyr.send_text(value&127);
     nrpn_echo(nrpn, value&127);
+#endif
     break;
   case KYRP_MSG_INDEX: 
     hasak.index = value%sizeof(hasak.msgs);

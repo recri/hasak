@@ -34,7 +34,7 @@
 #define KYRC_IDENT   0x0ad5	/* {type def title {identifier of the hasak keyer}} */
 
 /* Version of hasak */
-#define KYRC_VERSION 100	/* {type def title {version number of the NRPN set implemented}} */
+#define KYRC_VERSION 110	/* {type def title {version number of the NRPN set implemented}} */
 
 /* Magic number to identify valid eeprom contents */
 #define KYRC_MAGIC   0xad5d	/* {type def title {magic number to identify valid EEPROM contents}} */
@@ -184,22 +184,21 @@
 ** and can have their own keyer properties.
 ** Fist identifiers are named with the KYRF_ prefix
 */
-#define KYR_N_FIST 6		/* {type def title {number of keyer fists}} */
-#define KYRF_NONE	0	/* {type def title {no active fist, default parameters for other fist}} */
+#define KYR_N_FIST	7	/* {type def title {number of keyer fists}} */
+
+#define KYRF_NONE	0	/* {type def title {no active fist}} */
 #define KYRF_TUNE	1	/* {type def title {tune switch}} */
 #define KYRF_S_KEY	2	/* {type def title {Straight Key}} */
 #define KYRF_PAD	3	/* {type def title {Paddle}} */
-#define KYRF_WINK	4	/* {type def title {Winkey Key}} */
-#define KYRF_KYR	5	/* {type def title {Kyr Key}} */
-#define KYRF_BUT	6	/* {type def title {headset button straight key}} */
+#define KYRF_WINK	4	/* {type def title {Text Key}} */
+#define KYRF_KYR	5	/* {type def title {Text Key 2}} */
+#define KYRF_BUT	6	/* {type def title {button straight key}} */
 
 /* 
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYRD_CHAN_CC		1	/* {type def title {default channel for keyer control change}} */
-#define KYRD_CHAN_NOTE		1	/* {type def title {default channel for keyer notes}} */
-#define KYRD_CHAN_NRPN		1	/* {type def title {default channel for NRPN control}} */
+#define KYRD_CHANNEL	1	/* {type def title {default channel for keyer control change}} */
 
 /*
 ** midi note usage
@@ -210,27 +209,31 @@
 */
 #define KYRN_KEY_OUT	0      /* {type def title {note for tx key out signal}} */
 #define KYRN_PTT_OUT	1      /* {type def title {note for tx ptt out signal}} */
-#define KYRN_TUNE	2      /* {type def title {note for the tune channel}} */
-#define KYRN_L_PAD	3      /* {type def title {note for raw left paddle switch}} */
-#define KYRN_R_PAD	4      /* {type def title {note for raw right paddle switch}} */
-#define KYRN_S_KEY	5      /* {type def title {note for raw straight key switch}} */
-#define KYRN_EXT_PTT	6      /* {type def title {note for raw external ptt switch}} */
-#define KYRN_BUT	7      /* {type def title {note for raw button key}} */
-#define KYRN_TUNE_ST	8      /* {type def title {note for tune keyed sidetone}} */
-#define KYRN_S_KEY_ST	9      /* {type def title {note for straight keyed sidetone}} */
-#define KYRN_PAD_ST	10      /* {type def title {note for paddle keyed sidetone}} */
-#define KYRN_WINK_ST	11     /* {type def title {note for winkey keyed sidetone}} */
-#define KYRN_KEYER_ST	12     /* {type def title {note for keyer keyed sidetone}} */
-#define KYRN_BUT_ST	13     /* {type def title {note for button keyed sidetone}} */
+#define KYRN_L_PAD	2      /* {type def title {note for raw left paddle switch}} */
+#define KYRN_R_PAD	3      /* {type def title {note for raw right paddle switch}} */
+#define KYRN_S_KEY	4      /* {type def title {note for raw straight key switch}} */
+#define KYRN_EXT_PTT	5      /* {type def title {note for raw external ptt switch}} */
+#define KYRN_BUT	6      /* {type def title {note for raw button key}} */
+#define KYRN_TUNE	7      /* {type def title {note for the tune channel}} */
+
+#define KYRN_NONE_ST	8      /* {type def title {note for no keyed sidetone}} */
+#define KYRN_TUNE_ST	9     /* {type def title {note for tune keyed sidetone}} */
+#define KYRN_S_KEY_ST	10      /* {type def title {note for straight keyed sidetone}} */
+#define KYRN_PAD_ST	11     /* {type def title {note for paddle keyed sidetone}} */
+#define KYRN_WINK_ST	12     /* {type def title {note for winkey keyed sidetone}} */
+#define KYRN_KYR_ST	13     /* {type def title {note for keyer keyed sidetone}} */
+#define KYRN_BUT_ST	14     /* {type def title {note for button keyed sidetone}} */
+
 #define KYRN_KEY_ST	14     /* {type def title {note for actual keyed sidetone}} */
 #define KYRN_KEY_TX	15     /* {type def title {note for actual keyed transmitter}} */
 #define KYRN_PTT_TX	16     /* {type def title {note for actual keyed transmitter ptt}} */
 
 #define KYRN_EXT_OFF	0	 /* {type def title {external note off velocity}} */
 #define KYRN_EXT_ON	127	 /* {type def title {external note on velocity}} */
-#define KYRN_ENABLE	0b101	 /* {type def title {default enabled notes, keyout,pttout,tune}} */
 
-#define KYRC_NNOTE		32 /* {type def title {number of note states maintained in the keyer}} */
+#define KYRN_ENABLE	0b10000001 /* {type def title {default enabled notes, keyout,pttout,tune}} */
+
+#define KYR_N_NOTE		32 /* {type def title {number of note states maintained in the keyer}} */
 
 /*
 ** midi control change usage.

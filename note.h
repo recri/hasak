@@ -23,23 +23,111 @@
  * THE SOFTWARE.
  */
 
-static long note_changed = 0;
+/* forward ref */
+static void note_set(const int16_t note, const int8_t value);
+
+#define N_NOTE_LISTENERS 512
+#define N_NOTE_AFTERS 512
+
+struct note_listener {
+  void (*listener)(int note);
+  struct note_listener *next;
+};
+typedef struct note_listener note_listener_t;
+
+typedef struct {
+  elapsedSamples start;
+  uint32_t finish;
+  int8_t note, value;
+} note_after_t;
+
+static note_listener_t *note_head[KYR_N_NOTE];
+static note_listener_t *note_free;
+static note_listener_t note_node[N_NOTE_LISTENERS];
+
+static note_after_t note_afters[N_NOTE_AFTERS];
+
+static int note_listener_used = 0;
+static int note_after_used = 0;
 
 static void note_setup(void) {
+  for (int i = 0; i < KYR_N_NOTE; i += 1)
+    note_head[i] = NULL;
+  note_free = NULL;
+  for (int i = 0; i < N_NOTE_LISTENERS; i += 1) {
+    note_node[i].next = note_free;
+    note_free = &note_node[i];
+  }
+  for (int i = 0; i < N_NOTE_AFTERS; i += 1) note_afters[i].finish = 0;
 }
 
-static void note_loop(void) {
-  if (note_changed) {
-    for (int note = 0; note < KYRC_NNOTE; note += 1) {
-      if (note_changed & (1L<<note)) {
-	note_changed ^= (1L<<note);
-      }
+static void note_invalid(const int16_t note, const char *who) {
+  Serial.printf("invalid note %d in %s\n", note, who);
+}
+
+static int note_valid(const int16_t note) { return note >= 0 && note < KYR_N_NOTE; }
+
+static void note_listen(int note, void (*listener)(int note)) {
+  if ( ! note_valid(note)) {
+    note_invalid(note, "note_listen");
+    return;
+  }
+  if (note_free == NULL) {
+    Serial.printf("note_listen(%d, ...) no free listeners\n", note);
+    return;
+  }
+  note_listener_t *lp = note_free;
+  note_free = lp->next;
+  lp->listener = listener;
+  lp->next = note_head[note];
+  note_head[note] = lp;
+  note_listener_used += 1;
+}
+
+static void note_after(uint32_t samples, int8_t note, int8_t value) {
+  if (samples == 0) {
+    note_set(note, value);
+    return;
+  }
+  for (int i = 0; i < N_NOTE_AFTERS; i += 1)
+    if (note_afters[i].finish == 0) {
+      note_afters[i].start = 0;
+      note_afters[i].finish = samples;
+      note_afters[i].note = note;
+      note_afters[i].value = value;
+      note_after_used += 1;
+      return;
     }
+  Serial.printf("note_after(%d, %d, %d) no free afters\n", samples, note, value);
+}
+      
+static void note_loop(void) {
+  for (int i = 0; i < N_NOTE_AFTERS; i += 1)
+    if (note_afters[i].finish != 0 && note_afters[i].start >= note_afters[i].finish) {
+      note_afters[i].finish = 0;
+      note_after_used -= 1;
+      note_set(note_afters[i].note, note_afters[i].value);
+    }
+}
+
+static int note_get(const int16_t note) { 
+  if ( note_valid(note)) return hasak.notes[note];
+  note_invalid(note, "note_get");
+  return -1;
+}
+
+static void note_set(const int16_t note, const int8_t value) {
+  if ( note_valid(note) ) {
+    hasak.notes[note] = value;
+    Serial.printf("note_set(%d, %d)\n", note, value);
+    for (note_listener_t *lp = note_head[note]; lp != NULL; lp = lp->next) lp->listener(note);
+  } else {
+    note_invalid(note, "note_set");
   }
 }
 
-static void note_toggle(const int16_t note) {
-  hasak.notes[note] ^= 1;
-  note_changed |= (1L<<note);
-}
+static void note_toggle(const int16_t note) { note_set(note, hasak.notes[note] ^ 1); } 
 
+static void note_on(const int16_t note) { note_set(note, 1); } 
+
+static void note_off(const int16_t note) { note_set(note, 0); } 

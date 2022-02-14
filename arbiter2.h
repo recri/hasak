@@ -26,123 +26,74 @@
 /*
  * arbiter - the arbiter listens for sidetone key notes, grants the sidetone key
  * to the first fist which asks for it, but switches to higher priority fists when
- *  they interrupt the current fist.
- * straight key > paddle key > tune key > asciii keyer 
- *
- * The arbiter also manages swapping keyer parameters when switching active fist.
- * and updating computed per element timings when necessary.  Hmm, that won't
- * work perfectly, a keyer might start with the wrong timing, but it should catch
- * up soon enough.  
- *
- * This is much easier than the arbiter in the audio stream version, because the
- * ptt timing is separate.  Some keys won't generate ptt.
+ * they interrupt the current fist.
+ * straight key > paddle key > tune key > ascii keyer 
  */
 
-class Arbiter2 {
- public:
-  int active = -1;
-  int changeover = 0;
-  int timeon = 0;
-  int timeoff = 0;
-  elapsedMicros countup;
-  struct {
-    int note, vox;
-  } line[KYR_N_FIST];
-  void define_vox(int index, int note, int vox) {
-    if (index >= 0 && index < KYR_N_FIST) {
-      line[index].note = note;
-      line[index].vox = vox;
-    }
-  }
-  int get_active_vox(void) {
-    return active < 0 ? KYRF_NONE : line[active].vox;
-  }
-  void setup(void) {
-    // define the voices the arbiter sees on input channels
-    // changing to let their identity be their priority
-    define_vox(0, KYRN_S_KEY_ST, KYRF_S_KEY);
-    define_vox(1, KYRN_PAD_ST, KYRF_PAD);
-    define_vox(2, KYRN_TUNE_ST, KYRF_TUNE);
-    define_vox(3, KYRN_WINK_ST, KYRF_WINK);
-    define_vox(4, KYRN_KEYER_ST, KYRF_KYR);
-    define_vox(5, KYRN_BUT_ST, KYRF_BUT);
-  }
-  void loop(void) {
-    int n_active = 0, best = -1, send = 0;
+static int arbiter2_active = KYRN_NONE_ST;
+static int arbiter2_change_over = 0;
+static elapsedSamples arbiter2_counter = 0;
 
-    /* are we changing active voices */
-    if (changeover) {
-      /* have we waited long enough for the changeover */
-      if (countup < 30) return;
-      countup = 0;
-      changeover = 0;
-    }
-    
-    /* find highest priority active stream */
-    for (int i = 0; i < KYR_N_FIST; i += 1) {
-      if (hasak.notes[line[i].note]) {
-	n_active += 1;	// active if keyed
-	/* remember the highest priority active stream */
-	best = i;
-	break;
-      }
-    }
-
-    /* the result of the scan is combined with active_stream */
-    if (active < 0) {
-      /* there is no currently active stream */
-      /* any lingering active_tail has been cleared */
-      if (n_active == 0) {
-	/* there is no new voice keying */
-	/* send nothing */
-	;
-      } else {
-	/* there are one or more new voice(s) */
-	active = best;
-	/* send the active stream */
-	send = 1;
-	timeon = timeoff = 0;
-      }
-    } else {
-      /* there is a currently active stream */
-      if (n_active == 0 || active <= best) {
-	/* no contention */
-	/* send the active stream */
-	send = 1;
-      } else {
-	/* pre-empt active stream */
-	if (hasak.notes[KYRN_KEY_ST]) note_toggle(KYRN_KEY_ST);
-	/* set the new active stream */
-	active = best;
-	/* start the new active stream on the next loop */
-	changeover = 1;
-	countup = 0;
-      }
-    }
-    if (send) {
-      const uint8_t note = line[active].note;
-      if (hasak.notes[KYRN_KEY_ST] != hasak.notes[note]) {
-	if (hasak.notes[KYRN_KEY_ST])
-	  timeon = countup;
-	else
-	  timeoff = countup;
-	note_toggle(KYRN_KEY_ST);
-	countup = 0;
-      } else {
-	if (hasak.notes[KYRN_KEY_ST]) {
-	  /* stuck on? */
-	  ;
-	} else {
-	  if (countup > 7*timeon)
-	    active = -1;
-	}
-      }
-    }
+static void arbiter2_any_st(const int note) {
+  /* case 0 - change over to new active note in progress */
+  if (arbiter2_change_over)
+    return;
+  /* case 1 - continuation of active note */
+  if (note == arbiter2_active) {
+    if (note_get(note) != note_get(KYRN_KEY_ST))
+      note_toggle(KYRN_KEY_ST);
+    return;
   }
-};
+  /* case 2 - no active note, become active note */
+  if (arbiter2_active == KYRN_NONE_ST) {
+    arbiter2_active = note;
+    if (note_get(note) != note_get(KYRN_KEY_ST))
+      note_toggle(KYRN_KEY_ST);
+    return;
+  }
+  /* case 3 - lower priority than active note */
+  if (note > arbiter2_active)
+    return;
+  /* case 4 - preempt active note which is sounding */
+  if (note_get(arbiter2_active)) {
+    note_off(KYRN_KEY_ST);
+    arbiter2_active = note;
+    arbiter2_change_over = 1;
+    arbiter2_counter = 0;
+    return;
+  }
+  /* case 5 - preempt active note which is silent */
+  arbiter2_active = note;
+  if (note_get(note) != note_get(KYRN_KEY_ST))
+    note_toggle(KYRN_KEY_ST);
+  return;
+}
 
-static Arbiter2 arbiter2;
-  
-static void arbiter2_setup(void) { arbiter2.setup(); }
+static void arbiter2_release(const int note) {
+  arbiter2_active = KYRN_NONE_ST;
+}
 
-static void arbiter2_loop(void) { arbiter2.loop(); }
+static void arbiter2_setup(void) {
+  note_listen(KYRN_S_KEY_ST, arbiter2_any_st);
+  note_listen(KYRN_PAD_ST, arbiter2_any_st);
+  note_listen(KYRN_WINK_ST, arbiter2_any_st);
+  note_listen(KYRN_KYR_ST, arbiter2_any_st);
+  note_listen(KYRN_BUT_ST, arbiter2_any_st);
+  note_listen(KYRN_TUNE_ST, arbiter2_any_st);
+  note_listen(KYRN_PTT_TX, arbiter2_release);
+}
+
+static void arbiter2_loop(void) {
+  /* if we preempted a sounding note we have to allow one sample of sidetone off
+   * to trigger the fall ramp in the audio graph */
+  if (arbiter2_change_over && arbiter2_counter) {
+    arbiter2_change_over = 0;
+    if (note_get(arbiter2_active) != note_get(KYRN_KEY_ST))
+      note_toggle(KYRN_KEY_ST);
+  }
+}
+
+
+#if defined(NEW_AUDIO_GRAPH)
+int16_t get_active_vox(void) { return  arbiter2_active-KYRN_NONE_ST; }
+#endif
