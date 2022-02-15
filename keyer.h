@@ -24,46 +24,28 @@
  */
 
 /*
- * keyers
+ * straight key keyers
+ * paddle keyers in keyer_paddle.h
+ * text keyers in keyer_text.h
  */
-#include "keyer_paddle.h"
-
-static KeyerPaddle keyer_paddle(KYRF_PAD);
-
-static void keyer_s_key(int note) {
+static void keyer_s_key_listen(int note) {
   if (hasak.notes[KYRN_S_KEY] != hasak.notes[KYRN_S_KEY_ST]) note_toggle(KYRN_S_KEY_ST);
 }
 
-static void keyer_tune(int note) {
+static void keyer_tune_listen(int note) {
   if (hasak.notes[KYRN_TUNE] != hasak.notes[KYRN_TUNE_ST]) note_toggle(KYRN_TUNE_ST);
 }  
 
-static void keyer_but(int note) {
+static void keyer_but_listen(int note) {
   if (hasak.notes[KYRN_BUT] != hasak.notes[KYRN_BUT_ST]) note_toggle(KYRN_BUT_ST);
 }
 
-static void keyer_pad(int note) {
-  const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], 0);
-  if (key != note_get(KYRN_PAD_ST))
-    note_toggle(KYRN_PAD_ST);
-  //Serial.printf("keyer_pad(%d) -> key %d\n", note, key);
-}
-
 static void keyer_setup(void) {
-  note_listen(KYRN_S_KEY, keyer_s_key);
-  note_listen(KYRN_TUNE, keyer_tune);
-  note_listen(KYRN_BUT, keyer_but);
-  note_listen(KYRN_L_PAD, keyer_pad);
-  note_listen(KYRN_R_PAD, keyer_pad);
+  note_listen(KYRN_S_KEY, keyer_s_key_listen);
+  note_listen(KYRN_TUNE, keyer_tune_listen);
+  note_listen(KYRN_BUT, keyer_but_listen);
 }
 
 static void keyer_loop(void) {
-  static elapsedSamples ticks;
-  if (ticks) {
-    const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], ticks);
-    if (key != note_get(KYRN_PAD_ST))
-      note_toggle(KYRN_PAD_ST);
-    ticks = 0;
-  }
 }
 

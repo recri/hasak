@@ -15,8 +15,7 @@
 	with 0dB backing value default.
 [ ] put active voice, st decode speed, rx decode speed into
 	nrpns, but protect them against overwrites.
-[ ] 	
-[ ] move paddle keyer into it's own loop, minor rewrite.
+[x] move paddle keyer into it's own loop, minor rewrite.
 [x] move text keyer into the event loop
 [ ] implement common core functions
 [ ] implement JSON function

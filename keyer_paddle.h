@@ -152,3 +152,29 @@ private:
   KeyerNd7pa nd7pa;
   KeyerVk6ph vk6ph;
 };
+
+static KeyerPaddle keyer_paddle(KYRF_PAD);
+
+static void keyer_paddle_listener(int note) {
+  const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], 0);
+  if (key != note_get(KYRN_PAD_ST))
+    note_toggle(KYRN_PAD_ST);
+  //Serial.printf("keyer_pad(%d) -> key %d\n", note, key);
+}
+
+static void keyer_paddle_setup(void) {
+  note_listen(KYRN_L_PAD, keyer_paddle_listener);
+  note_listen(KYRN_R_PAD, keyer_paddle_listener);
+}
+
+static void keyer_paddle_loop(void) {
+  static elapsedSamples ticks;
+  if (ticks) {
+    const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], ticks);
+    if (key != note_get(KYRN_PAD_ST))
+      note_toggle(KYRN_PAD_ST);
+    ticks = 0;
+  }
+}
+
+

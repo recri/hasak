@@ -284,6 +284,7 @@ static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 #include "keyptt.h"
 #include "arbiter2.h"
 #include "keyer_text.h"
+#include "keyer_paddle.h"
 #include "keyer.h"
 #include "input.h"
 #include "inpin.h"
@@ -353,6 +354,7 @@ void setup(void) {
   inpin_setup();
   note_setup();
   keyer_setup();
+  keyer_paddle_setup();
   keyer_text_setup();
   arbiter2_setup();
   keyptt_setup();
@@ -367,6 +369,7 @@ void loop(void) {
   input_loop();			// poll analog input pins
   note_loop();			// note manager
   keyer_loop();			// keyer events
+  keyer_paddle_loop();		// paddle keyers
   keyer_text_loop();		// text keyers
   arbiter2_loop();		// arbitration of keyer events
   keyptt_loop();		// key generated ptt
