@@ -22,48 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef ring_buffer_h_
+#define ring_buffer_h_
 
-/*
- * keyers
- */
-#include "keyer_paddle.h"
+#include <Arduino.h>
 
-static KeyerPaddle keyer_paddle(KYRF_PAD);
+#ifndef RING_BUFFER_SIZE
+#define RING_BUFFER_SIZE 128
+#endif
 
-static void keyer_s_key(int note) {
-  if (hasak.notes[KYRN_S_KEY] != hasak.notes[KYRN_S_KEY_ST]) note_toggle(KYRN_S_KEY_ST);
-}
-
-static void keyer_tune(int note) {
-  if (hasak.notes[KYRN_TUNE] != hasak.notes[KYRN_TUNE_ST]) note_toggle(KYRN_TUNE_ST);
-}  
-
-static void keyer_but(int note) {
-  if (hasak.notes[KYRN_BUT] != hasak.notes[KYRN_BUT_ST]) note_toggle(KYRN_BUT_ST);
-}
-
-static void keyer_pad(int note) {
-  const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], 0);
-  if (key != note_get(KYRN_PAD_ST))
-    note_toggle(KYRN_PAD_ST);
-  //Serial.printf("keyer_pad(%d) -> key %d\n", note, key);
-}
-
-static void keyer_setup(void) {
-  note_listen(KYRN_S_KEY, keyer_s_key);
-  note_listen(KYRN_TUNE, keyer_tune);
-  note_listen(KYRN_BUT, keyer_but);
-  note_listen(KYRN_L_PAD, keyer_pad);
-  note_listen(KYRN_R_PAD, keyer_pad);
-}
-
-static void keyer_loop(void) {
-  static elapsedSamples ticks;
-  if (ticks) {
-    const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], ticks);
-    if (key != note_get(KYRN_PAD_ST))
-      note_toggle(KYRN_PAD_ST);
-    ticks = 0;
-  }
-}
-
+/* circular buffer of int for run lengths */
+/* a negative int represents abs(int) zeros */
+/* a positive int represents abs(int) ones */
+template <class T, unsigned SIZE>
+class RingBuffer {
+public:
+  RingBuffer() { }
+  void reset(void) { wptr = rptr = 0; }
+  bool can_get(void) { return rptr!=wptr; }
+  bool can_put(void) { return (wptr+1) != rptr; }
+  T peek(void) { return buff[rptr%SIZE]; }
+  T get(void) { return buff[rptr++%SIZE]; }
+  void put(T val) { buff[wptr++%SIZE] = val; }
+  int items(void) { return wptr-rptr; }
+  bool can_unput(void) { return can_get(); }
+  void unput(void) { wptr -= 1; }
+private:
+  unsigned wptr = 0, rptr = 0;
+  T buff[SIZE];
+};
+#endif

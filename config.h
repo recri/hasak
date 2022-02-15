@@ -228,6 +228,10 @@
 #define KYRN_KEY_TX	15     /* {type def title {note for actual keyed transmitter}} */
 #define KYRN_PTT_TX	16     /* {type def title {note for actual keyed transmitter ptt}} */
 
+#define KYRN_TXT_WINK	17     /* {type def title {note containing 7 bit ascii text for wink channel}} */
+#define KYRN_TXT_KYR	18     /* {type def title {note containing 7 bit ascii text for kyr channel}} */	
+#define KYRN_TXT_DEC	19     /* {type def title {note containing 7 bit ascii text decoded from sidetone}} */
+
 #define KYRN_EXT_OFF	0	 /* {type def title {external note off velocity}} */
 #define KYRN_EXT_ON	127	 /* {type def title {external note on velocity}} */
 

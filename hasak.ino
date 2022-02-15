@@ -272,17 +272,18 @@ static float timing_percent_max(uint32_t cpuCyclesMax) {
 /* valid teensy pin number, from teensy core sources */
 static int valid_pin(int pin) { return pin >= 0 && pin < CORE_NUM_TOTAL_PINS; }
 
-static void codec_enable(void);
-static int16_t codec_identify(void);
-static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
+// static void codec_enable(void);
+// static int16_t codec_identify(void);
+// static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
 static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 
-#include "nrpn.h"
 #include "codec.h"
+#include "nrpn.h"
 #include "midi.h"
 #include "note.h"
 #include "keyptt.h"
 #include "arbiter2.h"
+#include "keyer_text.h"
 #include "keyer.h"
 #include "input.h"
 #include "inpin.h"
@@ -352,6 +353,7 @@ void setup(void) {
   inpin_setup();
   note_setup();
   keyer_setup();
+  keyer_text_setup();
   arbiter2_setup();
   keyptt_setup();
   diagnostics_setup();
@@ -365,6 +367,7 @@ void loop(void) {
   input_loop();			// poll analog input pins
   note_loop();			// note manager
   keyer_loop();			// keyer events
+  keyer_text_loop();		// text keyers
   arbiter2_loop();		// arbitration of keyer events
   keyptt_loop();		// key generated ptt
   winkey_loop();		// winkey

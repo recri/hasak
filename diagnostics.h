@@ -239,10 +239,9 @@ static int16_t diag_any_vox_set(const int16_t vox) {
     (get_xnrpn(KYRP_XPER_IWS+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET);
 }
 
-#if defined(OLD_AUDIO_GRAPH)
 static char random_char(void) {
   char c;
-  do c = random(0,128); while ( ! wink.valid_text(c)); 
+  do c = random(0,128); while ( ! keyer_text_wink.valid_text(c)); 
   return c;
 }
 
@@ -253,7 +252,7 @@ static char *random_text(void) {
   buff[255] = 0;
   return buff;
 }
-#endif
+
 
 static char *read_line() {
   static char buff[256];
@@ -265,18 +264,16 @@ static char *read_line() {
   return buff;
 }
 
-#if defined(OLD_AUDIO_GRAPH)
 static const char *wink_send_ptr = NULL;
 static const char *kyr_send_ptr = NULL;
 
-static int send_some_text(const char *text, AudioInputText& input) {
+static int send_some_text(const char *text, KeyerText& input) {
   if (text == NULL) return 0;
   if (*text == 0) return 0;
   if ( ! input.valid_vox()) return 0;
   while (*text != 0 && input.can_send_text()) input.send_text(*text++);
   return *text != 0 && input.valid_vox();
 }
-#endif
 
 static uint8_t logging = 0;
 
@@ -422,16 +419,25 @@ void diagnostics_setup() { totalTime = 0; }
 
 void diagnostics_loop() {
   // dump background debug messages
+  static int elapsed_test = 0;
+  static elapsedSamples timer1, timer2;
   if (logging)
     for (int i = 0; i < 4; i += 1)
       if (debug_buffer[i][0] != 0) {
 	Serial.printf("%s\n", debug_buffer[i]);
 	debug_buffer[i][0] = 0;
       }
-#if defined(OLD_AUDIO_GRAPH)
-  if ( ! send_some_text(wink_send_ptr, wink)) wink_send_ptr = NULL;
-  if ( ! send_some_text(kyr_send_ptr, kyr)) kyr_send_ptr = NULL;
-#endif
+  if ( ! send_some_text(wink_send_ptr, keyer_text_wink)) wink_send_ptr = NULL;
+  if ( ! send_some_text(kyr_send_ptr, keyer_text_kyr)) kyr_send_ptr = NULL;
+
+  if (elapsed_test) {
+    if ((int)timer1 <= 0 && timer2 > 0) {
+      Serial.printf("timer1 %d timer2 %d\n", (int)timer1, (int)timer2);
+      timer2 = 0;
+      if (timer1 == 0) elapsed_test = 0;
+    }
+  }
+
   if (Serial.available()) {
     char *p = read_line();
     // Serial.printf("diag read '%s'\n", p);
@@ -449,13 +455,11 @@ void diagnostics_loop() {
 		    " b -> button diagnostics\n"
 		    " d -> debounce diagnostics\n"
 		    " l -> logging toggle\n"
-#if defined(OLD_AUDIO_GRAPH)
 		    " w... -> send ... up to newline to wink keyer\n"
 		    " k... -> send ... up to newline to kyr keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
 		    " K -> send lorem ipsum to kyr keyer\n"
 		    " Z -> send random to wink keyer\n"
-#endif
 		    " e -> default mixers\n"
 		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
 		    " i#### | il#### | ir#### -> set (both | left | right) i2s out mixers, # is 0|1\n"
@@ -472,13 +476,12 @@ void diagnostics_loop() {
     case 'b': breport(); break; /* button stats */
     case 'd': dreport(); break; /* debounce stats */
     case 'l': logging ^= 1; Serial.printf("logging %s\n", logging?"on":"off"); break;
-#if defined(OLD_AUDIO_GRAPH)
+    case 'E': elapsed_test ^= 1; timer1 = -10; timer2 = 0; break;
     case 'w': wink_send_ptr = p+1; break;
     case 'k': kyr_send_ptr = p+1; break;
     case 'W': wink_send_ptr = lorem; break;
     case 'K': kyr_send_ptr = lorem; break;
     case 'Z': wink_send_ptr = random_text(); break;
-#endif
     case 'e': mixer_set("i1100"); mixer_set("h1100"); mixer_set("u0010"); break;
     case 'h': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'i': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;

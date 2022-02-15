@@ -1,4 +1,10 @@
 * Todo list as of 2020-02-14
+[ ] if KYRF_NONE was > than all real fists, 
+	then the test for not sending from my_fist would be
+	active_fist < my_fist
+[x] incorporate ring_buffer.h
+[ ] make nrpn morse table NOTSET by default
+	backed by the const table in flash
 [ ] move text keyer into the event loop
 [ ] implement common core functions
 [ ] implement JSON function
