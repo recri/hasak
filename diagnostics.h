@@ -72,19 +72,10 @@ static void Sreport(void) {
 #else
   mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);	    Serial.println();
 #endif
-#if defined(OLD_AUDIO_GRAPH)
-  mreport("l_pad", l_pad);         mreport("r_pad", r_pad);         mreport("s_key", s_key);     Serial.println();
-  mreport("ptt sw", ptt_sw);       mreport("winkey", wink);         mreport("kyr", kyr);         Serial.println();
-  mreport("paddle", paddle);       mreport("button", button);       mreport("arbiter", arbiter); Serial.println();
-#endif
   mreport("tone_ramp", tone_ramp); mreport("key_ramp", key_ramp);   Serial.println();
   mreport("l_i2s_out", l_i2s_out); mreport("r_i2s_out", r_i2s_out); Serial.println();
   mreport("l_usb_out", l_usb_out); mreport("r_usb_out", r_usb_out); Serial.println();
   mreport("l_hdw_out", l_hdw_out); mreport("r_hdw_out", r_hdw_out); Serial.println();
-#if defined(OLD_AUDIO_GRAPH)
-  mreport("key_out", key_out);     mreport("ptt out", ptt_out);     Serial.println();
-  mreport("up out", up_out);      mreport("down out", down_out);    Serial.println();
-#endif
 }
 
 /* summary reset */
@@ -106,17 +97,6 @@ static void Sreset(void) {
 #if defined(KYRC_ENABLE_ADC_IN)
   mreset(adc_in);
 #endif
-#if defined(OLD_AUDIO_GRAPH)
-  mreset(l_pad);
-  mreset(r_pad);
-  mreset(s_key);
-  mreset(ptt_sw);
-  mreset(wink);
-  mreset(kyr);
-  mreset(paddle);
-  mreset(button);
-  mreset(arbiter);
-#endif
   mreset(tone_ramp);
   mreset(key_ramp);
   mreset(l_i2s_out);
@@ -125,35 +105,13 @@ static void Sreset(void) {
   mreset(r_usb_out);
   mreset(l_hdw_out);
   mreset(r_hdw_out);
-#if defined(OLD_AUDIO_GRAPH)
-  mreset(key_out);
-  mreset(ptt_out);
-  mreset(up_out);
-  mreset(down_out);
-#endif
   mreset(i2s_out);
   mreset(usb_out);
 }
 
 /* arbiter details */
 static void areport(void) {
-#if defined(NEW_AUDIO_GRAPH)
-  Serial.printf("arbiter fixt %d\n", get_active_vox());
-#endif
-#if defined(OLD_AUDIO_GRAPH)
-  Serial.printf("arbiter vox %d, stream %d, tail %d, head %d, delay %d\n",
-		get_active_vox(), arbiter.active_stream, arbiter.active_tail, 
-		arbiter.active_head, arbiter.active_delay);
-  for (int i = 0; i < KYR_N_FIST; i += 1)
-    Serial.printf("stream %d vox %d priority %d local %d\n", 
-		  i, arbiter.vox[i], arbiter.priority[i], arbiter.local[i]);
-  Serial.printf("keyq in %d items %d out %d, overrun %d, underrun %d, maxusage %d\n",
-		arbiter.keyq.in, arbiter.keyq.items(), arbiter.keyq.out,
-		arbiter.keyq.overrun, arbiter.keyq.underrun, arbiter.keyq.maxusage);
-  Serial.printf("pttq in %d items %d out %d, overrun %d, underrun %d, maxusage %d\n",
-		arbiter.pttq.in, arbiter.pttq.items(), arbiter.pttq.out,
-		arbiter.pttq.overrun, arbiter.pttq.underrun, arbiter.pttq.maxusage);
-#endif
+  Serial.printf("arbiter fist %d\n", get_active_vox());
 }
 
 /* button details */

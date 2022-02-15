@@ -450,16 +450,14 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     nrpn_echo_all();
     break;
   case KYRP_SEND_WINK: 
-#if defined(OLD_AUDIO_GRAPH)
-    wink.send_text(value&127); 
+    note_set(KYRN_TXT_WINK, value&127);
+    // keyer_text_wink.send_text(value&127); 
     nrpn_echo(nrpn, value&127);
-#endif
     break;
   case KYRP_SEND_KYR: 
-#if defined(OLD_AUDIO_GRAPH)
-    kyr.send_text(value&127);
+    note_set(KYRN_TXT_KYR, value&127);
+    // keyer_text_kyr.send_text(value&127);
     nrpn_echo(nrpn, value&127);
-#endif
     break;
   case KYRP_MSG_INDEX: 
     hasak.index = value%sizeof(hasak.msgs);

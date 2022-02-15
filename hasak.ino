@@ -45,12 +45,6 @@
 #include <Audio.h>
 // custom audio modules
 #include "src/Audio/input_byte.h"
-#if defined(OLD_AUDIO_GRAPH)
-#include "src/Audio/input_text.h"
-#include "src/Audio/effect_paddle.h"
-#include "src/Audio/effect_button.h"
-#include "src/Audio/effect_arbiter.h"
-#endif
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/output_byte.h"
 
@@ -68,66 +62,15 @@ AudioInputI2S           i2s_in;	// i2s audio in
 AudioInputAnalog	adc_in;	// headset switch detect
 #endif
 
-#if defined(OLD_AUDIO_GRAPH)
-AudioSynthWaveformDc	tune;	// tune switch
-AudioInputByte		s_key;	// straight key in
-AudioInputByte		l_pad;	// left paddle in
-AudioInputByte		r_pad;	// right paddle in
-AudioInputByte		ptt_sw;	// ptt switch
-AudioInputText		wink(KYRF_WINK);	// winkey text in
-AudioInputText		kyr(KYRF_KYR);	// kyr text in for op
-#endif
-
 // revised inputs
 AudioInputByte		st_key;		  // sidetone key line
 AudioInputByte		tx_key;		  // transmitter key line
 
-#if defined(OLD_AUDIO_GRAPH)
-// paddle keyer logic
-AudioEffectPaddle	paddle(KYRF_PAD);	// 
-AudioConnection         patchCord1a(l_pad, 0, paddle, 0);
-AudioConnection         patchCord1b(r_pad, 0, paddle, 1);
-
-// button discriminator
-AudioEffectButton	button;
-#if defined(KYRC_ENABLE_ADC_IN)
-AudioConnection		patchCord1c(adc_in, 0, button, 0);
-#endif
-
-// arbitration
-AudioEffectArbiter	arbiter;
-AudioConnection		patchCord2f(tune, 0, arbiter, 0);
-AudioConnection		patchCord2b(s_key, 0, arbiter, 1);
-AudioConnection		patchCord2a(paddle, 0, arbiter, 2);
-AudioConnection		patchCord2c(wink, 0, arbiter, 3);
-AudioConnection		patchCord2d(kyr, 0, arbiter, 4);
-AudioConnection		patchCord2e(button, 0, arbiter, 5);
-
-static void arbiter_setup(void) {
-  // define the fists the arbiter sees on input channels
-  // changing to let their identity be their priority
-  arbiter.define_vox(0, KYRF_TUNE, KYRF_TUNE, 0);
-  arbiter.define_vox(1, KYRF_S_KEY, KYRF_S_KEY, 0);
-  arbiter.define_vox(2, KYRF_PAD, KYRF_PAD, 0);
-  arbiter.define_vox(3, KYRF_WINK, KYRF_WINK, 0);
-  arbiter.define_vox(4, KYRF_KYR, KYRF_KYR, 1);
-  arbiter.define_vox(5, KYRF_BUT, KYRF_BUT, 1);
-}
-
-int16_t get_active_vox(void) { return arbiter.get_active_vox(); }
-#endif
-
 // shaped key waveform
 AudioSynthKeyedTone	tone_ramp(1); // one channel sidetone ramp
 AudioSynthKeyedTone	key_ramp(2);  // two channel IQ tone ramp
-#if defined(OLD_AUDIO_GRAPH)
-AudioConnection		patchCord3a(arbiter, 0, tone_ramp, 0); // sidetone key line
-AudioConnection		patchCord3b(arbiter, 1, key_ramp, 0);  // transmit key line
-#endif
-#if defined(NEW_AUDIO_GRAPH)
 AudioConnection		patchCord3a(st_key, 0, tone_ramp, 0); // sidetone key line
 AudioConnection		patchCord3b(tx_key, 1, key_ramp, 0);  // transmit key line
-#endif
 
 // 
 // output mixers
@@ -183,21 +126,6 @@ AudioConnection		patchCord923(i2s_in, 0, l_i2s_out, 3);
 AudioConnection		patchCord933(i2s_in, 1, r_i2s_out, 3);
 AudioConnection		patchCord943(i2s_in, 0, l_hdw_out, 3);
 AudioConnection		patchCord953(i2s_in, 1, r_hdw_out, 3);
-
-#if defined(OLD_AUDIO_GRAPH)
-// outputs
-AudioOutputByte		key_out;
-AudioOutputByte		ptt_out;
-
-AudioConnection		patchCord10a(arbiter, 1, key_out, 0);
-AudioConnection		patchCord10b(arbiter, 2, ptt_out, 0);
-
-AudioOutputByte		up_out;
-AudioOutputByte		down_out;
-
-AudioConnection		patchCord10d(button, 1, up_out, 0);
-AudioConnection		patchCord10e(button, 2, down_out, 0);
-#endif
 
 AudioOutputUSB          usb_out;
 AudioConnection		patchCord11a(l_usb_out, 0, usb_out, 0);
@@ -276,6 +204,7 @@ static int valid_pin(int pin) { return pin >= 0 && pin < CORE_NUM_TOTAL_PINS; }
 // static int16_t codec_identify(void);
 // static void codec_nrpn_set(const int16_t nrpn, const int16_t value);
 static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
+static void note_set(const int16_t note, const int8_t value);
 
 #include "codec.h"
 #include "nrpn.h"
@@ -303,22 +232,8 @@ static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
 static void interrupt() {
   uint32_t cycles = ARM_DWT_CYCCNT;
   hasak.sampleCount += 1;
-#if defined(OLD_AUDIO_GRAPH)
-  l_pad.send((digitalReadFast(KYR_L_PAD_PIN)^1)); // pin active low, note active high
-  r_pad.send((digitalReadFast(KYR_R_PAD_PIN)^1));
-  s_key.send((digitalReadFast(KYR_S_KEY_PIN)^1));
-  ptt_sw.send((digitalReadFast(KYR_EXT_PTT_PIN)^1));
-#endif
-#if defined(NEW_AUDIO_GRAPH)
   st_key.send(hasak.notes[KYRN_KEY_ST]);
   tx_key.send(hasak.notes[KYRN_KEY_TX]);
-#endif
-#if defined(OLD_AUDIO_GRAPH)
-  hasak._key_out=key_out.recv();
-  hasak._ptt_out=ptt_out.recv();
-  hasak._up_out = up_out.recv();
-  hasak._down_out = down_out.recv();
-#endif
   digitalWriteFast(KYR_KEY_OUT_PIN,hasak._key_out); // note active high, is pin active high or low?
   digitalWriteFast(KYR_PTT_OUT_PIN,hasak._ptt_out);
   isrCpuCyclesRaw += ARM_DWT_CYCCNT - cycles;
@@ -330,9 +245,6 @@ void setup(void) {
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
 
-#if defined(OLD_AUDIO_GRAPH)
-  arbiter_setup();
-#endif
   AudioMemory(40);
   nrpn_setup();
 
