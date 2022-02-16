@@ -216,9 +216,14 @@
 #define KYRN_BUT	6      /* {type def title {note for raw button key}} */
 #define KYRN_TUNE	7      /* {type def title {note for the tune channel}} */
 
+/* 
+** These notes are sidetones generated from various sources.
+** They are defined in priority order from highest to lowest.
+** Higher priority sidetones seize control from lower priority.
+*/
 #define KYRN_NONE_ST	8      /* {type def title {note for no keyed sidetone}} */
-#define KYRN_TUNE_ST	9     /* {type def title {note for tune keyed sidetone}} */
-#define KYRN_S_KEY_ST	10      /* {type def title {note for straight keyed sidetone}} */
+#define KYRN_TUNE_ST	9      /* {type def title {note for tune keyed sidetone}} */
+#define KYRN_S_KEY_ST	10     /* {type def title {note for straight keyed sidetone}} */
 #define KYRN_PAD_ST	11     /* {type def title {note for paddle keyed sidetone}} */
 #define KYRN_WINK_ST	12     /* {type def title {note for winkey keyed sidetone}} */
 #define KYRN_KYR_ST	13     /* {type def title {note for keyer keyed sidetone}} */
@@ -230,7 +235,8 @@
 
 #define KYRN_TXT_WINK	17     /* {type def title {note containing 7 bit ascii text for wink channel}} */
 #define KYRN_TXT_KYR	18     /* {type def title {note containing 7 bit ascii text for kyr channel}} */	
-#define KYRN_TXT_DEC	19     /* {type def title {note containing 7 bit ascii text decoded from sidetone}} */
+#define KYRN_ELT_DEC	19     /* {type def title {note containing 7 bit ascii element decoded from sidetone}} */
+#define KYRN_TXT_DEC	20     /* {type def title {note containing 7 bit ascii text decoded from sidetone}} */
 
 #define KYRN_EXT_OFF	0	 /* {type def title {external note off velocity}} */
 #define KYRN_EXT_ON	127	 /* {type def title {external note on velocity}} */
