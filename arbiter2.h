@@ -93,7 +93,4 @@ static void arbiter2_loop(void) {
   }
 }
 
-
-#if defined(NEW_AUDIO_GRAPH)
 int16_t get_active_vox(void) { return  arbiter2_active-KYRN_NONE_ST; }
-#endif

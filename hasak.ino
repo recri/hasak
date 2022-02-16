@@ -27,8 +27,8 @@
 /*
 ** crossing over from old to new
 */
-//#define OLD_AUDIO_GRAPH 1
-#define NEW_AUDIO_GRAPH 1
+#define OLD_VOX_USAGE
+//#define NEW_VOX_USAGE
 
 /*
 ** config.h contains preprocessor defined constants.
