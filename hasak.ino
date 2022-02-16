@@ -27,8 +27,8 @@
 /*
 ** crossing over from old to new
 */
-#define OLD_VOX_USAGE
-//#define NEW_VOX_USAGE
+//#define OLD_VOX_USAGE
+#define NEW_FIST_USAGE
 
 /*
 ** config.h contains preprocessor defined constants.

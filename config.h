@@ -175,25 +175,6 @@
 #define KYR_ST_FREQ_POT	17	/* {type pin title {sidetone frequency pot input pin} analog A3} */
 #define KYR_SPEED_POT	22	/* {type pin title {keyer speed pot input pin} analog A8} */
 
-/*
-** keyer fists
-** A keyer fist is a key or paddle or text input that can produce
-** a sidetone and a transmit output.
-** Six default fists.
-** Fists can have priority, lowest wins, and can be local, never transmitted,
-** and can have their own keyer properties.
-** Fist identifiers are named with the KYRF_ prefix
-*/
-#define KYR_N_FIST	7	/* {type def title {number of keyer fists}} */
-
-#define KYRF_NONE	0	/* {type def title {no active fist}} */
-#define KYRF_TUNE	1	/* {type def title {tune switch}} */
-#define KYRF_S_KEY	2	/* {type def title {Straight Key}} */
-#define KYRF_PAD	3	/* {type def title {Paddle}} */
-#define KYRF_WINK	4	/* {type def title {Text Key}} */
-#define KYRF_KYR	5	/* {type def title {Text Key 2}} */
-#define KYRF_BUT	6	/* {type def title {button straight key}} */
-
 /* 
 ** MIDI usage
 */
@@ -206,44 +187,52 @@
 ** these can be changed to any note numbers with KYRP_NOTE_*
 ** any set of these can be enabled for MIDI transmission with KYRP_NOTE_ENABLE
 ** Notes are named with KYRN_ prefix.
-*/
-#define KYRN_KEY_OUT	0      /* {type def title {note for tx key out signal}} */
-#define KYRN_PTT_OUT	1      /* {type def title {note for tx ptt out signal}} */
-#define KYRN_L_PAD	2      /* {type def title {note for raw left paddle switch}} */
-#define KYRN_R_PAD	3      /* {type def title {note for raw right paddle switch}} */
-#define KYRN_S_KEY	4      /* {type def title {note for raw straight key switch}} */
-#define KYRN_EXT_PTT	5      /* {type def title {note for raw external ptt switch}} */
-#define KYRN_BUT	6      /* {type def title {note for raw button key}} */
-#define KYRN_TUNE	7      /* {type def title {note for the tune channel}} */
-
-/* 
-** These notes are sidetones generated from various sources.
-** They are defined in priority order from highest to lowest.
+**
+** Notes named with KYRN_*_ST notes are sidetone sources.
+** KYRN_KEY_ST is the sidetone which is actually keyed.
+** KYRN_NONE_ST is the state when no sidetone source is active.
+** The rest are named after their source.
+** The ordering of the note numbers for KYRN_TUNE_ST to KYRN_NONE_ST
+** is significant, lower numbered sidetones take priority, but the
+** exact values are not important.
 ** Higher priority sidetones seize control from lower priority.
+** They may be reordered to alter the priorities, 
+** but KYRN_NONE_ST should always be the last, highest numbered
 */
-#define KYRN_NONE_ST	8      /* {type def title {note for no keyed sidetone}} */
-#define KYRN_TUNE_ST	9      /* {type def title {note for tune keyed sidetone}} */
-#define KYRN_S_KEY_ST	10     /* {type def title {note for straight keyed sidetone}} */
-#define KYRN_PAD_ST	11     /* {type def title {note for paddle keyed sidetone}} */
-#define KYRN_WINK_ST	12     /* {type def title {note for winkey keyed sidetone}} */
-#define KYRN_KYR_ST	13     /* {type def title {note for keyer keyed sidetone}} */
-#define KYRN_BUT_ST	14     /* {type def title {note for button keyed sidetone}} */
+#define KYRN_KEY_OUT	0      /* {type note title {note for tx key out signal}} */
+#define KYRN_PTT_OUT	1      /* {type note title {note for tx ptt out signal}} */
+#define KYRN_TUNE_ST	2	/* {type note title {note for tune keyed sidetone}} */
+#define KYRN_L_PAD	3      /* {type note title {note for raw left paddle switch}} */
+#define KYRN_R_PAD	4      /* {type note title {note for raw right paddle switch}} */
+#define KYRN_S_KEY	5      /* {type note title {note for raw straight key switch}} */
+#define KYRN_EXT_PTT	6      /* {type note title {note for raw external ptt switch}} */
+#define KYRN_BUT	7      /* {type note title {note for raw button key}} */
+#define KYRN_TUNE	8      /* {type note title {note for the tune channel}} */
 
-#define KYRN_KEY_ST	14     /* {type def title {note for actual keyed sidetone}} */
-#define KYRN_KEY_TX	15     /* {type def title {note for actual keyed transmitter}} */
-#define KYRN_PTT_TX	16     /* {type def title {note for actual keyed transmitter ptt}} */
+/* remaining sidetone sources, other than KYRN_TUNE_ST */
+#define KYRN_S_KEY_ST	9	/* {type note title {note for straight keyed sidetone}} */
+#define KYRN_PAD_ST	10	/* {type note title {note for paddle keyed sidetone}} */
+#define KYRN_WINK_ST	11	/* {type note title {note for winkey keyed sidetone}} */
+#define KYRN_KYR_ST	12	/* {type note title {note for keyer keyed sidetone}} */
+#define KYRN_BUT_ST	13	/* {type note title {note for button keyed sidetone}} */
+#define KYRN_NONE_ST	14      /* {type note title {note for no keyed sidetone}} */
 
-#define KYRN_TXT_WINK	17     /* {type def title {note containing 7 bit ascii text for wink channel}} */
-#define KYRN_TXT_KYR	18     /* {type def title {note containing 7 bit ascii text for kyr channel}} */	
-#define KYRN_ELT_DEC	19     /* {type def title {note containing 7 bit ascii element decoded from sidetone}} */
-#define KYRN_TXT_DEC	20     /* {type def title {note containing 7 bit ascii text decoded from sidetone}} */
+/* the real sidetone, a copy of one of the previous sidetone sources */
+#define KYRN_KEY_ST	14     /* {type note title {note for actual keyed sidetone}} */
+#define KYRN_KEY_TX	15     /* {type note title {note for actual keyed transmitter}} */
+#define KYRN_PTT_TX	16     /* {type note title {note for actual keyed transmitter ptt}} */
 
-#define KYRN_EXT_OFF	0	 /* {type def title {external note off velocity}} */
-#define KYRN_EXT_ON	127	 /* {type def title {external note on velocity}} */
+#define KYRN_TXT_WINK	17     /* {type note title {note containing 7 bit ascii text for wink channel}} */
+#define KYRN_TXT_KYR	18     /* {type note title {note containing 7 bit ascii text for kyr channel}} */	
+#define KYRN_ELT_DEC	19     /* {type note title {note containing 7 bit ascii element decoded from sidetone}} */
+#define KYRN_TXT_DEC	20     /* {type note title {note containing 7 bit ascii text decoded from sidetone}} */
 
-#define KYRN_ENABLE	0b10000001 /* {type def title {default enabled notes, keyout,pttout,tune}} */
+#define KYR_EXT_OFF	0	 /* {type def title {external note off velocity}} */
+#define KYR_EXT_ON	127	 /* {type def title {external note on velocity}} */
 
-#define KYR_N_NOTE		32 /* {type def title {number of note states maintained in the keyer}} */
+#define KYR_ENABLE	0b101 /* {type def title {default enabled notes, keyout,pttout,tune}} */
+
+#define KYR_N_NOTE	32	/* {type def title {number of note states maintained in the keyer}} */
 
 /*
 ** midi control change usage.
@@ -447,15 +436,7 @@
 
 #define KYRP_KEYER_LAST		(KYRP_KEYER+8) /* {type rel title {end of keyer block}} */
 
-/* seven repetitions of the keyer block for per fist customizations */
-#define KYRP_FIST_OFFSET	(KYRP_KEYER_LAST-KYRP_KEYER) /* {type rel title {size of keyer parameter block}} */
-#define KYRP_FIST_NONE		(KYRP_KEYER+KYRF_NONE*KYRP_FIST_OFFSET) /* {type rel title {base of default keyer parameters}} */
-#define KYRP_FIST_TUNE		(KYRP_KEYER+KYRF_TUNE*KYRP_FIST_OFFSET) /* {type rel title {base of tune keyer parameters}} */
-#define KYRP_FIST_S_KEY		(KYRP_KEYER+KYRF_S_KEY*KYRP_FIST_OFFSET) /* {type rel title {base of straight key parameters}} */
-#define KYRP_FIST_PAD		(KYRP_KEYER+KYRF_PAD*KYRP_FIST_OFFSET) /* {type rel title {base of paddle keyer parameters}} */
-#define KYRP_FIST_WINK		(KYRP_KEYER+KYRF_WINK*KYRP_FIST_OFFSET) /* {type rel title {base of text from winkey parameters}} */
-#define KYRP_FIST_KYR		(KYRP_KEYER+KYRF_KYR*KYRP_FIST_OFFSET) /* {type rel title {base of text from hasak parameters}} */
-#define KYRP_FIST_BUT		(KYRP_KEYER+KYRF_BUT*KYRP_FIST_OFFSET) /* {type rel title {base of headset button keyer parameters}} */
+#define KYRP_LAST		(KYRP_KEYER_LAST) /* {type rel title {one past end of stored keyer parameters}} */
 
 /* definitions of ADC targets, these had undefined symbols when placed immediately after KYRP_ADC* */
 #define KYRV_ADC_NOTHING	(KYRP_NOTHING) /* {type val label None title {pot controls nothing} value-of KYRP_ADC*_CONTROL property adcControls} */
@@ -463,8 +444,6 @@
 #define KYRV_ADC_LEVEL		(KYRP_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of KYRP_ADC*_CONTROL property adcControls} */
 #define KYRV_ADC_TONE		(KYRP_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of KYRP_ADC*_CONTROL property adcControls} */
 #define KYRV_ADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_ADC*_CONTROL property adcControls} */
-
-#define KYRP_LAST		(KYRP_FIST_BUT+KYRP_FIST_OFFSET) /* {type rel title {one past end of stored keyer parameters}} */
 
 #define KYRP_XFIRST		(1000) /* {type rel title {base of extended nrpn block}} */
 
@@ -478,16 +457,7 @@
 
 #define KYRP_XKEYER_LAST	(KYRP_XKEYER+5) /* {type rel title {one past end of extended keyer block}} */
 
-#define KYRP_XFIST_OFFSET	(KYRP_XKEYER_LAST-KYRP_XKEYER) /* {type rel title {size of extended keyer parameter block}} */
-#define KYRP_XFIST_NONE		(KYRP_XKEYER+KYRF_NONE*KYRP_XFIST_OFFSET) /* {type rel title {base of default keyer parameters}} */
-#define KYRP_XFIST_TUNE		(KYRP_XKEYER+KYRF_TUNE*KYRP_XFIST_OFFSET) /* {type rel title {base of tune keyer parameters}} */
-#define KYRP_XFIST_S_KEY		(KYRP_XKEYER+KYRF_S_KEY*KYRP_XFIST_OFFSET) /* {type rel title {base of straight key parameters}} */
-#define KYRP_XFIST_PAD		(KYRP_XKEYER+KYRF_PAD*KYRP_XFIST_OFFSET) /* {type rel title {base of paddle keyer parameters}} */
-#define KYRP_XFIST_WINK		(KYRP_XKEYER+KYRF_WINK*KYRP_XFIST_OFFSET) /* {type rel title {base of text from winkey parameters}} */
-#define KYRP_XFIST_KYR		(KYRP_XKEYER+KYRF_KYR*KYRP_XFIST_OFFSET) /* {type rel title {base of text from hasak parameters}} */
-#define KYRP_XFIST_BUT		(KYRP_XKEYER+KYRF_BUT*KYRP_XFIST_OFFSET) /* {type rel title {base of headset button keyer parameters}} */
-
-#define KYRP_XLAST		(KYRP_XFIST_BUT+KYRP_XFIST_OFFSET) /* {type rel title {end+1 of extended keyer block}} */
+#define KYRP_XLAST		(KYRP_XKEYER_LAST)
 
 #define KYRP_EXEC		(2000) /* {type rel title {base of command nrpns}} */
 

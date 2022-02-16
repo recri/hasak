@@ -112,7 +112,7 @@ private:
   int32_t kdelay = 0;
 
 public:
- KeyerVk6ph(const int vox) : KeyerGeneric(vox) { }
+ KeyerVk6ph() : KeyerGeneric() { }
 
   virtual int clock(int dit_on, int dah_on, int ticks) {
     int keyer_out = 0;

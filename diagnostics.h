@@ -35,11 +35,11 @@ elapsedMicros totalTime;
 
 /* summary report */
 static void sreport(void) {
-  float msPerIes = get_vox_xnrpn(get_active_vox(), KYRP_XPER_IES);
-  float msPerIls = get_vox_xnrpn(get_active_vox(), KYRP_XPER_ILS);
-  float msPerIws = get_vox_xnrpn(get_active_vox(), KYRP_XPER_IWS);
+  float msPerIes = get_xnrpn(KYRP_XPER_IES);
+  float msPerIls = get_xnrpn(KYRP_XPER_ILS);
+  float msPerIws = get_xnrpn(KYRP_XPER_IWS);
   Serial.printf("\t%f sample rate %f buffer size %d F_CPU %.1f MHz\n", totalTime/1e6, AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES, F_CPU/1e6f);
-  Serial.printf("\tactive %d ies/ils/iws %.1f/%.1f/%.1f ms\n", get_active_vox(), msPerIes, msPerIls, msPerIws);
+  Serial.printf("\ties/ils/iws %.1f/%.1f/%.1f ms\n", msPerIes, msPerIls, msPerIws);
   Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
   report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
@@ -109,19 +109,6 @@ static void Sreset(void) {
   mreset(usb_out);
 }
 
-/* arbiter details */
-static void areport(void) {
-  Serial.printf("arbiter fist %d\n", get_active_vox());
-}
-
-/* button details */
-static void breport(void) {
-  Serial.printf("button thresholds: %d %d %d %d %d\n", 
-		signed_value(get_nrpn(KYRP_BUTTON_0)), signed_value(get_nrpn(KYRP_BUTTON_1)),
-		signed_value(get_nrpn(KYRP_BUTTON_2)), signed_value(get_nrpn(KYRP_BUTTON_3)),
-		signed_value(get_nrpn(KYRP_BUTTON_4)));
-}
-
 /* debounce details */
 static void dreport(void) {
   Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(get_nrpn(KYRP_DEBOUNCE)), get_nrpn(KYRP_DEBOUNCE));
@@ -179,22 +166,6 @@ static void mixer_set(const char *p) {
   case 'h': return mixer2_set("hdw", l_hdw_out, r_hdw_out, p+1);
   default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
   }
-}
-
-static int16_t diag_any_vox_set(const int16_t vox) {
-  return (get_nrpn(KYRP_TONE+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_LEVEL+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_SPEED+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_SPEED_FRAC+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_FARNS+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_WEIGHT+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_RATIO+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_nrpn(KYRP_COMP+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_xnrpn(KYRP_XPER_DIT+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET)||
-    (get_xnrpn(KYRP_XPER_DAH+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_xnrpn(KYRP_XPER_IES+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_xnrpn(KYRP_XPER_ILS+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET) ||
-    (get_xnrpn(KYRP_XPER_IWS+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET);
 }
 
 static char random_char(void) {
@@ -334,43 +305,36 @@ void diag_nrpn_report(void) {
   Serial.printf("\t3 %d", get_nrpn(KYRP_MIX_HDW_R3));
   Serial.println();
 
-  for (int vox = KYRF_NONE; vox <= KYRF_BUT; vox += 1) {
-    if ( ! diag_any_vox_set(vox)) {
-      Serial.printf("\tFIST %d not set\n", vox);
-    } else {
-      Serial.printf("\tFIST %d", vox);
-      if (get_nrpn(KYRP_TONE+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET)
-	Serial.printf("\tTONE %.1f", nrpn_to_hertz(get_nrpn(KYRP_TONE+vox*KYRP_FIST_OFFSET)));
-      if (get_nrpn(KYRP_LEVEL+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tLEVEL %.2f", nrpn_to_db(get_nrpn(KYRP_LEVEL+vox*KYRP_FIST_OFFSET)));
-      if (get_nrpn(KYRP_SPEED+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tSPEED %d", get_nrpn(KYRP_SPEED+vox*KYRP_FIST_OFFSET));
-      if (get_nrpn(KYRP_SPEED_FRAC+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tSPEED_FRAC %d", get_nrpn(KYRP_SPEED_FRAC+vox*KYRP_FIST_OFFSET));
-      if (get_nrpn(KYRP_FARNS+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tFARNS %d", get_nrpn(KYRP_FARNS+vox*KYRP_FIST_OFFSET));
-      if (get_nrpn(KYRP_WEIGHT+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tWEIGHT %d", get_nrpn(KYRP_WEIGHT+vox*KYRP_FIST_OFFSET));
-      if (get_nrpn(KYRP_RATIO+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tRATIO %d", get_nrpn(KYRP_RATIO+vox*KYRP_FIST_OFFSET));
-      if (get_nrpn(KYRP_COMP+vox*KYRP_FIST_OFFSET) != KYRV_NOT_SET) 
-	Serial.printf("\tCOMP %.2f", samples_to_ms(get_nrpn(KYRP_COMP+vox*KYRP_FIST_OFFSET)));
-      Serial.print("\n\t");
-
-      /* keyer timings in samples for paddle and text keyers - scratch values */
-      if (get_xnrpn(KYRP_XPER_DIT+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET)
-	Serial.printf("\tDIT %ld", get_xnrpn(KYRP_XPER_DIT+vox*KYRP_XFIST_OFFSET));
-      if (get_xnrpn(KYRP_XPER_DAH+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET)
-	Serial.printf("\tDAH %ld", get_xnrpn(KYRP_XPER_DAH+vox*KYRP_XFIST_OFFSET));
-      if (get_xnrpn(KYRP_XPER_IES+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET)
-	Serial.printf("\tIES %ld", get_xnrpn(KYRP_XPER_IES+vox*KYRP_XFIST_OFFSET));
-      if (get_xnrpn(KYRP_XPER_ILS+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET)
-	Serial.printf("\tILS %ld", get_xnrpn(KYRP_XPER_ILS+vox*KYRP_XFIST_OFFSET));
-      if (get_xnrpn(KYRP_XPER_IWS+vox*KYRP_XFIST_OFFSET) != KYRV_NOT_SET)
-	Serial.printf("\tIWS %ld", get_xnrpn(KYRP_XPER_IWS+vox*KYRP_XFIST_OFFSET));
-      Serial.println("");
-    }
-  }
+  if (get_nrpn(KYRP_TONE) != KYRV_NOT_SET)
+    Serial.printf("\tTONE %.1f", nrpn_to_hertz(get_nrpn(KYRP_TONE)));
+  if (get_nrpn(KYRP_LEVEL) != KYRV_NOT_SET) 
+    Serial.printf("\tLEVEL %.2f", nrpn_to_db(get_nrpn(KYRP_LEVEL)));
+  if (get_nrpn(KYRP_SPEED) != KYRV_NOT_SET) 
+    Serial.printf("\tSPEED %d", get_nrpn(KYRP_SPEED));
+  if (get_nrpn(KYRP_SPEED_FRAC) != KYRV_NOT_SET) 
+    Serial.printf("\tSPEED_FRAC %d", get_nrpn(KYRP_SPEED_FRAC));
+  if (get_nrpn(KYRP_FARNS) != KYRV_NOT_SET) 
+    Serial.printf("\tFARNS %d", get_nrpn(KYRP_FARNS));
+  if (get_nrpn(KYRP_WEIGHT) != KYRV_NOT_SET) 
+    Serial.printf("\tWEIGHT %d", get_nrpn(KYRP_WEIGHT));
+  if (get_nrpn(KYRP_RATIO) != KYRV_NOT_SET) 
+    Serial.printf("\tRATIO %d", get_nrpn(KYRP_RATIO));
+  if (get_nrpn(KYRP_COMP) != KYRV_NOT_SET) 
+    Serial.printf("\tCOMP %.2f", samples_to_ms(get_nrpn(KYRP_COMP)));
+  Serial.print("\n\t");
+  
+  /* keyer timings in samples for paddle and text keyers - scratch values */
+  if (get_xnrpn(KYRP_XPER_DIT) != KYRV_NOT_SET)
+    Serial.printf("\tDIT %ld", get_xnrpn(KYRP_XPER_DIT));
+  if (get_xnrpn(KYRP_XPER_DAH) != KYRV_NOT_SET)
+    Serial.printf("\tDAH %ld", get_xnrpn(KYRP_XPER_DAH));
+  if (get_xnrpn(KYRP_XPER_IES) != KYRV_NOT_SET)
+    Serial.printf("\tIES %ld", get_xnrpn(KYRP_XPER_IES));
+  if (get_xnrpn(KYRP_XPER_ILS) != KYRV_NOT_SET)
+    Serial.printf("\tILS %ld", get_xnrpn(KYRP_XPER_ILS));
+  if (get_xnrpn(KYRP_XPER_IWS) != KYRV_NOT_SET)
+    Serial.printf("\tIWS %ld", get_xnrpn(KYRP_XPER_IWS));
+  Serial.println("");
 }
 
 void diagnostics_setup() { totalTime = 0; }
@@ -409,8 +373,6 @@ void diagnostics_loop() {
 		    " t ... -> timestamp + ... to Serial\n"
 		    " r -> reset usage counts\n"
 		    " R -> reset detailed usage counts\n"
-		    " a -> arbiter diagnostics\n"
-		    " b -> button diagnostics\n"
 		    " d -> debounce diagnostics\n"
 		    " l -> logging toggle\n"
 		    " w... -> send ... up to newline to wink keyer\n"
@@ -430,8 +392,6 @@ void diagnostics_loop() {
     case 't': treport(p+1); break; /* timestamp */
     case 'r': sreset(); break;	/* short reset */ 
     case 'R': Sreset(); break;	/* long reset */
-    case 'a': areport(); break; /* arbiter stats */
-    case 'b': breport(); break; /* button stats */
     case 'd': dreport(); break; /* debounce stats */
     case 'l': logging ^= 1; Serial.printf("logging %s\n", logging?"on":"off"); break;
     case 'E': elapsed_test ^= 1; timer1 = -10; timer2 = 0; break;

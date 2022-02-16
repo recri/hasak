@@ -205,6 +205,7 @@ proc main {argv} {
 	# dict incr size [dict get $values $name type] 
     }
     # add in the duplicated keyer voice instances
+    if {0} {
     set kmin [dict get $values KYRP_VOX_NONE value]
     set kmax [dict get $values KYRP_VOX_TUNE value]
     #puts "min $kmin max $kmax"
@@ -217,6 +218,7 @@ proc main {argv} {
 		#dict incr size $t
 	    }
 	}
+    }
     }
     # add in the value globs
     foreach glob $globs {

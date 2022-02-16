@@ -71,7 +71,7 @@ class KeyerNd7pa : public KeyerGeneric {
   int32_t timer;	// ticks counting down
 
 public:
- KeyerNd7pa(const int vox) : KeyerGeneric(vox), 
+ KeyerNd7pa() : KeyerGeneric(), 
     keyer_state(IDLE), dit_pending(false), dah_pending(false) { }
 
   virtual int clock(int dit_on, int dah_on, int ticks) {

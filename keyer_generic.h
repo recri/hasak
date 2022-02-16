@@ -27,8 +27,9 @@
 
 class KeyerGeneric {
  public:
- KeyerGeneric(const int vox) : vox(vox) { }
+ KeyerGeneric() { }
   void init(void) { }
+
   virtual int clock(int dit, int dah, int ticks) { return 0; }
   int pad_mode(void) { return get_nrpn(KYRP_PAD_MODE); }
   int32_t dit(void) { return get_xnrpn(KYRP_XPER_DIT); }
@@ -38,9 +39,6 @@ class KeyerGeneric {
   int32_t iws(void) { return get_xnrpn(KYRP_XPER_IWS); }
   int auto_ils(void) { return get_nrpn(KYRP_AUTO_ILS); }
   int auto_iws(void) { return get_nrpn(KYRP_AUTO_IWS); }
-  
- private:
-  const int vox;
 };
 
 #endif

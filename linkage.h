@@ -25,7 +25,7 @@
 #ifndef linkage_h_
 #define linkage_h_
 
-int16_t get_active_vox(void);
+int16_t get_active_st(void);
 
 typedef struct {
   /* block stored to eeprom */
@@ -80,6 +80,7 @@ static inline int32_t get_xnrpn(const int16_t nrpn) {
   return (unsigned)(nrpn-KYRP_XFIRST) < (KYRP_XLAST-KYRP_XFIRST) ? hasak.xnrpn[nrpn-KYRP_XFIRST] : invalid_get_xnrpn(nrpn);
 }
 
+#if defined(OLD_VOX_USAGE)
 /* fetch a vox specialized nrpn */
 static inline int16_t get_vox_nrpn(const int16_t vox, const int16_t nrpn) {
   const int16_t value = get_nrpn(KYRP_KEYER+vox*KYRP_FIST_OFFSET+(nrpn-KYRP_KEYER));
@@ -91,7 +92,7 @@ static inline int32_t get_vox_xnrpn(const int16_t vox, const int16_t nrpn) {
   const int32_t value = get_xnrpn(KYRP_XKEYER+vox*KYRP_XFIST_OFFSET+(nrpn-KYRP_XKEYER));
   return (value >= 0) ? value : get_xnrpn(nrpn);
 }
-
+#endif
 /* unit conversions */
 static inline int32_t ms_to_samples(const int16_t ms) { return ms * (AUDIO_SAMPLE_RATE*0.001); }
 static inline float samples_to_ms(const int32_t samples) { return samples / (AUDIO_SAMPLE_RATE*0.001); }

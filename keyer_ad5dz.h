@@ -29,7 +29,7 @@
 
 class KeyerAd5dz : public KeyerGeneric {
  public:
- KeyerAd5dz(const int vox) : KeyerGeneric(vox) { }
+ KeyerAd5dz() : KeyerGeneric() { }
   /* 
      keyer, coded in line because it works
      int clock(dit, dah, ticks) is called to advance the state machine

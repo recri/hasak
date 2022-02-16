@@ -59,6 +59,7 @@ static inline void set_xnrpn(const int16_t nrpn, const int32_t value) {
     invalid_set_xnrpn(nrpn, value);
 }
 
+#if 0
 /*
 ** The idea of set_vox_nrpn(vox, val) and get_vox_nrpn(vox) is that
 ** keyer voices may have customized parameters, but
@@ -96,19 +97,19 @@ static inline void set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const in
   else
     invalid_set_vox_xnrpn(vox, nrpn, value);
 }
-
+#endif
 /*
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
-static void nrpn_update_keyer_timing(const int16_t vox) {
+static void nrpn_update_keyer_timing(void) {
   const float wordDits = 50;
   const float sampleRate = AUDIO_SAMPLE_RATE;
-  const float wpm = get_vox_nrpn(vox, KYRP_SPEED)+get_vox_nrpn(vox, KYRP_SPEED_FRAC)*7.8125e-3f;
-  const float weight = get_vox_nrpn(vox, KYRP_WEIGHT);
-  const float ratio = get_vox_nrpn(vox, KYRP_RATIO);
-  const float compensation = signed_value(get_vox_nrpn(vox, KYRP_COMP));
-  const float farnsworth = get_vox_nrpn(vox, KYRP_FARNS);;
+  const float wpm = get_nrpn(KYRP_SPEED)+get_nrpn(KYRP_SPEED_FRAC)*7.8125e-3f;
+  const float weight = get_nrpn(KYRP_WEIGHT);
+  const float ratio = get_nrpn(KYRP_RATIO);
+  const float compensation = signed_value(get_nrpn(KYRP_COMP));
+  const float farnsworth = get_nrpn(KYRP_FARNS);;
   // const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)/100.0;
   const float w = (weight-50)/100.0;
@@ -135,11 +136,11 @@ static void nrpn_update_keyer_timing(const int16_t vox) {
   /* Serial.printf("morse_keyer base dit %ld, dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   // AudioNoInterrupts();
-  set_vox_xnrpn(vox, KYRP_XPER_DIT, ticksPerDit);
-  set_vox_xnrpn(vox, KYRP_XPER_DAH, ticksPerDah);
-  set_vox_xnrpn(vox, KYRP_XPER_IES, ticksPerIes);
-  set_vox_xnrpn(vox, KYRP_XPER_ILS, ticksPerIls);
-  set_vox_xnrpn(vox, KYRP_XPER_IWS, ticksPerIws);
+  set_xnrpn(KYRP_XPER_DIT, ticksPerDit);
+  set_xnrpn(KYRP_XPER_DAH, ticksPerDah);
+  set_xnrpn(KYRP_XPER_IES, ticksPerIes);
+  set_xnrpn(KYRP_XPER_ILS, ticksPerIls);
+  set_xnrpn(KYRP_XPER_IWS, ticksPerIws);
   // AudioInterrupts();
   /* Serial.printf("morse_keyer dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      get_vox_xnrpn(vox, KYRP_XPER_DIT), get_vox_xnrpn(vox, KYRP_XPER_DAH),
@@ -225,7 +226,7 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_NOTE_R_PAD, KYRN_R_PAD);
   nrpn_set(KYRP_NOTE_S_KEY, KYRN_S_KEY);
   nrpn_set(KYRP_NOTE_EXT_PTT, KYRN_EXT_PTT);
-  nrpn_set(KYRP_NOTE_ENABLE, KYRN_ENABLE);
+  nrpn_set(KYRP_NOTE_ENABLE, KYR_ENABLE);
 
   nrpn_set(KYRP_ADC_ENABLE, 1);
   nrpn_set(KYRP_ADC0_CONTROL, KYRV_ADC_NOTHING);
@@ -271,12 +272,6 @@ static void nrpn_set_defaults(void) {
   nrpn_set(KYRP_RATIO, 50);	/* percent */
   nrpn_set(KYRP_COMP,ms_to_samples(0));	/* 0 samples */
   nrpn_set(KYRP_FARNS, 0);	/* wpm */
-  
-  /* voice specializations */
-  for (int i = KYRP_FIST_TUNE; i < KYRP_LAST; i += 1)
-    hasak.nrpn[i] = KYRV_NOT_SET;
-  for (int i = KYRP_XFIST_TUNE; i < KYRP_XLAST; i += 1)
-    hasak.xnrpn[i-KYRP_XKEYER] = KYRV_NOT_SET;
 }
 
 #include "EEPROM.h"
@@ -416,23 +411,16 @@ static void nrpn_set(const int16_t nrpn, const int16_t value) {
     
     // case KYRP_MIXER+(0..23): see default case
 
-    // keyer fist cases
-#define keyer_case(FIST, FISTP) \
-  case FISTP+KYRP_TONE:	    case FISTP+KYRP_LEVEL: \
+  case KYRP_TONE:	    
+  case KYRP_LEVEL: 
     hasak.nrpn[nrpn] = value; nrpn_echo(nrpn, value); break; \
-  case FISTP+KYRP_SPEED:    case FISTP+KYRP_WEIGHT:    case FISTP+KYRP_RATIO:     case FISTP+KYRP_FARNS: \
-  case FISTP+KYRP_COMP:	    case FISTP+KYRP_SPEED_FRAC: \
-    hasak.nrpn[nrpn] = value; nrpn_update_keyer_timing(FIST); nrpn_echo(nrpn, value); break;
-    
-    keyer_case(KYRF_NONE, KYRP_FIST_NONE-KYRP_KEYER); // default keyer params
-    keyer_case(KYRF_TUNE, KYRP_FIST_TUNE-KYRP_KEYER); // tune params
-    keyer_case(KYRF_S_KEY, KYRP_FIST_S_KEY-KYRP_KEYER); // straight key keyer params
-    keyer_case(KYRF_PAD, KYRP_FIST_PAD-KYRP_KEYER);     // paddle keyer params
-    keyer_case(KYRF_WINK, KYRP_FIST_WINK-KYRP_KEYER); // winkey text keyer params
-    keyer_case(KYRF_KYR, KYRP_FIST_KYR-KYRP_KEYER);   // kyr text keyer params
-    keyer_case(KYRF_KYR, KYRP_FIST_BUT-KYRP_KEYER);   // button key params
-
-#undef keyer_case    
+  case KYRP_SPEED:
+  case KYRP_WEIGHT:
+  case KYRP_RATIO:
+  case KYRP_FARNS:
+  case KYRP_COMP:
+  case KYRP_SPEED_FRAC:							\
+    hasak.nrpn[nrpn] = value; nrpn_update_keyer_timing(); nrpn_echo(nrpn, value); break;
     
     /* commands, keep no state in hasak.nrpn */
   case KYRP_WRITE_EEPROM:

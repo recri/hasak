@@ -43,12 +43,11 @@ public:
 
   enum { none, dit, dah, ies, ils, iws };
 
-  KeyerText(int fist, int text_note, int st_note) :
-    fist(fist), text_note(text_note), st_note(st_note) {
+  KeyerText(int text_note, int st_note) : text_note(text_note), st_note(st_note) {
     code = prosign =  0;
     timing_element = none;
   }
-  int fist, text_note, st_note;
+  int text_note, st_note;
   RingBuffer<uint8_t, 128> chars;
   int code, prosign, timing_element;
   elapsedSamples timer;
@@ -59,14 +58,13 @@ public:
     prosign = 0;		// no prosign
     timing_element = none;	// element timing
     if (note_get(st_note)) note_toggle(st_note);
-    Serial.printf("keyer_text:abort() active %d fist %d\n", get_active_vox(), fist);
+    Serial.printf("keyer_text:abort() active %d st_note %d\n", get_active_st(), st_note);
     return 0;			// return false
   }
 
   int valid_vox(void) {
     return 1;
-    const int active = get_active_vox();
-    return active  == KYRF_NONE || fist < active;
+    return st_note < get_active_st();
   }
 
   // valid vox or abort
@@ -191,16 +189,16 @@ public:
   }
 };
 
-static KeyerText keyer_text_wink(KYRF_WINK, KYRN_TXT_WINK, KYRN_WINK_ST);
-static KeyerText keyer_text_kyr(KYRF_KYR, KYRN_TXT_KYR, KYRN_KYR_ST);
+static KeyerText keyer_text_wink(KYRN_TXT_WINK, KYRN_WINK_ST);
+static KeyerText keyer_text_kyr(KYRN_TXT_KYR, KYRN_KYR_ST);
 
 static void keyer_text_wink_listen(int note) { keyer_text_wink.receive(); }
 
 static void keyer_text_kyr_listen(int note) { keyer_text_kyr.receive(); }
 
 static void keyer_text_setup(void) {
-  note_listen(KYRN_TXT_WINK, keyer_text_wink_listen);
-  note_listen(KYRN_TXT_KYR, keyer_text_kyr_listen);
+  note_listen(keyer_text_wink.text_note, keyer_text_wink_listen);
+  note_listen(keyer_text_kyr.text_note, keyer_text_kyr_listen);
 }
 
 static void keyer_text_loop(void) {

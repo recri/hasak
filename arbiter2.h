@@ -93,4 +93,4 @@ static void arbiter2_loop(void) {
   }
 }
 
-int16_t get_active_vox(void) { return  arbiter2_active-KYRN_NONE_ST; }
+int16_t get_active_st(void) { return  arbiter2_active; }

@@ -124,10 +124,8 @@ static const uint8_t keyer_paddle_adapt[3][2][2][2][2][3] = {
 
 class KeyerPaddle {
  public:
-  KeyerPaddle(const int vox) : vox(vox), 
-			      ad5dz(vox), k1el(vox), nd7pa(vox), vk6ph(vox)
+  KeyerPaddle() : state(0)
   {
-    state = 0;
   }
   int clock(const int left, const int right, const int ticks) { 
     const int adapter = get_nrpn(KYRP_PAD_ADAPT);
@@ -145,7 +143,6 @@ class KeyerPaddle {
     }
   }
 private:
-  const int vox;
   uint8_t state;
   KeyerAd5dz ad5dz;
   KeyerK1el k1el;
@@ -153,7 +150,7 @@ private:
   KeyerVk6ph vk6ph;
 };
 
-static KeyerPaddle keyer_paddle(KYRF_PAD);
+static KeyerPaddle keyer_paddle;
 
 static void keyer_paddle_listener(int note) {
   const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], 0);

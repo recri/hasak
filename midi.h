@@ -116,7 +116,7 @@ static uint16_t midi_send_toggle(const uint16_t pinvalue, const int16_t note_nrp
   if ( ! midi_valid_note(note)) return pinvalue ^ 1; 
   /* Serial.printf("midi_send_toggle(%d, %d, %d, %d) to note %d\n", pinvalue, note_nrpn, channel, vox, note); */
   kyr_send_note += 1;
-  usbMIDI.sendNoteOn(note, pinvalue ? KYRN_EXT_OFF : KYRN_EXT_ON, channel);
+  usbMIDI.sendNoteOn(note, pinvalue ? KYR_EXT_OFF : KYR_EXT_ON, channel);
   usbMIDI.send_now();		// send it now
   return pinvalue ^ 1;		// invert the pin
 }

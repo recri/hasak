@@ -72,7 +72,7 @@
 ** // usage
 **
 ** // to make a keyer
-** KeyerK1el keyer(vox);
+** KeyerK1el keyer();
 **
 ** // send the current paddle state,
 ** // advance the keyer clock by ticks
@@ -119,7 +119,7 @@ private:
   }
 
 public:
-  KeyerK1el(const int vox) : KeyerGeneric(vox) {
+  KeyerK1el() : KeyerGeneric() {
     _keyerState = IDLE;
     _keyerControl = 0;
     _keyOut = 0;

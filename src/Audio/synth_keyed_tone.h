@@ -70,20 +70,10 @@ public:
   // fetch the current parameters for the rise ramp, and fall ramp
   // oscillatar may vary
   void start_rise() {
-    vox = get_active_vox();		// current vox, vox is consistent across in the arbiter
     rate = 0xFFFFFFFFu / get_nrpn(KYRP_RISE_TIME); // ramp rise time in samples
     fall_rate = 0xFFFFFFFFu / get_nrpn(KYRP_FALL_TIME); // ramp fall time in samples
     table = get_table(get_nrpn(KYRP_RISE_RAMP));
     fall_table = get_table(get_nrpn(KYRP_FALL_RAMP));
-    // int16_t iq_adjust = get_nrpn(KYRP_IQ_ADJUST);
-    // phase_increment = get_vox_nrpn(vox, KYRP_TONE) * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT);
-    // don't know what the units of iqph are, yet, 
-    // needs to be positive or negative offset from exact 90 phase.
-    // have 14bits, so 13bits and sign, thats +/-8192
-    // not sure that USB and LSB aren't actually the other way around
-    // there should be a level balance here, too.
-    // IQ might need its own frequency, too.
-    // I may have USB and LSB swapped
     switch (get_nrpn(KYRP_IQ_ENABLE)) {
     default:
     case KYRV_IQ_NONE: 
@@ -140,15 +130,14 @@ public:
     scale = (phase >> 8) & 0xFFFF;
     val2 *= scale;
     val1 *= 0x10000 - scale;
-    return tenthdbtolinear127(signed_value(get_vox_nrpn(vox, KYRP_LEVEL)))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
+    return tenthdbtolinear127(signed_value(get_nrpn(KYRP_LEVEL)))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
   }
   uint32_t phase_increment(void) {
-    return get_vox_nrpn(vox, KYRP_TONE) / 10.0 * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
+    return get_nrpn(KYRP_TONE) / 10.0 * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
   }
   virtual void update(void);
 private:
   const uint8_t channels;
-  uint8_t vox;
   uint32_t position; // 0 = off, 0xFFFFFFFF = on
   uint32_t fall_rate, rate;
   uint8_t direction;

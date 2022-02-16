@@ -368,7 +368,7 @@ static void winkey_update_eeprom(byte inum, byte data) { }
 static void winkey_set_pausing(uint8_t byte) { }
 
 // see if the keyer is idle
-static int winkey_keyer_idle(void) { return get_active_vox() == KYRF_NONE; }
+static int winkey_keyer_idle(void) { return get_active_st() > KYRN_WINK_ST; }
 
 // tune on/off
 static void winkey_tune(int byte) {
