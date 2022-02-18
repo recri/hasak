@@ -28,6 +28,7 @@
 #include "keyer_k1el.h"
 #include "keyer_nd7pa.h"
 #include "keyer_vk6ph.h"
+// #include "keyer_dl1ycf.h"
 
 /*
 ** paddle keyer is a choice of adapter and choice of iambic keyer
@@ -139,6 +140,7 @@ class KeyerPaddle {
     case KYRV_KEYER_K1EL: return k1el.clock(dit, dah, ticks);
     case KYRV_KEYER_ND7PA: return nd7pa.clock(dit, dah, ticks);
     case KYRV_KEYER_VK6PH: return vk6ph.clock(dit, dah, ticks);
+      // case KYRV_KEYER_DL1YCF: return dl1ycf.clock(dit, dah, ticks);
     default: return 0;
     }
   }
@@ -148,11 +150,12 @@ private:
   KeyerK1el k1el;
   KeyerNd7pa nd7pa;
   KeyerVk6ph vk6ph;
+  // KeyerDl1ycf dl1ycf;
 };
 
 static KeyerPaddle keyer_paddle;
 
-static void keyer_paddle_listener(int note) {
+static void keyer_paddle_listen(int note) {
   const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], 0);
   if (key != note_get(KYRN_PAD_ST))
     note_toggle(KYRN_PAD_ST);
@@ -160,17 +163,21 @@ static void keyer_paddle_listener(int note) {
 }
 
 static void keyer_paddle_setup(void) {
-  note_listen(KYRN_L_PAD, keyer_paddle_listener);
-  note_listen(KYRN_R_PAD, keyer_paddle_listener);
+  note_listen(KYRN_L_PAD, keyer_paddle_listen);
+  note_listen(KYRN_R_PAD, keyer_paddle_listen);
 }
 
 static void keyer_paddle_loop(void) {
   static elapsedSamples ticks;
-  if (ticks) {
-    const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], ticks);
-    if (key != note_get(KYRN_PAD_ST))
-      note_toggle(KYRN_PAD_ST);
-    ticks = 0;
+  if (active_sidetone < KYRN_PAD_ST && note_get(KYRN_PAD_ST)) {
+    note_toggle(KYRN_PAD_ST);
+  } else {
+    if (ticks) {
+      const int key = keyer_paddle.clock(hasak.notes[KYRN_L_PAD], hasak.notes[KYRN_R_PAD], ticks);
+      if (key != note_get(KYRN_PAD_ST))
+	note_toggle(KYRN_PAD_ST);
+      ticks = 0;
+    }
   }
 }
 

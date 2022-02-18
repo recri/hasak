@@ -35,7 +35,7 @@
 ** by default.
 */
 
-#include "ring_buffer.h"
+#include "../ring_buffer.h"
 
 class KeyerText {
 

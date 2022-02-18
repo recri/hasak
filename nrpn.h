@@ -36,28 +36,6 @@ hasak_t hasak = {
 /* forward reference */
 static void nrpn_set(const int16_t nrpn, const int16_t value);
 
-static void invalid_set_nrpn(const int16_t nrpn, const int16_t value) {
-  Serial.printf("invalid set_nrpn(%d, %d)\n", nrpn, value);
-}
-
-/* set a nrpn without echo */
-static inline void set_nrpn(const int16_t nrpn, const int16_t value) {
-  if ((unsigned)(nrpn-KYRP_FIRST) < KYRP_LAST)
-    hasak.nrpn[nrpn-KYRP_FIRST] = value;
-  else
-    invalid_set_nrpn(nrpn, value);
-}
-
-static void invalid_set_xnrpn(const int16_t nrpn, const int32_t value) {
-  Serial.printf("invalid set_xnrpn(%d, %ld)\n", nrpn, value);
-}
-
-static inline void set_xnrpn(const int16_t nrpn, const int32_t value) {
-  if ((unsigned)(nrpn-KYRP_XFIRST) < (KYRP_XLAST-KYRP_XFIRST))
-    hasak.xnrpn[nrpn-KYRP_XFIRST] = value;
-  else
-    invalid_set_xnrpn(nrpn, value);
-}
 
 #if 0
 /*

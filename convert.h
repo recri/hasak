@@ -22,25 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef linkage_h_
-#define linkage_h_
+#ifndef convert_h_
+#define convert_h_
 
 int16_t get_active_st(void);
 
 typedef struct {
-  /* block stored to eeprom */
-  /* three word header */
-  uint16_t header[3];
-  /* nrpn values */
-  int16_t nrpn[KYRP_LAST-KYRP_FIRST];
   /* saved messages */
   int8_t msgs[EEPROM_BYTES-(3+(KYRP_LAST-KYRP_FIRST)+3)*sizeof(int16_t)];
-  /* additional non-persistent storage */
-  int32_t xnrpn[KYRP_XLAST-KYRP_XFIRST];
   /* index for reading and writing message bytes */
   uint16_t index;
-  /* note latches */
-  uint8_t notes[KYR_N_NOTE];
   // count invocations of sampleInterrupt()  
   uint32_t sampleCount;
   // count invocations of loop()
@@ -58,41 +49,6 @@ typedef struct {
 
 extern hasak_t hasak;
 
-static uint32_t samples() { return hasak.sampleCount; }
-
-#include "elapsedSamples.h"
-
-static int16_t invalid_get_nrpn(const int16_t nrpn) {
-  Serial.printf("invalid get_nrpn(%d)\n", nrpn);
-  return -1;
-}
-/* fetch a nrpn */
-static inline int16_t get_nrpn(const int16_t nrpn) { 
-  return (unsigned)nrpn < (KYRP_LAST-KYRP_FIRST) ? hasak.nrpn[nrpn] : invalid_get_nrpn(nrpn);
-}
-
-static int32_t invalid_get_xnrpn(const int16_t nrpn) {
-  Serial.printf("invalid get_xnrpn(%d)\n", nrpn);
-  return -1;
-}
-/* fetch an xnrpn */  
-static inline int32_t get_xnrpn(const int16_t nrpn) {
-  return (unsigned)(nrpn-KYRP_XFIRST) < (KYRP_XLAST-KYRP_XFIRST) ? hasak.xnrpn[nrpn-KYRP_XFIRST] : invalid_get_xnrpn(nrpn);
-}
-
-#if defined(OLD_VOX_USAGE)
-/* fetch a vox specialized nrpn */
-static inline int16_t get_vox_nrpn(const int16_t vox, const int16_t nrpn) {
-  const int16_t value = get_nrpn(KYRP_KEYER+vox*KYRP_FIST_OFFSET+(nrpn-KYRP_KEYER));
-  return (value >= 0) ? value : get_nrpn(nrpn);
-}
-
-/* fetch a vox specialized xnrpn */
-static inline int32_t get_vox_xnrpn(const int16_t vox, const int16_t nrpn) {
-  const int32_t value = get_xnrpn(KYRP_XKEYER+vox*KYRP_XFIST_OFFSET+(nrpn-KYRP_XKEYER));
-  return (value >= 0) ? value : get_xnrpn(nrpn);
-}
-#endif
 /* unit conversions */
 static inline int32_t ms_to_samples(const int16_t ms) { return ms * (AUDIO_SAMPLE_RATE*0.001); }
 static inline float samples_to_ms(const int32_t samples) { return samples / (AUDIO_SAMPLE_RATE*0.001); }
@@ -103,6 +59,7 @@ static inline float int_to_127ths(const int16_t val) { return val*0.007874f; }
 static inline int16_t signed_value(const int16_t val) { return ((int16_t)(val<<2))>>2; }
 static inline float tenthdbtolinear(const int16_t val) { return min(2,powf(10.0f, val/(10.0*20.0))); } // tenthdb == dB/10
 static inline float qtrdbtolinear(const int16_t val) { return min(2,powf(10.0f, val/(4.0*20.0))); } // qtrdb == db/4
+
 /* */
 static const uint8_t qtrdbtolinearasbyte[] = {
   127, 123, 119, 116, 113, 109, 106, 103, 100, 98, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63, 61, 60, 58, 56, 55, 53, 52, 50, 49,
@@ -111,11 +68,13 @@ static const uint8_t qtrdbtolinearasbyte[] = {
   5, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 0
 };
+
 static inline uint8_t qtrdbtolinear127(const int16_t val) {
   if (val >= 0) return 127;
   if (-val >= (int16_t)sizeof(qtrdbtolinearasbyte)) return 0;
   return qtrdbtolinearasbyte[-val];
 }
+
 /* */
 static const uint8_t tenthdbtolinearasbyte[] = {
   127, 125, 124, 122, 121, 119, 118, 117, 115, 114, 113, 111, 110, 109, 108, 106, 105, 104, 103, 102, 100, 99, 98, 97, 96, 95, 94, 93, 92, 90, 89, 
@@ -130,6 +89,7 @@ static const uint8_t tenthdbtolinearasbyte[] = {
   2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0
 };
+
 static inline uint8_t tenthdbtolinear127(const int16_t val) {
   if (val >= 0) return 127;
   if (-val >= (int16_t)sizeof(tenthdbtolinearasbyte)) return 0;
@@ -137,5 +97,7 @@ static inline uint8_t tenthdbtolinear127(const int16_t val) {
 }
 
 static inline float nrpn_to_db(int16_t v) { return signed_value(v)/4.0; }
+
 static inline float nrpn_to_hertz(int16_t v) { return v/10.0; }
+
 #endif

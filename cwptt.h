@@ -24,28 +24,39 @@
  */
 
 /*
- * straight key keyers
- * paddle keyers in keyer_paddle.h
- * text keyers in keyer_text.h
- */
-static void keyer_s_key_listen(int note) {
-  if (hasak.notes[KYRN_S_KEY] != hasak.notes[KYRN_S_KEY_ST]) note_toggle(KYRN_S_KEY_ST);
+** ptt timing shim
+*/
+
+static elapsedSamples cwpttCounter; /* count the time */
+static uint32_t cwptt_head; /* cache head time for duration */
+static uint32_t cwptt_tail; /* cache tail time for duration */
+
+static void cwptt_listener(int note) {
+  if (note == KYRN_KEY_ST) {	/* sidetone transition */
+    if (note_get(KYRN_KEY_ST)) { /* sidetone is on */
+      if ( ! note_get(KYRN_PTT_TX)) {
+	note_toggle(KYRN_PTT_TX);
+	cwptt_head = get_nrpn(KYRP_HEAD_TIME);
+	cwptt_tail = max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_xnrpn(KYRP_XPER_DIT));
+      }
+      note_after(cwptt_head, KYRN_KEY_TX, 1);
+    } else {			/* sidetone is off */
+      note_after(cwptt_head, KYRN_KEY_TX, 0);
+    }
+  } else if (note == KYRN_KEY_TX) { /* tx keying transition */
+    cwpttCounter = 0;	/* time the element */
+  }
 }
 
-static void keyer_tune_listen(int note) {
-  if (hasak.notes[KYRN_TUNE] != hasak.notes[KYRN_TUNE_ST]) note_toggle(KYRN_TUNE_ST);
-}  
-
-static void keyer_but_listen(int note) {
-  if (hasak.notes[KYRN_BUT] != hasak.notes[KYRN_BUT_ST]) note_toggle(KYRN_BUT_ST);
+static void cwptt_setup(void) {
+  note_listen(KYRN_KEY_ST, cwptt_listener);
+  note_listen(KYRN_KEY_TX, cwptt_listener);
+  note_listen(KYRN_PTT_TX, cwptt_listener);
 }
 
-static void keyer_setup(void) {
-  note_listen(KYRN_S_KEY, keyer_s_key_listen);
-  note_listen(KYRN_TUNE, keyer_tune_listen);
-  note_listen(KYRN_BUT, keyer_but_listen);
+static void cwptt_loop(void) {
+  if (note_get(KYRN_PTT_TX) &&		      /* ptt tx is on */
+      note_get(KYRN_KEY_TX) == 0 &&	      /* key tx is off */
+      cwpttCounter > cwptt_tail)	      /* tail has expired */
+    note_toggle(KYRN_PTT_TX);		      /* ptt off */
 }
-
-static void keyer_loop(void) {
-}
-

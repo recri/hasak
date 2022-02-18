@@ -28,18 +28,16 @@
 ** a template to supply the number of nrpns to implement
 ** so instantiote with HasakMidi<NNRPN> midi(usbMidi,channel)
 */
-template <int _N_NOTE, int _N_CTRL, int _N_NRPN> class Midi {
+template <int _N_NRPN> class Midi {
 
  public:
 
-  static const int N_NOTE = _N_NOTE;
+  static const int N_NOTE = 128;
 
-  static const int N_CTRL = _N_CTRL;
+  static const int N_CTRL = 128;
 
   static const int N_NRPN = _N_NRPN;
 
-private:
-  
   static const int NOTE = 0;
 
   static const int CTRL = 1;
@@ -56,7 +54,7 @@ private:
 
  public:
 
-  Midi(usb_midi_class _usbMIDI, int _channel=1) : usbMIDI(_usbMIDI), channel(_channel) { }
+ HasakMidi(usb_midi_class _usbMIDI, int _channel=1) : usbMIDI(_usbMIDI), channel(_channel) { }
 
  private:
 
@@ -194,11 +192,6 @@ private:
     listener_t *next;
     void (*listener)(int t);
   };
-
-  /*
-  ** could do this with a 1 byte listener chain id
-  ** per index rather than a full pointer per index
-  */
   listener_t *listeners[N_NOTE+N_CTRL+N_NRPN];
 
  public:
@@ -220,13 +213,6 @@ private:
      super(nrpn_is_valid(nrpn) ? nrpn_hoist(nrpn) : -1, listener);
    }
  };
-
-  int listeners_installed(void) {
-    int count = 0;
-    for (int index = note_hoist(0); index < nrpn_hoist(N_NRPN); index += 1)
-      count += listeners[index] != NULL;
-    return count;
-  }
 
  private:
 
@@ -258,7 +244,6 @@ private:
   }
 
   void loop(void) {
-    /* dispatch incoming midi */
     while (usbMIDI.read(channel)) {
       const type = usbMIDI.getType();
       if (type == case usbMIDI.ControlChange) {
@@ -267,11 +252,6 @@ private:
 	const int index = ctrl_hoist(ctrl);
 	if ( ! (flags[index]&INPUT_ENABLE)) continue;
 	set_from_input(index, usbMIDI.getData2());
-	/* 
-	** recognize nrpns, could do from a listener,
-	** but I can't figure out how to set one up
-	** from inside the class.
-	*/
 	if (ctrl == NRPN_VAL_LSB) {
 	  const int nrpn = (nrpn_get(NRPN_CC_MSB)<<7)|nrpn_get(NRPN_CC_LSB);
 	  if (nrpn_is_valid(nrpn))
@@ -292,16 +272,12 @@ private:
 	set_from_input(note, 0);
       }
     }
-    /* dispatch every timeouts? */
-    /* dispatch after timeouts? */
   }
+  /* dispatch every timeouts? */
+  /* dispatch after timeouts? */
 };
 
-static Midi<128,128,256> midi(usbMIDI, 1);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+static Midi<256> midi(usbMIDI, 1);
 
 static void midi_setup(void) { midi.setup(); }
 
@@ -315,58 +291,6 @@ static void ctrl_get(int ctrl) { return midi.ctrl_get(ctrl); }
 
 static void ctrl_set(int ctrl, int value) { return midi.ctrl_set(ctrl, value); }
     
+static void nrpn_get(int nrpn) { return midi.nrpn_get(nrpn); }
 
-/*
-** access to nrpns and xnrpns
-*/
-/* report invalid access */
-static int invalid_nrpn_get(const int nrpn) {
-  Serial.printf("invalid nrpn_get(%d)\n", nrpn);
-  return -1;
-}
-
-/* fetch a nrpn */
-static inline int nrpn_get(const int nrpn) { 
-  return (unsigned)nrpn < KYRP_LAST ? midi.nrpn_get(nrpn) : invalid_nrpn_get(nrpn);
-}
-
-/* report invalid access */
-static int invalid_xnrpn_get(const int nrpn) {
-  Serial.printf("invalid get_xnrpn(%d)\n", nrpn);
-  return -1;
-}
-
-/* fetch an xnrpn */  
-static inline int xnrpn_get(const int nrpn) {
-  return (unsigned)nrpn < KYRP_LAST-1 ? (midi.nrpn_get(nrpn)<<14)|midi.nrpn_get(nrpn+1) : invalid_xnrpn_get(nrpn);
-}
-
-/* report invalid access */
-static void invalid_set_nrpn(const int nrpn, const int value) {
-  Serial.printf("invalid set_nrpn(%d, %d)\n", nrpn, value);
-}
-
-/* set a nrpn without echo */
-static inline void nrpn_set(const int nrpn, const int value) {
-  if ((unsigned)nrpn < KYRP_LAST)
-    midi.nrpn_set(nrpn, value);
-  else
-    invalid_nrpn_set(nrpn, value);
-}
-
-/* report invalid access */
-static void invalid_xnrpn_set(const int nrpn, const int value) {
-  Serial.printf("invalid set_xnrpn(%d, %ld)\n", nrpn, value);
-}
-
-static inline void xnrpn_set(const int nrpn, const int value) {
-  if ((unsigned)nrpn < KYRP_XLAST-1) {
-    midi.nrpn_set(nrpn, (value>>14)&0x3fff);
-    midi.nrpn_set(nrpn+1, value&0x3fff);
-  } else
-    invalid_set_xnrpn(nrpn, value);
-}
-
-#ifdef __cplusplus
-}
-#endif
+static void nrpn_set(int nrpn, int value) { return midi.nrpn_set(nrpn, value); }

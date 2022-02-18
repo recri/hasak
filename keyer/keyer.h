@@ -23,40 +23,18 @@
  * THE SOFTWARE.
  */
 
-/*
-** ptt timing shim
-*/
+#include "keyer_straight.h"
+#include "keyer_paddle.h"
+#include "keyer_text.h"
 
-static elapsedSamples keypttCounter;
-static uint32_t keyptt_head; /*  */
-static uint32_t keyptt_tail; /*  */
-
-static void keyptt_listener(int note) {
-  if (note == KYRN_KEY_ST) {	/* sidetone transition */
-    if (note_get(KYRN_KEY_ST)) { /* sidetone is on */
-      if ( ! note_get(KYRN_PTT_TX)) {
-	note_toggle(KYRN_PTT_TX);
-	keyptt_head = get_nrpn(KYRP_HEAD_TIME);
-	keyptt_tail = max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_xnrpn(KYRP_XPER_DIT));
-      }
-      note_after(keyptt_head, KYRN_KEY_TX, 1);
-    } else {			/* sidetone is off */
-      note_after(keyptt_head, KYRN_KEY_TX, 0);
-    }
-  } else if (note == KYRN_KEY_TX) { /* tx keying transition */
-    keypttCounter = 0;	/* time the element */
-  }
+static void keyer_setup() {
+  keyer_straight_setup();
+  keyer_paddle_setup();
+  keyer_text_setup();
 }
 
-static void keyptt_setup(void) {
-  note_listen(KYRN_KEY_ST, keyptt_listener);
-  note_listen(KYRN_KEY_TX, keyptt_listener);
-  note_listen(KYRN_PTT_TX, keyptt_listener);
-}
-
-static void keyptt_loop(void) {
-  if (note_get(KYRN_PTT_TX) &&		      /* ptt tx is on */
-      note_get(KYRN_KEY_TX) == 0 &&	      /* key tx is off */
-      keypttCounter > keyptt_tail)	      /* tail has expired */
-    note_toggle(KYRN_PTT_TX);		      /* ptt off */
+static void keyer_loop() {
+  keyer_straight_loop();
+  keyer_paddle_loop();
+  keyer_text_loop();
 }
