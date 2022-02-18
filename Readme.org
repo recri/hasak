@@ -1,45 +1,94 @@
 * Ham and Swiss Army Knife (hasak) keyer
 ** A morse code keyer for the Softerhardware/CWKeyer
-   low latency keyer project.  The goal is to allow
-   the operator to hear keyed code with low latency
-   while listening to and keying a possibly remote
-   transceiver.
+   low latency keyer project.  The goal is to allow the operator to hear keyed code
+   with low latency while listening to and keying a possibly remote transceiver.
 
-   Following the general plan, this keyer runs on a Teensy 4,
-   acts as a morse code keyer, takes its parameters from MIDI,
-   and produces very low latency sidetone.
-
-   The current release is built for the CWKeyer prototype.  I
-   haven't tested against the Teensy4+AudioAdapter, bare Teensy4,
-   Teensy3+AudioAdapter, or bare Teensy3.
-
-   This release responds to the four control potentiometers and
-   produces output through the WM8960 codec.  It keys from a straight
-   key or paddle.  It plays audio from the computer.
+   The current release is built for the CWKeyer prototype.
+   The default setup mixes sidetone and received audio from
+   USB audio and sends that to the codec output.
    
-   This release is somewhat inconsistent on my prototype.  Sometimes
-   I get no audio at all after downloading code, sometimes I get a
-   continuous tone, and sometimes I get a working keyer.  Not sure
-   what causes it, but it generally goes away with a few rounds of
-   unplugging and replugging the USB cable or a fresh download.
-** Yet to be done
-*** Winkey emulation
-   most of the code is there, but it's not hooked up.  I'll be
-   dependent on others for testing.
-*** Midi controller	
-   I'm working on a web app that will query and set keyer parameters.
-*** Other hardware   
-   The code should be able to run on a bare Teensy3, a Teensy3+AudioAdapter,
-   a bare Teensy4, and a Teensy4+AudioAdapter, but I need to rebuild the
-   variants to test that those still work.
+   The cwkeyer-js project provides a web app for controlling hasak
+   and other keyers and MIDI devices which identify themselves
+   sufficiently.
+   See https://github.com/recri/cwkeyer-js for more information
+   about that.
+** Other hardware   
+   The code should also be able to run on a bare Teensy3, 
+   a Teensy3+AudioAdapter,
+   a bare Teensy4,
+   and a Teensy4+AudioAdapter, 
+   but I need to rebuild the variants to test that those still work.
 ** Hasak details
-   All of the timing and sequencing happens inside the Teensy Audio
-   Library processing loop with sample accuracy. The pins which
-   reflect key, paddle, and switch closures are sampled and latched
-   at sample rate and processed into sidetone, IQ tone, and CMOS
-   outputs as a side effect of the audio library computing output
-   audio samples.
+   The midi interface is provided by midi.h, midi_note.h, midi_ctrl.h,
+   and midi_nrpn.h.  This is a very general midi controller interface
+   which manages incoming and outgoing midi traffic, maintains arrays
+   of current note, control, and nrpn values, and supports listeners
+   that are fired when any of the values are written or almost written.
+   The interface accepts template parameters for the number of notes,
+   control changes, and non-registered parameters (NRPNs) to support.  
+   The constructor accepts a Teensy usb_midi_class reference and a 
+   channel number.
 
+   Each note, control change, and NRPN, collectively the state values, can
+   be independently enabled for input, output, echo, and writing.  State
+   values - whether notes, controls, or NRPNs - that are not input enabled
+   are ignored on input.  State values that are not output enabled never 
+   leave the device, though they can be indirectly leaked.  If a state value
+   is both input and output enabled, then it can additionally be echo enabled,
+   which means that the message is echoed back to acknowledge receipt. If the 
+   state value is read only, then input values never alter the controllers'
+   state, though they can still generate listener events.  If a state value
+   is input enabled, output enabled, echo enabled, and read only, then the 
+   echo will contain the controller's value rather than the value in the input
+   state value.
+
+   So the interface maintains an array of bytes for notes, an array of bytes for
+   control changes, an array of short ints for NRPNs, and an array of bytes for
+   flags.  The device side can read and write the values and modify the flags.
+   The only action on received state values which the interface takes by default
+   is to trigger NRPN assembly when it receives MIDI control change 38.
+   
+   Most state values are read directly from the midi interface when required
+   rather than acted upon in the controller. That is, there is no midi interface
+   code checking for the frequency setting to be changed in order to implement
+   the frequency change.  The oscillator control pulls the current frequency 
+   setting from the midi interface when it is time to update the oscillator
+   frequency.  And there is no code looking at the sidetone key line to see
+   whether the oscillator in the audio graph needs to be enabled.  The sidetone
+   key line is mirrored directly from the midi interface array into the audio
+   graph in a sample rate interrupt.  Many of the important actions in any
+   audio application can be done this way.
+
+   State values which need immediate implementation are handled by listeners.
+   Each note, control, or NRPN can have listeners attached to it.  When the
+   interface sets the value of the note, control, or NRPN, (or would have set
+   the value if it weren't read only) it invokes the listeners registered on
+   the state value.  A listener is a function which takes one argument - the 
+   note, control, or NRPN number - and returns nothing.  Listeners have no
+   overhead in the interface other than a list head.  Each listener registered
+   provides the storage for a list element.  The latency of calling a listener
+   is the latency of a function call.
+   
+   The keyer logic is implemented via the listener mechanism. Hardware switch
+   states are reflected into hardware switch notes, which triggers listeners.
+   Each keyer implementation listener reflects its assigned hardware switch 
+   notes, either directly for a straight key or through an iambic keyer, into
+   a keyer implementation sidetone note, which triggers listeners. There are
+   different sidetone notes for each possible key line, one for each straight
+   key, one for each iambic keyer, one for each text keyer, and one for each
+   remote keyer.  Sidetone arbitration listeners pick one of the active sidetone
+   notes, grant it the actual sidetone key, and reflect it onto the actual keyer
+   sidetone note, which triggers listeners. The cwptt listener generates a 
+   tx_ptt note, delays and stretches the actual sidetone key note, and reflects
+   it to tx_key note, which triggers listeners.  The listeners to st_key, tx_key 
+   and tx_ptt can reflect the note to hardware pins, or reflect to the host as a
+   midi note, or both, or neither.  The st_key and tx_key note listeners can also
+   reflect the notes into the audio graph to key the sideton or IQ oscillators.
+   
+   midi.h exposes a static void midi_setup(void) function to initialize the
+   interface and a static void midi_loop(void) function which polls for incoming
+   usb input and returns.
+   
    The Arduino loop() function monitors MIDI over USB for control
    change messages which can modify the keyer tone, keyer speed, 
    keyer volume, and so on.  There are 312 potential parameters

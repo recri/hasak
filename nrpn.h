@@ -22,83 +22,91 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/***************************************************************
-** NRPN (non-registered parameter) handling.
-***************************************************************/
-/* array of persistent nrpn values */
-hasak_t hasak = {
-  { KYRC_MAGIC, sizeof(hasak.nrpn), KYRC_VERSION },
-  { 0 },
-  { 0 },
-  0 
-};
-
-/* forward reference */
-static void nrpn_set(const int16_t nrpn, const int16_t value);
-
-
-#if 0
-/*
-** The idea of set_vox_nrpn(vox, val) and get_vox_nrpn(vox) is that
-** keyer voices may have customized parameters, but
-** fall back to the common parameter set when no
-** customized parameter has been set.
-** So set_vox_nrpn() sets the bank of the hasak.nrpn that
-** is vox specific, and get_vox_nrpn(vox, NRPN) looks in the vox
-** specific bank and returns its value if it has been
-** set, otherwise returns the value from the default bank.
-**
-** The value that marks a set parameter is hasak.nrpn[INDEX] >= 0
-** because nrpn values are 14bit unsigned.
-*/
-
-static void invalid_set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
-  Serial.printf("invalid_set_vox_nrpn(%d, %d, %d)\n", vox, nrpn, value);
-}
-
-/* set a vox specialized nrpn */
-static inline void set_vox_nrpn(const int16_t vox, const int16_t nrpn, const int16_t value) {
-  if ((unsigned)vox <= KYR_N_FIST && (unsigned)(nrpn-KYRP_XKEYER) < KYRP_XFIST_OFFSET)
-    set_nrpn(nrpn-KYRP_XKEYER+vox*KYRP_FIST_OFFSET, value);
-  else
-    invalid_set_vox_nrpn(vox, nrpn, value);
-}
-
-static void invalid_set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const int32_t value) {
-  Serial.printf("invalid_set_vox_xnrpn(%d, %d, %ld)\n", vox, nrpn, value);
-}
-
-/* set a vox specialized nrpn */
-static inline void set_vox_xnrpn(const int16_t vox, const int16_t nrpn, const int32_t value) {
-  if ((unsigned)vox <= KYR_N_FIST && (unsigned)(nrpn-KYRP_XKEYER) < (KYRP_XFIST_TUNE-KYRP_XKEYER))
-    hasak.xnrpn[(nrpn-KYRP_XKEYER)+vox*KYRP_FIST_OFFSET] = value;
-  else
-    invalid_set_vox_xnrpn(vox, nrpn, value);
-}
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+/*
+** access to nrpns and xnrpns
+*/
+/* report invalid access */
+static int invalid_nrpn(const int nrpn, const char *who) {
+  Serial.printf("invalid nrpn %d in %s\n", nrpn, who);
+  return -1;
+}
+
+/* report invalid access */
+static int invalid_xnrpn(const int nrpn, const char *who) {
+  Serial.printf("invalid xnrpn %d in %s\n", nrpn, who);
+  return -1;
+}
+
+/* valid nrpn test */
+static inline int nrpn_is_valid(const int nrpn) {
+  return midi.nrpn_is_valid(nrpn);
+}
+
+/* fetch a nrpn */
+static inline int nrpn_get(const int nrpn) { 
+  return nrpn_is_valid(nrpn) ? midi.nrpn_get(nrpn) : invalid_nrpn(nrpn, "nrpn_get");
+}
+
+/* fetch an xnrpn */  
+static inline int xnrpn_get(const int nrpn) {
+  return nrpn_is_valid(nrpn+1) ? (midi.nrpn_get(nrpn)<<14)|midi.nrpn_get(nrpn+1) : invalid_xnrpn(nrpn, "xnrpn_get");
+}
+
+/* set a nrpn */
+static inline void nrpn_set(const int nrpn, const int value) {
+  if (nrpn_is_valid(nrpn))
+    midi.nrpn_set(nrpn, value);
+  else
+    invalid_nrpn(nrpn, "nrpn_set");
+}
+
+/* set an xnrpn */
+static inline void xnrpn_set(const int nrpn, const int value) {
+  if (nrpn_is_valid(nrpn+1)) {
+    midi.nrpn_set(nrpn, (value>>14)&0x3fff);
+    midi.nrpn_set(nrpn+1, value&0x3fff);
+  } else
+    invalid_xnrpn(nrpn, "xnrpn_set");
+}
+
+/* define a nrpn */
+static void nrpn_define(const int nrpn, const int value, 
+			const int input_enable, const int output_enable, 
+			const int echo_enable, const int read_only) {
+  if (nrpn_is_valid(nrpn)) {
+    midi.nrpn_flags_set(midi_flags_encode(input_enable, output_enable, echo_enable, read_only));
+    nprn_set(nrpn, value);
+  } else
+    nrpn_invalid(nrpn, "nrpn_define");
+}
+
 /*
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
 static void nrpn_update_keyer_timing(void) {
-  const float wordDits = 50;
-  const float sampleRate = AUDIO_SAMPLE_RATE;
+  const int wordDits = 50;
+  const int sampleRate = AUDIO_SAMPLE_RATE;
   const float wpm = get_nrpn(KYRP_SPEED)+get_nrpn(KYRP_SPEED_FRAC)*7.8125e-3f;
-  const float weight = get_nrpn(KYRP_WEIGHT);
-  const float ratio = get_nrpn(KYRP_RATIO);
-  const float compensation = signed_value(get_nrpn(KYRP_COMP));
-  const float farnsworth = get_nrpn(KYRP_FARNS);;
+  const int weight = get_nrpn(KYRP_WEIGHT);
+  const int ratio = get_nrpn(KYRP_RATIO);
+  const int compensation = signed_value(get_nrpn(KYRP_COMP));
+  const int farnsworth = get_nrpn(KYRP_FARNS);;
   // const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
-  const float r = (ratio-50)/100.0;
-  const float w = (weight-50)/100.0;
-  const float c = compensation;
+  const float r = (ratio-50)*0.01;
+  const float w = (weight-50)*0.01;
+  const int c = compensation;
   /* samples_per_dit = (samples_per_second * second_per_minute) / (words_per_minute * dits_per_word);  */
-  const uint32_t ticksPerBaseDit = ((sampleRate * 60) / (wpm * wordDits));
-  const int32_t ticksPerDit = (1+r+w) * ticksPerBaseDit+c;
-  const int32_t ticksPerDah = (3-r+w) * ticksPerBaseDit+c;
-  const int32_t ticksPerIes = (1  -w) * ticksPerBaseDit-c;
-        int32_t ticksPerIls = (3  -w) * ticksPerBaseDit-c;
-        int32_t ticksPerIws = (7  -w) * ticksPerBaseDit-c;
+  const uint32_t ticksPerBaseDit = ((sampleRate * 60.0f) / (wpm * wordDits));
+  const int32_t ticksPerDit = (1+r+w) * ticksPerBaseDit+c+0.5;
+  const int32_t ticksPerDah = (3-r+w) * ticksPerBaseDit+c+0.5;
+  const int32_t ticksPerIes = (1  -w) * ticksPerBaseDit-c+0.5;
+        int32_t ticksPerIls = (3  -w) * ticksPerBaseDit-c+0.5;
+        int32_t ticksPerIws = (7  -w) * ticksPerBaseDit-c+0.5;
     
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
@@ -114,11 +122,11 @@ static void nrpn_update_keyer_timing(void) {
   /* Serial.printf("morse_keyer base dit %ld, dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   // AudioNoInterrupts();
-  set_xnrpn(KYRP_XPER_DIT, ticksPerDit);
-  set_xnrpn(KYRP_XPER_DAH, ticksPerDah);
-  set_xnrpn(KYRP_XPER_IES, ticksPerIes);
-  set_xnrpn(KYRP_XPER_ILS, ticksPerIls);
-  set_xnrpn(KYRP_XPER_IWS, ticksPerIws);
+  xnrpn_set(KYRP_XPER_DIT, ticksPerDit);
+  xnrpn_set(KYRP_XPER_DAH, ticksPerDah);
+  xnrpn_set(KYRP_XPER_IES, ticksPerIes);
+  xnrpn_set(KYRP_XPER_ILS, ticksPerIls);
+  xnrpn_set(KYRP_XPER_IWS, ticksPerIws);
   // AudioInterrupts();
   /* Serial.printf("morse_keyer dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      get_vox_xnrpn(vox, KYRP_XPER_DIT), get_vox_xnrpn(vox, KYRP_XPER_DAH),
@@ -485,3 +493,6 @@ static void nrpn_loop(void) {
     }
   }
 }
+#ifdef __cplusplus
+}
+#endif

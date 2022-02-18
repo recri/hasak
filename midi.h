@@ -182,6 +182,13 @@ private:
 
   void nrpn_flags_set(int nrpn, int value) { nrpn_is_valid(nrpn) ? flags_set(nrpn_hoist(nrpn), value) : -1; }
 
+  int flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
+    return (input_enable ? INPUT_ENABLE : 0) | 
+      (output_enable ? OUTPUT_ENABLE : 0) |
+      (echo_enable ? ECHO_ENABLE : 0) |
+      (read_only ? READ_ONLY : 0);
+  }
+
  private:
 
   class listener_t {
@@ -307,64 +314,8 @@ static void midi_setup(void) { midi.setup(); }
 
 static void midi_loop(void) { midi.loop(); }
     
-static void note_get(int note) { return midi.note_get(note); }
-
-static void note_set(int note, int value) { return midi.note_set(note, value); }
-    
-static void ctrl_get(int ctrl) { return midi.ctrl_get(ctrl); }
-
-static void ctrl_set(int ctrl, int value) { return midi.ctrl_set(ctrl, value); }
-    
-
-/*
-** access to nrpns and xnrpns
-*/
-/* report invalid access */
-static int invalid_nrpn_get(const int nrpn) {
-  Serial.printf("invalid nrpn_get(%d)\n", nrpn);
-  return -1;
-}
-
-/* fetch a nrpn */
-static inline int nrpn_get(const int nrpn) { 
-  return (unsigned)nrpn < KYRP_LAST ? midi.nrpn_get(nrpn) : invalid_nrpn_get(nrpn);
-}
-
-/* report invalid access */
-static int invalid_xnrpn_get(const int nrpn) {
-  Serial.printf("invalid get_xnrpn(%d)\n", nrpn);
-  return -1;
-}
-
-/* fetch an xnrpn */  
-static inline int xnrpn_get(const int nrpn) {
-  return (unsigned)nrpn < KYRP_LAST-1 ? (midi.nrpn_get(nrpn)<<14)|midi.nrpn_get(nrpn+1) : invalid_xnrpn_get(nrpn);
-}
-
-/* report invalid access */
-static void invalid_set_nrpn(const int nrpn, const int value) {
-  Serial.printf("invalid set_nrpn(%d, %d)\n", nrpn, value);
-}
-
-/* set a nrpn without echo */
-static inline void nrpn_set(const int nrpn, const int value) {
-  if ((unsigned)nrpn < KYRP_LAST)
-    midi.nrpn_set(nrpn, value);
-  else
-    invalid_nrpn_set(nrpn, value);
-}
-
-/* report invalid access */
-static void invalid_xnrpn_set(const int nrpn, const int value) {
-  Serial.printf("invalid set_xnrpn(%d, %ld)\n", nrpn, value);
-}
-
-static inline void xnrpn_set(const int nrpn, const int value) {
-  if ((unsigned)nrpn < KYRP_XLAST-1) {
-    midi.nrpn_set(nrpn, (value>>14)&0x3fff);
-    midi.nrpn_set(nrpn+1, value&0x3fff);
-  } else
-    invalid_set_xnrpn(nrpn, value);
+static int midi_flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
+  return midi.flags_encode(input_enable, output_enable, echo_enable, read_only
 }
 
 #ifdef __cplusplus
