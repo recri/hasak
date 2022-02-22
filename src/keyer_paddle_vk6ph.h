@@ -17,8 +17,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 
-#ifndef keyer_vk6ph_h_
-#define keyer_vk6ph_h_
+#ifndef keyer_paddle_vk6ph_h_
+#define keyer_paddle_vk6ph_h_
 
 /*
 
@@ -83,9 +83,9 @@ Boston, MA  02110-1301, USA.
 
         Speed calculation -  Using standard PARIS timing, dot_period(mS) = 1200/WPM
 */
-#include "keyer_generic.h"
+#include "keyer_paddle_generic.h"
 
-class KeyerVk6ph : public KeyerGeneric {
+class KeyerVk6ph : public KeyerPaddleGeneric {
 
 private:
   enum {
@@ -112,7 +112,7 @@ private:
   int32_t kdelay = 0;
 
 public:
- KeyerVk6ph() : KeyerGeneric() { }
+ KeyerVk6ph() : KeyerPaddleGeneric() { }
 
   virtual int clock(int dit_on, int dah_on, int ticks) {
     int keyer_out = 0;

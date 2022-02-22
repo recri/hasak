@@ -82,13 +82,13 @@ static int16_t input_cook_value(const int16_t nrpn2, const int16_t value, int16_
   case KYRP_IQ_ADJUST:
   case KYRP_IQ_BALANCE:
   case KYRP_ST_PAN:
+  case KYRP_COMP:		/* -8192 .. +8191 samples */
     *cooked = ((value-512)*4) & KYRV_MASK; return 1;
   case KYRP_DEBOUNCE:		/* 0 .. 16383 samples */
   case KYRP_HEAD_TIME:
   case KYRP_TAIL_TIME:
   case KYRP_RISE_TIME:
   case KYRP_FALL_TIME:
-  case KYRP_COMP:
     *cooked = (12*value) & KYRV_MASK; return 1;
   case KYRP_WEIGHT:		/* 25 .. 75 percent */
   case KYRP_RATIO:
@@ -113,30 +113,30 @@ static int input_update(const int16_t adc_number) {
   int16_t *valuep = &input_value[adc_number];
   bool invert = input_invert[adc_number];
   int16_t nrpn2, raw_value, cooked_value;
-  nrpn2 = get_nrpn(nrpn);  /* fetch the nrpn controlled by this adc */
+  nrpn2 = nrpn_get(nrpn);  /* fetch the nrpn controlled by this adc */
   if (nrpn2 == 0) return 0; /* if this input is not attached to anything */
   adc->update();		    /* update the reader */
   raw_value = invert ? 1023-adc->getValue() : adc->getValue(); /* get the updated value */
   if (raw_value == *valuep) return 0; /* if the raw value has not changed */
   *valuep = raw_value;		      /* save the new value */
   if ( ! input_cook_value(nrpn2, raw_value, &cooked_value)) return 0; /* if the cooker errors */
-  if (cooked_value == get_nrpn(nrpn2)) return 0; /* if the cooked value hasn't changed */
+  if (cooked_value == nrpn_get(nrpn2)) return 0; /* if the cooked value hasn't changed */
   nrpn_set(nrpn2, cooked_value);		 /* set the new value */
   return 1;					 /* signal a change */
 }
 
 static void input_loop(void) {
   static uint8_t count = 0;
-  if (get_nrpn(KYRP_ADC_ENABLE) && 
+  if (nrpn_get(KYRP_ADC_ENABLE) && 
       (count++ & 0xF) == 0 && 
       (count>>4) < 5 &&
       input_update(count>>4) != 0) {
     /* Serial.printf("%3d: inputs 0 1 2 3 4 =  %d %d %d %d %d\n", 
 		    count,
-		    get_nrpn(get_nrpn(KYRP_ADC0_CONTROL)), 
-		    signed_value(get_nrpn(get_nrpn(KYRP_ADC1_CONTROL))),
-		    signed_value(get_nrpn(get_nrpn(KYRP_ADC2_CONTROL))),
-		    get_nrpn(get_nrpn(KYRP_ADC3_CONTROL)),
-		    get_nrpn(get_nrpn(KYRP_ADC4_CONTROL))) */;
+		    nrpn_get(nrpn_get(KYRP_ADC0_CONTROL)), 
+		    signed_value(nrpn_get(nrpn_get(KYRP_ADC1_CONTROL))),
+		    signed_value(nrpn_get(nrpn_get(KYRP_ADC2_CONTROL))),
+		    nrpn_get(nrpn_get(KYRP_ADC3_CONTROL)),
+		    nrpn_get(nrpn_get(KYRP_ADC4_CONTROL))) */;
   }
 }

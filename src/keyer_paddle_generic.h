@@ -22,19 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef keyer_paddle_generic_h_
+#define keyer_paddle_generic_h_
 
-#include "keyer_straight.h"
-#include "keyer_paddle.h"
-#include "keyer_text.h"
+#include "../config.h"
+#include "../linkage.h"
 
-static void keyer_setup() {
-  keyer_straight_setup();
-  keyer_paddle_setup();
-  keyer_text_setup();
-}
+#include "keyer_timing_generic.h"
 
-static void keyer_loop() {
-  keyer_straight_loop();
-  keyer_paddle_loop();
-  keyer_text_loop();
-}
+class KeyerPaddleGeneric : public KeyerTimingGeneric {
+ public:
+  KeyerPaddleGeneric() : KeyerTimingGeneric() { }
+  // void init(void) { }
+  virtual int clock(int dit, int dah, int ticks) { return 0; }
+  int pad_mode(void) { return get_nrpn(KYRP_PAD_MODE); }
+  int auto_ils(void) { return get_nrpn(KYRP_AUTO_ILS); }
+  int auto_iws(void) { return get_nrpn(KYRP_AUTO_IWS); }
+};
+
+#endif

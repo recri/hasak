@@ -22,51 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef ring_buffer_h_
+#define ring_buffer_h_
 
-#ifdef __cplusplus
-extern "C" {
+#include <Arduino.h>
+
+#ifndef RING_BUFFER_SIZE
+#define RING_BUFFER_SIZE 128
 #endif
 
-static int note_invalid(const int note, const char *who) {
-  Serial.printf("invalid note %d in %s\n", note, who);
-  return -1;
-}
-
-static int note_is_valid(int note) { return midi.note_is_valid(note); }
-  
-static void note_get(int note) { 
-  return note_is_valid(note) ? midi.note_get(note) : note_invalid(note, "note_get");
-}
-
-static void note_set(int note, int value) { 
-  if (note_is_valid(note))
-    midi.note_set(note, value);
-  else
-    note_invalid(note, "note_set");
-}
-
-/* define a note */
-static void note_define(const int note, const int value, 
-			const int input_enable, const int output_enable, 
-			const int echo_enable, const int read_only) {
-  if (note_is_valid(note)) {
-    midi.note_flags_set(note, midi_flags_encode(input_enable, output_enable, echo_enable, read_only));
-    nprn_set(note, value);
-  } else
-    note_invalid(note, "nrpn_define");
-}
-
-static void note_toggle(const int note) { note_set(note, note_get(note) ^ 1); } 
-
-static void note_on(const int note) { note_set(note, 1); } 
-
-static void note_off(const int note) { note_set(note, 0); } 
-
-static void note_setup(void) {
-}
-static void note_loop(void) {
-}
-
-#ifdef __cplusplus
-}
+/* circular buffer of SIZE elements of type T */
+template <class T, unsigned SIZE>
+class RingBuffer {
+public:
+  RingBuffer() { }
+  void reset(void) { wptr = rptr = 0; }
+  bool can_get(void) { return rptr!=wptr; }
+  bool can_put(void) { return (wptr+1) != rptr; }
+  T peek(void) { return buff[rptr%SIZE]; }
+  T get(void) { return buff[rptr++%SIZE]; }
+  void put(T val) { buff[wptr++%SIZE] = val; }
+  int items(void) { return wptr-rptr; }
+  bool can_unput(void) { return can_get(); }
+  void unput(void) { wptr -= 1; }
+private:
+  unsigned wptr = 0, rptr = 0;
+  T buff[SIZE];
+};
 #endif

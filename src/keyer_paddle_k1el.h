@@ -65,8 +65,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef keyer_k1el_h_
-#define keyer_k1el_h_
+#ifndef keyer_paddle_k1el_h_
+#define keyer_paddle_k1el_h_
 
 /*
 ** // usage
@@ -80,9 +80,9 @@
 ** keyout = keyer.clock(dit, dah, ticks);	
 **
 */
-#include "keyer_generic.h"
+#include "keyer_paddle_generic.h"
 
-class KeyerK1el : public KeyerGeneric {
+class KeyerK1el : public KeyerPaddleGeneric {
 private:
   //  keyerControl bit definitions
   static const int DIT_L = 0x01;     // Dit latch
@@ -119,7 +119,7 @@ private:
   }
 
 public:
-  KeyerK1el() : KeyerGeneric() {
+  KeyerK1el() : KeyerPaddleGeneric() {
     _keyerState = IDLE;
     _keyerControl = 0;
     _keyOut = 0;

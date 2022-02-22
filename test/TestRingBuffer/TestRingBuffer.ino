@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include "ring_buffer.h"
+#include "../../src/ring_buffer.h"
 
 RingBuffer r;
 

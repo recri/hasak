@@ -22,32 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef convert_h_
-#define convert_h_
+#ifndef linkage_h_
+#define linkage_h_
 
-int16_t get_active_st(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef struct {
-  /* saved messages */
-  int8_t msgs[EEPROM_BYTES-(3+(KYRP_LAST-KYRP_FIRST)+3)*sizeof(int16_t)];
-  /* index for reading and writing message bytes */
-  uint16_t index;
-  // count invocations of sampleInterrupt()  
-  uint32_t sampleCount;
-  // count invocations of loop()
-  uint32_t loopCount;
-  /* output latches */
-  uint8_t _key_out, _ptt_out;
-  uint8_t _up_out, _down_out;
-  /* note in latches */
-  uint8_t _l_pad_note_on, _r_pad_note_on, _s_key_note_on, _ptt_sw_note_on;
-  uint8_t _key_out_note_on, _ptt_out_note_on;
-  uint8_t _tune_note_on;
-  /* statistics */
-  
-}  hasak_t;
-
-extern hasak_t hasak;
+  /* forward references */
+int get_active_st(void);	// arbiter2.h, move to nrpn
+int get_note(int note);
+int get_ctrl(int ctrl);
+int get_nrpn(int nrpn);
+int get_xnrpn(int xnrpn);
+static int codec_identify();
 
 /* unit conversions */
 static inline int32_t ms_to_samples(const int16_t ms) { return ms * (AUDIO_SAMPLE_RATE*0.001); }
@@ -99,5 +87,9 @@ static inline uint8_t tenthdbtolinear127(const int16_t val) {
 static inline float nrpn_to_db(int16_t v) { return signed_value(v)/4.0; }
 
 static inline float nrpn_to_hertz(int16_t v) { return v/10.0; }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

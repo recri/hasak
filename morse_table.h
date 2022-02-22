@@ -50,6 +50,11 @@
 //   return code;
 // }
 //
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MORSE_NIL  0x01		// no character
 
 #define MORSE_A	   0x06		// A    .-
@@ -186,3 +191,7 @@ static const unsigned char morse[64] = {
    MORSE_NIL,			//95 _    not in ITU-R M.1677-1
    MORSE_NIL			//96 `    not in ITU-R M.1677-1
 };
+
+#ifdef __cplusplus
+}
+#endif

@@ -63,6 +63,7 @@ public:
     return ones;
   }
   virtual void update(void);
+  unsigned update_counter = 0;
 private:
   static audio_block_t *ones;
   int16_t last;

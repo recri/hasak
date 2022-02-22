@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef keyer_nd7pa_h_
-#define keyer_nd7pa_h_
+#ifndef keyer_paddle_nd7pa_h_
+#define keyer_paddle_nd7pa_h_
 /*
 ** This has been stripped down to the minimal iambic state machine
 ** from the AVR sources that accompany the article in QEX March/April
@@ -53,9 +53,9 @@
 // R. Traylor
 // 3.19.2012
 // iambic keyer      
-#include "keyer_generic.h"
+#include "keyer_paddle_generic.h"
 
-class KeyerNd7pa : public KeyerGeneric {
+class KeyerNd7pa : public KeyerPaddleGeneric {
  private:
   // keyer states
   static const int IDLE =     0;  // waiting for a paddle closure 
@@ -71,7 +71,7 @@ class KeyerNd7pa : public KeyerGeneric {
   int32_t timer;	// ticks counting down
 
 public:
- KeyerNd7pa() : KeyerGeneric(), 
+ KeyerNd7pa() : KeyerPaddleGeneric(), 
     keyer_state(IDLE), dit_pending(false), dah_pending(false) { }
 
   virtual int clock(int dit_on, int dah_on, int ticks) {

@@ -30,7 +30,7 @@
 static bool codec_sgtl5000;
 static bool codec_wm8960;
 
-static int16_t codec_identify(void) {
+static int codec_identify(void) {
   if (codec_sgtl5000 && codec_wm8960) return 5000+8960;
   if (codec_sgtl5000) return 5000;
   if (codec_wm8960) return 8960;
@@ -62,8 +62,19 @@ static void codec_wm8960_set(const int16_t nrpn, const int16_t value) {
   }
 }
 
-static void codec_nrpn_set(const int16_t nrpn, const int16_t value) {
+static void codec_listener(const int nrpn) {
+  const int value = nrpn_get(nrpn);
   if (codec_sgtl5000) codec_sgtl5000_set(nrpn, value);
   if (codec_wm8960) codec_wm8960_set(nrpn, value);
 }
 
+
+static void codec_setup(void) {
+  /* set nrpn listeners for our functions */
+  nrpn_listen(KYRP_VOLUME, codec_listener);
+  nrpn_listen(KYRP_INPUT_SELECT, codec_listener);
+  nrpn_listen(KYRP_INPUT_LEVEL, codec_listener);
+}
+
+static void codec_loop(void) {
+}

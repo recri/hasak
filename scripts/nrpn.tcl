@@ -87,19 +87,19 @@ proc jsformat-all {values} {
 	    # skip the output mixers
 	    if {[string match KYRP_MIX_* $key]} continue
 	    # primary KYR* string -> Object table
-	    if {$type in {rel par cmd inf val opts} ||
+	    if {$type in {rel nrpn val opts} ||
 		[string match *VOX* $key] ||
 		[string match *_CC_* $key] ||
-		[string match KYRC_VERSION $key]
+		[string match KYR_VERSION $key]
 	    } {
 		lappend kyrp [jsformat-any $key $table]
 	    }
 	    # property name -> KYR* table
-	    if {$type in {par opts cmd inf}} {
+	    if {$type in {nrpn opts}} {
 		lappend prop "[jsq $property]: \"$key\""
 	    }
 	    # nrpn -> KYR* table
-	    if {$type in {par cmd inf}} {
+	    if {$type in {nrpn}} {
 		lappend nrpn "[jsq $value]: \"$key\""
 	    }
 	}
@@ -108,7 +108,7 @@ proc jsformat-all {values} {
 }
 proc jsformat {values} {
     set ::jsquoted 0
-    set v [dict get $values KYRC_VERSION value]
+    set v [dict get $values KYR_VERSION value]
     set d ",\n    "
     return "// parameter map for hasak 100
 // generated with .../hasak/doc/nrpn.tcl from .../hasak/config.h
@@ -118,7 +118,7 @@ export const hasakProperties = {\n    [join [jsformat-all $values] $d]\n};"
 
 proc jsonformat {values} {
     set ::jsquoted 1
-    set v [dict get $values KYRC_VERSION value]
+    set v [dict get $values KYR_VERSION value]
     set d ",\n    "
     return "{\n    [join [jsformat-all $values] $d]\n}"
 }
@@ -248,7 +248,7 @@ proc main {argv} {
 	dups {
 	    set dups [dict create]
 	    foreach key [dict keys $values KYRP_*] {
-		if {[dict get $values $key type] eq {par}} {
+		if {[dict get $values $key type] eq {nrpn}} {
 		    dict lappend dups [dict get $values $key value] $key
 		}
 	    }
@@ -265,7 +265,7 @@ proc main {argv} {
 	}
 	props {
 	    dict for {key table} $values {
-		if {[dict get $table type] eq {par}} {
+		if {[dict get $table type] eq {nrpn}} {
 		    puts "$key [dict get $table property]"
 		}
 	    }
@@ -274,7 +274,7 @@ proc main {argv} {
 	    set cursor 0
 	    dict for {name table} $values {
 		dict with table {
-		    if {$type in {par rel}} {
+		    if {$type in {nrpn rel}} {
 			if {$value < $cursor} {
 			    if {[string match KYRP_*VOX_OFFSET $name]} continue
 			    if {$name in {KYRP_VOX_NONE}} {
@@ -308,7 +308,7 @@ proc main {argv} {
 	    set patterns [dict create]
 	    dict for {key table} $values {
 		set type [dict get $table type]
-		if {$type eq {par} && [dict exists $table values]} {
+		if {$type eq {nrpn} && [dict exists $table values]} {
 		    set vglob [dict get $table values]
 		    if {[dict exists $patterns $vglob]} continue
 		    dict set patterns $vglob true

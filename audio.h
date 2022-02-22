@@ -18,19 +18,19 @@
 // inputs
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
-#if defined(KYRC_ENABLE_ADC_IN)
+#if defined(KYR_ENABLE_ADC_IN)
 AudioInputAnalog	adc_in;	// headset switch detect
 #endif
 
 // revised inputs
-AudioInputByte		st_key;		  // sidetone key line
-AudioInputByte		tx_key;		  // transmitter key line
+AudioInputByte		au_st_key;  // sidetone key line
+AudioInputByte		au_key_out; // transmitter key line
 
 // shaped key waveform
 AudioSynthKeyedTone	tone_ramp(1); // one channel sidetone ramp
 AudioSynthKeyedTone	key_ramp(2);  // two channel IQ tone ramp
-AudioConnection		patchCord3a(st_key, 0, tone_ramp, 0); // sidetone key line
-AudioConnection		patchCord3b(tx_key, 1, key_ramp, 0);  // transmit key line
+AudioConnection		patchCord3a(au_st_key, 0, tone_ramp, 0); // sidetone key line
+AudioConnection		patchCord3b(au_key_out, 1, key_ramp, 0);  // transmit key line
 
 // 
 // output mixers
@@ -95,7 +95,7 @@ AudioOutputI2S          i2s_out;
 AudioConnection		patchCord11c(l_i2s_out, 0, i2s_out, 0);
 AudioConnection		patchCord11d(r_i2s_out, 0, i2s_out, 1);
 
-#if defined(KYRC_ENABLE_HDW_OUT)
+#if defined(KYR_ENABLE_HDW_OUT)
 #if defined(TEENSY31) || defined(TEENSY32)
 AudioOutputAnalog	hdw_out;
 AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);

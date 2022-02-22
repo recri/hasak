@@ -22,33 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef ring_buffer_h_
-#define ring_buffer_h_
 
-#include <Arduino.h>
+/*
+** sidetone ptt timing, just a simple tail
+*/
 
-#ifndef RING_BUFFER_SIZE
-#define RING_BUFFER_SIZE 128
-#endif
+static elapsedSamples stptt_tail_counter; /* count up the tail time */
 
-/* circular buffer of int for run lengths */
-/* a negative int represents abs(int) zeros */
-/* a positive int represents abs(int) ones */
-template <class T, unsigned SIZE>
-class RingBuffer {
-public:
-  RingBuffer() { }
-  void reset(void) { wptr = rptr = 0; }
-  bool can_get(void) { return rptr!=wptr; }
-  bool can_put(void) { return (wptr+1) != rptr; }
-  T peek(void) { return buff[rptr%SIZE]; }
-  T get(void) { return buff[rptr++%SIZE]; }
-  void put(T val) { buff[wptr++%SIZE] = val; }
-  int items(void) { return wptr-rptr; }
-  bool can_unput(void) { return can_get(); }
-  void unput(void) { wptr -= 1; }
-private:
-  unsigned wptr = 0, rptr = 0;
-  T buff[SIZE];
-};
-#endif
+static void stptt_sidetone_listener(int note) {
+  if (note_get(KYRN_KEY_ST) &&	/* sidetone on */
+      ! note_get(KYRN_PTT_ST))  /* ptt not on */
+      note_toggle(KYRN_PTT_ST);	/* start sidetone */
+  stptt_tail_counter = 0;	/* reset the element timer */
+}
+
+static void stptt_every_sample(void) {
+  const unsigned tail = xnrpn_get(KYRP_XPER_IWS); /* 7 dit word space tail */
+  if (note_get(KYRN_PTT_ST) &&		      /* ptt st is on */
+      note_get(KYRN_KEY_ST) == 0 &&	      /* key st is off */
+      stptt_tail_counter > tail) 	      /* tail has expired */
+    note_toggle(KYRN_PTT_ST);		      /* ptt off */
+}
+
+static void stptt_setup(void) {
+  note_listen(KYRN_KEY_ST, stptt_sidetone_listener);
+  every_sample(stptt_every_sample);
+}
+
+static void stptt_loop(void) {
+}

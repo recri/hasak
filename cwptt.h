@@ -26,37 +26,58 @@
 /*
 ** ptt timing shim
 */
+#include "src/ring_buffer.h"
 
-static elapsedSamples cwpttCounter; /* count the time */
-static uint32_t cwptt_head; /* cache head time for duration */
-static uint32_t cwptt_tail; /* cache tail time for duration */
+static elapsedSamples cwptt_tail_counter; /* count down the time */
+static RingBuffer<uint32_t,256> cwptt_delay_line;
+static unsigned long cwptt_tail_time;
+static byte cwptt_tail_time_is_stale = 1; /* flag for initial computation */
 
-static void cwptt_listener(int note) {
-  if (note == KYRN_KEY_ST) {	/* sidetone transition */
-    if (note_get(KYRN_KEY_ST)) { /* sidetone is on */
-      if ( ! note_get(KYRN_PTT_TX)) {
-	note_toggle(KYRN_PTT_TX);
-	cwptt_head = get_nrpn(KYRP_HEAD_TIME);
-	cwptt_tail = max(get_nrpn(KYRP_TAIL_TIME), get_nrpn(KYRP_HANG_TIME)*get_xnrpn(KYRP_XPER_DIT));
-      }
-      note_after(cwptt_head, KYRN_KEY_TX, 1);
-    } else {			/* sidetone is off */
-      note_after(cwptt_head, KYRN_KEY_TX, 0);
-    }
-  } else if (note == KYRN_KEY_TX) { /* tx keying transition */
-    cwpttCounter = 0;	/* time the element */
+static void cwptt_nrpn_listener(int nrpn) {
+  cwptt_tail_time_is_stale = 1;	/* flag for recompute */
+}
+
+static void cwptt_sidetone_listener(int note) {
+  if (note_get(KYRN_KEY_ST))	/* sidetone is on */
+    if ( ! note_get(KYRN_PTT_OUT))
+      note_toggle(KYRN_PTT_OUT);
+  // queue element for possibly later replay
+  if (cwptt_delay_line.can_put())
+    cwptt_delay_line.put(timing_samples()+nrpn_get(KYRP_HEAD_TIME));
+  else
+    Serial.printf("cwptt_listener, delay line overflow, reduce speed or ptt head time\n");
+}
+
+static void cwptt_key_out_listener(int note) {
+  cwptt_tail_counter = 0;	     /* reset the element timer */
+}
+
+static void cwptt_every_sample(void) {
+  if (cwptt_tail_time_is_stale) {
+    cwptt_tail_time_is_stale = 0;
+    cwptt_tail_time = max(nrpn_get(KYRP_TAIL_TIME), nrpn_get(KYRP_HANG_TIME)*xnrpn_get(KYRP_XPER_DIT));
+  }
+  if (note_get(KYRN_PTT_OUT) &&		      /* ptt tx is on */
+      note_get(KYRN_KEY_OUT) == 0 &&	      /* key tx is off */
+      cwptt_tail_counter > cwptt_tail_time) { /* tail has expired */
+    note_toggle(KYRN_PTT_OUT);		      /* ptt off */
+  }
+  if (cwptt_delay_line.can_get() &&	      /* something is queued */ 
+      cwptt_delay_line.peek()-timing_samples() <= 0) { /* its time has come */
+    cwptt_delay_line.get();			       /* pull it off the queue */
+    note_toggle(KYRN_KEY_OUT);			       /* toggle the output note */
   }
 }
 
 static void cwptt_setup(void) {
-  note_listen(KYRN_KEY_ST, cwptt_listener);
-  note_listen(KYRN_KEY_TX, cwptt_listener);
-  note_listen(KYRN_PTT_TX, cwptt_listener);
+  cwptt_tail_time_is_stale = 1;			    // flag for recompute
+  nrpn_listen(KYRP_TAIL_TIME, cwptt_nrpn_listener); // and reflag when necessary
+  nrpn_listen(KYRP_HANG_TIME, cwptt_nrpn_listener); // and reflag when necessary
+  nrpn_listen(KYRP_XPER_DIT+1, cwptt_nrpn_listener); // and reflag when necessary
+  note_listen(KYRN_KEY_ST, cwptt_sidetone_listener);
+  note_listen(KYRN_KEY_OUT, cwptt_key_out_listener);
+  every_sample(cwptt_every_sample);
 }
 
 static void cwptt_loop(void) {
-  if (note_get(KYRN_PTT_TX) &&		      /* ptt tx is on */
-      note_get(KYRN_KEY_TX) == 0 &&	      /* key tx is off */
-      cwpttCounter > cwptt_tail)	      /* tail has expired */
-    note_toggle(KYRN_PTT_TX);		      /* ptt off */
 }

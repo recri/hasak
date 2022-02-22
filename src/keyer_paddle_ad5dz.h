@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef _keyer_ad5dz_h_
-#define _keyer_ad5dz_h_
+#ifndef _keyer_paddle_ad5dz_h_
+#define _keyer_paddle_ad5dz_h_
 
-#include "keyer_generic.h"
+#include "keyer_paddle_generic.h"
 
-class KeyerAd5dz : public KeyerGeneric {
+class KeyerAd5dz : public KeyerPaddleGeneric {
  public:
- KeyerAd5dz() : KeyerGeneric() { }
+ KeyerAd5dz() : KeyerPaddleGeneric() { }
   /* 
      keyer, coded in line because it works
      int clock(dit, dah, ticks) is called to advance the state machine

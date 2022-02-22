@@ -27,26 +27,47 @@
  * straight key keyers
  */
 static void keyer_straight_s_key_listen(int note) {
-  if (hasak.notes[KYRN_S_KEY] != hasak.notes[KYRN_S_KEY_ST]) note_toggle(KYRN_S_KEY_ST);
+  if (note_get(KYRN_HW_S_KEY) != note_get(KYRN_ST_S_KEY)) note_toggle(KYRN_ST_S_KEY);
 }
+
+#if defined(KYR_ENABLE_SKEY2)
+static void keyer_straight_s_key2_listen(int note) {
+  if (note_get(KYRN_HW_S_KEY2) != note_get(KYRN_ST_S_KEY2)) note_toggle(KYRN_ST_S_KEY2);
+}
+#endif
+
+#if defined(KYR_ENABLE_SKEY3)
+static void keyer_straight_s_key3_listen(int note) {
+  if (note_get(KYRN_HW_S_KEY3) != note_get(KYRN_ST_S_KEY3)) note_toggle(KYRN_ST_S_KEY3);
+}
+#endif
 
 static void keyer_straight_tune_listen(int note) {
-  if (hasak.notes[KYRN_TUNE] != hasak.notes[KYRN_TUNE_ST]) note_toggle(KYRN_TUNE_ST);
+  if (note_get(KYRN_MIDI_IN_TUNE) != note_get(KYRN_ST_TUNE)) note_toggle(KYRN_ST_TUNE);
 }  
 
+#if defined(KYR_ENABLE_BUT)
 static void keyer_straight_but_listen(int note) {
-  if (hasak.notes[KYRN_BUT] != hasak.notes[KYRN_BUT_ST]) note_toggle(KYRN_BUT_ST);
+  if (note_get(KYRN_HW_BUT) != note_get(KYRN_ST_BUT)) note_toggle(KYRN_ST_BUT);
 }
+#endif
 
 static void keyer_straight_setup(void) {
-  note_listen(KYRN_S_KEY, keyer_straight_s_key_listen);
-  note_listen(KYRN_TUNE, keyer_straight_tune_listen);
-  note_listen(KYRN_BUT, keyer_straight_but_listen);
+  note_listen(KYRN_HW_S_KEY, keyer_straight_s_key_listen);
+  note_listen(KYRN_MIDI_IN_TUNE, keyer_straight_tune_listen);
+
+#if defined(KYR_ENABLE_SKEY2)
+  note_listen(KYRN_HW_S_KEY2, keyer_straight_s_key2_listen);
+#endif
+
+#if defined(KYR_ENABLE_SKEY3)
+  note_listen(KYRN_HW_S_KEY3, keyer_straight_s_key3_listen);
+#endif
+
+#if defined(KYR_ENABLE_BUT)
+  note_listen(KYRN_HW_BUT, keyer_straight_but_listen);
+#endif
 }
 
-static void keyer_skey_loop(void) {
-  if (active_sidetone < KYRN_S_KEY_ST && note_get(KYRN_S_KEY_ST)) note_toggle(KYRN_S_KEY_ST);
-  if (active_sidetone < KYRN_TUNE && note_get(KYRN_TUNE)) note_toggle(KYRN_TUNE);
-  if (active_sidetone < KYRN_BUT_ST && note_get(KYRN_BUT_ST)) note_toggle(KYRN_BUT_ST);
+static void keyer_straight_loop(void) {
 }
-

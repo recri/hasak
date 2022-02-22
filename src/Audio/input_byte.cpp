@@ -29,6 +29,7 @@ audio_block_t *AudioInputByte::ones = NULL;
 void AudioInputByte::update(void)
 {
   int32_t write_position = tell();
+  update_counter += 1;
   /* 
   ** if we have debounce greater or equal to block length
   ** just send a block of last and be done with it.
@@ -87,7 +88,8 @@ void AudioInputByte::update(void)
 	sum += *bp++ = last;
       } else if (*bp != last) {
 	sum += last = *bp++;
-	debounce = get_nrpn(KYRP_DEBOUNCE);
+	// no debouncing because these are clean digital inputs now.
+	debounce = 0; // get_nrpn(KYRP_DEBOUNCE)
       } else {
 	sum += *bp++;
       }

@@ -23,6 +23,16 @@
  * THE SOFTWARE.
  */
 
+#ifndef _keyer_text_h
+#define _keyer_text_h
+
+#include "../config.h"
+#include "Arduino.h"
+#include "../linkage.h"
+
+#include "keyer_timing_generic.h"
+#include "ring_buffer.h"
+
 /*
 ** hasak text keyer component.
 **
@@ -35,28 +45,28 @@
 ** by default.
 */
 
-#include "../ring_buffer.h"
 
-class KeyerText {
+class KeyerText : public KeyerTimingGeneric {
 
 public:
 
-  enum { none, dit, dah, ies, ils, iws };
+  enum { key_none, key_dit, key_dah, key_ies, key_ils, key_iws } timing_element;
 
-  KeyerText(int text_note, int st_note) : text_note(text_note), st_note(st_note) {
+  KeyerText(int text_note, int st_note) : KeyerTimingGeneric(), text_note(text_note), st_note(st_note) {
     code = prosign =  0;
-    timing_element = none;
+    timing_element = key_none;
   }
+
   int text_note, st_note;
   RingBuffer<uint8_t, 128> chars;
-  int code, prosign, timing_element;
-  elapsedSamples timer;
+  int code, prosign;
+  unsigned long timer;
 
   int abort() {
     chars.reset();		// clear text buffer
     code = 0;			// clear element buffer
     prosign = 0;		// no prosign
-    timing_element = none;	// element timing
+    timing_element = key_none;	// element timing
     if (note_get(st_note)) note_toggle(st_note);
     Serial.printf("keyer_text:abort() active %d st_note %d\n", get_active_st(), st_note);
     return 0;			// return false
@@ -111,20 +121,24 @@ public:
     send_text(note_get(text_note));
   }
 
-  void loop(void) {
+  void clock(int ticks) {
 
-  while (valid_vox_or_abort()) {
+    while (valid_vox_or_abort()) {
+      if (timing_element != key_none) {
+	timer += ticks;
+	if ((int)timer < 0) return; // element timer not expired
+      }
       switch (timing_element) {
-      case none: {
+      case key_none: {
 	int value = recv_text();
 	if (value < 0) {	   // nothing to send
 	  return;
 	}
 	if (value == ' ') {	  // send word space
-	  timing_element = iws;
+	  timing_element = key_iws;
 	  timer = -get_xnrpn(KYRP_XPER_IWS);
 	} else if (value == '|') { // send half dit space
-	  timing_element = iws;
+	  timing_element = key_iws;
 	  timer = -get_xnrpn(KYRP_XPER_DIT)/2;
 	} else if (value == '\e') { // prosign together the next two characters
 	  prosign += 1;
@@ -133,53 +147,49 @@ public:
 	  // return;
 	  code = get_nrpn(KYRP_MORSE+value-33);
 	  if (code > 1)
-	    timing_element = ies;
+	    timing_element = key_ies;
 	}
 	continue;
       }
-      case dit:
-      case dah:
-	if ((int)timer < 0) return; // element timer not expired
+      case key_dit:
+      case key_dah:
 	note_toggle(st_note);	    // start interelement space
 	timer = -get_xnrpn(KYRP_XPER_IES);
-	timing_element = ies;
+	timing_element = key_ies;
 	continue;
 
-      case ies:
-	if ((int)timer < 0) return; // element timer not expired
+      case key_ies:
 	if (code != 1) {	    // another element in code
 	  note_toggle(st_note);	    // start next element
 	  if (code&1) {		    // next element is dah
 	    timer = -get_xnrpn(KYRP_XPER_DAH);
-	    timing_element = dah;
+	    timing_element = key_dah;
 	  } else {		    // next element is dit
 	    timer = -get_xnrpn(KYRP_XPER_DIT);
-	    timing_element = dit;
+	    timing_element = key_dit;
 	  }
 	  code >>= 1;	            // clear element from code
 	} else if (prosign) {       // code is finished, but we're in a prosign
 	  prosign -= 1;
-	  timing_element = none;
+	  timing_element = key_none;
 	} else {		    // code is finished, extend ies to ils
 	  timer = -(get_xnrpn(KYRP_XPER_ILS)-get_xnrpn(KYRP_XPER_IES));
-	  timing_element = ils;
+	  timing_element = key_ils;
 	}
 	continue;
 	
-      case ils:
-	if ((int)timer < 0) return; // element timer not expired
+      case key_ils:
 	if (chars.peek() == ' ') {  // extend to iws
 	  recv_text();		    // pull the space
 	  timer = -(get_xnrpn(KYRP_XPER_IWS)-get_xnrpn(KYRP_XPER_ILS));
-	  timing_element = iws;
+	  timing_element = key_iws;
 	} else {		    // start the next code
-	  timing_element = none;
+	  timing_element = key_none;
 	}
 	continue;
 
-      case iws:
-	if ((int)timer < 0) return; // element timer not expired
-	timing_element = none;
+      case key_iws:
+	timing_element = key_none;
 	continue;
 
       default:
@@ -189,19 +199,4 @@ public:
   }
 };
 
-static KeyerText keyer_text_wink(KYRN_TXT_WINK, KYRN_WINK_ST);
-static KeyerText keyer_text_kyr(KYRN_TXT_KYR, KYRN_KYR_ST);
-
-static void keyer_text_wink_listen(int note) { keyer_text_wink.receive(); }
-
-static void keyer_text_kyr_listen(int note) { keyer_text_kyr.receive(); }
-
-static void keyer_text_setup(void) {
-  note_listen(keyer_text_wink.text_note, keyer_text_wink_listen);
-  note_listen(keyer_text_kyr.text_note, keyer_text_kyr_listen);
-}
-
-static void keyer_text_loop(void) {
-  keyer_text_wink.loop();
-  keyer_text_kyr.loop();
-}
+#endif

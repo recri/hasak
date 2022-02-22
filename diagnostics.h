@@ -26,95 +26,104 @@
 ** diagnostics / command line interface
 */
 /* usage report line */
-static void report(const char *tag, uint32_t use, uint32_t umax) {
+static void diag_report(const char *tag, uint32_t use, uint32_t umax) {
   Serial.printf("%16s %5.3f%% %5.3f%%", tag, timing_percent(use), timing_percent_max(umax));
   // Serial.printf("\n");
 }
 
-elapsedMicros totalTime;
+elapsedMicros diag_totalTime;
 
 /* summary report */
-static void sreport(void) {
-  float msPerIes = get_xnrpn(KYRP_XPER_IES);
-  float msPerIls = get_xnrpn(KYRP_XPER_ILS);
-  float msPerIws = get_xnrpn(KYRP_XPER_IWS);
-  Serial.printf("\t%f sample rate %f buffer size %d F_CPU %.1f MHz\n", totalTime/1e6, AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES, F_CPU/1e6f);
-  Serial.printf("\ties/ils/iws %.1f/%.1f/%.1f ms\n", msPerIes, msPerIls, msPerIws);
-  Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
-  report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
-  report("isr", isrCyclesPerAudioBuffer, isrCyclesPerAudioBufferMax);
+static void diag_sreport(void) {
+  static elapsedLoops eLoops;
+  static elapsedSamples eSamples;
+  static elapsedUpdates eUpdates;
+  unsigned loops = eLoops; eLoops = 0;
+  unsigned samples = eSamples; eSamples = 0;
+  unsigned updates = eUpdates; eUpdates = 0;
+
+  Serial.printf("Short summary:\n");
+  Serial.printf("\ttime %f(s), sample rate %f(sps) buffer size %d(bytes) F_CPU %.1f(MHz)\n", 
+		diag_totalTime/1e6, AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES, F_CPU/1e6f);
+  Serial.printf("\tdit/dah/ies/ils/iws %ld/%ld/%ld/%ld/%ld samples\n",
+		xnrpn_get(KYRP_XPER_DIT), xnrpn_get(KYRP_XPER_DAH),
+		xnrpn_get(KYRP_XPER_IES), xnrpn_get(KYRP_XPER_ILS), xnrpn_get(KYRP_XPER_IWS));
+  // Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
+  diag_report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
+  diag_report("isr", timing_isrCyclesPerAudioBuffer, timing_isrCyclesPerAudioBufferMax);
   Serial.printf("%16s %2d %2d\n", "buffers", AudioMemoryUsage(), AudioMemoryUsageMax());
-  Serial.printf("\tsampleCount %ld, loopCount %ld, loop/sample %f\n",
-		hasak.sampleCount, hasak.loopCount, (float)hasak.loopCount/hasak.sampleCount);
+  Serial.printf("\tupdates %ld samples %ld, loops %ld, sample/update %.2f loop/sample %.2f\n",
+		updates, samples, loops, (float)samples/updates, (float)loops/samples);
 }
 
-static void treport(const char *p) {
-  Serial.printf("\t%f %s\n", totalTime/1e6, p);
+static void diag_treport(const char *p) {
+  Serial.printf("\t%f %s\n", diag_totalTime/1e6, p);
 }
 
 /* generic audio module report and reset */
-static void mreport(const char *tag, AudioStream& str) {
-  report(tag, str.cpu_cycles, str.cpu_cycles_max);
+static void diag_mreport(const char *tag, AudioStream& str) {
+  diag_report(tag, str.cpu_cycles, str.cpu_cycles_max);
 }
 
 /* long report */
-static void Sreport(void) {
+static void diag_Sreport(void) {
   // report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max, AudioMemoryUsage(), AudioMemoryUsageMax(), 0, 0);
   // report("denom", cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax, 0, 0, 0, 0);
-  sreport();
-#if defined(KYRC_ENABLE_ADC_IN)
-  mreport("i2s_in", i2s_in);       mreport("usb_in", usb_in);       mreport("adc_in", adc_in);   Serial.println();
+  diag_sreport();
+  Serial.printf("Extended summary:\n");
+#if defined(KYR_ENABLE_ADC_IN)
+  diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in);       diag_mreport("adc_in", adc_in);   Serial.println();
 #else
-  mreport("i2s_in", i2s_in);       mreport("usb_in", usb_in);       Serial.println();
+  diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in);       Serial.println();
 #endif
-#if defined(KYRC_ENABLE_HDW_OUT)
-  mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);     mreport("hdw_out", hdw_out); Serial.println();
+#if defined(KYR_ENABLE_HDW_OUT)
+  diag_mreport("i2s_out", i2s_out);     diag_mreport("usb_out", usb_out);     diag_mreport("hdw_out", hdw_out); Serial.println();
 #else
-  mreport("i2s_out", i2s_out);     mreport("usb_out", usb_out);	    Serial.println();
+  diag_mreport("i2s_out", i2s_out);     diag_mreport("usb_out", usb_out);     Serial.println();
 #endif
-  mreport("tone_ramp", tone_ramp); mreport("key_ramp", key_ramp);   Serial.println();
-  mreport("l_i2s_out", l_i2s_out); mreport("r_i2s_out", r_i2s_out); Serial.println();
-  mreport("l_usb_out", l_usb_out); mreport("r_usb_out", r_usb_out); Serial.println();
-  mreport("l_hdw_out", l_hdw_out); mreport("r_hdw_out", r_hdw_out); Serial.println();
+  diag_mreport("tone_ramp", tone_ramp); diag_mreport("key_ramp", key_ramp);   Serial.println();
+  diag_mreport("l_i2s_out", l_i2s_out); diag_mreport("r_i2s_out", r_i2s_out); Serial.println();
+  diag_mreport("l_usb_out", l_usb_out); diag_mreport("r_usb_out", r_usb_out); Serial.println();
+  diag_mreport("l_hdw_out", l_hdw_out); diag_mreport("r_hdw_out", r_hdw_out); Serial.println();
 }
 
 /* summary reset */
-static void mreset(AudioStream &str) {
+static void diag_mreset(AudioStream &str) {
   str.processorUsageMaxReset();
 }
 
-static void sreset(void) {
-  cpuCyclesPerAudioBufferMax = cpuCyclesPerAudioBuffer;
-  isrCyclesPerAudioBufferMax = isrCyclesPerAudioBuffer;
+static void diag_sreset(void) {
+  timing_cpuCyclesPerAudioBufferMax = timing_cpuCyclesPerAudioBuffer;
+  timing_isrCyclesPerAudioBufferMax = timing_isrCyclesPerAudioBuffer;
   AudioProcessorUsageMaxReset();
   AudioMemoryUsageMaxReset();
 }
 
-static void Sreset(void) {
-  sreset();
-  mreset(i2s_in);
-  mreset(usb_in);
-#if defined(KYRC_ENABLE_ADC_IN)
-  mreset(adc_in);
+static void diag_Sreset(void) {
+  diag_sreset();
+  diag_mreset(i2s_in);
+  diag_mreset(usb_in);
+#if defined(KYR_ENABLE_ADC_IN)
+  diag_mreset(adc_in);
 #endif
-  mreset(tone_ramp);
-  mreset(key_ramp);
-  mreset(l_i2s_out);
-  mreset(r_i2s_out);
-  mreset(l_usb_out);
-  mreset(r_usb_out);
-  mreset(l_hdw_out);
-  mreset(r_hdw_out);
-  mreset(i2s_out);
-  mreset(usb_out);
+  diag_mreset(tone_ramp);
+  diag_mreset(key_ramp);
+  diag_mreset(l_i2s_out);
+  diag_mreset(r_i2s_out);
+  diag_mreset(l_usb_out);
+  diag_mreset(r_usb_out);
+  diag_mreset(l_hdw_out);
+  diag_mreset(r_hdw_out);
+  diag_mreset(i2s_out);
+  diag_mreset(usb_out);
 }
 
 /* debounce details */
-static void dreport(void) {
-  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(get_nrpn(KYRP_DEBOUNCE)), get_nrpn(KYRP_DEBOUNCE));
+static void diag_dreport(void) {
+  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(nrpn_get(KYRP_DEBOUNCE)), nrpn_get(KYRP_DEBOUNCE));
 }
 
-static const char *lorem = 
+static const char *diag_lorem = 
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
   "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris "
@@ -131,7 +140,7 @@ static const char *lorem =
 ** channel 4 - test stream
 ** loop over as many specs as are present
 */
-static void mixer3_set(const char *dev, AudioMixer4& m, const char *p) {
+static void diag_mixer3_set(const char *dev, AudioMixer4& m, const char *p) {
   // Serial.printf("prepare for %s do_left %d do_right %d at \"%s\"\n", dev, dol, dor, p);
   for (int i = 0; i < 4; i += 1) {
     switch (*p++) {
@@ -141,49 +150,49 @@ static void mixer3_set(const char *dev, AudioMixer4& m, const char *p) {
     }
   }
 }
-static void mixer2_set(const char *dev, AudioMixer4& l, AudioMixer4& r, const char *p) {
+static void diag_mixer2_set(const char *dev, AudioMixer4& l, AudioMixer4& r, const char *p) {
   Serial.printf("recognized device %s\n", dev);
   switch (*p) {
   case 'l': 
-    mixer3_set(dev, l, p+1);	/* left mixers */
+    diag_mixer3_set(dev, l, p+1);	/* left mixers */
     return;
   case 'r':
-    mixer3_set(dev, r, p+1);	/* right mixers */
+    diag_mixer3_set(dev, r, p+1);	/* right mixers */
     return;
   case '0':
   case '1': 
-    mixer3_set(dev, l, p); /* both mixers */
-    mixer3_set(dev, r, p); /* both mixers */
+    diag_mixer3_set(dev, l, p); /* both mixers */
+    diag_mixer3_set(dev, r, p); /* both mixers */
     return;
   default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
   }
 }
-static void mixer_set(const char *p) {
+static void diag_mixer_set(const char *p) {
   Serial.printf("mixer_set(\"%s\")\n", p);
   switch (*p) {
-  case 'u': return mixer2_set("usb", l_usb_out, r_usb_out, p+1); 
-  case 'i': return mixer2_set("i2s", l_i2s_out, r_i2s_out, p+1);
-  case 'h': return mixer2_set("hdw", l_hdw_out, r_hdw_out, p+1);
+  case 'u': return diag_mixer2_set("usb", l_usb_out, r_usb_out, p+1); 
+  case 'i': return diag_mixer2_set("i2s", l_i2s_out, r_i2s_out, p+1);
+  case 'h': return diag_mixer2_set("hdw", l_hdw_out, r_hdw_out, p+1);
   default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
   }
 }
 
-static char random_char(void) {
+static char diag_random_char(void) {
   char c;
-  do c = random(0,128); while ( ! keyer_text_wink.valid_text(c)); 
+  do c = random(0,128); while ( ! keyer_text.valid_text(c)); 
   return c;
 }
 
-static char *random_text(void) {
+static char *diag_random_text(void) {
   static char buff[256];
   for (unsigned i = 0; i < sizeof(buff)-1; i += 1)
-    buff[i] = random_char();
+    buff[i] = diag_random_char();
   buff[255] = 0;
   return buff;
 }
 
 
-static char *read_line() {
+static char *diag_read_line() {
   static char buff[256];
   unsigned i = 0;
   for (int c = Serial.read(); c != '\n'; c = Serial.read())
@@ -193,10 +202,10 @@ static char *read_line() {
   return buff;
 }
 
-static const char *wink_send_ptr = NULL;
-static const char *kyr_send_ptr = NULL;
+static const char *diag_text_send_ptr = NULL;
+static const char *diag_text2_send_ptr = NULL;
 
-static int send_some_text(const char *text, KeyerText& input) {
+static int diag_send_some_text(const char *text, KeyerText& input) {
   if (text == NULL) return 0;
   if (*text == 0) return 0;
   if ( ! input.valid_vox()) return 0;
@@ -204,153 +213,140 @@ static int send_some_text(const char *text, KeyerText& input) {
   return *text != 0 && input.valid_vox();
 }
 
-static uint8_t logging = 0;
+static uint8_t diag_logging = 0;
 
-char debug_buffer[4][256];
+char diag_debug_buffer[4][256];
 
 void diag_nrpn_report(void) {
-  Serial.printf("\tVOLUME %.2f", nrpn_to_db(get_nrpn(KYRP_VOLUME)));
-  Serial.printf("\tINPUT_SELECT %d", get_nrpn(KYRP_INPUT_SELECT));
-  Serial.printf("\tINPUT_LEVEL %.2f", nrpn_to_db(get_nrpn(KYRP_INPUT_LEVEL)));
+  Serial.printf("\tVOLUME %.2f", nrpn_to_db(nrpn_get(KYRP_VOLUME)));
+  Serial.printf("\tINPUT_SELECT %d", nrpn_get(KYRP_INPUT_SELECT));
+  Serial.printf("\tINPUT_LEVEL %.2f", nrpn_to_db(nrpn_get(KYRP_INPUT_LEVEL)));
   Serial.println("");
   Serial.printf("\tBUTTON_* %d, %d, %d, %d, %d", 
-		signed_value(get_nrpn(KYRP_BUTTON_0)), signed_value(get_nrpn(KYRP_BUTTON_1)),
-		signed_value(get_nrpn(KYRP_BUTTON_2)), signed_value(get_nrpn(KYRP_BUTTON_3)),
-		signed_value(get_nrpn(KYRP_BUTTON_4)));
+		signed_value(nrpn_get(KYRP_BUTTON_0)), signed_value(nrpn_get(KYRP_BUTTON_1)),
+		signed_value(nrpn_get(KYRP_BUTTON_2)), signed_value(nrpn_get(KYRP_BUTTON_3)),
+		signed_value(nrpn_get(KYRP_BUTTON_4)));
   Serial.println("");
-  Serial.printf("\tPTT_EN %d", get_nrpn(KYRP_PTT_ENABLE));
-  Serial.printf("\tTX_EN %d", get_nrpn(KYRP_TX_ENABLE));
-  Serial.printf("\tST_EN %d", get_nrpn(KYRP_ST_ENABLE));
-  Serial.printf("\tIQ_EN %d", get_nrpn(KYRP_IQ_ENABLE));
-  Serial.printf("\tADJ %d", signed_value(get_nrpn(KYRP_IQ_ADJUST)));
-  Serial.printf("\tBAL %d", signed_value(get_nrpn(KYRP_IQ_BALANCE)));
+  Serial.printf("\tPTT_EN %d", nrpn_get(KYRP_PTT_ENABLE));
+  Serial.printf("\tTX_EN %d", nrpn_get(KYRP_TX_ENABLE));
+  Serial.printf("\tST_EN %d", nrpn_get(KYRP_ST_ENABLE));
+  Serial.printf("\tIQ_EN %d", nrpn_get(KYRP_IQ_ENABLE));
+  Serial.printf("\tADJ %d", signed_value(nrpn_get(KYRP_IQ_ADJUST)));
+  Serial.printf("\tBAL %d", signed_value(nrpn_get(KYRP_IQ_BALANCE)));
   Serial.println("");
-  Serial.printf("\tST_PAN %d", get_nrpn(KYRP_ST_PAN));
+  Serial.printf("\tST_PAN %d", nrpn_get(KYRP_ST_PAN));
 
-  Serial.printf("\tDEBOUNCE %d", get_nrpn(KYRP_DEBOUNCE));
+  Serial.printf("\tDEBOUNCE %d", nrpn_get(KYRP_DEBOUNCE));
 
-  Serial.printf("\tHEAD_TIME %d", get_nrpn(KYRP_HEAD_TIME));
-  Serial.printf("\tTAIL_TIME %d", get_nrpn(KYRP_TAIL_TIME));
-  Serial.printf("\tHANG_TIME %d", get_nrpn(KYRP_HANG_TIME));
-  Serial.println("");
-
-  Serial.printf("\tRISE_TIME %d", get_nrpn(KYRP_RISE_TIME));
-  Serial.printf("\tFALL_TIME %d", get_nrpn(KYRP_FALL_TIME));
-  Serial.printf("\tRISE_RAMP %d", get_nrpn(KYRP_RISE_RAMP));
-  Serial.printf("\tFALL_RAMP %d", get_nrpn(KYRP_FALL_RAMP));
+  Serial.printf("\tHEAD_TIME %d", nrpn_get(KYRP_HEAD_TIME));
+  Serial.printf("\tTAIL_TIME %d", nrpn_get(KYRP_TAIL_TIME));
+  Serial.printf("\tHANG_TIME %d", nrpn_get(KYRP_HANG_TIME));
   Serial.println("");
 
-  Serial.printf("\tPAD_MODE %d", get_nrpn(KYRP_PAD_MODE));
-  Serial.printf("\tPAD_SWAP %d", get_nrpn(KYRP_PAD_SWAP));
-  Serial.printf("\tPAD_ADAPT %d", get_nrpn(KYRP_PAD_ADAPT));
-  Serial.printf("\tAUTO_ILS %d", get_nrpn(KYRP_AUTO_ILS));
-  Serial.printf("\tAUTO_IWS %d", get_nrpn(KYRP_AUTO_IWS));
-  Serial.printf("\tPAD_KEYER %d", get_nrpn(KYRP_PAD_KEYER));
+  Serial.printf("\tRISE_TIME %d", nrpn_get(KYRP_RISE_TIME));
+  Serial.printf("\tFALL_TIME %d", nrpn_get(KYRP_FALL_TIME));
+  Serial.printf("\tRISE_RAMP %d", nrpn_get(KYRP_RISE_RAMP));
+  Serial.printf("\tFALL_RAMP %d", nrpn_get(KYRP_FALL_RAMP));
   Serial.println("");
 
-  Serial.printf("\tCHAN_CC %d", get_nrpn(KYRP_CHAN_CC));
-  Serial.printf("\tNOTE %d", get_nrpn(KYRP_CHAN_NOTE));
+  Serial.printf("\tPAD_MODE %d", nrpn_get(KYRP_PAD_MODE));
+  Serial.printf("\tPAD_SWAP %d", nrpn_get(KYRP_PAD_SWAP));
+  Serial.printf("\tPAD_ADAPT %d", nrpn_get(KYRP_PAD_ADAPT));
+  Serial.printf("\tAUTO_ILS %d", nrpn_get(KYRP_AUTO_ILS));
+  Serial.printf("\tAUTO_IWS %d", nrpn_get(KYRP_AUTO_IWS));
+  Serial.printf("\tPAD_KEYER %d", nrpn_get(KYRP_PAD_KEYER));
   Serial.println("");
 
-  Serial.printf("\tNOTE_L_PAD %d", get_nrpn(KYRP_NOTE_L_PAD));
-  Serial.printf("\t_R_PAD %d", get_nrpn(KYRP_NOTE_R_PAD));
-  Serial.printf("\t_S_KEY %d", get_nrpn(KYRP_NOTE_S_KEY));
-  Serial.printf("\t_EXT_PTT %d", get_nrpn(KYRP_NOTE_EXT_PTT));
-  Serial.printf("\t_KEY_OUT %d", get_nrpn(KYRP_NOTE_KEY_OUT));
-  Serial.printf("\t_PTT_OUT %d", get_nrpn(KYRP_NOTE_PTT_OUT));
+  Serial.printf("\tCHAN_CC %d", nrpn_get(KYRP_CHAN_CC));
+  Serial.printf("\tNOTE %d", nrpn_get(KYRP_CHAN_NOTE));
   Serial.println("");
 
-  Serial.printf("\tADC_ENABLE 0x%02x", get_nrpn(KYRP_ADC_ENABLE));
-  Serial.printf("\tADC*_CONTROL %d", get_nrpn(KYRP_ADC0_CONTROL));
-  Serial.printf(" %d", get_nrpn(KYRP_ADC1_CONTROL));
-  Serial.printf(" %d", get_nrpn(KYRP_ADC2_CONTROL));
-  Serial.printf(" %d", get_nrpn(KYRP_ADC3_CONTROL));
-  Serial.printf(" %d", get_nrpn(KYRP_ADC4_CONTROL));
+  Serial.printf("\tNOTE_L_PAD %d", nrpn_get(KYRP_NOTE_L_PAD));
+  Serial.printf("\t_R_PAD %d", nrpn_get(KYRP_NOTE_R_PAD));
+  Serial.printf("\t_S_KEY %d", nrpn_get(KYRP_NOTE_S_KEY));
+  Serial.printf("\t_EXT_PTT %d", nrpn_get(KYRP_NOTE_EXT_PTT));
+  Serial.printf("\t_KEY_OUT %d", nrpn_get(KYRP_NOTE_KEY_OUT));
+  Serial.printf("\t_PTT_OUT %d", nrpn_get(KYRP_NOTE_PTT_OUT));
+  Serial.println("");
+
+  Serial.printf("\tADC_ENABLE 0x%02x", nrpn_get(KYRP_ADC_ENABLE));
+  Serial.printf("\tADC*_CONTROL %d", nrpn_get(KYRP_ADC0_CONTROL));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC1_CONTROL));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC2_CONTROL));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC3_CONTROL));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC4_CONTROL));
   Serial.println();
 
   /* 64 morse code translations */
-  Serial.printf("\tOUT_ENABLE 0x%04x", get_nrpn(KYRP_OUT_ENABLE));
+  Serial.printf("\tOUT_ENABLE 0x%04x", nrpn_get(KYRP_OUT_ENABLE));
   Serial.println();
 
-  Serial.printf("\tUSB_L0 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_L0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_L1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_L2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_L3)));
+  Serial.printf("\tUSB_L0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L3)));
 
-  Serial.printf("\tR0 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_R0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_R1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_R2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_USB_R3)));
+  Serial.printf("\tR0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R3)));
   Serial.println();
 
-  Serial.printf("\tI2S_L0 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_L0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_L1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_L2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_L3)));
+  Serial.printf("\tI2S_L0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L3)));
 
-  Serial.printf("\tR0 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_R0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_R1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_R2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(get_nrpn(KYRP_MIX_I2S_R3)));
+  Serial.printf("\tR0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R3)));
   Serial.println();
 
-  Serial.printf("\tHDW_L0 %d", get_nrpn(KYRP_MIX_HDW_L0));
-  Serial.printf("\t1 %d", get_nrpn(KYRP_MIX_HDW_L1));
-  Serial.printf("\t2 %d", get_nrpn(KYRP_MIX_HDW_L2));
-  Serial.printf("\t3 %d", get_nrpn(KYRP_MIX_HDW_L3));
+  Serial.printf("\tHDW_L0 %d", nrpn_get(KYRP_MIX_HDW_L0));
+  Serial.printf("\t1 %d", nrpn_get(KYRP_MIX_HDW_L1));
+  Serial.printf("\t2 %d", nrpn_get(KYRP_MIX_HDW_L2));
+  Serial.printf("\t3 %d", nrpn_get(KYRP_MIX_HDW_L3));
 
-  Serial.printf("\tR0 %d", get_nrpn(KYRP_MIX_HDW_R0));
-  Serial.printf("\t1 %d", get_nrpn(KYRP_MIX_HDW_R1));
-  Serial.printf("\t2 %d", get_nrpn(KYRP_MIX_HDW_R2));
-  Serial.printf("\t3 %d", get_nrpn(KYRP_MIX_HDW_R3));
+  Serial.printf("\tR0 %d", nrpn_get(KYRP_MIX_HDW_R0));
+  Serial.printf("\t1 %d", nrpn_get(KYRP_MIX_HDW_R1));
+  Serial.printf("\t2 %d", nrpn_get(KYRP_MIX_HDW_R2));
+  Serial.printf("\t3 %d", nrpn_get(KYRP_MIX_HDW_R3));
   Serial.println();
 
-  if (get_nrpn(KYRP_TONE) != KYRV_NOT_SET)
-    Serial.printf("\tTONE %.1f", nrpn_to_hertz(get_nrpn(KYRP_TONE)));
-  if (get_nrpn(KYRP_LEVEL) != KYRV_NOT_SET) 
-    Serial.printf("\tLEVEL %.2f", nrpn_to_db(get_nrpn(KYRP_LEVEL)));
-  if (get_nrpn(KYRP_SPEED) != KYRV_NOT_SET) 
-    Serial.printf("\tSPEED %d", get_nrpn(KYRP_SPEED));
-  if (get_nrpn(KYRP_SPEED_FRAC) != KYRV_NOT_SET) 
-    Serial.printf("\tSPEED_FRAC %d", get_nrpn(KYRP_SPEED_FRAC));
-  if (get_nrpn(KYRP_FARNS) != KYRV_NOT_SET) 
-    Serial.printf("\tFARNS %d", get_nrpn(KYRP_FARNS));
-  if (get_nrpn(KYRP_WEIGHT) != KYRV_NOT_SET) 
-    Serial.printf("\tWEIGHT %d", get_nrpn(KYRP_WEIGHT));
-  if (get_nrpn(KYRP_RATIO) != KYRV_NOT_SET) 
-    Serial.printf("\tRATIO %d", get_nrpn(KYRP_RATIO));
-  if (get_nrpn(KYRP_COMP) != KYRV_NOT_SET) 
-    Serial.printf("\tCOMP %.2f", samples_to_ms(get_nrpn(KYRP_COMP)));
+  Serial.printf("\tTONE %.1f", nrpn_to_hertz(nrpn_get(KYRP_TONE)));
+  Serial.printf("\tLEVEL %.2f", nrpn_to_db(nrpn_get(KYRP_LEVEL)));
+  Serial.printf("\tSPEED %d", nrpn_get(KYRP_SPEED));
+  Serial.printf("\tSPEED_FRAC %d", nrpn_get(KYRP_SPEED_FRAC));
+  Serial.printf("\tFARNS %d", nrpn_get(KYRP_FARNS));
+  Serial.printf("\tWEIGHT %d", nrpn_get(KYRP_WEIGHT));
+  Serial.printf("\tRATIO %d", nrpn_get(KYRP_RATIO));
+  Serial.printf("\tCOMP %.2f", samples_to_ms(nrpn_get(KYRP_COMP)));
   Serial.print("\n\t");
   
   /* keyer timings in samples for paddle and text keyers - scratch values */
-  if (get_xnrpn(KYRP_XPER_DIT) != KYRV_NOT_SET)
-    Serial.printf("\tDIT %ld", get_xnrpn(KYRP_XPER_DIT));
-  if (get_xnrpn(KYRP_XPER_DAH) != KYRV_NOT_SET)
-    Serial.printf("\tDAH %ld", get_xnrpn(KYRP_XPER_DAH));
-  if (get_xnrpn(KYRP_XPER_IES) != KYRV_NOT_SET)
-    Serial.printf("\tIES %ld", get_xnrpn(KYRP_XPER_IES));
-  if (get_xnrpn(KYRP_XPER_ILS) != KYRV_NOT_SET)
-    Serial.printf("\tILS %ld", get_xnrpn(KYRP_XPER_ILS));
-  if (get_xnrpn(KYRP_XPER_IWS) != KYRV_NOT_SET)
-    Serial.printf("\tIWS %ld", get_xnrpn(KYRP_XPER_IWS));
+  Serial.printf("\tDIT %ld", xnrpn_get(KYRP_XPER_DIT));
+  Serial.printf("\tDAH %ld", xnrpn_get(KYRP_XPER_DAH));
+  Serial.printf("\tIES %ld", xnrpn_get(KYRP_XPER_IES));
+  Serial.printf("\tILS %ld", xnrpn_get(KYRP_XPER_ILS));
+  Serial.printf("\tIWS %ld", xnrpn_get(KYRP_XPER_IWS));
   Serial.println("");
 }
 
-void diagnostics_setup() { totalTime = 0; }
+void diagnostics_setup() { diag_totalTime = 0; }
 
 void diagnostics_loop() {
   // dump background debug messages
   static int elapsed_test = 0;
   static elapsedSamples timer1, timer2;
-  if (logging)
+  if (diag_logging)
     for (int i = 0; i < 4; i += 1)
-      if (debug_buffer[i][0] != 0) {
-	Serial.printf("%s\n", debug_buffer[i]);
-	debug_buffer[i][0] = 0;
+      if (diag_debug_buffer[i][0] != 0) {
+	Serial.printf("%s\n", diag_debug_buffer[i]);
+	diag_debug_buffer[i][0] = 0;
       }
-  if ( ! send_some_text(wink_send_ptr, keyer_text_wink)) wink_send_ptr = NULL;
-  if ( ! send_some_text(kyr_send_ptr, keyer_text_kyr)) kyr_send_ptr = NULL;
+  if ( ! diag_send_some_text(diag_text_send_ptr, keyer_text)) diag_text_send_ptr = NULL;
+  if ( ! diag_send_some_text(diag_text2_send_ptr, keyer_text2)) diag_text2_send_ptr = NULL;
 
   if (elapsed_test) {
     if ((int)timer1 <= 0 && timer2 > 0) {
@@ -361,7 +357,7 @@ void diagnostics_loop() {
   }
 
   if (Serial.available()) {
-    char *p = read_line();
+    char *p = diag_read_line();
     // Serial.printf("diag read '%s'\n", p);
     switch (*p) {
     default: break;
@@ -387,23 +383,23 @@ void diagnostics_loop() {
 		    );
       break;
     case 'n': diag_nrpn_report(); break; /* full nrpn dump */
-    case 's': sreport(); break; /* short summary */
-    case 'S': Sreport(); break; /* long summary */
-    case 't': treport(p+1); break; /* timestamp */
-    case 'r': sreset(); break;	/* short reset */ 
-    case 'R': Sreset(); break;	/* long reset */
-    case 'd': dreport(); break; /* debounce stats */
-    case 'l': logging ^= 1; Serial.printf("logging %s\n", logging?"on":"off"); break;
+    case 's': diag_sreport(); break; /* short summary */
+    case 'S': diag_Sreport(); break; /* long summary */
+    case 't': diag_treport(p+1); break; /* timestamp */
+    case 'r': diag_sreset(); break;	/* short reset */ 
+    case 'R': diag_Sreset(); break;	/* long reset */
+    case 'd': diag_dreport(); break; /* debounce stats */
+    case 'l': diag_logging ^= 1; Serial.printf("logging %s\n", diag_logging?"on":"off"); break;
     case 'E': elapsed_test ^= 1; timer1 = -10; timer2 = 0; break;
-    case 'w': wink_send_ptr = p+1; break;
-    case 'k': kyr_send_ptr = p+1; break;
-    case 'W': wink_send_ptr = lorem; break;
-    case 'K': kyr_send_ptr = lorem; break;
-    case 'Z': wink_send_ptr = random_text(); break;
-    case 'e': mixer_set("i1100"); mixer_set("h1100"); mixer_set("u0010"); break;
-    case 'h': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
-    case 'i': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
-    case 'u': mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
+    case 'w': diag_text_send_ptr = p+1; break;
+    case 'k': diag_text2_send_ptr = p+1; break;
+    case 'W': diag_text_send_ptr = diag_lorem; break;
+    case 'K': diag_text2_send_ptr = diag_lorem; break;
+    case 'Z': diag_text_send_ptr = diag_random_text(); break;
+    case 'e': diag_mixer_set("i1100"); diag_mixer_set("h1100"); diag_mixer_set("u0010"); break;
+    case 'h': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
+    case 'i': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
+    case 'u': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     }
   }
 }  

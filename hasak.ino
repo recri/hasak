@@ -24,32 +24,29 @@
  */
 
 #include <Arduino.h>
-
-/* valid teensy pin number, from teensy core sources */
 static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_PINS; }
-
-static void midi_send_nrpn(const int16_t nrpn, const int16_t value);
-static void note_set(const int16_t note, const int8_t value);
-
 #include "config.h"		// configuration
-#include "convert.h"
-#include "timing.h"		// timing 
-#include "midi.h"
-#include "note.h"
-#include "ctrl.h"
-#include "nrpn.h"
+#include "linkage.h"		// 
 #include "audio.h"
-
+#undef READ_ONLY		// from somewhere in the libraries the audio library wants
+#include "timing.h"		// timing 
+#include "every_sample.h"
+#include "after_idle.h"
+#include "midi.h"
+#include "default.h"
 #include "codec.h"
-// #include "nrpn.h"
-// #include "midi.h"
-// #include "note.h"
+#include "nrpn.h"
+#include "decode.h"
+#include "cwroute.h"
 #include "cwptt.h"
-#include "arbiter2.h"
-#include "keyer/keyer.h"
+#include "stptt.h"
+#include "arbiter.h"
+#include "keyer_straight.h"
+#include "keyer_paddle.h"
+#include "keyer_text.h"
 #include "input.h"
 #include "inpin.h"
-#include "winkey.h"
+//#include "winkey.h"
 #include "diagnostics.h"
 
 //
@@ -62,58 +59,83 @@ static void note_set(const int16_t note, const int8_t value);
 // interrupt handler.
 //
 static void interrupt() {
+  // maintain timing information
   uint32_t cycles = ARM_DWT_CYCCNT;
-  timing_sampleCount += 1;
-  st_key.send(hasak.notes[KYRN_KEY_ST]);
-  tx_key.send(hasak.notes[KYRN_KEY_TX]);
-  digitalWriteFast(KYR_KEY_OUT_PIN,hasak._key_out); // note active high, is pin active high or low?
-  digitalWriteFast(KYR_PTT_OUT_PIN,hasak._ptt_out);
+  // sidetone and transmit key to audio loop
+  au_st_key.send(note_get(KYRN_AU_ST_KEY));
+  au_key_out.send(note_get(KYRN_AU_IQ_KEY));
+  // maintain timing information
   timing_isrCpuCyclesRaw += ARM_DWT_CYCCNT - cycles;
+  timing_sampleCounter += 1;
 }
 
 void setup(void) {
   Serial.begin(115200);
 
+  /* FIX.ME - these go in outpin.h */
   pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
   pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
 
+  /* FIX.ME - these go in audio.h - audio_setup() */
   AudioMemory(40);
+
+  nrpn_set_default(KYRP_SET_DEFAULT);
+  nrpn_set(KYRP_VOLUME, -200);
+
+  midi_setup();
+  default_setup();
+  codec_setup();
+  codec_enable();
   nrpn_setup();
 
-  /* We want to sample the switch inputs at the sample rate.
-   * We can do that by attaching a pin interrupt to the LRCLK
-   * pin.  But that doesn't work on the Teensy4, so we jumper
-   * the LRCLK pin to another pin and attach a pin interrupt
-   * to the second pin.  But that doesn't work if people don't
-   * want to hack on their Teensys, so we can also use an
-   * interval timer.
-   */
+  /*
+  ** set an interval timer to latch inputs into the audio update loop.
+  */
   static IntervalTimer timer;
   timer.priority(96);
   timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 
-  midi_setup();
-  winkey_setup();
-  input_setup();
-  inpin_setup();
-  note_setup();
-  keyer_setup();
-  arbiter2_setup();
-  cwptt_setup();
+  timing_setup();		// start your timers
+  every_sample_setup();
+  after_idle_setup();
+
+  input_setup();		// prepare to read adc's
+  inpin_setup();		// prepare to read pin's
+  keyer_straight_setup();
+  keyer_paddle_setup();
+  keyer_text_setup();
+  arbiter_setup();		// prepare to arbitrate
+  stptt_setup();
+  cwptt_setup();		// cw ptt setup
+  cwroute_setup();
+  decode_setup();
+  // winkey_setup();
   diagnostics_setup();
 }
 
+/*
+** loop calls the loop function for each module
+** but many of those functions are empty.
+*/
 void loop(void) {
   timing_loop();		// accumulate counts
   midi_loop();			// drain midi input
+  codec_loop();			// probably nothing
+  default_loop();		// probably nothing
+  nrpn_loop();			// probably nothing
   inpin_loop();			// poll digital input pins
   input_loop();			// poll analog input pins
-  note_loop();			// note manager
-  keyer_loop();			// keyer events
-  arbiter2_loop();		// arbitration of keyer events
+  keyer_straight_loop();	// probably nothing
+  keyer_paddle_loop();		// probably nothing
+  keyer_text_loop();		// probably nothing
+  arbiter_loop();		// arbitration of keyer events
+  stptt_loop();			// probably
   cwptt_loop();			// key generated ptt
-  winkey_loop();		// winkey
-  nrpn_loop();			// nrpn management 
+  cwroute_loop();
+  decode_loop();
+  // winkey_loop();		// winkey
+  every_sample_loop();		// run every sample
+  after_idle_loop();		// run once at end of loop()
   diagnostics_loop();		// console
 }
 
