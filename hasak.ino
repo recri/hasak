@@ -26,27 +26,33 @@
 #include <Arduino.h>
 static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_PINS; }
 #include "config.h"		// configuration
-#include "linkage.h"		// 
-#include "audio.h"
-#undef READ_ONLY		// from somewhere in the libraries the audio library wants
-#include "timing.h"		// timing 
-#include "every_sample.h"
-#include "after_idle.h"
-#include "midi.h"
-#include "default.h"
-#include "codec.h"
-#include "nrpn.h"
-#include "decode.h"
-#include "cwroute.h"
-#include "cwptt.h"
-#include "stptt.h"
-#include "arbiter.h"
-#include "keyer_straight.h"
-#include "keyer_paddle.h"
-#include "keyer_text.h"
-#include "input.h"
-#include "inpin.h"
-//#include "winkey.h"
+#include "cwmorse.h"		// morse code table
+#include "linkage.h"		// forward references, linkage, and conversions
+#include "audio.h"		// audio graph
+#undef READ_ONLY		// trash from the audio library includes
+#include "timing.h"		// timing counters
+#include "every_sample.h"	// every_sample implementation
+#include "after_idle.h"		// after_idle implementation
+#include "midi.h"		// midi interface
+#include "default.h"		// define MIDI note, ctrl, and nrpn flags FIX.ME rename midi_defs.h
+#include "codec.h"		// handle the audio hardware
+#include "nrpn.h"		// default values and listeners for nrpns
+#include "cwdecode.h"		// decode cw element stream -> ascii
+#include "cwdetime.h"		// detime cw key line -> element stream
+#include "cwroute.h"		// route notes into and out of the keyer
+#include "cwptt.h"		// translate sidetone key -> tx ptt and key
+#include "cwstptt.h"		// translate sidetone key -> sidetone ptt
+#include "cwarbiter.h"		// arbitrate multiple side tone key lines
+#include "cwkey_straight.h"	// hardware switch -> straight key sidetone
+#include "cwkey_paddle.h"	// hardare paddle -> iambic keyed sidetone
+#include "cwkey_text.h"		// ascii characters -> mechanically keyed sidetone
+#include "input.h"		// input adc states -> input adc nrpns FIX.ME rename inadc.h
+// #include "inmap.h"		// input adc nrpns -> keyer parameter nrpns
+#include "inpin.h"		// input pin states -> input pin notes FIX.ME rename
+// #include "outpin.h"		// output notes -> output pins FIX.ME
+// #include "instring.h"	// input strings from MIDI
+// #include "outstring.h"	// output strings to MIDI
+// #include "cwinkey.h"		// FIX.ME - make it work
 #include "diagnostics.h"
 
 //
@@ -99,17 +105,18 @@ void setup(void) {
   every_sample_setup();
   after_idle_setup();
 
-  input_setup();		// prepare to read adc's
-  inpin_setup();		// prepare to read pin's
-  keyer_straight_setup();
-  keyer_paddle_setup();
-  keyer_text_setup();
-  arbiter_setup();		// prepare to arbitrate
-  stptt_setup();
-  cwptt_setup();		// cw ptt setup
+  input_setup();
+  inpin_setup();
+  cwkey_straight_setup();
+  cwkey_paddle_setup();
+  cwkey_text_setup();
+  cwarbiter_setup();
+  cwstptt_setup();
+  cwptt_setup();
   cwroute_setup();
-  decode_setup();
-  // winkey_setup();
+  cwdetime_setup();
+  cwdecode_setup();
+  // cwinkey_setup();
   diagnostics_setup();
 }
 
@@ -120,20 +127,21 @@ void setup(void) {
 void loop(void) {
   timing_loop();		// accumulate counts
   midi_loop();			// drain midi input
-  codec_loop();			// probably nothing
-  default_loop();		// probably nothing
-  nrpn_loop();			// probably nothing
-  inpin_loop();			// poll digital input pins
-  input_loop();			// poll analog input pins
-  keyer_straight_loop();	// probably nothing
-  keyer_paddle_loop();		// probably nothing
-  keyer_text_loop();		// probably nothing
-  arbiter_loop();		// arbitration of keyer events
-  stptt_loop();			// probably
+  codec_loop();
+  default_loop();
+  nrpn_loop();
+  inpin_loop();
+  input_loop();
+  cwkey_straight_loop();
+  cwkey_paddle_loop();
+  cwkey_text_loop();
+  cwarbiter_loop();		// arbitration of keyer events
+  cwstptt_loop();			// probably
   cwptt_loop();			// key generated ptt
   cwroute_loop();
-  decode_loop();
-  // winkey_loop();		// winkey
+  cwdetime_loop();
+  cwdecode_loop();
+  // cwwinkey_loop();		// winkey
   every_sample_loop();		// run every sample
   after_idle_loop();		// run once at end of loop()
   diagnostics_loop();		// console

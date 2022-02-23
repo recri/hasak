@@ -32,11 +32,11 @@ class KeyerTimingGeneric {
  public:
   KeyerTimingGeneric() { }
   // element timings in sample clock units
-  int32_t dit(void) { return get_xnrpn(KYRP_XPER_DIT); }
-  int32_t dah(void) { return get_xnrpn(KYRP_XPER_DAH); }
-  int32_t ies(void) { return get_xnrpn(KYRP_XPER_IES); }
-  int32_t ils(void) { return get_xnrpn(KYRP_XPER_ILS); }
-  int32_t iws(void) { return get_xnrpn(KYRP_XPER_IWS); }
+  int32_t dit(void) { return xnrpn_get(KYRP_XPER_DIT); }
+  int32_t dah(void) { return xnrpn_get(KYRP_XPER_DAH); }
+  int32_t ies(void) { return xnrpn_get(KYRP_XPER_IES); }
+  int32_t ils(void) { return xnrpn_get(KYRP_XPER_ILS); }
+  int32_t iws(void) { return xnrpn_get(KYRP_XPER_IWS); }
 };
 
 #endif

@@ -125,7 +125,7 @@ extern "C" {
    | '|'   | 0x7C |(½ dit pad)|
 */
 
-static const unsigned char morse[64] = {
+static const unsigned char cwmorse[64] = {
    MORSE_NIL,			//33 !    not in ITU-R M.1677-1
    MORSE_DQUOTE,		//34 "    .-..-.
    MORSE_NIL,			//35 #    not in ITU-R M.1677-1

@@ -56,9 +56,10 @@ static int note_get(int note) {
 }
 
 static void note_set(int note, int value) { 
-  if (note_is_valid(note))
+  if (note_is_valid(note)) {
+    // Serial.printf("note_set(%d, %d)\n", note, value);
     midi.note_set(note, value);
-  else
+  } else
     note_invalid(note, "note_set");
 }
 

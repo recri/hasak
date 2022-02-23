@@ -199,7 +199,7 @@
 ** MIDI usage
 */
 /* midi channel usage */
-#define KYR_CHANNEL	1	/* {type def title {default channel for keyer control change}} */
+#define KYR_CHANNEL	1	/* {type def title {default MIDI channel for all keyer MIDI}} */
 
 /*
 ** midi note usage
@@ -353,12 +353,13 @@
 
 /*
 ** nrpn assigments
-** nrpns are organized into blocks: 
+** nrpns were organized into blocks: 
 ** KYRP_CODEC - global codec controls
 ** KYRP_SOFT  - soft global controls
 ** KYRP_MORSE - the 64 character morse code table
 ** KYRP_MIXER - the 24 output mixer levels
 ** KYRP_KEYER - the default keyer parameters
+** but now they're jumbled up.
 */
 #define KYRV_NOT_SET -1		/* {type val title {16 bit not set value}} */
 #define KYRV_MASK    0x3fff	/* {type val title {14 bit mask}} */
@@ -396,7 +397,7 @@
 #define KYRP_ST_ENABLE		(KYRP_SOFT+9) /* {type nrpn label STEn title {enable sidetone generation} range {0 1} property sidetoneEnable} */
 #define KYRP_IQ_BALANCE		(KYRP_SOFT+10) /* {type nrpn label IQBal title {adjustment to IQ balance} range {-8192 8191} unit pp8191 ignore 1 property iqAdjustBalance} */
 #define KYRP_ST_PAN		(KYRP_SOFT+11) /* {type nrpn label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 ignore 1 property sidetonePan} */
-#define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type nrpn label OutMix title {output mixer enable bits} range {0 4095} property outputEnable} */
+#define KYRP_OUT_ENABLE		(KYRP_SOFT+12) /* {type nrpn sub short label OutMix title {output mixer enable bits, shorthand} range {0 4095} property outputEnable} */
 #define KYRP_REMOTE_KEY		(KYRP_SOFT+13) /* {type nrpn label Remote title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
 
 #define KYRP_COMM		(KYRP_SOFT+14) /* {type rel title {keyer parameters shared across fists}} */
@@ -441,9 +442,9 @@
 
 #define KYRP_CHAN		(KYRP_PAD+6) /* {type rel title {base of midi channels}} */
 
-#define KYRP_CHAN_CC		(KYRP_CHAN+0) /* {type nrpn title {midi channel for simple controls} unit {} range {0 16} property channelCC} */
-#define KYRP_CHAN_NOTE		(KYRP_CHAN+1) /* {type nrpn title {midi channel for notes} unit {} range {0 16} property channelNote} */
-#define KYRP_CHAN_NRPN		(KYRP_CHAN+2) /* {type nrpn title {midi channel for NRPN format controls} unit {} range {0 16} property channelNrpn} */
+#define KYRP_CHAN_CC		(KYRP_CHAN+0) /* {type nrpn title {midi channel for simple controls} unit {} range {0 16} property channelCC note obsolete} */
+#define KYRP_CHAN_NOTE		(KYRP_CHAN+1) /* {type nrpn title {midi channel for notes} unit {} range {0 16} property channelNote note obsolete} */
+#define KYRP_CHAN_NRPN		(KYRP_CHAN+2) /* {type nrpn title {midi channel for NRPN format controls} unit {} range {0 16} property channelNrpn note obsolete} */
 #define KYRV_CHAN_INVALID	0	       /* {type val title {invalid channel, used to disable midi channel}} */
 
 /* I think these note translations should go away */
@@ -570,9 +571,47 @@
 #define KYRP_STRING_BYTE	(KYRP_INSERT+7) /* {type nrpn sub cmd title {transfer a byte for a string} propertyStringByte} */
 #define KYRP_N_NOTE		(KYRP_INSERT+8) /* {type nrpn sub info title {number of notes} property keyerNNote} */
 #define KYRP_N_CTRL		(KYRP_INSERT+9) /* {type nrpn sub info title {number of controls} property keyerNCtrl} */
+#define KYRP_ACTIVE_ST		(KYRP_INSERT+10) /* {type nrpn sub info title {note number of active sidetone source} property keyerActiveSidetone} */
+
+#define KYRP_MIXER2		(KYRP_INSERT+11) /* {type rel title {base of output mixer block}} */
+
+#define KYRP_MIX_EN_USB_L0	(KYRP_MIXER2+0)	/* {type nrpn title {enable i2s_in left to usb_out left} range {0 1}} */
+#define KYRP_MIX_EN_USB_L1	(KYRP_MIXER2+1)	/* {type nrpn title {enable sidetone left to usb_out left} range {0 1}} */
+#define KYRP_MIX_EN_USB_L2	(KYRP_MIXER2+2)	/* {type nrpn title {enable IQ left to usb_out left} range {0 1}} */
+#define KYRP_MIX_EN_USB_L3	(KYRP_MIXER2+3)  /* {type nrpn title {enable usb_in left to usb_out left} range {0 1}} */
+
+#define KYRP_MIX_EN_USB_R0	(KYRP_MIXER2+4)	/* {type nrpn title {enable i2s_in right to usb_out right} range {0 1}} */
+#define KYRP_MIX_EN_USB_R1	(KYRP_MIXER2+5)	/* {type nrpn title {enable sidetone right to usb_out right} range {0 1}} */
+#define KYRP_MIX_EN_USB_R2	(KYRP_MIXER2+6)	/* {type nrpn title {enable IQ right to usb_out right} range {0 1}} */
+#define KYRP_MIX_EN_USB_R3	(KYRP_MIXER2+7)  /* {type nrpn title {enable usb_in right to usb_out right} range {0 1}} */
+
+#define KYRP_MIX_EN_I2S_L0	(KYRP_MIXER2+8)  /* {type nrpn title {enable usb_in left to i2s_out left} range {0 1}} */
+#define KYRP_MIX_EN_I2S_L1	(KYRP_MIXER2+9)  /* {type nrpn title {enable sidetone left to i2s_out left} range {0 1}} */
+#define KYRP_MIX_EN_I2S_L2	(KYRP_MIXER2+10) /* {type nrpn title {enable IQ left to i2s_out left} range {0 1}} */
+#define KYRP_MIX_EN_I2S_L3	(KYRP_MIXER2+11) /* {type nrpn title {enable i2s_in right to i2s_out right} range {0 1}} */
+
+#define KYRP_MIX_EN_I2S_R0	(KYRP_MIXER2+12) /* {type nrpn title {enable usb_in right to i2s_out right} range {0 1}} */
+#define KYRP_MIX_EN_I2S_R1	(KYRP_MIXER2+13) /* {type nrpn title {enable sidetone right to i2s_out right} range {0 1}} */
+#define KYRP_MIX_EN_I2S_R2	(KYRP_MIXER2+14) /* {type nrpn title {enable IQ right to i2s_out right} range {0 1}} */
+#define KYRP_MIX_EN_I2S_R3	(KYRP_MIXER2+15) /* {type nrpn title {enable i2s_in right to i2s_out right} range {0 1}} */
+
+#define KYRP_MIX_EN_HDW_L0	(KYRP_MIXER2+16) /* {type nrpn title {enable usb_in left to hdw_out left} range {0 1}} */
+#define KYRP_MIX_EN_HDW_L1	(KYRP_MIXER2+17) /* {type nrpn title {enable sidetone left to hdw_out left} range {0 1}} */
+#define KYRP_MIX_EN_HDW_L2	(KYRP_MIXER2+18) /* {type nrpn title {enable IQ left to hdw_out left} range {0 1}} */
+#define KYRP_MIX_EN_HDW_L3	(KYRP_MIXER2+19) /* {type nrpn title {enable i2s_in left to hdw_out left} range {0 1}} */
+
+#define KYRP_MIX_EN_HDW_R0	(KYRP_MIXER2+20) /* {type nrpn title {enable usb_in right to hdw_out right} range {0 1}} */
+#define KYRP_MIX_EN_HDW_R1	(KYRP_MIXER2+21) /* {type nrpn title {enable sidetone right to hdw_out right} range {0 1}} */
+#define KYRP_MIX_EN_HDW_R2	(KYRP_MIXER2+22) /* {type nrpn title {enable IQ right to hdw_out right} range {0 1}} */
+#define KYRP_MIX_EN_HDW_R3	(KYRP_MIXER2+23) /* {type nrpn title {enable i2s_in right to hdw_out right} range {0 1}} */
+
+#define KYRP_MIX_SLEW_RAMP	(KYRP_MIXER2+24) /* {type nrpn title {slew ramp for mixer changes} values KYRV_RAMP_* default KYRV_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define KYRP_MIX_SLEW_TIME	(KYRP_MIXER2+25) /* {type nrpn title {slew time for mixer changes} range {0 16383} unit sample property mixerSlewTime} */
+#define KYRP_OUT_ENABLE_L	(KYRP_MIXER2+26) /* {type nrpn sub short label OutMixL title {output mixer left enable bits, shorthand} range {0 4095} property outputEnableLeft} */
+#define KYRP_OUT_ENABLE_R	(KYRP_MIXER2+27) /* {type nrpn sub short label OutMixR title {output mixer right enable bits, shorthand} range {0 4095} property outputEnableRight} */
 
 /* relocate the exec and info blocks to contiguous */
-#define KYRP_EXEC		(KYRP_INSERT+10) /* {type rel title {base of command nrpns}} */
+#define KYRP_EXEC		(KYRP_MIXER2+28) /* {type rel title {base of command nrpns}} */
 
 #define KYRP_WRITE_EEPROM	(KYRP_EXEC+0) /* {type nrpn sub cmd label {Write EEPROM} title {write nrpn+msgs to eeprom} property writeEEPROM} */
 #define KYRP_READ_EEPROM	(KYRP_EXEC+1) /* {type nrpn sub cmd label {Read EEPROM} title {read nrpn+msgs from eeprom} property loadEEPROM} */
@@ -603,3 +642,11 @@
 /* end of defined nrpns */
 /* end of config.h */
 #endif
+/*
+** NOTES, CTRLS, NRPNs to add:
+** FIX.ME KYRP_INPIN_?_PIN KYRP_INPIN_?_NOTE KYRP_INPIN_?_DEBOUNCE
+** FIX.ME KYRP_INADC_?_PIN KYRP_INPIN_?_NRPN KYRP_INPIN_?_SAMPLERATE
+** FIX.ME KYRP_MAPADC_?_NRPNI KYRP_MAPADC_NRPNO KYRP_MAPADC_?_LOW KYRP_MAPADC_?_HIGH
+** FIX.ME KYRP_OUTPIN_?_PIN KYRP_OUTPIN_?_NOTE KYRP_OUTPIN_?_LOGIC
+** FIX.ME rewrite Mixer4 to take ramp, time, mute, level from nrpn
+*/

@@ -30,11 +30,10 @@ extern "C" {
 #endif
 
   /* forward references */
-int get_active_st(void);	// arbiter2.h, move to nrpn
-int get_note(int note);
-int get_ctrl(int ctrl);
-int get_nrpn(int nrpn);
-int get_xnrpn(int xnrpn);
+int get_note(int note);		// externally available note_get()
+int get_ctrl(int ctrl);		// externally available ctrl_get()
+int get_nrpn(int nrpn);		// externally available nrpn_get()
+int get_xnrpn(int xnrpn);	// externally available xnrpn_get()
 static int codec_identify();
 
 /* unit conversions */

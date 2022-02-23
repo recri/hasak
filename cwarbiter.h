@@ -30,69 +30,67 @@
  * straight key > paddle key > tune key > ascii keyer 
  */
 
-static int arbiter_active = KYRN_ST_NONE;
-static int arbiter_change_over = 0;
-static elapsedSamples arbiter_counter = 0;
+static int cwarbiter_change_over = 0;
 
-static void arbiter_any_st(const int note) {
+static void cwarbiter_any_st(const int note) {
   /* case 0 - change over to new active note in progress */
-  if (arbiter_change_over)
+  if (cwarbiter_change_over)
     return;
   /* case 1 - continuation of active note */
-  if (note == arbiter_active) {
+  if (note == nrpn_get(KYRP_ACTIVE_ST)) {
     if (note_get(note) != note_get(KYRN_KEY_ST))
       note_toggle(KYRN_KEY_ST);
     return;
   }
   /* case 2 - no active note, become active note */
-  if (arbiter_active == KYRN_ST_NONE) {
-    arbiter_active = note;
+  if (nrpn_get(KYRP_ACTIVE_ST) == KYRN_ST_NONE) {
+    nrpn_set(KYRP_ACTIVE_ST, note);
     if (note_get(note) != note_get(KYRN_KEY_ST))
       note_toggle(KYRN_KEY_ST);
     return;
   }
   /* case 3 - lower priority than active note */
-  if (note > arbiter_active)
+  if (note > nrpn_get(KYRP_ACTIVE_ST))
     return;
   /* case 4 - preempt active note which is sounding */
-  if (note_get(arbiter_active)) {
+  if (note_get(nrpn_get(KYRP_ACTIVE_ST))) {
     note_off(KYRN_KEY_ST);
-    arbiter_active = note;
-    arbiter_change_over = 1;
-    arbiter_counter = 0;
+    nrpn_set(KYRP_ACTIVE_ST, note);
+    cwarbiter_change_over = 1;
     return;
   }
   /* case 5 - preempt active note which is silent */
-  arbiter_active = note;
+  nrpn_set(KYRP_ACTIVE_ST, note);
   if (note_get(note) != note_get(KYRN_KEY_ST))
     note_toggle(KYRN_KEY_ST);
   return;
 }
 
-static void arbiter_release(const int note) {
-  arbiter_active = KYRN_ST_NONE;
+static void cwarbiter_release(const int note) {
+  nrpn_set(KYRP_ACTIVE_ST, KYRN_ST_NONE);
 }
 
-static void arbiter_setup(void) {
-  note_listen(KYRN_ST_S_KEY, arbiter_any_st);
-  note_listen(KYRN_ST_PAD, arbiter_any_st);
-  note_listen(KYRN_ST_TEXT, arbiter_any_st);
-  note_listen(KYRN_ST_TEXT2, arbiter_any_st);
-  note_listen(KYRN_ST_BUT, arbiter_any_st);
-  note_listen(KYRN_ST_TUNE, arbiter_any_st);
-  note_listen(KYRN_PTT_OUT, arbiter_release);
-}
-
-/* FIX.ME - move to every_sample() */
-static void arbiter_loop(void) {
+static void cwarbiter_sample(void) {
   /* if we preempted a sounding note we have to allow one sample of sidetone off
    * to trigger the fall ramp in the audio graph */
-  if (arbiter_change_over && arbiter_counter) {
-    arbiter_change_over = 0;
-    if (note_get(arbiter_active) != note_get(KYRN_KEY_ST))
+  if (cwarbiter_change_over && ++cwarbiter_change_over > 32) {
+    cwarbiter_change_over = 0;
+    if (note_get(nrpn_get(KYRP_ACTIVE_ST)) != note_get(KYRN_KEY_ST))
       note_toggle(KYRN_KEY_ST);
   }
 }
 
-/* this should go into a nrpn */
-int get_active_st(void) { return  arbiter_active; }
+static void cwarbiter_setup(void) {
+  note_listen(KYRN_ST_S_KEY, cwarbiter_any_st);
+  note_listen(KYRN_ST_PAD, cwarbiter_any_st);
+  note_listen(KYRN_ST_TEXT, cwarbiter_any_st);
+  note_listen(KYRN_ST_TEXT2, cwarbiter_any_st);
+  note_listen(KYRN_ST_BUT, cwarbiter_any_st);
+  note_listen(KYRN_ST_TUNE, cwarbiter_any_st);
+  note_listen(KYRN_PTT_ST, cwarbiter_release);
+  every_sample(cwarbiter_sample);
+  nrpn_set(KYRP_ACTIVE_ST, KYRN_ST_NONE);
+}
+
+static void cwarbiter_loop(void) {
+}

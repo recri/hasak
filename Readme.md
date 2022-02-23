@@ -2,42 +2,76 @@
 ## Firmware for the Softerhardware/CWKeyerShield
 The goal is to allow the operator to hear keyed code with low
 latency while listening to and keying a possibly remote 
-transceiver. 
+transceiver.
 
-The current release is built for the CWKeyer prototype.
-The default setup mixes sidetone and received audio from
-USB audio and sends that to the codec output.
+The current release is built for the CWKeyer prototype with a Teensy
+4.0.  The default setup mixes sidetone and received audio from USB 
+audio and sends that to the codec and MQS outputs.
    
-The `cwkeyer-js` project provides a web app for controlling hasak
-and other keyers and MIDI devices which identify themselves
-sufficiently.
+The [`cwkeyer-js`](https://github.com/recri/cwkeyer-js) project
+provides a web app for controlling hasak and other keyers and MIDI
+devices which identify themselves sufficiently.  Try it at
+[cwkeyer.elf.org](https://cwkeyer.elf.org).
    
-See [cwkeyer-js](https://github.com/recri/cwkeyer-js) for more
-information about that.
 
 ## Other hardware
-The `hasak.TEENSY40@600.hex` image should run on a bare Teensy4
-and a Teensy4+AudioAdapter.  The code should also compile for a
-bare Teensy3 and a Teensy3+AudioAdapter. But I need to rebuild the
-variants to test that those still work.
+The `hasak/hasak.TEENSY40@600.hex` image in github should also run on a
+bare Teensy4.0 or a Teensy4.0+AudioAdapter.  The code should also compile
+for Teensy3.x or Teensy4.1 either bare or with an AudioAdapter, and
+the Teensy 4.1 should work in the CWKeyer prototype. I need to build
+the variants to test that those still work.
+
+Operating as a keyer with headphones connected to the Teensy 4 medium
+quality sound channels (with a simple RC lowpass or a transformer to
+clean up the buzz) is highly recommended, so you can hear what the
+codec adds to the experience.  It also lets you free up the codec so
+it can do linein/lineout stereo.
 
 ## Hasak details
 Hasak consists of a general purpose MIDI controller interface
 and a code that implements a morse code keyer using that
 interface.
 
+The hasak source directory contains `hasak.ino`, the Arduino sketch
+for the project, and an assortment of C header files that `hasak.ino`
+includes.  The `src` subdirectory contains C++ source headers, and the
+`src/Audio` directory contains the C++ headers and implementaion files
+which define components for the Teensy Audio library.
+
+### Why so many files?
+
+The MIDI and keyer functions are broken into files with well defined
+jobs, so they can each focus on doing their job.  And the coder can
+often get all the code that does a job on one page.
+
+### Why so many `static` declarations?
+
+The `static` storage class identifies objects which cannot be seen
+outside their compilation unit, which is `hasak.ino`.  So the compiler
+knows all the possible uses for a `static` data and functions.  It is
+free to expand `static` functions `inline` where possible.  And no
+actual definition ever needs to be generated if no one takes the
+address of a `static` function.
+
 ### Midi interface
-The midi interface is provided by `midi.h`.  This manages incoming 
-and outgoing midi traffic, maintains arrays of current note (note), 
-control change (ctrl), and nonregistered parameter (nrpn)
-values. It also supports listeners that are fired when any of the
-values are written (or almost written). 
+The midi interface is provided by `midi.h` with the assistance of
+`src/midi.h`.  This manages incoming and outgoing midi traffic,
+maintains arrays of current note (`NOTE`), control change (`CTRL`),
+and nonregistered parameter (`NRPN`) values. It implements a firewall
+that allows any subset of incoming messages to be enabled or ignored,
+any subset of outgoing messages to be enabled for sending, any subset
+of input messages to be echoed back, and any subset of messages to be
+marked read only.  It also supports listeners that are fired when any
+of the `NOTE`, `CTRL`, or `NRPN` values are set (or almost set, if
+read only).
 
 The interface is written as a C++ template class which accepts
-template parameters for the number of notes, control changes, and
-non-registered parameters (NRPNs) to support. The template class
-constructor takes a Teensy `usb_midi_class` reference and a channel
-number.
+template parameters for `N_NOTE`, `N_CTRL`, and `N_NRPN`.  `NOTE`
+ranges from `0` to `N_NOTE-1`, `CTRL` from `0` to `N_CTRL-1`, and
+`NRPN` from `0` to `N_NRPN-1`. `NRPN` entry requires `N_CTRL > 99`,
+but other than that `midi.h` supports any range you like. The template
+class constructor takes a Teensy `usb_midi_class` reference and a
+channel number. 
 
 Each note, control change, and NRPN, collectively the state values,
 can be independently enabled for input, output, echo, and writing.
@@ -81,7 +115,8 @@ invokes the listeners registered on the state value.  A listener is
 a function which takes one argument - the note, control, or NRPN
 number - and returns nothing.  Listeners have no overhead in the
 interface other than a list head.  Each listener registered
-provides the storage for a list element.  The latency of calling a
+provides the storage for a list element. which makes the macros that
+register listeners a little fragile and peculiar.  The latency of calling a
 listener is the latency of a function call.
    
 ### Keyer implementation

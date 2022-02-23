@@ -24,35 +24,62 @@
  * THE SOFTWARE.
  */
 
-#ifndef rawmixer_h_
-#define rawmixer_h_
+#ifndef mixer_h_
+#define mixer_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 
-// this is a raw mixer that joins four sample streams by addition
-// the streams should be preattenuated accordingly
-class RawAudioMixer4 : public AudioStream
+class AudioMixer4 : public AudioStream
 {
+#if defined(__ARM_ARCH_7EM__)
 public:
-	RawAudioMixer4(void) : AudioStream(4, inputQueueArray) {
+	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
+		for (int i=0; i<4; i++) multiplier[i] = 65536;
 	}
 	virtual void update(void);
+	void gain(unsigned int channel, float gain) {
+		if (channel >= 4) return;
+		if (gain > 32767.0f) gain = 32767.0f;
+		else if (gain < -32767.0f) gain = -32767.0f;
+		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
+	}
 private:
+	int32_t multiplier[4];
 	audio_block_t *inputQueueArray[4];
 
-};
-
-class RawAudioAmplifier : public AudioStream
-{
+#elif defined(KINETISL)
 public:
-	RawAudioAmplifier(void) : AudioStream(2, inputQueueArray) {
+	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
+		for (int i=0; i<4; i++) multiplier[i] = 256;
 	}
 	virtual void update(void);
-        int32_t get_multiplier(void) { return multiplier; }
+	void gain(unsigned int channel, float gain) {
+		if (channel >= 4) return;
+		if (gain > 127.0f) gain = 127.0f;
+		else if (gain < -127.0f) gain = -127.0f;
+		multiplier[channel] = gain * 256.0f; // TODO: proper roundoff?
+	}
+private:
+	int16_t multiplier[4];
+	audio_block_t *inputQueueArray[4];
+#endif
+};
+
+class AudioAmplifier : public AudioStream
+{
+public:
+	AudioAmplifier(void) : AudioStream(1, inputQueueArray), multiplier(65536) {
+	}
+	virtual void update(void);
+	void gain(float n) {
+		if (n > 32767.0f) n = 32767.0f;
+		else if (n < -32767.0f) n = -32767.0f;
+		multiplier = n * 65536.0f;
+	}
 private:
 	int32_t multiplier;
-	audio_block_t *inputQueueArray[2];
+	audio_block_t *inputQueueArray[1];
 };
 
 #endif

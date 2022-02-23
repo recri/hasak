@@ -179,7 +179,7 @@ static void diag_mixer_set(const char *p) {
 
 static char diag_random_char(void) {
   char c;
-  do c = random(0,128); while ( ! keyer_text.valid_text(c)); 
+  do c = random(0,128); while ( ! cwkey_text.valid_text(c)); 
   return c;
 }
 
@@ -209,7 +209,10 @@ static int diag_send_some_text(const char *text, KeyerText& input) {
   if (text == NULL) return 0;
   if (*text == 0) return 0;
   if ( ! input.valid_vox()) return 0;
-  while (*text != 0 && input.can_send_text()) input.send_text(*text++);
+  while (*text != 0 && input.can_send_text()) {
+    // Serial.printf("sending %d\n", *text);
+    input.send_text(*text++);
+  }
   return *text != 0 && input.valid_vox();
 }
 
@@ -345,8 +348,8 @@ void diagnostics_loop() {
 	Serial.printf("%s\n", diag_debug_buffer[i]);
 	diag_debug_buffer[i][0] = 0;
       }
-  if ( ! diag_send_some_text(diag_text_send_ptr, keyer_text)) diag_text_send_ptr = NULL;
-  if ( ! diag_send_some_text(diag_text2_send_ptr, keyer_text2)) diag_text2_send_ptr = NULL;
+  if ( ! diag_send_some_text(diag_text_send_ptr, cwkey_text)) diag_text_send_ptr = NULL;
+  if ( ! diag_send_some_text(diag_text2_send_ptr, cwkey_text2)) diag_text2_send_ptr = NULL;
 
   if (elapsed_test) {
     if ((int)timer1 <= 0 && timer2 > 0) {
@@ -371,8 +374,8 @@ void diagnostics_loop() {
 		    " R -> reset detailed usage counts\n"
 		    " d -> debounce diagnostics\n"
 		    " l -> logging toggle\n"
-		    " w... -> send ... up to newline to wink keyer\n"
-		    " k... -> send ... up to newline to kyr keyer\n"
+		    " w... -> send ... up to newline to text keyer\n"
+		    " k... -> send ... up to newline to text2 keyer\n"
 		    " W -> send lorem ipsum to wink keyer\n"
 		    " K -> send lorem ipsum to kyr keyer\n"
 		    " Z -> send random to wink keyer\n"

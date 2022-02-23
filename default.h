@@ -149,7 +149,7 @@ static void default_define(void) {
     case KYRP_ST_ENABLE:	nrpn_define(nrpn, KYR_ENABLE_ST,	1, 1, 1, 0); break;
     case KYRP_IQ_BALANCE:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
     case KYRP_ST_PAN:		nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
-    case KYRP_OUT_ENABLE:	nrpn_define(nrpn, 0b001011001100,	1, 1, 1, 0); break;
+    case KYRP_OUT_ENABLE:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
     case KYRP_REMOTE_KEY:	nrpn_define(nrpn, 1,			1, 1, 1, 0); break;
     case KYRP_DEBOUNCE:		nrpn_define(nrpn, 1000,			1, 1, 1, 0); break;
     case KYRP_HEAD_TIME:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
@@ -239,6 +239,37 @@ static void default_define(void) {
     case KYRP_N_NOTE:		nrpn_define(nrpn, KYR_N_NOTE,		1, 1, 1, 1); break; // readonly
     case KYRP_N_CTRL:		nrpn_define(nrpn, KYR_N_CTRL,		1, 1, 1, 1); break; // readonly
     case KYRP_N_NRPN:		nrpn_define(nrpn, KYR_N_NRPN,		1, 1, 1, 1); break; // readonly
+    case KYRP_ACTIVE_ST:	nrpn_define(nrpn, KYRN_ST_NONE,		1, 1, 1, 1); break; // readonly
+
+    case KYRP_MIX_EN_USB_L0:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_L1:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_L2:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_L3:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_R0:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_R1:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_R2:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_USB_R3:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_L0:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_L1:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_L2:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_L3:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_R0:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_R1:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_R2:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_I2S_R3:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_L0:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_L1:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_L2:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_L3:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_R0:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_R1:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_R2:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_EN_HDW_R3:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_SLEW_RAMP:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_MIX_SLEW_TIME:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_OUT_ENABLE_L:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+    case KYRP_OUT_ENABLE_R:	nrpn_define(nrpn, 0,			1, 1, 1, 0); break;
+
     case KYRP_QUERY:		nrpn_define(nrpn, 0,			1, 1, 0, 1); break; // readonly, echo response
     case KYRP_UNSET:		nrpn_define(nrpn, 0,			1, 1, 0, 1); break; // readonly, no response
     case KYRP_CHANNEL:		nrpn_define(nrpn, KYR_CHANNEL,		1, 1, 1, 0); break;
@@ -259,7 +290,7 @@ static void default_define(void) {
     case KYRP_MSG_SIZE:		nrpn_define(nrpn, 0,			1, 1, 1, 1); break;
     case KYRP_SAMPLE_RATE:	nrpn_define(nrpn, 0,			1, 1, 1, 1); break;
     case KYRP_EEPROM_LENGTH:	nrpn_define(nrpn, 0,			1, 1, 1, 1); break;
-    case KYRP_ID_CPU:		nrpn_define(nrpn, 0,	1, 1, 1, 1); break;
+    case KYRP_ID_CPU:		nrpn_define(nrpn, 0,			1, 1, 1, 1); break;
     case KYRP_ID_CODEC:		nrpn_define(nrpn, 0,			1, 1, 1, 1); break;
     default: 
       Serial.printf("default_setup: overlooked nrpn %d\n", nrpn); break;

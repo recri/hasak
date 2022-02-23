@@ -26,8 +26,8 @@
 #ifndef _keyer_text_h
 #define _keyer_text_h
 
-#include "../config.h"
 #include "Arduino.h"
+#include "../config.h"
 #include "../linkage.h"
 
 #include "keyer_timing_generic.h"
@@ -45,11 +45,14 @@
 ** by default.
 */
 
-
 class KeyerText : public KeyerTimingGeneric {
 
 public:
 
+  const int text_note, st_note;
+  RingBuffer<uint8_t, 128> chars;
+  int code, prosign;
+  unsigned timer;
   enum { key_none, key_dit, key_dah, key_ies, key_ils, key_iws } timing_element;
 
   KeyerText(int text_note, int st_note) : KeyerTimingGeneric(), text_note(text_note), st_note(st_note) {
@@ -57,33 +60,8 @@ public:
     timing_element = key_none;
   }
 
-  int text_note, st_note;
-  RingBuffer<uint8_t, 128> chars;
-  int code, prosign;
-  unsigned long timer;
-
-  int abort() {
-    chars.reset();		// clear text buffer
-    code = 0;			// clear element buffer
-    prosign = 0;		// no prosign
-    timing_element = key_none;	// element timing
-    if (note_get(st_note)) note_toggle(st_note);
-    Serial.printf("keyer_text:abort() active %d st_note %d\n", get_active_st(), st_note);
-    return 0;			// return false
-  }
-
-  int valid_vox(void) {
-    return 1;
-    return st_note < get_active_st();
-  }
-
-  // valid vox or abort
-  int valid_vox_or_abort(void) {
-    return valid_vox() ? 1 : abort();
-  }
-
   bool valid_text(uint8_t value) {
-    return (value-33 >= 0 && value-33 < 64 && get_nrpn(KYRP_MORSE+value-33) != 1) || 
+    return (value-33 >= 0 && value-33 < 64 && nrpn_get(KYRP_MORSE+value-33) != 1) || 
       (value >='a' && value <= 'z') ||
       value == ' ' || value == '\t' || value == '\n' || 
       value == '\e' || value == '|';
@@ -94,58 +72,61 @@ public:
   // return -1 if there is no room or the character
   // was rejected by valid_text
   int send_text(uint8_t value) {
-    // only if we're allowed
-    if ( ! valid_vox_or_abort()) return -1;
     // reject false characters
     if ( ! valid_text(value)) return -1;
+    // don't overfill the buffer
+    if ( ! chars.can_put()) return -1;
     // convert to upper case
     if (value >='a' && value <= 'z') value -= 32;
     // map spaces to space
     if (value == ' ' || value == '\t' || value == '\n') value = ' ';
-    if (chars.can_put()) {
-      chars.put(value);
-      return 0;
-    }
-    return -1;
+    // Serial.printf("queued %d\n", value);
+    chars.put(value);
+    // return success
+    return 0;
   }
 
-  int recv_text(void) { return valid_vox_or_abort() && chars.can_get() ? chars.get() : -1; }
+  int recv_text(void) { return chars.can_get() ? chars.get() : -1; }
 
   // return true if there is room to queue a character
-  int can_send_text() { return valid_vox() && chars.can_put(); }
+  int can_send_text() { return chars.can_put(); }
 
   void unsend_text(void) { if (chars.can_unput()) chars.unput(); }
 
   void receive() { 
-    Serial.printf("keyer_text:receive from %d %d\n", text_note, note_get(text_note));
+    // Serial.printf("keyer_text:receive from %d %d\n", text_note, note_get(text_note));
     send_text(note_get(text_note));
   }
 
+  int valid_vox(void) {
+    return st_note <= nrpn_get(KYRP_ACTIVE_ST);
+  }
+  
   void clock(int ticks) {
-
-    while (valid_vox_or_abort()) {
+    while (valid_vox()) {
       if (timing_element != key_none) {
 	timer += ticks;
-	if ((int)timer < 0) return; // element timer not expired
+	if ((int)timer < 0) 
+	  break; // element timer not expired
       }
       switch (timing_element) {
       case key_none: {
 	int value = recv_text();
 	if (value < 0) {	   // nothing to send
-	  return;
+	  break;
 	}
+	// Serial.printf("recv_text() = %d\n", value);
 	if (value == ' ') {	  // send word space
 	  timing_element = key_iws;
-	  timer = -get_xnrpn(KYRP_XPER_IWS);
+	  timer = -iws();
 	} else if (value == '|') { // send half dit space
 	  timing_element = key_iws;
-	  timer = -get_xnrpn(KYRP_XPER_DIT)/2;
+	  timer = -dit()/2;
 	} else if (value == '\e') { // prosign together the next two characters
 	  prosign += 1;
 	} else {
-	  // Serial.printf("keyer_text::loop() try to get_nrpn(%d)\n", KYRP_MORSE+value-33);
-	  // return;
-	  code = get_nrpn(KYRP_MORSE+value-33);
+	  code = nrpn_get(KYRP_MORSE+value-33);
+	  // Serial.printf("nrpn_get(KYRP_MORSE+...) = %d\n", code);
 	  if (code > 1)
 	    timing_element = key_ies;
 	}
@@ -154,35 +135,35 @@ public:
       case key_dit:
       case key_dah:
 	note_toggle(st_note);	    // start interelement space
-	timer = -get_xnrpn(KYRP_XPER_IES);
 	timing_element = key_ies;
+	timer = -ies();
 	continue;
 
       case key_ies:
 	if (code != 1) {	    // another element in code
 	  note_toggle(st_note);	    // start next element
 	  if (code&1) {		    // next element is dah
-	    timer = -get_xnrpn(KYRP_XPER_DAH);
 	    timing_element = key_dah;
+	    timer = -dah();
 	  } else {		    // next element is dit
-	    timer = -get_xnrpn(KYRP_XPER_DIT);
 	    timing_element = key_dit;
+	    timer = -dit();
 	  }
 	  code >>= 1;	            // clear element from code
 	} else if (prosign) {       // code is finished, but we're in a prosign
 	  prosign -= 1;
 	  timing_element = key_none;
 	} else {		    // code is finished, extend ies to ils
-	  timer = -(get_xnrpn(KYRP_XPER_ILS)-get_xnrpn(KYRP_XPER_IES));
 	  timing_element = key_ils;
+	  timer = -(ils()-ies());
 	}
 	continue;
 	
       case key_ils:
-	if (chars.peek() == ' ') {  // extend to iws
+	if (chars.can_get() && chars.peek() == ' ') {  // extend to iws
 	  recv_text();		    // pull the space
-	  timer = -(get_xnrpn(KYRP_XPER_IWS)-get_xnrpn(KYRP_XPER_ILS));
 	  timing_element = key_iws;
+	  timer = -(iws()-ils());
 	} else {		    // start the next code
 	  timing_element = key_none;
 	}
@@ -195,8 +176,23 @@ public:
       default:
 	Serial.printf("invalid timing_element (%d) in keyer_text.loop()\n", timing_element);
       }
+      break;
+    }
+    if ( ! valid_vox() && // lost the key
+	 (chars.can_get() || // some chars to send
+	 code > 1 ||	     // a char being sent
+	 prosign != 0 ||     // a prosign open
+	 timing_element != key_none || // timing an element
+	 note_get(st_note)) ) {	       // note sounding
+      chars.reset();		       // clear text buffer
+      code = 0;			       // clear element buffer
+      prosign = 0;		       // clear prosign
+      timing_element = key_none;       // clear element timing
+      if (note_get(st_note)) note_toggle(st_note); // clear sounding note
+      // Serial.printf("keyer_text:abort() active %d st_note %d\n", nrpn_get(KYRP_ACTIVE_ST), st_note);
     }
   }
 };
+
 
 #endif

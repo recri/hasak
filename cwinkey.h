@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 #if ! defined(KYR_ENABLE_WINKEY)
-void winkey_setup(void) { }
-void winkey_loop(void) { }
+void cwinkey_setup(void) { }
+void cwinkey_loop(void) { }
 #else
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -85,7 +85,7 @@ enum WKSTAT {
   POINTER_1,
   POINTER_2,
   POINTER_3
-} winkey_state=FREE;
+} cwinkey_state=FREE;
 
 //
 // Winkeyer properties all reduced to this enumeration
@@ -105,7 +105,7 @@ typedef enum {
   WK_PADDLE_POINT,
   WK_RATIO,
   WK_PIN_CONFIG
-} winkey_property_t;
+} cwinkey_property_t;
 
 
 //
@@ -131,7 +131,7 @@ typedef enum {
 #define PTT_ENABLED(PinConfig)      (PinConfig & 0x01)
 #define HANGBITS(PinConfig)         ((PinConfig & 0x30) >> 4)
 
-static void winkey_set(winkey_property_t p, int v) {
+static void cwinkey_set(cwinkey_property_t p, int v) {
   switch (p) {
   case WK_MODE_REGISTER:
     //static uint8_t ModeRegister=0x10;       // no echos, no swap, Iambic-A by default
@@ -270,7 +270,7 @@ static void winkey_set(winkey_property_t p, int v) {
   }
 }
 
-static int winkey_get(winkey_property_t p) {
+static int cwinkey_get(cwinkey_property_t p) {
   switch (p) {
   case WK_MODE_REGISTER: {
     int v = 0;
@@ -328,54 +328,54 @@ static uint8_t SpeedPot =  0;           // Speed value from the Potentiometer
 ///////////////////////////////////////
 
 // check for available byte from host
-static byte winkey_available(void) { return Serial2.available(); }
+static byte cwinkey_available(void) { return Serial2.available(); }
 
 // Read one byte from host
-static int winkey_from_host() { return Serial2.read(); }
+static int cwinkey_from_host() { return Serial2.read(); }
 
 // Write one byte to the host
-static void winkey_to_host(int c) { Serial2.write(c); }
+static void cwinkey_to_host(int c) { Serial2.write(c); }
 
 // remove last queued character
-static void winkey_backspace(void) { wink.unsend_text(); }
+static void cwinkey_backspace(void) { wink.unsend_text(); }
 
 // clear queued characters
-static void winkey_clearbuf(void) { wink.abort(); }
+static void cwinkey_clearbuf(void) { wink.abort(); }
 
 // queue one, two, or three characters
-static void winkey_queue(uint8_t c) { wink.send_text(c); }
+static void cwinkey_queue(uint8_t c) { wink.send_text(c); }
 
-static void winkey_setbufpos(uint8_t byte) {
+static void cwinkey_setbufpos(uint8_t byte) {
   // not clear what to do
   // if (byte > 0) byte--;
 }
 
-static void winkey_bufzero(uint8_t byte) {
+static void cwinkey_bufzero(uint8_t byte) {
   // not clear what to do
 }
 
 
 // restore winkey state from eeprom
-static void winkey_read_from_eeprom(void) { }
+static void cwinkey_read_from_eeprom(void) { }
 
 // restore winkey byte from eeprom
-static byte winkey_read_eeprom(int inum) { return 0; }
+static byte cwinkey_read_eeprom(int inum) { return 0; }
 
 // write winkey byte to eeprom
-static void winkey_update_eeprom(byte inum, byte data) { }
+static void cwinkey_update_eeprom(byte inum, byte data) { }
 
 // set the pausing
-static void winkey_set_pausing(uint8_t byte) { }
+static void cwinkey_set_pausing(uint8_t byte) { }
 
 // see if the keyer is idle
-static int winkey_keyer_idle(void) { return get_active_st() > KYRN_WINK_ST; }
+static int cwinkey_keyer_idle(void) { return nrpn_get(KYRP_ACTIVE_ST) > KYRN_TEXT_ST; }
 
 // tune on/off
-static void winkey_tune(int byte) {
+static void cwinkey_tune(int byte) {
   // hmm, these delays are going to screw everything up
   // Do not bother about lead-in and tail times, but DO switch PTT
   // if (byte) {
-  //   winkey_clearbuf();
+  //   cwinkey_clearbuf();
   //   tuning=1;
   //   if (PTT_ENABLED) {
   //     ptt_on();
@@ -392,58 +392,58 @@ static void winkey_tune(int byte) {
   // }
 }
 
-static void winkey_rdprom(void) {
+static void cwinkey_rdprom(void) {
   // dump EEPROM command
   // only dump bytes 0 through 15,
   // report the others being zero
   // Nothing must interrupt us, therefore no state machine
   // delays are a no no
   for (inum=0; inum<16; inum++) {
-    winkey_to_host(winkey_read_eeprom(inum));
+    cwinkey_to_host(cwinkey_read_eeprom(inum));
     // delay(20);
   }
   for (inum=16; inum < 256; inum++) {
-    winkey_to_host(0);
+    cwinkey_to_host(0);
     // delay(20);
   }
 }
 
-static void winkey_wrprom(void) {
+static void cwinkey_wrprom(void) {
   //
   // Load EEPROM command
   // nothing must interrupt us, hence no state machine
   //
   for (int inum = 0; inum < 256; inum += 1) {
-    while ( ! winkey_available());
+    while ( ! cwinkey_available());
     if (inum < 16)
-      winkey_update_eeprom(inum, winkey_from_host());
+      cwinkey_update_eeprom(inum, cwinkey_from_host());
     else
-      (void)winkey_from_host();
+      (void)cwinkey_from_host();
   }
 }
 
-static void winkey_dump_default(void) {
+static void cwinkey_dump_default(void) {
   // never used so I refrain from making an own "state" for this.
-  winkey_to_host(winkey_get(WK_MODE_REGISTER)); // 0
-  winkey_to_host(winkey_get(WK_SPEED));		// 1
-  winkey_to_host(winkey_get(WK_SIDETONE));      // 2
-  winkey_to_host(winkey_get(WK_WEIGHT));	// 3
-  winkey_to_host(winkey_get(WK_PTT_LEAD_IN));   // 4
-  winkey_to_host(winkey_get(WK_PTT_TAIL));      // 5
-  winkey_to_host(winkey_get(WK_MIN_WPM));	// 6
-  winkey_to_host(winkey_get(WK_WPM_RANGE));     // 7
-  winkey_to_host(winkey_get(WK_EXTENSION));     // 8
-  winkey_to_host(winkey_get(WK_COMPENSATION));  // 9
-  winkey_to_host(winkey_get(WK_FARNSWORTH));    // 10
-  winkey_to_host(winkey_get(WK_PADDLE_POINT));  // 11
-  winkey_to_host(winkey_get(WK_RATIO));		// 12
-  winkey_to_host(winkey_get(WK_PIN_CONFIG));    // 13
-  winkey_to_host(0);				// 14
+  cwinkey_to_host(cwinkey_get(WK_MODE_REGISTER)); // 0
+  cwinkey_to_host(cwinkey_get(WK_SPEED));		// 1
+  cwinkey_to_host(cwinkey_get(WK_SIDETONE));      // 2
+  cwinkey_to_host(cwinkey_get(WK_WEIGHT));	// 3
+  cwinkey_to_host(cwinkey_get(WK_PTT_LEAD_IN));   // 4
+  cwinkey_to_host(cwinkey_get(WK_PTT_TAIL));      // 5
+  cwinkey_to_host(cwinkey_get(WK_MIN_WPM));	// 6
+  cwinkey_to_host(cwinkey_get(WK_WPM_RANGE));     // 7
+  cwinkey_to_host(cwinkey_get(WK_EXTENSION));     // 8
+  cwinkey_to_host(cwinkey_get(WK_COMPENSATION));  // 9
+  cwinkey_to_host(cwinkey_get(WK_FARNSWORTH));    // 10
+  cwinkey_to_host(cwinkey_get(WK_PADDLE_POINT));  // 11
+  cwinkey_to_host(cwinkey_get(WK_RATIO));		// 12
+  cwinkey_to_host(cwinkey_get(WK_PIN_CONFIG));    // 13
+  cwinkey_to_host(0);				// 14
 }  
 
 
 
-static byte winkey_get_speed_pot(void) {
+static byte cwinkey_get_speed_pot(void) {
   return 0;
 }
 
@@ -452,7 +452,7 @@ static byte winkey_get_speed_pot(void) {
 // This is the WinKey state machine
 //
 ///////////////////////////////////////
-void winkey_state_machine() {
+void cwinkey_state_machine() {
   uint8_t byte;
   static int OldWKstatus=-1;           // this is to detect status changes
   static int OldSpeedPot=-1;           // this is to detect Speed pot changes
@@ -461,16 +461,16 @@ void winkey_state_machine() {
   // Now comes the WinKey state machine
   // First, handle commands that need no further bytes
   //
-  switch (winkey_state) {
-  case GETPOT:		winkey_to_host(128+winkey_get_speed_pot()); winkey_state=FREE; break;      // send immediately
-  case BACKSPACE:	winkey_backspace(); winkey_state=FREE; break;
-  case CLEAR:		winkey_clearbuf(); winkey_state=FREE; break;
-  case WKSTAT:		winkey_to_host(WKstatus); winkey_state=FREE; break;
-  case NULLCMD:		winkey_state=FREE; break;
-  case CANCELSPD:	winkey_state=FREE; break;      // cancel buffered speed, ignored
-  case BUFNOP:		winkey_state=FREE; break;      // buffered no-op; ignored
-  case RDPROM:		winkey_rdprom(); winkey_state=FREE; break;
-  case WRPROM:		winkey_wrprom(); winkey_state=FREE; break;
+  switch (cwinkey_state) {
+  case GETPOT:		cwinkey_to_host(128+cwinkey_get_speed_pot()); cwinkey_state=FREE; break;      // send immediately
+  case BACKSPACE:	cwinkey_backspace(); cwinkey_state=FREE; break;
+  case CLEAR:		cwinkey_clearbuf(); cwinkey_state=FREE; break;
+  case WKSTAT:		cwinkey_to_host(WKstatus); cwinkey_state=FREE; break;
+  case NULLCMD:		cwinkey_state=FREE; break;
+  case CANCELSPD:	cwinkey_state=FREE; break;      // cancel buffered speed, ignored
+  case BUFNOP:		cwinkey_state=FREE; break;      // buffered no-op; ignored
+  case RDPROM:		cwinkey_rdprom(); cwinkey_state=FREE; break;
+  case WRPROM:		cwinkey_wrprom(); cwinkey_state=FREE; break;
   default: break;     // This is a multi-byte command handled below
   }
   //
@@ -478,97 +478,97 @@ void winkey_state_machine() {
   // NOTE: process *all* ADMIN command even if hostmode is closed. For example,
   // fldigi sends "echo" first and then "open".
   //
-  if (winkey_available()) {
-    byte=winkey_from_host();
+  if (cwinkey_available()) {
+    byte=cwinkey_from_host();
 
-    if (hostmode == 0 && winkey_state == FREE && byte != ADMIN) return;
+    if (hostmode == 0 && cwinkey_state == FREE && byte != ADMIN) return;
     //
     // This switch statement builds the "WinKey" state machine
     //
-    switch (winkey_state) {
+    switch (cwinkey_state) {
     case FREE:
       //
       // In the idle state, the incoming byte is either a letter to
       // be transmitted or the start of the WinKey command.
       //
       if (byte >= 0x20) {
-			winkey_queue(byte); winkey_state=FREE;
+			cwinkey_queue(byte); cwinkey_state=FREE;
       } else {
-			winkey_state=(enum WKSTAT) byte; inum=0;
+			cwinkey_state=(enum WKSTAT) byte; inum=0;
       }
       break;
-    case SWALLOW:	winkey_state=FREE; break;
-    case XECHO:		winkey_to_host(byte); winkey_state=FREE; break;
-    case MESSAGE:	winkey_state=FREE; break;        // output stored message as CW
+    case SWALLOW:	cwinkey_state=FREE; break;
+    case XECHO:		cwinkey_to_host(byte); cwinkey_state=FREE; break;
+    case MESSAGE:	cwinkey_state=FREE; break;        // output stored message as CW
     case ADMIN:
       switch (byte) {
-      case 0:		winkey_state=SWALLOW; break; // Admin Calibrate
-      case 1:		winkey_state=FREE; winkey_read_from_eeprom(); hostmode=0; break; // Admin Reset
-      case 2:		hostmode = 1; winkey_to_host(WKVERSION); winkey_state=FREE; break; // Admin Open
-      case 3:		hostmode = 0; winkey_read_from_eeprom(); winkey_state=FREE; break; // Admin Close
-      case 4:		winkey_state=XECHO; break; // Admin Echo
+      case 0:		cwinkey_state=SWALLOW; break; // Admin Calibrate
+      case 1:		cwinkey_state=FREE; cwinkey_read_from_eeprom(); hostmode=0; break; // Admin Reset
+      case 2:		hostmode = 1; cwinkey_to_host(WKVERSION); cwinkey_state=FREE; break; // Admin Open
+      case 3:		hostmode = 0; cwinkey_read_from_eeprom(); cwinkey_state=FREE; break; // Admin Close
+      case 4:		cwinkey_state=XECHO; break; // Admin Echo
       case 5:			     // Admin 
       case 6:
       case 8:
-      case 9:		winkey_to_host(0); break;            // only for backwards compatibility
-      case 7:		winkey_dump_default(); winkey_state=FREE; break;    // Admin DumpDefault
-      case 10:		winkey_state=FREE; break;      // Admin set WK1 mode
-      case 11:		winkey_state=FREE; break;      // Admin set WK2 mode
-      case 12:		winkey_state=RDPROM; break;
-      case 13:		winkey_state=WRPROM; break;
-      case 14:		winkey_state=MESSAGE; break;
+      case 9:		cwinkey_to_host(0); break;            // only for backwards compatibility
+      case 7:		cwinkey_dump_default(); cwinkey_state=FREE; break;    // Admin DumpDefault
+      case 10:		cwinkey_state=FREE; break;      // Admin set WK1 mode
+      case 11:		cwinkey_state=FREE; break;      // Admin set WK2 mode
+      case 12:		cwinkey_state=RDPROM; break;
+      case 13:		cwinkey_state=WRPROM; break;
+      case 14:		cwinkey_state=MESSAGE; break;
       }
       break;
-    case WK2MODE:	winkey_set(WK_MODE_REGISTER, byte); winkey_state=FREE; break;
-    case WKSPEED:	winkey_set(WK_SPEED, byte); winkey_state=FREE; break;
-    case SIDETONE:	winkey_set(WK_SIDETONE, byte); winkey_state=FREE; break;
-    case WEIGHT:	winkey_set(WK_WEIGHT, byte); winkey_state=FREE; break;
+    case WK2MODE:	cwinkey_set(WK_MODE_REGISTER, byte); cwinkey_state=FREE; break;
+    case WKSPEED:	cwinkey_set(WK_SPEED, byte); cwinkey_state=FREE; break;
+    case SIDETONE:	cwinkey_set(WK_SIDETONE, byte); cwinkey_state=FREE; break;
+    case WEIGHT:	cwinkey_set(WK_WEIGHT, byte); cwinkey_state=FREE; break;
     case PTT: 
-      if (inum==0) {	winkey_set(WK_PTT_LEAD_IN, byte); inum += 1; break; }
-      if (inum==1) {	winkey_set(WK_PTT_TAIL, byte); winkey_state=FREE; break; }
-			winkey_state=FREE; break;
+      if (inum==0) {	cwinkey_set(WK_PTT_LEAD_IN, byte); inum += 1; break; }
+      if (inum==1) {	cwinkey_set(WK_PTT_TAIL, byte); cwinkey_state=FREE; break; }
+			cwinkey_state=FREE; break;
     case POTSET:
-      if (inum==0) {	winkey_set(WK_MIN_WPM, byte); inum += 1; break; }
-      if (inum==1) {	winkey_set(WK_WPM_RANGE, byte); winkey_state=FREE; break; }
-			winkey_state=FREE; break;
-    case FARNS:		winkey_set(WK_FARNSWORTH, byte); winkey_state=FREE; break;
-    case EXTENSION:	winkey_set(WK_EXTENSION, byte); winkey_state=FREE; break;
-    case KEYCOMP:	winkey_set(WK_COMPENSATION, byte); winkey_state=FREE; break;
-    case RATIO:		winkey_set(WK_RATIO, byte); winkey_state=FREE; break;
-    case PINCONFIG:	winkey_set(WK_PIN_CONFIG, byte); winkey_state=FREE; break;
-    case PAUSE:		winkey_set_pausing(byte); winkey_state=FREE; break;
-    case TUNE:		winkey_tune(byte); winkey_state=FREE; break;
-    case HSCW:		winkey_state=FREE; break; // ignored
+      if (inum==0) {	cwinkey_set(WK_MIN_WPM, byte); inum += 1; break; }
+      if (inum==1) {	cwinkey_set(WK_WPM_RANGE, byte); cwinkey_state=FREE; break; }
+			cwinkey_state=FREE; break;
+    case FARNS:		cwinkey_set(WK_FARNSWORTH, byte); cwinkey_state=FREE; break;
+    case EXTENSION:	cwinkey_set(WK_EXTENSION, byte); cwinkey_state=FREE; break;
+    case KEYCOMP:	cwinkey_set(WK_COMPENSATION, byte); cwinkey_state=FREE; break;
+    case RATIO:		cwinkey_set(WK_RATIO, byte); cwinkey_state=FREE; break;
+    case PINCONFIG:	cwinkey_set(WK_PIN_CONFIG, byte); cwinkey_state=FREE; break;
+    case PAUSE:		cwinkey_set_pausing(byte); cwinkey_state=FREE; break;
+    case TUNE:		cwinkey_tune(byte); cwinkey_state=FREE; break;
+    case HSCW:		cwinkey_state=FREE; break; // ignored
     case LOADDEF:
       if (inum>=WK_MODE_REGISTER && 
 	  inum<=WK_PIN_CONFIG) { 
-			winkey_set((winkey_property_t)inum, byte); inum += 1; break;
+			cwinkey_set((cwinkey_property_t)inum, byte); inum += 1; break;
       }
-			winkey_state=FREE; break;
-    case PADSW:		winkey_state=FREE; break;      // paddle switch-point ignored
-    case SOFTPAD:	winkey_state=FREE; break;     // software paddle ignored
+			cwinkey_state=FREE; break;
+    case PADSW:		cwinkey_state=FREE; break;      // paddle switch-point ignored
+    case SOFTPAD:	cwinkey_state=FREE; break;     // software paddle ignored
     case POINTER_1:
-    case POINTER_2:	winkey_setbufpos(byte); winkey_state=FREE; break; // unclear
-    case POINTER_3:	winkey_bufzero(byte); winkey_state=FREE; break; // unclear
+    case POINTER_2:	cwinkey_setbufpos(byte); cwinkey_state=FREE; break; // unclear
+    case POINTER_3:	cwinkey_bufzero(byte); cwinkey_state=FREE; break; // unclear
     case POINTER:
       switch (byte) {
-      case 0:		winkey_clearbuf(); winkey_state=FREE; break;
-      case 1:		winkey_state=POINTER_1; break;
-      case 2:		winkey_state=POINTER_2; break;
-      case 3:		winkey_state=POINTER_3; break;
-      default:		winkey_state=FREE;      break;
+      case 0:		cwinkey_clearbuf(); cwinkey_state=FREE; break;
+      case 1:		cwinkey_state=POINTER_1; break;
+      case 2:		cwinkey_state=POINTER_2; break;
+      case 3:		cwinkey_state=POINTER_3; break;
+      default:		cwinkey_state=FREE;      break;
       }
       break;
-    case SETPTT:	winkey_state=FREE; break;     // buffered PTT ignored
-    case KEYBUF:	winkey_state=FREE; break;     //buffered key-down ignored
-    case WAIT:		winkey_state=FREE; break;      // buffered wait ignored
+    case SETPTT:	cwinkey_state=FREE; break;     // buffered PTT ignored
+    case KEYBUF:	cwinkey_state=FREE; break;     //buffered key-down ignored
+    case WAIT:		cwinkey_state=FREE; break;      // buffered wait ignored
     case PROSIGN: 
-      if (inum==0) {	winkey_queue(0x1b); winkey_queue(byte); inum += 1; break; }
-      if (inum==1) {	winkey_queue(byte); winkey_state=FREE; break; }
-			winkey_state=FREE; break;
-    case BUFSPD:	winkey_state=FREE; break;      // buffered speed change ignored
+      if (inum==0) {	cwinkey_queue(0x1b); cwinkey_queue(byte); inum += 1; break; }
+      if (inum==1) {	cwinkey_queue(byte); cwinkey_state=FREE; break; }
+			cwinkey_state=FREE; break;
+    case BUFSPD:	cwinkey_state=FREE; break;      // buffered speed change ignored
     case HSCWSPD:	break;	// HSCW speed change ignored
-    default:		winkey_state=FREE; break;
+    default:		cwinkey_state=FREE; break;
     }
   }
 
@@ -580,7 +580,7 @@ void winkey_state_machine() {
     breakin=0;
   } else {
     WKstatus &= 0xFD;
-    if (winkey_keyer_idle()) {
+    if (cwinkey_keyer_idle()) {
       WKstatus &= 0xFB;
     } else {
       WKstatus |= 0x04;
@@ -588,11 +588,11 @@ void winkey_state_machine() {
   }  
   
   if ((WKstatus != OldWKstatus) && hostmode) {
-    winkey_to_host(WKstatus);
+    cwinkey_to_host(WKstatus);
     OldWKstatus=WKstatus;
   }
   if ((SpeedPot != OldSpeedPot) && hostmode) {
-    winkey_to_host(128+SpeedPot);
+    cwinkey_to_host(128+SpeedPot);
     OldSpeedPot=SpeedPot;  
   }
 }
@@ -600,10 +600,10 @@ void winkey_state_machine() {
 /***************************************************************
  ** Winkey interface
  ***************************************************************/
-static void winkey_setup(void) {
+static void cwinkey_setup(void) {
 }
 
-static void winkey_loop(void) {
+static void cwinkey_loop(void) {
   winkey_state_machine();
 }
 

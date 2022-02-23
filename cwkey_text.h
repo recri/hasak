@@ -24,50 +24,44 @@
  */
 
 /*
- * straight key keyers
- */
-static void keyer_straight_s_key_listen(int note) {
-  if (note_get(KYRN_HW_S_KEY) != note_get(KYRN_ST_S_KEY)) note_toggle(KYRN_ST_S_KEY);
+** hasak text keyer component.
+**
+** I've adopted the compact code representation and the winkey convention
+** of a prefix operator to form prosigns by concatenation, but I'm feeling
+** a little queasy about corner cases.
+**
+** The morse table has moved into the NRPN array, so it can be augmented as
+** required.  It covers the 64 characters from ! to `, though many are undefined
+** by default.
+*/
+
+#include "src/keyer_text.h"
+
+static KeyerText cwkey_text(KYRN_TXT_TEXT, KYRN_ST_TEXT);
+
+static void cwkey_text_listen(int note) { cwkey_text.receive(); }
+
+static void cwkey_text_clock(void) { cwkey_text.clock(1); }
+
+#if defined (KYR_ENABLE_TEXT2)
+static KeyerText cwkey_text2(KYRN_TXT_TEXT2, KYRN_ST_TEXT2);
+
+static void cwkey_text2_listen(int note) { cwkey_text2.receive(); }
+
+static void cwkey_text2_clock(void) { cwkey_text2.clock(1); }
+#endif
+
+static void cwkey_text_setup(void) {
+
+  note_listen(cwkey_text.text_note, cwkey_text_listen);
+  every_sample(cwkey_text_clock);
+
+#if defined(KYR_ENABLE_TEXT2)
+  note_listen(cwkey_text2.text_note, cwkey_text2_listen);
+  every_sample(cwkey_text2_clock);
+#endif
+
 }
 
-#if defined(KYR_ENABLE_SKEY2)
-static void keyer_straight_s_key2_listen(int note) {
-  if (note_get(KYRN_HW_S_KEY2) != note_get(KYRN_ST_S_KEY2)) note_toggle(KYRN_ST_S_KEY2);
-}
-#endif
-
-#if defined(KYR_ENABLE_SKEY3)
-static void keyer_straight_s_key3_listen(int note) {
-  if (note_get(KYRN_HW_S_KEY3) != note_get(KYRN_ST_S_KEY3)) note_toggle(KYRN_ST_S_KEY3);
-}
-#endif
-
-static void keyer_straight_tune_listen(int note) {
-  if (note_get(KYRN_MIDI_IN_TUNE) != note_get(KYRN_ST_TUNE)) note_toggle(KYRN_ST_TUNE);
-}  
-
-#if defined(KYR_ENABLE_BUT)
-static void keyer_straight_but_listen(int note) {
-  if (note_get(KYRN_HW_BUT) != note_get(KYRN_ST_BUT)) note_toggle(KYRN_ST_BUT);
-}
-#endif
-
-static void keyer_straight_setup(void) {
-  note_listen(KYRN_HW_S_KEY, keyer_straight_s_key_listen);
-  note_listen(KYRN_MIDI_IN_TUNE, keyer_straight_tune_listen);
-
-#if defined(KYR_ENABLE_SKEY2)
-  note_listen(KYRN_HW_S_KEY2, keyer_straight_s_key2_listen);
-#endif
-
-#if defined(KYR_ENABLE_SKEY3)
-  note_listen(KYRN_HW_S_KEY3, keyer_straight_s_key3_listen);
-#endif
-
-#if defined(KYR_ENABLE_BUT)
-  note_listen(KYRN_HW_BUT, keyer_straight_but_listen);
-#endif
-}
-
-static void keyer_straight_loop(void) {
+static void cwkey_text_loop(void) {
 }

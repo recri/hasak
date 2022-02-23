@@ -131,18 +131,17 @@ class KeyerPaddle {
   {
   }
   int clock(const int left, const int right, const int ticks) { 
-    const int adapter = get_nrpn(KYRP_PAD_ADAPT);
-    const int swapped = get_nrpn(KYRP_PAD_SWAP);
+    const int adapter = nrpn_get(KYRP_PAD_ADAPT);
+    const int swapped = nrpn_get(KYRP_PAD_SWAP);
     const uint8_t *map = keyer_paddle_adapt[adapter][swapped][state][left][right];
     state = map[0];
     const int dit = map[1];
     const int dah = map[2];
-    switch (get_nrpn(KYRP_PAD_KEYER)) {
+    switch (nrpn_get(KYRP_PAD_KEYER)) {
     case KYRV_KEYER_AD5DZ: return ad5dz.clock(dit, dah, ticks);
     case KYRV_KEYER_K1EL: return k1el.clock(dit, dah, ticks);
     case KYRV_KEYER_ND7PA: return nd7pa.clock(dit, dah, ticks);
     case KYRV_KEYER_VK6PH: return vk6ph.clock(dit, dah, ticks);
-      // case KYRV_KEYER_DL1YCF: return dl1ycf.clock(dit, dah, ticks);
     default: return 0;
     }
   }

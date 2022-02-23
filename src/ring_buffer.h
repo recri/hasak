@@ -37,12 +37,12 @@ class RingBuffer {
 public:
   RingBuffer() { }
   void reset(void) { wptr = rptr = 0; }
+  int items(void) { return wptr-rptr; }
   bool can_get(void) { return rptr!=wptr; }
-  bool can_put(void) { return (wptr+1) != rptr; }
   T peek(void) { return buff[rptr%SIZE]; }
   T get(void) { return buff[rptr++%SIZE]; }
+  bool can_put(void) { return (wptr+1) != rptr; }
   void put(T val) { buff[wptr++%SIZE] = val; }
-  int items(void) { return wptr-rptr; }
   bool can_unput(void) { return can_get(); }
   void unput(void) { wptr -= 1; }
 private:
