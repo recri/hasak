@@ -50,7 +50,7 @@ void AudioSynthKeyedTone::update(void)
       return;
     }
   } else if (channels == 2) {
-    if (get_nrpn(KYRP_IQ_ENABLE) == KYRV_IQ_NONE) {
+    if ( ! get_nrpn(KYRP_IQ_ENABLE)) {
       if (blockk) release(blockk);
       return;
     }

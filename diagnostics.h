@@ -140,17 +140,17 @@ static const char *diag_lorem =
 ** channel 4 - test stream
 ** loop over as many specs as are present
 */
-static void diag_mixer3_set(const char *dev, AudioMixer4& m, const char *p) {
+static void diag_mixer3_set(const char *dev, RAudioMixer4& m, const char *p) {
   // Serial.printf("prepare for %s do_left %d do_right %d at \"%s\"\n", dev, dol, dor, p);
   for (int i = 0; i < 4; i += 1) {
     switch (*p++) {
-    case '0': m.gain(i, 0.0f); continue;
-    case '1': m.gain(i, 1.0f); continue;
+    case '0': nrpn_set(m.enable_nrpn+i, 0); continue;
+    case '1': nrpn_set(m.enable_nrpn+i, 1); continue;
     default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
     }
   }
 }
-static void diag_mixer2_set(const char *dev, AudioMixer4& l, AudioMixer4& r, const char *p) {
+static void diag_mixer2_set(const char *dev, RAudioMixer4& l, RAudioMixer4& r, const char *p) {
   Serial.printf("recognized device %s\n", dev);
   switch (*p) {
   case 'l': 
@@ -177,6 +177,20 @@ static void diag_mixer_set(const char *p) {
   }
 }
 
+static void diag_mixer_dump_one(const char *lbl, RAudioMixer4& mix, int level, int enable) {
+  Serial.printf("%s: ", lbl);
+  for (int i = 0; i < 4; i += 1) Serial.printf(" %4d %d %d, ", signed_value(nrpn_get(level+i)), nrpn_get(enable+i), mix.last_value(i));
+  Serial.printf("\n");
+}
+
+static void diag_mixer_dump(void) {
+  diag_mixer_dump_one("l_usb_out", l_usb_out, KYRP_MIX_USB_L0,KYRP_MIX_EN_USB_L0);
+  diag_mixer_dump_one("r_usb_out", r_usb_out, KYRP_MIX_USB_R0,KYRP_MIX_EN_USB_R0);
+  diag_mixer_dump_one("l_i2s_out", l_i2s_out, KYRP_MIX_I2S_L0,KYRP_MIX_EN_I2S_L0);
+  diag_mixer_dump_one("r_i2s_out", r_i2s_out, KYRP_MIX_I2S_R0,KYRP_MIX_EN_I2S_R0);
+  diag_mixer_dump_one("l_hdw_out", l_hdw_out, KYRP_MIX_HDW_L0,KYRP_MIX_EN_HDW_L0);
+  diag_mixer_dump_one("r_hdw_out", r_hdw_out, KYRP_MIX_HDW_R0,KYRP_MIX_EN_HDW_R0);
+}
 static char diag_random_char(void) {
   char c;
   do c = random(0,128); while ( ! cwkey_text.valid_text(c)); 
@@ -191,16 +205,6 @@ static char *diag_random_text(void) {
   return buff;
 }
 
-
-static char *diag_read_line() {
-  static char buff[256];
-  unsigned i = 0;
-  for (int c = Serial.read(); c != '\n'; c = Serial.read())
-    if (i < sizeof(buff)-1)
-      buff[i++] = c;
-  buff[i] = 0;
-  return buff;
-}
 
 static const char *diag_text_send_ptr = NULL;
 static const char *diag_text2_send_ptr = NULL;
@@ -336,6 +340,16 @@ void diag_nrpn_report(void) {
   Serial.println("");
 }
 
+static char *diag_read_line() {
+  static char buff[256];
+  unsigned i = 0;
+  for (int c = Serial.read(); c != '\n'; c = Serial.read())
+    if (i < sizeof(buff)-1)
+      buff[i++] = c;
+  buff[i] = 0;
+  return buff;
+}
+
 void diagnostics_setup() { diag_totalTime = 0; }
 
 void diagnostics_loop() {
@@ -380,6 +394,7 @@ void diagnostics_loop() {
 		    " K -> send lorem ipsum to kyr keyer\n"
 		    " Z -> send random to wink keyer\n"
 		    " e -> default mixers\n"
+		    " f -> check mixers\n"
 		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
 		    " i#### | il#### | ir#### -> set (both | left | right) i2s out mixers, # is 0|1\n"
 		    " u#### | ul#### | ur#### -> set (both | left | right) usb out mixers, # is 0|1\n"
@@ -392,14 +407,15 @@ void diagnostics_loop() {
     case 'r': diag_sreset(); break;	/* short reset */ 
     case 'R': diag_Sreset(); break;	/* long reset */
     case 'd': diag_dreport(); break; /* debounce stats */
-    case 'l': diag_logging ^= 1; Serial.printf("logging %s\n", diag_logging?"on":"off"); break;
     case 'E': elapsed_test ^= 1; timer1 = -10; timer2 = 0; break;
+    case 'l': diag_logging ^= 1; Serial.printf("logging %s\n", diag_logging?"on":"off"); break;
     case 'w': diag_text_send_ptr = p+1; break;
     case 'k': diag_text2_send_ptr = p+1; break;
     case 'W': diag_text_send_ptr = diag_lorem; break;
     case 'K': diag_text2_send_ptr = diag_lorem; break;
     case 'Z': diag_text_send_ptr = diag_random_text(); break;
     case 'e': diag_mixer_set("i1100"); diag_mixer_set("h1100"); diag_mixer_set("u0010"); break;
+    case 'f': diag_mixer_dump(); break;
     case 'h': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'i': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
     case 'u': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;

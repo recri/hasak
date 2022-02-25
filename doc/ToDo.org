@@ -1,18 +1,24 @@
-* Todo list as of 2020-02-14
-[ ] if KYRF_NONE was > than all real fists, 
+* Todo list as of 2022-02-24
+[ ] redo mixer automation ramps as every_buffer(listener) that resets the mixer.gain()
+	can use the ramp code.
+[ ] move the ramp code into src from src/Audio
+[ ] use the ramp code for keyed oscillator
+[ ] make the keyed oscillator handle negative frequencies
+* Todo list as of 2022-02-14
+[x] if KYRF_NONE was > than all real fists, 
 	then the test for not sending from my_fist would be
 	active_fist < my_fist
 [x] incorporate ring_buffer.h
 	used by keyer_text.h
 [x] clean out unused src/Audio/*
-[ ] move listener and after code into c++ classes
+[x] move listener and after code into c++ classes
 	and test them
-[ ] sort the after list by time to expiry
+[x] sort the after list by time to expiry
 	though it might not make much difference
 [ ] get statistics on listeners and afters	
-[ ] make nrpn morse table NOTSET by default
+[-] make nrpn morse table NOTSET by default
 	backed by the const table in flash
-[ ] make mixers nrpns be NOTSET by default
+[-] make mixers nrpns be NOTSET by default
 	with 0dB backing value default.
 [ ] put active voice, st decode speed, rx decode speed into
 	nrpns, but protect them against overwrites.
@@ -22,35 +28,35 @@
 [ ] implement common core functions
 [ ] implement JSON function
 [ ] implement string passing proposal
-[ ] digital pins - add slots for second
+[x] digital pins - add slots for second
 	straight key, paddle, ptt switch, tx out, tx ptt out.
-[ ] make all digital pins NRPN configurable off or on PIN
-[ ] make all digital pins NRPN configurable for notes
-[ ] make all digital pins NRPN configurable for debounce
-[ ] make all digital pins NRPN configurable for sample rate
-[ ] analog pins - add slots for additional adcs
-[ ] make all analog pins NRPN configurable for off or PIN
-[ ] make all analog pins NRPN configurable for NRPN
-[ ] make all analog pins NRPN configurable for sample rate
-[ ] map notes, controls, and NRPNs into a unified range of tokens,
-[ ] separate arrays of storage slots for notes, controls, and nrpns
-[ ] make all notes and controls and nrpns listenable,
+[x] make all digital pins NRPN configurable off or on PIN
+[x] make all digital pins NRPN configurable for notes
+[-] make all digital pins NRPN configurable for debounce
+[-] make all digital pins NRPN configurable for sample rate
+[x] analog pins - add slots for additional adcs
+[x] make all analog pins NRPN configurable for off or PIN
+[x] make all analog pins NRPN configurable for NRPN
+[-] make all analog pins NRPN configurable for sample rate
+[x] map notes, controls, and NRPNs into a unified range of tokens,
+[x] separate arrays of storage slots for notes, controls, and nrpns
+[x] make all notes and controls and nrpns listenable,
 	use a byte array to store the index into a listener
 	head array and other flags.
-[ ] make all notes, controls, and nrpns delayable, general
+[x] make all notes, controls, and nrpns delayable, general
 	timing mechanism.
 [ ] add extension interface for using hasak as a framework for other
 	keyer implementations.  Keep Chuck Broadwell W5UXH
 	chuck.broadwell@gmail.com informed.
-[ ] move all non-essential activity out of the MIDI control change
+[x] move all non-essential activity out of the MIDI control change
 	callback, mark altered controls in a bitmap and process the
 	changes in the loop.  Most especially, no nrpn_echo's inside
 	the control change callback.
-[ ] write a modified Mixer4 that polls for level and mute from the
+[x] write a modified Mixer4 that polls for level and mute from the
 	nrpn array rather than needed explicit settings.
 [ ] make default serial monitor start winkey when needed
 [ ] verify bare Teensy3/4 and Teensy3/4+AudioAdapter
-[ ] transition tweening, changing the internal levels and mutes
+[x] transition tweening, changing the internal levels and mutes
 	so output mixer gains (24) 
 	and mutes (12), 
 	and the sidetone levels (6)
@@ -70,7 +76,7 @@
 	still mysterious, same nrpn values except for gaps,
 	but keyer still broken.
 [ ] make a key/ptt led indicator for the key/ptt output jack
-* Todo list as of 2020-02-07
+* Todo list as of 2022-02-07
 [x] make voices into fists, named KYRF_*
 [x] make notes named KYRN_*
 [-] queue events generated during usbMIDI.read() to fire

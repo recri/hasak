@@ -82,10 +82,13 @@ static void cwarbiter_sample(void) {
 
 static void cwarbiter_setup(void) {
   note_listen(KYRN_ST_S_KEY, cwarbiter_any_st);
+  note_listen(KYRN_ST_S_KEY2, cwarbiter_any_st);
+  note_listen(KYRN_ST_S_KEY3, cwarbiter_any_st);
   note_listen(KYRN_ST_PAD, cwarbiter_any_st);
+  note_listen(KYRN_ST_PAD2, cwarbiter_any_st);
+  note_listen(KYRN_ST_PAD3, cwarbiter_any_st);
   note_listen(KYRN_ST_TEXT, cwarbiter_any_st);
   note_listen(KYRN_ST_TEXT2, cwarbiter_any_st);
-  note_listen(KYRN_ST_BUT, cwarbiter_any_st);
   note_listen(KYRN_ST_TUNE, cwarbiter_any_st);
   note_listen(KYRN_PTT_ST, cwarbiter_release);
   every_sample(cwarbiter_sample);

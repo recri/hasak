@@ -24,62 +24,42 @@
  * THE SOFTWARE.
  */
 
-#ifndef mixer_h_
-#define mixer_h_
+#ifndef rmixer_h_
+#define rmixer_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
+#include "../../config.h"
+#include "../../linkage.h"
+#include "responsive.h"
 
-class AudioMixer4 : public AudioStream
+class RAudioMixer4 : public AudioStream
 {
-#if defined(__ARM_ARCH_7EM__)
 public:
-	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
-		for (int i=0; i<4; i++) multiplier[i] = 65536;
-	}
-	virtual void update(void);
-	void gain(unsigned int channel, float gain) {
-		if (channel >= 4) return;
-		if (gain > 32767.0f) gain = 32767.0f;
-		else if (gain < -32767.0f) gain = -32767.0f;
-		multiplier[channel] = gain * 65536.0f; // TODO: proper roundoff?
-	}
+  const int level_nrpn;
+  const int enable_nrpn;
+  RAudioMixer4(int16_t level, int16_t enable, int16_t ramp_nrpn, int16_t time_nrpn) :
+    AudioStream(4, inputQueueArray), level_nrpn(level), enable_nrpn(enable) {
+    for (int i=0; i<4; i++) ramp[i] = new ResponsiveGainRamp(level_nrpn+i, enable_nrpn+i, ramp_nrpn, time_nrpn);
+  }
+  virtual void update(void);
+  uint32_t last_value(int i) { if (i >= 0 && i < 4) return ramp[i]->last_value; return 0xffffffffu; }
 private:
-	int32_t multiplier[4];
-	audio_block_t *inputQueueArray[4];
-
-#elif defined(KINETISL)
-public:
-	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
-		for (int i=0; i<4; i++) multiplier[i] = 256;
-	}
-	virtual void update(void);
-	void gain(unsigned int channel, float gain) {
-		if (channel >= 4) return;
-		if (gain > 127.0f) gain = 127.0f;
-		else if (gain < -127.0f) gain = -127.0f;
-		multiplier[channel] = gain * 256.0f; // TODO: proper roundoff?
-	}
-private:
-	int16_t multiplier[4];
-	audio_block_t *inputQueueArray[4];
-#endif
+  ResponsiveGainRamp *ramp[4];
+  audio_block_t *inputQueueArray[4];
 };
 
-class AudioAmplifier : public AudioStream
+class RAudioAmplifier : public AudioStream
 {
 public:
-	AudioAmplifier(void) : AudioStream(1, inputQueueArray), multiplier(65536) {
-	}
-	virtual void update(void);
-	void gain(float n) {
-		if (n > 32767.0f) n = 32767.0f;
-		else if (n < -32767.0f) n = -32767.0f;
-		multiplier = n * 65536.0f;
-	}
+  RAudioAmplifier(int16_t level, int16_t enable, int16_t ramp_nrpn, int16_t time_nrpn) :
+    AudioStream(1, inputQueueArray) {
+    ramp = new ResponsiveGainRamp(level, enable, ramp_nrpn, time_nrpn);
+  }
+  virtual void update(void);
 private:
-	int32_t multiplier;
-	audio_block_t *inputQueueArray[1];
+  ResponsiveGainRamp *ramp;
+  audio_block_t *inputQueueArray[1];
 };
 
 #endif

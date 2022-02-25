@@ -7,6 +7,7 @@
 #include "src/Audio/input_byte.h"
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/output_byte.h"
+#include "src/Audio/rmixer.h"
 
 // audio sample values
 #include "src/Audio/sample_value.h"
@@ -35,15 +36,17 @@ AudioConnection		patchCord3b(au_key_out, 1, key_ramp, 0);  // transmit key line
 // 
 // output mixers
 // channel 0 rx_input from usb_in or mic_input from i2s_in
+// passing in nrpns for the gain and enable parameters for each channel
+// and slew paramters common to all channels
 // 
-AudioMixer4              l_usb_out;
-AudioMixer4              r_usb_out;
-AudioMixer4              l_i2s_out;
-AudioMixer4              r_i2s_out;
-AudioMixer4              l_hdw_out;
-AudioMixer4              r_hdw_out;
+RAudioMixer4              l_usb_out(KYRP_MIX_USB_L0,KYRP_MIX_EN_USB_L0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
+RAudioMixer4              r_usb_out(KYRP_MIX_USB_R0,KYRP_MIX_EN_USB_R0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
+RAudioMixer4              l_i2s_out(KYRP_MIX_I2S_L0,KYRP_MIX_EN_I2S_L0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
+RAudioMixer4              r_i2s_out(KYRP_MIX_I2S_R0,KYRP_MIX_EN_I2S_R0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
+RAudioMixer4              l_hdw_out(KYRP_MIX_HDW_L0,KYRP_MIX_EN_HDW_L0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
+RAudioMixer4              r_hdw_out(KYRP_MIX_HDW_R0,KYRP_MIX_EN_HDW_R0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
 // output mixer pointers in order of output mixer nrpns
-AudioMixer4		*mix_out[6] = {
+RAudioMixer4		*mix_out[6] = {
   &l_usb_out, &r_usb_out, &l_i2s_out, &r_i2s_out, &l_hdw_out, &r_hdw_out
 };
 

@@ -59,6 +59,7 @@
 #include <AudioStream.h>
 #include "sample_value.h"
 #include "../../linkage.h"
+#include "responsive.h"
 #include "data_table.h"
 
 class AudioSynthKeyedTone : public AudioStream
@@ -74,17 +75,11 @@ public:
     fall_rate = 0xFFFFFFFFu / get_nrpn(KYRP_FALL_TIME); // ramp fall time in samples
     table = get_table(get_nrpn(KYRP_RISE_RAMP));
     fall_table = get_table(get_nrpn(KYRP_FALL_RAMP));
-    switch (get_nrpn(KYRP_IQ_ENABLE)) {
-    default:
-    case KYRV_IQ_NONE: 
-    case KYRV_IQ_USB: 
-      phase_I = +45.0 * (4294967296.0 / 360.0);
-      phase_Q = (360-45.0) * (4294967296.0 / 360.0);
-      break;
-    case KYRV_IQ_LSB: 
+    phase_I = +45.0 * (4294967296.0 / 360.0);
+    phase_Q = (360-45.0) * (4294967296.0 / 360.0);
+    if (get_nrpn(KYRP_IQ_USB)) {
       phase_I = (360-45.0) * (4294967296.0 / 360.0);
       phase_Q = +45.0 * (4294967296.0 / 360.0); 
-      break;
     }
   }
   // fetch the current parameters for the fall ramp
@@ -133,7 +128,7 @@ public:
     return tenthdbtolinear127(signed_value(get_nrpn(KYRP_LEVEL)))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
   }
   uint32_t phase_increment(void) {
-    return get_nrpn(KYRP_TONE) / 10.0 * (4294967296.0 / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
+    return get_nrpn(KYRP_TONE) * 0.1f * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
   }
   virtual void update(void);
 private:

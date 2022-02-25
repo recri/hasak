@@ -31,10 +31,10 @@ static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_
 #include "audio.h"		// audio graph
 #undef READ_ONLY		// trash from the audio library includes
 #include "timing.h"		// timing counters
-#include "every_sample.h"	// every_sample implementation
+#include "every_any.h"		// every_any period implementation
 #include "after_idle.h"		// after_idle implementation
 #include "midi.h"		// midi interface
-#include "default.h"		// define MIDI note, ctrl, and nrpn flags FIX.ME rename midi_defs.h
+#include "define.h"		// define MIDI note, ctrl, and nrpn flags FIX.ME rename midi_defs.h
 #include "codec.h"		// handle the audio hardware
 #include "nrpn.h"		// default values and listeners for nrpns
 #include "cwdecode.h"		// decode cw element stream -> ascii
@@ -46,7 +46,7 @@ static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_
 #include "cwkey_straight.h"	// hardware switch -> straight key sidetone
 #include "cwkey_paddle.h"	// hardare paddle -> iambic keyed sidetone
 #include "cwkey_text.h"		// ascii characters -> mechanically keyed sidetone
-#include "input.h"		// input adc states -> input adc nrpns FIX.ME rename inadc.h
+#include "inadc.h"		// input adc states -> input adc nrpns FIX.ME rename inadc.h
 // #include "inmap.h"		// input adc nrpns -> keyer parameter nrpns
 #include "inpin.h"		// input pin states -> input pin notes FIX.ME rename
 // #include "outpin.h"		// output notes -> output pins FIX.ME
@@ -85,11 +85,11 @@ void setup(void) {
   /* FIX.ME - these go in audio.h - audio_setup() */
   AudioMemory(40);
 
-  nrpn_set_default(KYRP_SET_DEFAULT);
+  // nrpn_set_default(KYRP_SET_DEFAULT);
   nrpn_set(KYRP_VOLUME, -200);
 
   midi_setup();
-  default_setup();
+  define_setup();
   codec_setup();
   codec_enable();
   nrpn_setup();
@@ -102,10 +102,10 @@ void setup(void) {
   timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 
   timing_setup();		// start your timers
-  every_sample_setup();
+  every_any_setup();
   after_idle_setup();
 
-  input_setup();
+  inadc_setup();
   inpin_setup();
   cwkey_straight_setup();
   cwkey_paddle_setup();
@@ -128,10 +128,10 @@ void loop(void) {
   timing_loop();		// accumulate counts
   midi_loop();			// drain midi input
   codec_loop();
-  default_loop();
+  define_loop();
   nrpn_loop();
   inpin_loop();
-  input_loop();
+  inadc_loop();
   cwkey_straight_loop();
   cwkey_paddle_loop();
   cwkey_text_loop();
@@ -142,7 +142,7 @@ void loop(void) {
   cwdetime_loop();
   cwdecode_loop();
   // cwwinkey_loop();		// winkey
-  every_sample_loop();		// run every sample
+  every_any_loop();		// run every sample
   after_idle_loop();		// run once at end of loop()
   diagnostics_loop();		// console
 }
