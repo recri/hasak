@@ -114,9 +114,9 @@ static void nrpn_recompute_morse(int nrpn) {
 
 /*
 ** expand mixer shorthand bits to individual mixer channel nrpns
-** nrpn == KYRP_OUT_ENABLE then set left and right according to bits
-** nrpn == KYRP_OUT_ENABLE_L then set left according to bits
-** nrpn == KYRP_OUT_ENABLE_R then set right according to bits
+** nrpn == KYRP_MIX_ENABLE then set left and right according to bits
+** nrpn == KYRP_MIX_ENABLE_L then set left according to bits
+** nrpn == KYRP_MIX_ENABLE_R then set right according to bits
 ** in each case the mask has 12 bits and ranges from 0 to 4095
 ** in each case we have 4 bits for usb, i2s, and hdw out mixers
 ** the order of the mixers and enables is:
@@ -133,12 +133,12 @@ static void nrpn_recompute_mixer_enables(int nrpn) {
     const int l = (i%4)+(i/4)*8;
     const int r = l+4;
     const int v = (value & (1<<(11-i))) != 0;
-    if (nrpn == KYRP_OUT_ENABLE) {
+    if (nrpn == KYRP_MIX_ENABLE) {
       nrpn_set(KYRP_MIXER2+l, v);
       nrpn_set(KYRP_MIXER2+r, v);
-    } else if (nrpn == KYRP_OUT_ENABLE_L) {
+    } else if (nrpn == KYRP_MIX_ENABLE_L) {
       nrpn_set(KYRP_MIXER2+l, v);
-    } else if (nrpn == KYRP_OUT_ENABLE_R) {
+    } else if (nrpn == KYRP_MIX_ENABLE_R) {
       nrpn_set(KYRP_MIXER2+r, v);
     } else {
       Serial.printf("bad nrpn %d in nrpn_recompute_mixer_enables\n");
@@ -320,25 +320,6 @@ static void nrpn_id_json(int nrpn) {
 static void nrpn_string_handler(int nrpn) {
 }
 
-
-/*
-** inadc endpoints for pot mapping.
-*/
-#define KYR_INADC_TONE_MAX 2500
-#define KYR_INADC_TONE_MIN 12500
-#define KYR_INADC_SPEED_MAX 5
-#define KYR_INADC_SPEED_MIN 55
-#define KYR_INADC_VOLUME_MAX -320
-#define KYR_INADC_VOLUME_MIN 0
-#define KYR_INADC_FRAC_MAX 0
-#define KYR_INADC_FRAC_MIN 127
-#define KYR_INADC_BAL_MAX -8192
-#define KYR_INADC_BAL_MIN 8191
-#define KYR_INADC_TIME_MAX 0
-#define KYR_INADC_TIME_MIN 16383
-#define KYR_INADC_RATIO_MIN 25
-#define KYR_INADC_RATIO_MAX 75
-
 /*
 ** this where we initialize the keyer nrpns
 */
@@ -399,87 +380,69 @@ static void nrpn_set_default(int nrpn) {
   nrpn_set(KYRP_MIXER_SLEW_TIME, 128);
   nrpn_set(KYRP_FREQ_SLEW_RAMP, KYRV_RAMP_HANN);
   nrpn_set(KYRP_FREQ_SLEW_TIME,	128);
-  nrpn_set(KYRP_OUT_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits.IQ to usb, usb+sidetone to i2s and hdw
-  nrpn_set(KYRP_OUT_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
-  nrpn_set(KYRP_OUT_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
-  nrpn_set(KYRP_IN_DEBOUNCE, 1000);
-  nrpn_set(KYRP_IN_LOGIC, 0);
-  nrpn_set(KYRP_OUT_LOGIC, 1);
+  nrpn_set(KYRP_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits.IQ to usb, usb+sidetone to i2s and hdw
+  nrpn_set(KYRP_MIX_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
+  nrpn_set(KYRP_MIX_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
+  nrpn_set(KYRP_PIN_DEBOUNCE, 1000);
+  nrpn_set(KYRP_POUT_LOGIC, 1);
   nrpn_set(KYRP_ADC_RATE, 10);
   xnrpn_set(KYRP_XIQ_FREQ, 600);
   nrpn_set(KYRP_IQ_USB, 1);
 
-  nrpn_set(KYRP_INPIN0_PIN, KYR_R_PAD_PIN);
-  nrpn_set(KYRP_INPIN0_NOTE, KYRN_HW_L_PAD);
-  nrpn_set(KYRP_INPIN1_PIN, KYR_L_PAD_PIN);
-  nrpn_set(KYRP_INPIN1_NOTE, KYRN_HW_R_PAD);
-  nrpn_set(KYRP_INPIN2_PIN, KYR_S_KEY_PIN);
-  nrpn_set(KYRP_INPIN2_NOTE, KYRN_HW_S_KEY);
-  nrpn_set(KYRP_INPIN3_PIN, KYR_EXT_PTT_PIN);
-  nrpn_set(KYRP_INPIN3_NOTE, KYRN_HW_EXT_PTT);
-  nrpn_set(KYRP_INPIN4_PIN, -1);
-  nrpn_set(KYRP_INPIN4_NOTE, -1);
-  nrpn_set(KYRP_INPIN5_PIN, -1);
-  nrpn_set(KYRP_INPIN5_NOTE, -1);
-  nrpn_set(KYRP_INPIN6_PIN, -1);
-  nrpn_set(KYRP_INPIN6_NOTE, -1);
-  nrpn_set(KYRP_INPIN7_PIN, -1);
-  nrpn_set(KYRP_INPIN7_NOTE, -1);
+  nrpn_set(KYRP_PIN0_PIN, -1);
+  nrpn_set(KYRP_PIN0_NOTE, -1);
+  nrpn_set(KYRP_PIN1_PIN, -1);
+  nrpn_set(KYRP_PIN1_NOTE, -1);
+  nrpn_set(KYRP_PIN2_PIN, -1);
+  nrpn_set(KYRP_PIN2_NOTE, -1);
+  nrpn_set(KYRP_PIN3_PIN, -1);
+  nrpn_set(KYRP_PIN3_NOTE, -1);
+  nrpn_set(KYRP_PIN4_PIN, -1);
+  nrpn_set(KYRP_PIN4_NOTE, -1);
+  nrpn_set(KYRP_PIN5_PIN, -1);
+  nrpn_set(KYRP_PIN5_NOTE, -1);
+  nrpn_set(KYRP_PIN6_PIN, -1);
+  nrpn_set(KYRP_PIN6_NOTE, -1);
+  nrpn_set(KYRP_PIN7_PIN, -1);
+  nrpn_set(KYRP_PIN7_NOTE, -1);
 
-  nrpn_set(KYRP_OUTPIN0_PIN, KYR_KEY_OUT_PIN);
-  nrpn_set(KYRP_OUTPIN0_NOTE, KYRN_HW_KEY_OUT);
-  nrpn_set(KYRP_OUTPIN1_PIN, KYR_PTT_OUT_PIN);
-  nrpn_set(KYRP_OUTPIN1_NOTE, KYRN_HW_PTT_OUT);
-  nrpn_set(KYRP_OUTPIN2_PIN, -1);
-  nrpn_set(KYRP_OUTPIN2_NOTE, -1);
-  nrpn_set(KYRP_OUTPIN3_PIN, -1);
-  nrpn_set(KYRP_OUTPIN3_NOTE, -1);
-  nrpn_set(KYRP_OUTPIN4_PIN, -1);
-  nrpn_set(KYRP_OUTPIN4_NOTE, -1);
-  nrpn_set(KYRP_OUTPIN5_PIN, -1);
-  nrpn_set(KYRP_OUTPIN5_NOTE, -1);
-  nrpn_set(KYRP_OUTPIN6_PIN, -1);
-  nrpn_set(KYRP_OUTPIN6_NOTE, -1);
-  nrpn_set(KYRP_OUTPIN7_PIN, -1);
-  nrpn_set(KYRP_OUTPIN7_NOTE, -1);
+  nrpn_set(KYRP_POUT0_PIN, -1);
+  nrpn_set(KYRP_POUT0_NOTE, -1);
+  nrpn_set(KYRP_POUT1_PIN, -1);
+  nrpn_set(KYRP_POUT1_NOTE, -1);
+  nrpn_set(KYRP_POUT2_PIN, -1);
+  nrpn_set(KYRP_POUT2_NOTE, -1);
+  nrpn_set(KYRP_POUT3_PIN, -1);
+  nrpn_set(KYRP_POUT3_NOTE, -1);
+  nrpn_set(KYRP_POUT4_PIN, -1);
+  nrpn_set(KYRP_POUT4_NOTE, -1);
+  nrpn_set(KYRP_POUT5_PIN, -1);
+  nrpn_set(KYRP_POUT5_NOTE, -1);
+  nrpn_set(KYRP_POUT6_PIN, -1);
+  nrpn_set(KYRP_POUT6_NOTE, -1);
+  nrpn_set(KYRP_POUT7_PIN, -1);
+  nrpn_set(KYRP_POUT7_NOTE, -1);
 
-  nrpn_set(KYRP_INADC0_PIN, -1);
-  nrpn_set(KYRP_INADC0_NRPN, KYRV_INADC_NOTHING);
-  nrpn_set(KYRP_INADC0_MIN, 0);
-  nrpn_set(KYRP_INADC0_MAX, 0);
-  nrpn_set(KYRP_INADC1_PIN, KYR_VOLUME_POT);
-  nrpn_set(KYRP_INADC1_NRPN, KYRV_INADC_VOLUME);
-  nrpn_set(KYRP_INADC1_MIN, KYR_INADC_VOLUME_MIN);
-  nrpn_set(KYRP_INADC1_MAX, KYR_INADC_VOLUME_MAX);
-  nrpn_set(KYRP_INADC2_PIN, KYR_ST_VOL_POT);
-  nrpn_set(KYRP_INADC2_NRPN, KYRV_INADC_LEVEL);
-  nrpn_set(KYRP_INADC2_MIN, KYR_INADC_VOLUME_MIN);
-  nrpn_set(KYRP_INADC2_MAX, KYR_INADC_VOLUME_MAX);
-  nrpn_set(KYRP_INADC3_PIN, KYR_ST_FREQ_POT);
-  nrpn_set(KYRP_INADC3_NRPN, KYRV_INADC_TONE);
-  nrpn_set(KYRP_INADC3_MIN, KYR_INADC_TONE_MIN);
-  nrpn_set(KYRP_INADC3_MAX, KYR_INADC_TONE_MAX);
-  nrpn_set(KYRP_INADC4_PIN, KYR_SPEED_POT);
-  nrpn_set(KYRP_INADC4_NRPN, KYRV_INADC_SPEED);
-  nrpn_set(KYRP_INADC4_MIN, KYR_INADC_SPEED_MIN);
-  nrpn_set(KYRP_INADC4_MAX, KYR_INADC_SPEED_MAX);
-  nrpn_set(KYRP_INADC5_PIN, -1);
-  nrpn_set(KYRP_INADC5_NRPN, KYRV_INADC_NOTHING);
-  nrpn_set(KYRP_INADC5_MIN, 0);
-  nrpn_set(KYRP_INADC5_MAX, 0);
-  nrpn_set(KYRP_INADC6_PIN, 1);
-  nrpn_set(KYRP_INADC6_NRPN, KYRV_INADC_NOTHING);
-  nrpn_set(KYRP_INADC6_MIN, 0);
-  nrpn_set(KYRP_INADC6_MAX, 0);
-  nrpn_set(KYRP_INADC7_PIN, -1);
-  nrpn_set(KYRP_INADC7_NRPN, KYRV_INADC_NOTHING);
-  nrpn_set(KYRP_INADC7_MIN, 0);
-  nrpn_set(KYRP_INADC7_MAX, 0);
+  nrpn_set(KYRP_ADC0_PIN, KYR_VOLUME_POT);
+  nrpn_set(KYRP_ADC0_NRPN, KYRV_ADC_VOLUME);
+  nrpn_set(KYRP_ADC1_PIN, KYR_ST_VOL_POT);
+  nrpn_set(KYRP_ADC1_NRPN, KYRV_ADC_LEVEL);
+  nrpn_set(KYRP_ADC2_PIN, KYR_ST_FREQ_POT);
+  nrpn_set(KYRP_ADC2_NRPN, KYRV_ADC_TONE);
+  nrpn_set(KYRP_ADC3_PIN, KYR_SPEED_POT);
+  nrpn_set(KYRP_ADC3_NRPN, KYRV_ADC_SPEED);
+  nrpn_set(KYRP_ADC4_PIN, -1);
+  nrpn_set(KYRP_ADC4_NRPN, -1);
+  nrpn_set(KYRP_ADC5_PIN, 1);
+  nrpn_set(KYRP_ADC5_NRPN, -1);
+  nrpn_set(KYRP_ADC6_PIN, -1);
+  nrpn_set(KYRP_ADC6_NRPN, -1);
+  nrpn_set(KYRP_ADC7_PIN, -1);
+  nrpn_set(KYRP_ADC7_NRPN, -1);
 
   /* morse code table */
   /* change this to NOTSET, pull NOTSET values from morse[i-KYRP_MORSE] */
-  for (int i = 0; i < 64; i += 1) 
-    nrpn_set(KYRP_MORSE+i, cwmorse[i]);
+  for (int i = 0; i < 64; i += 1) nrpn_set(KYRP_MORSE+i, cwmorse[i]);
 
   /* output mixers */
   for (int i = KYRP_MIXER; i < KYRP_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
@@ -488,7 +451,7 @@ static void nrpn_set_default(int nrpn) {
   for (int i = KYRP_MIXER2; i < KYRP_MIXER2+24; i += 1) nrpn_set(i, 0); /* muted */
 
   /* codec */
-  nrpn_set(KYRP_CODEC_VOLUME, 0);
+  nrpn_set(KYRP_VOLUME, 0);
   nrpn_set(KYRP_INPUT_SELECT, 0);
   nrpn_set(KYRP_INPUT_LEVEL, 0);
 
@@ -510,9 +473,9 @@ static void nrpn_setup(void) {
   nrpn_listen(KYRP_FARNS, nrpn_recompute_morse);
 
   /* mixer enable update, listen for changes */
-  nrpn_listen(KYRP_OUT_ENABLE, nrpn_recompute_mixer_enables);
-  nrpn_listen(KYRP_OUT_ENABLE_L, nrpn_recompute_mixer_enables);
-  nrpn_listen(KYRP_OUT_ENABLE_L, nrpn_recompute_mixer_enables);
+  nrpn_listen(KYRP_MIX_ENABLE, nrpn_recompute_mixer_enables);
+  nrpn_listen(KYRP_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
+  nrpn_listen(KYRP_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
 
   /* commands */
   nrpn_listen(KYRP_WRITE_EEPROM, nrpn_write_eeprom);
@@ -539,8 +502,7 @@ static void nrpn_setup(void) {
   /* possibly, probe the EEPROM for saved settings and restore them */
 }
 
-static void nrpn_loop(void) {
-}
+static void nrpn_loop(void) {}
 
 //#ifdef __cplusplus
 //}

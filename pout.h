@@ -24,44 +24,28 @@
  */
 
 /*
-** hasak text keyer component.
-**
-** I've adopted the compact code representation and the winkey convention
-** of a prefix operator to form prosigns by concatenation, but I'm feeling
-** a little queasy about corner cases.
-**
-** The morse table has moved into the NRPN array, so it can be augmented as
-** required.  It covers the 64 characters from ! to `, though many are undefined
-** by default.
-*/
+ * digital pin output
+ */
 
-#include "src/keyer_text.h"
-
-static KeyerText cwkey_text(KYRN_TXT_TEXT, KYRN_ST_TEXT);
-
-static void cwkey_text_listen(int note) { cwkey_text.receive(); }
-
-static void cwkey_text_clock(void) { cwkey_text.clock(1); }
-
-#if KYR_N_TEXT > 1
-static KeyerText cwkey_text2(KYRN_TXT_TEXT2, KYRN_ST_TEXT2);
-
-static void cwkey_text2_listen(int note) { cwkey_text2.receive(); }
-
-static void cwkey_text2_clock(void) { cwkey_text2.clock(1); }
-#endif
-
-static void cwkey_text_setup(void) {
-
-  note_listen(cwkey_text.text_note, cwkey_text_listen);
-  every_sample(cwkey_text_clock);
-
-#if KYR_N_TEXT > 1
-  note_listen(cwkey_text2.text_note, cwkey_text2_listen);
-  every_sample(cwkey_text2_clock);
-#endif
-
+static void pout_key_hw_key_out(int note) {
+  digitalWriteFast(KYR_KEY_OUT_PIN,  nrpn_get(KYRP_POUT_LOGIC) ? note_get(KYRN_HW_KEY_OUT) : ! note_get(KYRN_HW_KEY_OUT));
 }
 
-static void cwkey_text_loop(void) {
+static void pout_key_hw_ptt_out(int note) {
+  digitalWriteFast(KYR_PTT_OUT_PIN, nrpn_get(KYRP_POUT_LOGIC) ? note_get(KYRN_HW_PTT_OUT) : ! note_get(KYRN_HW_PTT_OUT));
+}
+
+static void pout_setup(void) {
+  pinMode(KYR_PTT_OUT_PIN, OUTPUT); 
+  digitalWrite(KYR_PTT_OUT_PIN, ! nrpn_get(KYRP_POUT_LOGIC));
+  note_listen(KYRN_HW_KEY_OUT, pout_key_hw_key_out);
+
+  pinMode(KYR_KEY_OUT_PIN, OUTPUT);
+  digitalWrite(KYR_PTT_OUT_PIN, ! nrpn_get(KYRP_POUT_LOGIC));
+  note_listen(KYRN_HW_PTT_OUT, pout_key_hw_ptt_out);
+
+  // FIX.ME additional input configuration awaiting listener_node_t free list
+}
+
+static void pout_loop(void) {
 }

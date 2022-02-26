@@ -106,7 +106,10 @@ proc jsformat-all {values} {
 		^KYRC_.*$ { lappend kyrc [jsformat-any $key $table] }
 		^KYRP_.*$ { 
 		    # skip the output mixers
-		    if {[string match KYRP_MIX_* $key]} continue
+		    if {[string match KYRP_MIX_USB* $key]} continue
+		    if {[string match KYRP_MIX_I2S* $key]} continue
+		    if {[string match KYRP_MIX_HDW* $key]} continue
+		    if {[string match KYRP_MIX_EN_* $key]} continue
 		    lappend kyrp [jsformat-any $key $table]
 		    if {$type in {nrpn opts}} {
 			lappend prop "[jsq $property]: \"$key\""

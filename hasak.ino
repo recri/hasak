@@ -46,10 +46,11 @@ static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_
 #include "cwkey_straight.h"	// hardware switch -> straight key sidetone
 #include "cwkey_paddle.h"	// hardare paddle -> iambic keyed sidetone
 #include "cwkey_text.h"		// ascii characters -> mechanically keyed sidetone
-#include "inadc.h"		// input adc states -> input adc nrpns FIX.ME rename inadc.h
-// #include "inmap.h"		// input adc nrpns -> keyer parameter nrpns
-#include "inpin.h"		// input pin states -> input pin notes FIX.ME rename
-// #include "outpin.h"		// output notes -> output pins FIX.ME
+#include "adc.h"		// input adc states -> input adc nrpns FIX.ME rename inadc.h
+#include "adcmap.h"		// input adc nrpns -> keyer parameter nrpns
+#include "pin.h"		// input pin states -> input pin notes rename
+#include "pout.h"		// output pin notes -> output pins
+
 // #include "instring.h"	// input strings from MIDI
 // #include "outstring.h"	// output strings to MIDI
 // #include "cwinkey.h"		// FIX.ME - make it work
@@ -105,8 +106,10 @@ void setup(void) {
   every_any_setup();
   after_idle_setup();
 
-  inadc_setup();
-  inpin_setup();
+  adc_setup();
+  adcmap_setup();
+  pin_setup();
+  pout_setup();
   cwkey_straight_setup();
   cwkey_paddle_setup();
   cwkey_text_setup();
@@ -130,8 +133,10 @@ void loop(void) {
   codec_loop();
   define_loop();
   nrpn_loop();
-  inpin_loop();
-  inadc_loop();
+  pout_loop();
+  pin_loop();
+  adc_loop();
+  adcmap_loop();
   cwkey_straight_loop();
   cwkey_paddle_loop();
   cwkey_text_loop();

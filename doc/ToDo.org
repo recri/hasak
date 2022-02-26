@@ -1,9 +1,33 @@
 * Todo list as of 2022-02-24
+[x] test that the json.h file produces legit json string
+	with json_pp.
+[x] refactor adc to report input raw reads to a fixed nrpn.
+	using the fixed nrpn as the current value
+	to filter out no change.
+[x] which is heard by a map listener who translates
+	into the target nrpn, using the target nrpn
+	to identify the mapping and filter out no change.
+[x] refactor inpin -> in, outpin -> out, inadc -> adc
+[ ] write the string mechanism.
+[ ] test the json transfer mechanism.
 [ ] redo mixer automation ramps as every_buffer(listener) that resets the mixer.gain()
 	can use the ramp code.
-[ ] move the ramp code into src from src/Audio
-[ ] use the ramp code for keyed oscillator
-[ ] make the keyed oscillator handle negative frequencies
+[ ] move the ramp code into src from src/Audio.
+[ ] use the ramp code for keyed oscillator.
+[ ] make the keyed oscillator handle negative frequencies.
+[ ] make a boolean flag to mark note, ctrl, and nrpn values
+	as boolean values.  Might store them more efficiently.
+[ ] make a high range of nrpns for internal use, not saved,
+	but potentially observable to watch the operation.
+	move xper_dit etc there.
+[x] make a low range of nrpns for the midi controller exclusively
+[ ] move the midi.h modulating nrpns into the front and have midi.h
+	use them directly. KYRP_CHANNEL, KYRP_ECHO_ENABLE.
+[ ] put live values into the NRPN array, loops, samples, updates, millis
+	and fire listeners on them to implement every_any!
+[x] insert Steve's WM8960 nrpns into the ephemeral block
+[ ] make a listener node allocator, so we can make listeners inside loops,
+	or in functions with note, ctrl, or nrpn parameters.
 * Todo list as of 2022-02-14
 [x] if KYRF_NONE was > than all real fists, 
 	then the test for not sending from my_fist would be

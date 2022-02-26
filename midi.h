@@ -25,14 +25,14 @@
 
 #include "src/midi.h"
 
-static Midi<128,128,256> midi(usbMIDI, 1);
+static Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN> midi(usbMIDI, 1);
 
 // not until I'm sure it's needed
 // #ifdef __cplusplus
 // extern "C" {
 // #endif
 
-#define midi_listener_t Midi<128,128,256>::listener_t
+#define midi_listener_t Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN>::listener_t
 #define note_listen(n, f) {static midi_listener_t t(f); midi.note_listen(n,&t);}
 #define ctrl_listen(c, f) {static midi_listener_t t(f); midi.ctrl_listen(c,&t);}
 #define nrpn_listen(p, f) {static midi_listener_t t(f); midi.nrpn_listen(p,&t);}
@@ -57,7 +57,7 @@ static int note_get(int note) {
 
 static void note_set(int note, int value) { 
   if (note_is_valid(note)) {
-    // Serial.printf("note_set(%d, %d)\n", note, value);
+    Serial.printf("note_set(%d, %d)\n", note, value);
     midi.note_set(note, value);
   } else
     note_invalid(note, "note_set");

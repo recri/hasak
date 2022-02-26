@@ -71,16 +71,21 @@ static void diag_Sreport(void) {
   // report("denom", cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax, 0, 0, 0, 0);
   diag_sreport();
   Serial.printf("Extended summary:\n");
-#if defined(KYR_ENABLE_ADC_IN)
-  diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in);       diag_mreport("adc_in", adc_in);   Serial.println();
-#else
+  diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in); 
+#if KYR_ENABLE_HDW_IN > 0
+  diag_mreport("hdw_in", hdw_in);
+#endif
+   Serial.println();
+
   diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in);       Serial.println();
+  diag_mreport("i2s_out", i2s_out);     diag_mreport("usb_out", usb_out);
+#if KYR_ENABLE_HDW_OUT > 0
+#if 0
+  diag_mreport("hdw_out", hdw_out); 
 #endif
-#if defined(KYR_ENABLE_HDW_OUT)
-  diag_mreport("i2s_out", i2s_out);     diag_mreport("usb_out", usb_out);     diag_mreport("hdw_out", hdw_out); Serial.println();
-#else
-  diag_mreport("i2s_out", i2s_out);     diag_mreport("usb_out", usb_out);     Serial.println();
 #endif
+  Serial.println();
+
   diag_mreport("tone_ramp", tone_ramp); diag_mreport("key_ramp", key_ramp);   Serial.println();
   diag_mreport("l_i2s_out", l_i2s_out); diag_mreport("r_i2s_out", r_i2s_out); Serial.println();
   diag_mreport("l_usb_out", l_usb_out); diag_mreport("r_usb_out", r_usb_out); Serial.println();
@@ -103,8 +108,8 @@ static void diag_Sreset(void) {
   diag_sreset();
   diag_mreset(i2s_in);
   diag_mreset(usb_in);
-#if defined(KYR_ENABLE_ADC_IN)
-  diag_mreset(adc_in);
+#if defined(KYR_ENABLE_HDW_IN)
+  diag_mreset(hdw_in);
 #endif
   diag_mreset(tone_ramp);
   diag_mreset(key_ramp);
@@ -120,7 +125,7 @@ static void diag_Sreset(void) {
 
 /* debounce details */
 static void diag_dreport(void) {
-  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(nrpn_get(KYRP_DEBOUNCE)), nrpn_get(KYRP_DEBOUNCE));
+  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(nrpn_get(KYRP_PIN_DEBOUNCE)), nrpn_get(KYRP_PIN_DEBOUNCE));
 }
 
 static const char *diag_lorem = 
@@ -229,21 +234,15 @@ void diag_nrpn_report(void) {
   Serial.printf("\tINPUT_SELECT %d", nrpn_get(KYRP_INPUT_SELECT));
   Serial.printf("\tINPUT_LEVEL %.2f", nrpn_to_db(nrpn_get(KYRP_INPUT_LEVEL)));
   Serial.println("");
-  Serial.printf("\tBUTTON_* %d, %d, %d, %d, %d", 
-		signed_value(nrpn_get(KYRP_BUTTON_0)), signed_value(nrpn_get(KYRP_BUTTON_1)),
-		signed_value(nrpn_get(KYRP_BUTTON_2)), signed_value(nrpn_get(KYRP_BUTTON_3)),
-		signed_value(nrpn_get(KYRP_BUTTON_4)));
-  Serial.println("");
-  Serial.printf("\tPTT_EN %d", nrpn_get(KYRP_PTT_ENABLE));
+  Serial.printf("\tPTT_EN %d", nrpn_get(KYRP_PTT_REQUIRE));
   Serial.printf("\tTX_EN %d", nrpn_get(KYRP_TX_ENABLE));
   Serial.printf("\tST_EN %d", nrpn_get(KYRP_ST_ENABLE));
   Serial.printf("\tIQ_EN %d", nrpn_get(KYRP_IQ_ENABLE));
-  Serial.printf("\tADJ %d", signed_value(nrpn_get(KYRP_IQ_ADJUST)));
-  Serial.printf("\tBAL %d", signed_value(nrpn_get(KYRP_IQ_BALANCE)));
+  Serial.printf("\tIQ_BAL %d", signed_value(nrpn_get(KYRP_IQ_BALANCE)));
+  Serial.printf("\tST_BAL %d", nrpn_get(KYRP_ST_BALANCE));
   Serial.println("");
-  Serial.printf("\tST_PAN %d", nrpn_get(KYRP_ST_PAN));
 
-  Serial.printf("\tDEBOUNCE %d", nrpn_get(KYRP_DEBOUNCE));
+  Serial.printf("\tDEBOUNCE %d", nrpn_get(KYRP_PIN_DEBOUNCE));
 
   Serial.printf("\tHEAD_TIME %d", nrpn_get(KYRP_HEAD_TIME));
   Serial.printf("\tTAIL_TIME %d", nrpn_get(KYRP_TAIL_TIME));
@@ -264,28 +263,19 @@ void diag_nrpn_report(void) {
   Serial.printf("\tPAD_KEYER %d", nrpn_get(KYRP_PAD_KEYER));
   Serial.println("");
 
-  Serial.printf("\tCHAN_CC %d", nrpn_get(KYRP_CHAN_CC));
-  Serial.printf("\tNOTE %d", nrpn_get(KYRP_CHAN_NOTE));
+  Serial.printf("\tCHANNEL %d", nrpn_get(KYRP_CHANNEL));
   Serial.println("");
 
-  Serial.printf("\tNOTE_L_PAD %d", nrpn_get(KYRP_NOTE_L_PAD));
-  Serial.printf("\t_R_PAD %d", nrpn_get(KYRP_NOTE_R_PAD));
-  Serial.printf("\t_S_KEY %d", nrpn_get(KYRP_NOTE_S_KEY));
-  Serial.printf("\t_EXT_PTT %d", nrpn_get(KYRP_NOTE_EXT_PTT));
-  Serial.printf("\t_KEY_OUT %d", nrpn_get(KYRP_NOTE_KEY_OUT));
-  Serial.printf("\t_PTT_OUT %d", nrpn_get(KYRP_NOTE_PTT_OUT));
-  Serial.println("");
-
-  Serial.printf("\tADC_ENABLE 0x%02x", nrpn_get(KYRP_ADC_ENABLE));
-  Serial.printf("\tADC*_CONTROL %d", nrpn_get(KYRP_ADC0_CONTROL));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC1_CONTROL));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC2_CONTROL));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC3_CONTROL));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC4_CONTROL));
+  Serial.printf("\tADC_ENABLE %d", nrpn_get(KYRP_ADC_ENABLE));
+  Serial.printf("\tADC*_NRPN %d", nrpn_get(KYRP_ADC0_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC1_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC2_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC3_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_ADC4_NRPN));
   Serial.println();
 
   /* 64 morse code translations */
-  Serial.printf("\tOUT_ENABLE 0x%04x", nrpn_get(KYRP_OUT_ENABLE));
+  Serial.printf("\tMIX_ENABLE 0x%04x", nrpn_get(KYRP_MIX_ENABLE));
   Serial.println();
 
   Serial.printf("\tUSB_L0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L0)));
@@ -363,8 +353,10 @@ void diagnostics_loop() {
 	diag_debug_buffer[i][0] = 0;
       }
   if ( ! diag_send_some_text(diag_text_send_ptr, cwkey_text)) diag_text_send_ptr = NULL;
+#if KYR_N_TEXT > 1
   if ( ! diag_send_some_text(diag_text2_send_ptr, cwkey_text2)) diag_text2_send_ptr = NULL;
-
+#endif
+  
   if (elapsed_test) {
     if ((int)timer1 <= 0 && timer2 > 0) {
       Serial.printf("timer1 %d timer2 %d\n", (int)timer1, (int)timer2);
@@ -389,10 +381,12 @@ void diagnostics_loop() {
 		    " d -> debounce diagnostics\n"
 		    " l -> logging toggle\n"
 		    " w... -> send ... up to newline to text keyer\n"
+		    " W -> send lorem ipsum to text keyer\n"
+#if KYR_N_TEXT > 1
 		    " k... -> send ... up to newline to text2 keyer\n"
-		    " W -> send lorem ipsum to wink keyer\n"
-		    " K -> send lorem ipsum to kyr keyer\n"
-		    " Z -> send random to wink keyer\n"
+		    " K -> send lorem ipsum to text2 keyer\n"
+#endif
+		    " Z -> send random to text keyer\n"
 		    " e -> default mixers\n"
 		    " f -> check mixers\n"
 		    " h#### | hl#### | hr#### -> set (both | left | right) hdw out mixers, # is 0|1\n"
@@ -410,10 +404,12 @@ void diagnostics_loop() {
     case 'E': elapsed_test ^= 1; timer1 = -10; timer2 = 0; break;
     case 'l': diag_logging ^= 1; Serial.printf("logging %s\n", diag_logging?"on":"off"); break;
     case 'w': diag_text_send_ptr = p+1; break;
-    case 'k': diag_text2_send_ptr = p+1; break;
     case 'W': diag_text_send_ptr = diag_lorem; break;
-    case 'K': diag_text2_send_ptr = diag_lorem; break;
     case 'Z': diag_text_send_ptr = diag_random_text(); break;
+#if KYR_N_TEXT > 1
+    case 'k': diag_text2_send_ptr = p+1; break;
+    case 'K': diag_text2_send_ptr = diag_lorem; break;
+#endif
     case 'e': diag_mixer_set("i1100"); diag_mixer_set("h1100"); diag_mixer_set("u0010"); break;
     case 'f': diag_mixer_dump(); break;
     case 'h': diag_mixer_set(p); Serial.printf("mixer_set(%s) returned\n", p); break;
