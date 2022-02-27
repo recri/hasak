@@ -33,15 +33,21 @@
 static int cwarbiter_change_over = 0;
 
 static void cwarbiter_any_st(const int note) {
+  // Serial.printf("cwarbiter_any_st(%d) active %d\n", note, nrpn_get(KYRP_ACTIVE_ST));
+
   /* case 0 - change over to new active note in progress */
   if (cwarbiter_change_over)
     return;
+  // Serial.printf("not change_over\n");
+
   /* case 1 - continuation of active note */
   if (note == nrpn_get(KYRP_ACTIVE_ST)) {
     if (note_get(note) != note_get(KYRN_KEY_ST))
       note_toggle(KYRN_KEY_ST);
     return;
   }
+  // Serial.printf("not continuation of current note\n");
+
   /* case 2 - no active note, become active note */
   if (nrpn_get(KYRP_ACTIVE_ST) == KYRN_ST_NONE) {
     nrpn_set(KYRP_ACTIVE_ST, note);
@@ -49,9 +55,13 @@ static void cwarbiter_any_st(const int note) {
       note_toggle(KYRN_KEY_ST);
     return;
   }
+  // Serial.printf("not replacing no sidetone\n");
+
   /* case 3 - lower priority than active note */
   if (note > nrpn_get(KYRP_ACTIVE_ST))
     return;
+  // Serial.printf("not lower priority\n");
+
   /* case 4 - preempt active note which is sounding */
   if (note_get(nrpn_get(KYRP_ACTIVE_ST))) {
     note_off(KYRN_KEY_ST);
@@ -59,6 +69,8 @@ static void cwarbiter_any_st(const int note) {
     cwarbiter_change_over = 1;
     return;
   }
+  // Serial.printf("not preempting\n");
+
   /* case 5 - preempt active note which is silent */
   nrpn_set(KYRP_ACTIVE_ST, note);
   if (note_get(note) != note_get(KYRN_KEY_ST))
@@ -91,9 +103,7 @@ static void cwarbiter_setup(void) {
   note_listen(KYRN_ST_TEXT2, cwarbiter_any_st);
   note_listen(KYRN_ST_TUNE, cwarbiter_any_st);
   note_listen(KYRN_PTT_ST, cwarbiter_release);
-  every_sample(cwarbiter_sample);
   nrpn_set(KYRP_ACTIVE_ST, KYRN_ST_NONE);
 }
 
-static void cwarbiter_loop(void) {
-}
+static void cwarbiter_loop(void) {}

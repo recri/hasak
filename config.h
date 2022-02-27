@@ -55,16 +55,16 @@
 #define KYR_ENABLE_POTS 1 /* {type def title {Should we start with potentiometers for volume, pitch, and speed enabled}} */
 
 /* enable hardware output - FIX.ME hdw_out should be pointer */
-#define KYR_ENABLE_HDW_OUT 1 /* {type def title {Should we enable the hardware audio out channel}} */
+//#define KYR_ENABLE_HDW_OUT 1 /* {type def title {Should we enable the hardware audio out channel}} */
 
 /* enable hardware input - FIX.ME adc_in should be pointer */
-#define KYR_ENABLE_HDW_IN 1 /* {type def title {Should we enable a hardware input input channel}} */
+//#define KYR_ENABLE_HDW_IN 1 /* {type def title {Should we enable a hardware input input channel}} */
 
 /* enable winkey emulator, but don't, it doesn't work */
 #define KYR_ENABLE_WINKEY 1  /* {type def title {Should we enable the winkey emulator}} */
 
 /* numbers of configurable modules that are implemented */
-/* don't change these unless you're prepared to modify all the code that's wired to their values */
+/* *** don't change these unless you're prepared to modify all the code that's wired to their values *** */
 #define KYR_N_PIN	8 /* {type def title {number of digital input pins that can be configured}} */
 #define KYR_N_ADC	8 /* {type def title {number of analog input pins that can be configured}} */
 #define KYR_N_POUT	8 /* {type def title {number of digital output pins that can be configured}} */
@@ -75,41 +75,79 @@
 /*
 ** decide which Teensy we're running on
 ** this works great, but it confuses nrpn.tcl
+** so all of the pin values it sees are the last values set
 */
-#if defined(TEENSYDUINO)
-  #if defined(ARDUINO_TEENSY40)
-  #define TEENSY4 1
-  #define TEENSY40 1
-  #define EEPROM_BYTES 1080
-  #elif defined(ARDUINO_TEENSY41)
-  #define TEENSY4 1
-  #define TEENSY41 1
-  #define EEPROM_BYTES 4284
-  #elif defined(ARDUINO_TEENSY30)
-  #define TEENSY3 1
-  #define TEENSY30 1
-  #define EEPROM_BYTES 2048
-  #elif defined(ARDUINO_TEENSY31)
-  #define TEENSY3 1
-  #define TEENSY31 1
-  #define EEPROM_BYTES 2048
-  #elif defined(ARDUINO_TEENSY32)
-  #define TEENSY3 1
-  #define TEENSY32 1
-  #define EEPROM_BYTES 2048
-  #elif defined(ARDUINO_TEENSY35)
-  #define TEENSY3 1
-  #define TEENSY35 1
-  #define EEPROM_BYTES 4096
-  #elif defined(ARDUINO_TEENSY36)
-  #define TEENSY3 1
-  #define TEENSY36 1
-  #define EEPROM_BYTES 4096
-  #else
-  #error "You're not building for a Teensy 4.1, 4.0, 3.6, 3.5, 3.2, 3.1 or 3.0?"
-  #endif
+#if ! defined(TEENSYDUINO)
+
+#error "You're not building for a Teensy?"
+
+#elif defined(ARDUINO_TEENSY40)
+
+#define TEENSY4 1
+#define TEENSY40 1
+#define EEPROM_BYTES 1080
+#define TEENSY_CPU_ID 40
+static int pin_valid(int pin) { return ((unsigned)(pin) <= 33); }
+static int pin_analog(int pin) { return ((pin) >= 14 && (pin) <= 27); }
+
+#elif defined(ARDUINO_TEENSY41)
+
+#define TEENSY4 1
+#define TEENSY41 1
+#define EEPROM_BYTES 4284
+#define TEENSY_CPU_ID 41
+static int pin_valid(int pin) { return ((unsigned)(pin) <= 41); }
+static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 27) || ((pin) >= 38 && (pin) <= 41)); }
+
+#elif defined(ARDUINO_TEENSY30)
+
+#define TEENSY3 1
+#define TEENSY30 1
+#define EEPROM_BYTES 2048
+#define TEENSY_CPU_ID 30
+static int pin_valid(int pin) { return ((unsigned)(pin) <= 33); }
+static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 23) || ((pin) >= 26 && (pin) <= 31)); }
+
+#elif defined(ARDUINO_TEENSY31)
+
+#define TEENSY3 1
+#define TEENSY31 1
+#define EEPROM_BYTES 2048
+#define TEENSY_CPU_ID 31
+static int pin_valid(int pin) { return ((unsigned)(pin) <= 33); }
+static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 23) || ((pin) >= 26 && (pin) <= 31)); }
+
+#elif defined(ARDUINO_TEENSY32)
+
+#define TEENSY3 1
+#define TEENSY32 1
+#define EEPROM_BYTES 2048
+#define TEENSY_CPU_ID 32
+static int pin_valid(int pin) { return ((unsigned)(pin) <= 33); }
+static int pin_analog(pin) { return (((pin) >= 14 && (pin) <= 23) || ((pin) >= 26 && (pin) <= 31)); }
+
+#elif defined(ARDUINO_TEENSY35)
+
+#define TEENSY3 1
+#define TEENSY35 1
+#define EEPROM_BYTES 4096
+#define TEENSY_CPU_ID 35
+static int pin_valid(int pin) { return ((unsigned)(pin) < 58); }
+static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 27) || ((pin) >= 31 && (pin) <= 39)); }
+
+#elif defined(ARDUINO_TEENSY36)
+
+#define TEENSY3 1
+#define TEENSY36 1
+#define EEPROM_BYTES 4096
+#define TEENSY_CPU_ID 36
+static int pin_valid(int pin) { return ((unsigned)(pin) < 58); }
+static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 27) || ((pin) >= 31 && (pin) <= 39)); }
+
 #else
-  #error "You're not building for a Teensy?"
+
+#error "You're not building for a Teensy 4.1, 4.0, 3.6, 3.5, 3.2, 3.1 or 3.0?"
+
 #endif
 
 /*
@@ -175,7 +213,8 @@
 /* Teensy LC DAC 26/A12 */
 
 #endif
-
+static int pin_i2s(int p) { return ((p)==KYR_DIN||(p)==KYR_DOUT||(p)==KYR_MCLK||(p)==KYR_BCLK||(p)==KYR_LRCLK); }
+static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 /* 
 ** pin allocations for standard input switches and output latches
 */
@@ -229,47 +268,68 @@
 #define KYRN_MIDI_OUT_KEY	0 /* {type note title {tx key out midi signal}} */
 #define KYRN_MIDI_OUT_PTT	1 /* {type note title {tx ptt out midi signal}} */
 #define KYRN_MIDI_IN_TUNE	2 /* {type note title {tune key in midi signal}} */
-#define KYRN_MIDI_OUT_ST	3 /* {type note title {sidetone  out midi signal}} */
+#define KYRN_MIDI_OUT_ST	3 /* {type note title {sidetone out midi signal}} */
 #define KYRN_MIDI_VOL		4 /* {type note title {volume leak in/out midi}} */
 #define KYRN_MIDI_ST_VOL	5 /* {type note title {sidetone volume leak in/out midi}} */
 #define KYRN_MIDI_ST_FREQ	6 /* {type note title {sidetone frequency leak in/out midi}} */
 #define KYRN_MIDI_SPEED		7 /* {type note title {keyer speed leak in/out midi}} */
 
-/* imported/exported signals from/to hardware */
-#define KYRN_HW_L_PAD		8 /* {type note title {1st left paddle switch}} */
-#define KYRN_HW_R_PAD		9 /* {type note title {1st right paddle switch}} */
-#define KYRN_HW_S_KEY		10 /* {type note title {1st straight key switch}} */
-#define KYRN_HW_EXT_PTT		11 /* {type note title {1st external ptt switch}} */
+/* Notes for KYR_N_PIN hardware input pins */
+#define KYRN_PIN0		8  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN1		9  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN2		10  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN3		11  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN4		12  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN5		13  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN6		14  /* {type nrpn title {input hardware pin note}} */
+#define KYRN_PIN7		15  /* {type nrpn title {input hardware pin note}} */
 
-#define KYRN_HW_TUNE		12 /* {type note title {tune switch}} */
-#define KYRN_HW_L_PAD2		13 /* {type note title {2nd left paddle switch}} */
-#define KYRN_HW_R_PAD2		14 /* {type note title {2nd right paddle switch}} */
-#define KYRN_HW_S_KEY2		15 /* {type note title {2nd straight key switch}} */
-#define KYRN_HW_EXT_PTT2	16 /* {type note title {2nd external ptt switch}} */
-#define KYRN_HW_L_PAD3		17 /* {type note title {3rd left paddle switch}} */
-#define KYRN_HW_R_PAD3		18 /* {type note title {3rd right paddle switch}} */
-#define KYRN_HW_S_KEY3		19 /* {type note title {34d straight key switch}} */
-#define KYRN_HW_KEY_OUT		20 /* {type note title {hardware key out}} */
-#define KYRN_HW_PTT_OUT		21 /* {type note title {hardware ptt out}} */
-#define KYRN_HW_KEY_OUT2	22 /* {type note title {2nd hardware key out}} */
-#define KYRN_HW_PTT_OUT2	23 /* {type note title {2nd hardware ptt out}} */
+/* notes for KYR_N_POUT hardware output pins */
+#define KYRN_POUT0		16  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT1		17  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT2		18  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT3		19  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT4		20  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT5		21  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT6		22  /* {type nrpn title {output hardware pin note}} */
+#define KYRN_POUT7		23  /* {type nrpn title {output hardware pin note}} */
+
+/* default imported/exported signals from/to hardware */
+#define KYRN_HW_L_PAD		KYRN_PIN0 /* {type note title {1st left paddle switch}} */
+#define KYRN_HW_R_PAD		KYRN_PIN1 /* {type note title {1st right paddle switch}} */
+#define KYRN_HW_S_KEY		KYRN_PIN2 /* {type note title {1st straight key switch}} */
+#define KYRN_HW_EXT_PTT		KYRN_PIN3 /* {type note title {1st external ptt switch}} */
+#define KYRN_HW_KEY_OUT		KYRN_POUT0 /* {type note title {hardware key out}} */
+#define KYRN_HW_PTT_OUT		KYRN_POUT1 /* {type note title {hardware ptt out}} */
+
+/* additional signals */
+#define KYRN_HW_TUNE		24 /* {type note title {tune switch}} */
+#define KYRN_HW_L_PAD2		25 /* {type note title {2nd left paddle switch}} */
+#define KYRN_HW_R_PAD2		26 /* {type note title {2nd right paddle switch}} */
+#define KYRN_HW_S_KEY2		27 /* {type note title {2nd straight key switch}} */
+#define KYRN_HW_EXT_PTT2	28 /* {type note title {2nd external ptt switch}} */
+#define KYRN_HW_L_PAD3		29 /* {type note title {3rd left paddle switch}} */
+#define KYRN_HW_R_PAD3		30 /* {type note title {3rd right paddle switch}} */
+#define KYRN_HW_S_KEY3		31 /* {type note title {34d straight key switch}} */
+#define KYRN_HW_KEY_OUT2	32 /* {type note title {2nd hardware key out}} */
+#define KYRN_HW_PTT_OUT2	33 /* {type note title {2nd hardware ptt out}} */
 
 /* imported/exported signals from/to audio graph */
-#define KYRN_AU_ST_KEY		24 /* {type note title {keying sidetone in audio graph}} */
-#define KYRN_AU_IQ_KEY		25 /* {type note title {keying transmit in audio graph}} */
-#define KYRN_AU_DECODE		26 /* {type note title {receiving tone signal from audio graph}} */
+#define KYRN_AU_ST_KEY		34 /* {type note title {keying sidetone in audio graph}} */
+#define KYRN_AU_IQ_KEY		35 /* {type note title {keying transmit in audio graph}} */
+#define KYRN_AU_DECODE		36 /* {type note title {receiving tone signal from audio graph}} */
 
 /* sidetone source signals, ordered from highest priority to lowest */
-#define KYRN_ST_S_KEY		27 /* {type note title {straight keyed sidetone}} */
-#define KYRN_ST_S_KEY2		28 /* {type note title {2nd straight keyed sidetone}} */
-#define KYRN_ST_S_KEY3		29 /* {type note title {3rd straight keyed sidetone}} */
-#define KYRN_ST_PAD		30 /* {type note title {paddle keyed sidetone}} */
-#define KYRN_ST_PAD2		31 /* {type note title {2nd paddle keyed sidetone}} */
-#define KYRN_ST_PAD3		32 /* {type note title {3rd paddle keyed sidetone}} */
-#define KYRN_ST_TUNE		33 /* {type note title {tune switch sidetone}} */
-#define KYRN_ST_TEXT		34 /* {type note title {text keyed sidetone}} */
-#define KYRN_ST_TEXT2		35 /* {type note title {2nd text keyed sidetone}} */
-#define KYRN_ST_NONE		36 /* {type note title {no keyed sidetone}} */
+#define KYRN_ST_S_KEY		37 /* {type note title {straight keyed sidetone}} */
+#define KYRN_ST_S_KEY2		38 /* {type note title {2nd straight keyed sidetone}} */
+#define KYRN_ST_S_KEY3		39 /* {type note title {3rd straight keyed sidetone}} */
+#define KYRN_ST_PAD		40 /* {type note title {paddle keyed sidetone}} */
+#define KYRN_ST_PAD2		41 /* {type note title {2nd paddle keyed sidetone}} */
+#define KYRN_ST_PAD3		42 /* {type note title {3rd paddle keyed sidetone}} */
+#define KYRN_ST_TUNE		43 /* {type note title {tune switch sidetone}} */
+#define KYRN_ST_TEXT		44 /* {type note title {text keyed sidetone}} */
+#define KYRN_ST_TEXT2		45 /* {type note title {2nd text keyed sidetone}} */
+#define KYRN_ST_NONE		46 /* {type note title {no keyed sidetone}} */
 
 /* 
 ** the real sidetone, a copy of one of the previous sidetone sources,
@@ -279,39 +339,21 @@
 ** in a final step which applies KYRP_TX_ENABLE, KYRP_ST_ENABLE, KYR_IQ_ENABLE, and other
 ** mode modifications TBD.
 */
-#define KYRN_KEY_ST		37 /* {type note title {key sidetone}} */
-#define KYRN_PTT_ST		38 /* {type note title {sidetone ptt}} */
-#define KYRN_KEY_OUT		39 /* {type note title {key transmitter}} */
-#define KYRN_PTT_OUT		40 /* {type note title {keyed transmitter ptt}} */
+#define KYRN_KEY_ST		47 /* {type note title {key sidetone}} */
+#define KYRN_PTT_ST		48 /* {type note title {sidetone ptt}} */
+#define KYRN_KEY_OUT		49 /* {type note title {key transmitter}} */
+#define KYRN_PTT_OUT		50 /* {type note title {keyed transmitter ptt}} */
 
 /* A hack which happens without even thinking about it, send characters as notes */
-#define KYRN_TXT_TEXT		41 /* {type note title {note containing 7 bit ascii text for text channel}} */
-#define KYRN_TXT_TEXT2		42 /* {type note title {note containing 7 bit ascii text for 2nd text channel}} */	
+#define KYRN_TXT_TEXT		51 /* {type note title {note containing 7 bit ascii text for text channel}} */
+#define KYRN_TXT_TEXT2		52 /* {type note title {note containing 7 bit ascii text for 2nd text channel}} */	
 
 /* A decoder channel running on the sidetone key line */
-#define KYRN_ELT_DEC		43 /* {type note title {note containing 7 bit ascii element decoded from sidetone}} */
-#define KYRN_TXT_DEC		44 /* {type note title {note containing 7 bit ascii text decoded from sidetone}} */
+#define KYRN_ELT_DEC		53 /* {type note title {note containing 7 bit ascii element decoded from sidetone}} */
+#define KYRN_TXT_DEC		54 /* {type note title {note containing 7 bit ascii text decoded from sidetone}} */
 
-/* Notes for additional input and output pins */
-#define KYRN_PIN0		45  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN1		46  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN2		47  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN3		48  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN4		49  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN5		50  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN6		51  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN7		52  /* {type nrpn title {input hardware pin note}} */
 
-#define KYRN_POUT0		53  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT1		54  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT2		55  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT3		56  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT4		57  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT5		58  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT6		59  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT7		60  /* {type nrpn title {output hardware pin note}} */
-
-#define KYR_N_NOTE		61 /* {type def title {number of note states maintained in the keyer}} */
+#define KYR_N_NOTE		55 /* {type def title {number of note states maintained in the keyer}} */
 
 /* The external values of MIDI NoteOn/NoteOff, internally 0 is off and 1 is on. */
 #define KYRV_EXT_NOTE_OFF	0 /* {type val title {external note off velocity}} */
@@ -419,26 +461,27 @@
 #define KYRP_STRING_END		(KYRP_FIRST+3) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
 #define KYRP_STRING_BYTE	(KYRP_FIRST+4) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
 
-#define KYRP_MIDI_INPUTS	(KYRP_FIRST+5) /* {type nrpn sub info title {number of midi input messages received} listen false} */
-#define KYRP_MIDI_OUTPUTS	(KYRP_FIRST+6) /* {type nrpn sub info title {number of midi output messages sent} listen false} */
-#define KYRP_MIDI_ECHOES	(KYRP_FIRST+7) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen false} */
-#define KYRP_MIDI_SENDS		(KYRP_FIRST+8) /* {type nrpn sub info title {number of midi explicit send messages} listen false} */
-#define KYRP_MIDI_NOTES		(KYRP_FIRST+9) /* {type nrpn sub info title {number of midi notes} listen false} */
-#define KYRP_MIDI_CTRLS		(KYRP_FIRST+10) /* {type nrpn sub info title {number of midi notes} listen false} */
-#define KYRP_MIDI_NRPNS		(KYRP_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen false} */
-#define KYRP_LISTENER_NODES     (KYRP_FIRST+12) /* {type nrpn sub info title {number of listener nodes allocated} listen false} */
-#define KYRP_LISTENER_LISTS	(KYRP_FIRST+13) /* {type nrpn sub info title {number of listener lists allocated} listen false} */
-#define KYRP_LISTENER_CALLS	(KYRP_FIRST+14) /* {type nrpn sub info title {number of listener nodes called} listen false} */
-#define KYRP_LISTENER_FIRES	(KYRP_FIRST+15) /* {type nrpn sub info title {number of listener lists called} listen false} */
-#define KYRP_STATS_RESET	(KYRP_FIRST+16) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
-#define KYRP_LOOP		(KYRP_FIRST+17) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
-#define KYRP_SAMPLE		(KYRP_FIRST+18) /* {type nrpn sub info title {sample counter, 48000Hz}} */
-#define KYRP_UPDATE		(KYRP_FIRST+19) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
-#define KYRP_MILLI		(KYRP_FIRST+20) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
-#define KYRP_10MILLI		(KYRP_FIRST+21) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
-#define KYRP_100MILLI		(KYRP_FIRST+22) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
+#define KYRP_MIDI_INPUTS	(KYRP_FIRST+5) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
+#define KYRP_MIDI_OUTPUTS	(KYRP_FIRST+6) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
+#define KYRP_MIDI_ECHOES	(KYRP_FIRST+7) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
+#define KYRP_MIDI_SENDS		(KYRP_FIRST+8) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
+#define KYRP_MIDI_NOTES		(KYRP_FIRST+9) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define KYRP_MIDI_CTRLS		(KYRP_FIRST+10) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define KYRP_MIDI_NRPNS		(KYRP_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define KYRP_LISTENER_NODES     (KYRP_FIRST+12) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
+#define KYRP_LISTENER_LISTS	(KYRP_FIRST+13) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
+#define KYRP_LISTENER_CALLS	(KYRP_FIRST+14) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
+#define KYRP_LISTENER_FIRES	(KYRP_FIRST+15) /* {type nrpn sub info title {number of listener lists called} listen 0} */
+#define KYRP_LISTENER_LOOPS	(KYRP_FIRST+16) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
+#define KYRP_STATS_RESET	(KYRP_FIRST+17) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
+#define KYRP_LOOP		(KYRP_FIRST+18) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
+#define KYRP_SAMPLE		(KYRP_FIRST+19) /* {type nrpn sub info title {sample counter, 48000Hz}} */
+#define KYRP_UPDATE		(KYRP_FIRST+20) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
+#define KYRP_MILLI		(KYRP_FIRST+21) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
+#define KYRP_10MILLI		(KYRP_FIRST+22) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
+#define KYRP_100MILLI		(KYRP_FIRST+23) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
 
-#define KYRP_SAVED		(KYRP_FIRST+23) /* {type rel title {base of saved NRPN parameters}} */
+#define KYRP_SAVED		(KYRP_FIRST+24) /* {type rel title {base of saved NRPN parameters}} */
 
 #define KYRP_SECOND		(KYRP_SAVED) /* {type rel title {base of persistent midi.h parameters}} */
 
@@ -450,8 +493,8 @@
 
 #define KYRP_ENABLE		(KYRP_SECOND+5) /* {type rel title {base of keyer enable nrpns}} */
 
-#define KYRP_IN_ENABLE		(KYRP_ENABLE+0) /* {type ctrl label Input title {enable input pin processing} property keyerInput} */ 
-#define KYRP_OUT_ENABLE		(KYRP_ENABLE+1) /* {type ctrl label Output title {enable output pin processing} property keyerOutput} */ 
+#define KYRP_PIN_ENABLE		(KYRP_ENABLE+0) /* {type ctrl label Input title {enable input pin processing} property keyerInput} */ 
+#define KYRP_POUT_ENABLE	(KYRP_ENABLE+1) /* {type ctrl label Output title {enable output pin processing} property keyerOutput} */ 
 #define KYRP_ADC_ENABLE		(KYRP_ENABLE+2) /* {type ctrl label Adc title {enable adc input pin processing} property keyerAdc} */ 
 #define KYRP_ST_ENABLE		(KYRP_ENABLE+3) /* {type nrpn label ST title {enable sidetone generation} range {0 1} property sidetoneEnable} */
 #define KYRP_TX_ENABLE		(KYRP_ENABLE+4) /* {type nrpn label TX title {enable TX ouputs} range {0 1} property txEnable} */
@@ -539,69 +582,53 @@
 #define KYRP_PIN		(KYRP_MISC+14) /* {type rel title {base of hardware digital input pin common  block}} */
 
 #define KYRP_PIN0_PIN	(KYRP_PIN+0)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN0_NOTE	(KYRP_PIN+1)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN1_PIN	(KYRP_PIN0_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN1_NOTE	(KYRP_PIN0_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN2_PIN	(KYRP_PIN1_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN2_NOTE	(KYRP_PIN1_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN3_PIN	(KYRP_PIN2_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN3_NOTE	(KYRP_PIN2_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN4_PIN	(KYRP_PIN3_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN4_NOTE	(KYRP_PIN3_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN5_PIN	(KYRP_PIN4_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN5_NOTE	(KYRP_PIN4_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN6_PIN	(KYRP_PIN5_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN6_NOTE	(KYRP_PIN5_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
-#define KYRP_PIN7_PIN	(KYRP_PIN6_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
-#define KYRP_PIN7_NOTE	(KYRP_PIN6_NOTE+2)  /* {type nrpn label Note title {input pin note generated} range {-1 127} property inpinNote} */
+#define KYRP_PIN1_PIN	(KYRP_PIN+1)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
+#define KYRP_PIN2_PIN	(KYRP_PIN+2)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
+#define KYRP_PIN3_PIN	(KYRP_PIN+3)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
+#define KYRP_PIN4_PIN	(KYRP_PIN+4)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
+#define KYRP_PIN5_PIN	(KYRP_PIN+5)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
+#define KYRP_PIN6_PIN	(KYRP_PIN+6)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
+#define KYRP_PIN7_PIN	(KYRP_PIN+7)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
 
-#define KYRP_POUT	(KYRP_PIN+KYR_N_PIN*2) /* {type rel title {base of hardware digital output pin block}} */
+#define KYRP_POUT	(KYRP_PIN+KYR_N_PIN) /* {type rel title {base of hardware digital output pin block}} */
 
 #define KYRP_POUT0_PIN	(KYRP_POUT+0)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT0_NOTE	(KYRP_POUT+1)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT1_PIN	(KYRP_POUT+2)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT1_NOTE	(KYRP_POUT+3)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT2_PIN	(KYRP_POUT+4)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT2_NOTE	(KYRP_POUT+5)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT3_PIN	(KYRP_POUT+6)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT3_NOTE	(KYRP_POUT+7)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT4_PIN	(KYRP_POUT+8)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT4_NOTE	(KYRP_POUT+9)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT5_PIN	(KYRP_POUT+10)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT5_NOTE	(KYRP_POUT+11)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT6_PIN	(KYRP_POUT+12)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT6_NOTE	(KYRP_POUT+13)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
-#define KYRP_POUT7_PIN	(KYRP_POUT+14)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
-#define KYRP_POUT7_NOTE	(KYRP_POUT+15)  /* {type nrpn label Note title {output pin note to be mirrored} range {-1 127} property outpinNote} */
+#define KYRP_POUT1_PIN	(KYRP_POUT+1)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
+#define KYRP_POUT2_PIN	(KYRP_POUT+2)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
+#define KYRP_POUT3_PIN	(KYRP_POUT+3)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
+#define KYRP_POUT4_PIN	(KYRP_POUT+4)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
+#define KYRP_POUT5_PIN	(KYRP_POUT+5)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
+#define KYRP_POUT6_PIN	(KYRP_POUT+6)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
+#define KYRP_POUT7_PIN	(KYRP_POUT+7)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
 
-#define KYRP_ADC		(KYRP_POUT+KYR_N_POUT*2) /* {type rel title {base of hardware analog input pin block}} */
+#define KYRP_ADC	(KYRP_POUT+KYR_N_POUT) /* {type rel title {base of hardware analog input pin block}} */
 
-#define KYRP_ADC0_PIN		(KYRP_ADC+0) /* {type nrpn label adc0Pin title {hardware pin for adc0} range {-1 127} property adc0Pin} */
-#define KYRP_ADC0_VAL		(KYRP_ADC+1) /* {type nrpn label adc0Val title {analog value for adc0} range {0 1023} property adc0Val} */
-#define KYRP_ADC0_NRPN		(KYRP_ADC+2) /* {type nrpn label adc0Nrpn title {nrpn connected to adc0} values KYRV_ADC_* property adc0Nrpn} */
-#define KYRP_ADC1_PIN		(KYRP_ADC0_PIN+3) /* {type nrpn label adc1Pin title {hardware pin for adc1} range {-1 127} property adc1Pin} */
-#define KYRP_ADC1_VAL		(KYRP_ADC0_VAL+3) /* {type nrpn label adc1Val title {analog value for adc1} range {0 1023} property adc1Val} */
-#define KYRP_ADC1_NRPN		(KYRP_ADC0_NRPN+3) /* {type nrpn label adc1Nrpn title {nrpn connected to adc1} values KYRV_ADC_* property adc1Nrpn} */
-#define KYRP_ADC2_PIN		(KYRP_ADC1_PIN+3) /* {type nrpn label adc2Pin title {hardware pin for adc2} range {-1 127} property adc2Pin} */
-#define KYRP_ADC2_VAL		(KYRP_ADC1_VAL+3) /* {type nrpn label adc2Val title {analog value for adc2} range {0 1023} property adc2Val} */
-#define KYRP_ADC2_NRPN		(KYRP_ADC1_NRPN+3) /* {type nrpn label adc2Nrpn title {nrpn connected to adc2} values KYRV_ADC_* property adc2Nrpn} */
-#define KYRP_ADC3_PIN		(KYRP_ADC2_PIN+3) /* {type nrpn label adc3Pin title {hardware pin for adc3} range {-1 127} property adc3Pin} */
-#define KYRP_ADC3_VAL		(KYRP_ADC2_VAL+3) /* {type nrpn label adc3Val title {analog value for adc3} range {0 1023} property adc3Val} */
-#define KYRP_ADC3_NRPN		(KYRP_ADC2_NRPN+3) /* {type nrpn label adc3Nrpn title {nrpn connected to adc3} values KYRV_ADC_* property adc3Nrpn} */
-#define KYRP_ADC4_PIN		(KYRP_ADC3_PIN+3) /* {type nrpn label adc4Pin title {hardware pin for adc4} range {-1 127} property adc4Pin} */
-#define KYRP_ADC4_VAL		(KYRP_ADC3_VAL+3) /* {type nrpn label adc4Val title {analog value for adc4} range {0 1023} property adc4Val} */
-#define KYRP_ADC4_NRPN		(KYRP_ADC3_NRPN+3) /* {type nrpn label adc4Nrpn title {nrpn connected to adc4} values KYRV_ADC_* property adc4Nrpn} */
-#define KYRP_ADC5_PIN		(KYRP_ADC4_PIN+3) /* {type nrpn label adc5Pin title {hardware pin for adc5} range {-1 127} property adc5Pin} */
-#define KYRP_ADC5_VAL		(KYRP_ADC4_VAL+3) /* {type nrpn label adc5Val title {analog value for adc5} range {0 1023} property adc5Val} */
-#define KYRP_ADC5_NRPN		(KYRP_ADC4_NRPN+3) /* {type nrpn label adc5Nrpn title {nrpn connected to adc5} values KYRV_ADC_* property adc5Nrpn} */
-#define KYRP_ADC6_PIN		(KYRP_ADC5_PIN+3) /* {type nrpn label adc6Pin title {hardware pin for adc6} range {-1 127} property adc6Pin} */
-#define KYRP_ADC6_VAL		(KYRP_ADC5_VAL+3) /* {type nrpn label adc6Val title {analog value for adc6} range {0 1023} property adc6Val} */
-#define KYRP_ADC6_NRPN		(KYRP_ADC5_NRPN+3) /* {type nrpn label adc6Nrpn title {nrpn connected to adc6} values KYRV_ADC_* property adc6Nrpn} */
-#define KYRP_ADC7_PIN		(KYRP_ADC6_PIN+3) /* {type nrpn label adc7Pin title {hardware pin for adc7} range {-1 127} property adc7Pin} */
-#define KYRP_ADC7_VAL		(KYRP_ADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
-#define KYRP_ADC7_NRPN		(KYRP_ADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values KYRV_ADC_* property adc7Nrpn} */
+#define KYRP_ADC0_PIN	(KYRP_ADC+0) /* {type nrpn label adc0Pin title {hardware pin for adc0} range {-1 127} property adc0Pin} */
+#define KYRP_ADC0_VAL	(KYRP_ADC+1) /* {type nrpn label adc0Val title {analog value for adc0} range {0 1023} property adc0Val} */
+#define KYRP_ADC0_NRPN	(KYRP_ADC+2) /* {type nrpn label adc0Nrpn title {nrpn connected to adc0} values KYRV_ADC_* property adc0Nrpn} */
+#define KYRP_ADC1_PIN	(KYRP_ADC0_PIN+3) /* {type nrpn label adc1Pin title {hardware pin for adc1} range {-1 127} property adc1Pin} */
+#define KYRP_ADC1_VAL	(KYRP_ADC0_VAL+3) /* {type nrpn label adc1Val title {analog value for adc1} range {0 1023} property adc1Val} */
+#define KYRP_ADC1_NRPN	(KYRP_ADC0_NRPN+3) /* {type nrpn label adc1Nrpn title {nrpn connected to adc1} values KYRV_ADC_* property adc1Nrpn} */
+#define KYRP_ADC2_PIN	(KYRP_ADC1_PIN+3) /* {type nrpn label adc2Pin title {hardware pin for adc2} range {-1 127} property adc2Pin} */
+#define KYRP_ADC2_VAL	(KYRP_ADC1_VAL+3) /* {type nrpn label adc2Val title {analog value for adc2} range {0 1023} property adc2Val} */
+#define KYRP_ADC2_NRPN	(KYRP_ADC1_NRPN+3) /* {type nrpn label adc2Nrpn title {nrpn connected to adc2} values KYRV_ADC_* property adc2Nrpn} */
+#define KYRP_ADC3_PIN	(KYRP_ADC2_PIN+3) /* {type nrpn label adc3Pin title {hardware pin for adc3} range {-1 127} property adc3Pin} */
+#define KYRP_ADC3_VAL	(KYRP_ADC2_VAL+3) /* {type nrpn label adc3Val title {analog value for adc3} range {0 1023} property adc3Val} */
+#define KYRP_ADC3_NRPN	(KYRP_ADC2_NRPN+3) /* {type nrpn label adc3Nrpn title {nrpn connected to adc3} values KYRV_ADC_* property adc3Nrpn} */
+#define KYRP_ADC4_PIN	(KYRP_ADC3_PIN+3) /* {type nrpn label adc4Pin title {hardware pin for adc4} range {-1 127} property adc4Pin} */
+#define KYRP_ADC4_VAL	(KYRP_ADC3_VAL+3) /* {type nrpn label adc4Val title {analog value for adc4} range {0 1023} property adc4Val} */
+#define KYRP_ADC4_NRPN	(KYRP_ADC3_NRPN+3) /* {type nrpn label adc4Nrpn title {nrpn connected to adc4} values KYRV_ADC_* property adc4Nrpn} */
+#define KYRP_ADC5_PIN	(KYRP_ADC4_PIN+3) /* {type nrpn label adc5Pin title {hardware pin for adc5} range {-1 127} property adc5Pin} */
+#define KYRP_ADC5_VAL	(KYRP_ADC4_VAL+3) /* {type nrpn label adc5Val title {analog value for adc5} range {0 1023} property adc5Val} */
+#define KYRP_ADC5_NRPN	(KYRP_ADC4_NRPN+3) /* {type nrpn label adc5Nrpn title {nrpn connected to adc5} values KYRV_ADC_* property adc5Nrpn} */
+#define KYRP_ADC6_PIN	(KYRP_ADC5_PIN+3) /* {type nrpn label adc6Pin title {hardware pin for adc6} range {-1 127} property adc6Pin} */
+#define KYRP_ADC6_VAL	(KYRP_ADC5_VAL+3) /* {type nrpn label adc6Val title {analog value for adc6} range {0 1023} property adc6Val} */
+#define KYRP_ADC6_NRPN	(KYRP_ADC5_NRPN+3) /* {type nrpn label adc6Nrpn title {nrpn connected to adc6} values KYRV_ADC_* property adc6Nrpn} */
+#define KYRP_ADC7_PIN	(KYRP_ADC6_PIN+3) /* {type nrpn label adc7Pin title {hardware pin for adc7} range {-1 127} property adc7Pin} */
+#define KYRP_ADC7_VAL	(KYRP_ADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
+#define KYRP_ADC7_NRPN	(KYRP_ADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values KYRV_ADC_* property adc7Nrpn} */
 
-#define KYRP_MORSE		(KYRP_ADC+KYR_N_ADC*3) /* {type rel title {morse code table base}} */
+#define KYRP_MORSE	(KYRP_ADC+KYR_N_ADC*3) /* {type rel title {morse code table base}} */
 
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through `, with many holes */

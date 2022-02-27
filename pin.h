@@ -28,120 +28,33 @@
  */
 
 static void pin_sample(void) {
-  // ah, inverted logic, pins are active low, notes are active high
-  // debounce by ignoring changes for a period of time
 
-  /* first four input pins are hard wired */
-  static elapsedSamples pin_l_pad_debounce;
-  if ((int)pin_l_pad_debounce >= 0 &&
-      digitalReadFast(KYR_L_PAD_PIN) == note_get(KYRN_HW_L_PAD)) {
-    note_toggle(KYRN_HW_L_PAD);
-    pin_l_pad_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-  }
-  static elapsedSamples pin_r_pad_debounce;
-  if ((int)pin_r_pad_debounce >= 0 &&
-      digitalReadFast(KYR_R_PAD_PIN) == note_get(KYRN_HW_R_PAD)) {
-    note_toggle(KYRN_HW_R_PAD);
-    pin_r_pad_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-  }
-  static elapsedSamples pin_s_key_debounce;
-  if ((int)pin_s_key_debounce >= 0 &&
-      digitalReadFast(KYR_S_KEY_PIN) == note_get(KYRN_HW_S_KEY)) {
-    note_toggle(KYRN_HW_S_KEY);
-    pin_s_key_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-  }
-  static elapsedSamples pin_ext_ptt_debounce;
-  if ((int)pin_ext_ptt_debounce >= 0 && 
-      digitalReadFast(KYR_EXT_PTT_PIN) == note_get(KYRN_HW_EXT_PTT)) {
-    note_toggle(KYRN_HW_EXT_PTT);
-    pin_ext_ptt_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-  }
-
-  /* eight additional pins which can be wired up */
-  if (nrpn_get(KYRP_PIN0_PIN) >= 0 && nrpn_get(KYRP_PIN0_NOTE) > 0) {
-    static elapsedSamples pin_0_debounce;
-    if ((int)pin_0_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN0_PIN)) == note_get(nrpn_get(KYRP_PIN0_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN0_NOTE));
-      pin_0_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN1_PIN) >= 0 && nrpn_get(KYRP_PIN1_NOTE) > 0) {
-    static elapsedSamples pin_1_debounce;
-    if ((int)pin_1_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN1_PIN)) == note_get(nrpn_get(KYRP_PIN1_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN1_NOTE));
-      pin_1_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN2_PIN) >= 0 && nrpn_get(KYRP_PIN2_NOTE) > 0) {
-    static elapsedSamples pin_2_debounce;
-    if ((int)pin_2_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN2_PIN)) == note_get(nrpn_get(KYRP_PIN2_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN2_NOTE));
-      pin_2_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN3_PIN) >= 0 && nrpn_get(KYRP_PIN3_NOTE) > 0) {
-    static elapsedSamples pin_3_debounce;
-    if ((int)pin_3_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN3_PIN)) == note_get(nrpn_get(KYRP_PIN3_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN3_NOTE));
-      pin_3_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN4_PIN) >= 0 && nrpn_get(KYRP_PIN4_NOTE) > 0) {
-    static elapsedSamples pin_4_debounce;
-    if ((int)pin_4_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN4_PIN)) == note_get(nrpn_get(KYRP_PIN4_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN4_NOTE));
-      pin_4_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN5_PIN) >= 0 && nrpn_get(KYRP_PIN5_NOTE) > 0) {
-    static elapsedSamples pin_5_debounce;
-    if ((int)pin_5_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN5_PIN)) == note_get(nrpn_get(KYRP_PIN5_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN5_NOTE));
-      pin_5_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN6_PIN) >= 0 && nrpn_get(KYRP_PIN6_NOTE) > 0) {
-    static elapsedSamples pin_6_debounce;
-    if ((int)pin_6_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN6_PIN)) == note_get(nrpn_get(KYRP_PIN6_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN6_NOTE));
-      pin_6_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
-    }
-  }
-  if (nrpn_get(KYRP_PIN7_PIN) >= 0 && nrpn_get(KYRP_PIN7_NOTE) > 0) {
-    static elapsedSamples pin_7_debounce;
-    if ((int)pin_7_debounce >= 0 && 
-	digitalReadFast(nrpn_get(KYRP_PIN7_PIN)) == note_get(nrpn_get(KYRP_PIN7_NOTE))) {
-      note_toggle(nrpn_get(KYRP_PIN7_NOTE));
-      pin_7_debounce = -nrpn_get(KYRP_PIN_DEBOUNCE);
+  /* KYR_N_PIN digital input pins which can be wired up */
+  /* assumes that the pin and note nrpns occur in a contiguous block */
+  /* ah, inverted logic, pins are active low, notes are active high */
+  /* debounce by ignoring changes for a period of time */
+  static elapsedSamples debounce[KYR_N_PIN];
+  for (int i = 0; i < KYR_N_PIN; i += 1) {
+    const int pin = nrpn_get(KYRP_PIN0_PIN+i);
+    const int note = KYRN_PIN0+i;
+    if (pin_valid(pin)) {
+      if ((int)debounce[i] >= 0 && digitalReadFast(pin) == note_get(note)) {
+	note_toggle(note);
+	debounce[i] = -nrpn_get(KYRP_PIN_DEBOUNCE);
+      }
     }
   }
 }
 
-static void pin_set_pin(int nrpn) {
-  if (nrpn_get(nrpn) >= 0)
-    pinMode(nrpn_get(nrpn), INPUT_PULLUP);
+static void pin_pin_listener(int nrpn) {
+  const int pin = nrpn_get(nrpn);
+  if (pin_valid(pin))
+    pinMode(pin, INPUT_PULLUP);
 }
 
 static void pin_setup(void) {
-  pinMode(KYR_L_PAD_PIN, INPUT_PULLUP);
-  pinMode(KYR_R_PAD_PIN, INPUT_PULLUP);
-  pinMode(KYR_S_KEY_PIN, INPUT_PULLUP);
-  pinMode(KYR_EXT_PTT_PIN, INPUT_PULLUP);
-  nrpn_listen(KYRP_PIN0_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN1_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN2_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN3_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN4_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN5_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN6_PIN, pin_set_pin);
-  nrpn_listen(KYRP_PIN7_PIN, pin_set_pin);
+  for (int i = 0; i < KYR_N_PIN; i += 1)
+    nrpn_listen(KYRP_PIN0_PIN+i, pin_pin_listener);
 }
 
 static void pin_loop(void) {

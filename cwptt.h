@@ -52,7 +52,7 @@ static void cwptt_key_out_listener(int note) {
   cwptt_tail_counter = 0;	     /* reset the element timer */
 }
 
-static void cwptt_every_sample(void) {
+static void cwptt_sample(void) {
   if (cwptt_tail_time_is_stale) {
     cwptt_tail_time_is_stale = 0;
     cwptt_tail_time = max(nrpn_get(KYRP_TAIL_TIME), nrpn_get(KYRP_HANG_TIME)*xnrpn_get(KYRP_XPER_DIT));
@@ -76,8 +76,7 @@ static void cwptt_setup(void) {
   nrpn_listen(KYRP_XPER_DIT+1, cwptt_nrpn_listener); // and reflag when necessary
   note_listen(KYRN_KEY_ST, cwptt_sidetone_listener);
   note_listen(KYRN_KEY_OUT, cwptt_key_out_listener);
-  every_sample(cwptt_every_sample);
+  // every_sample(cwptt_every_sample);
 }
 
-static void cwptt_loop(void) {
-}
+static void cwptt_loop(void) {}

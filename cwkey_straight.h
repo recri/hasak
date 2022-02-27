@@ -30,44 +30,25 @@ static void cwkey_straight_s_key_listen(int note) {
   if (note_get(KYRN_HW_S_KEY) != note_get(KYRN_ST_S_KEY)) note_toggle(KYRN_ST_S_KEY);
 }
 
-#if defined(KYR_ENABLE_SKEY2)
 static void cwkey_straight_s_key2_listen(int note) {
   if (note_get(KYRN_HW_S_KEY2) != note_get(KYRN_ST_S_KEY2)) note_toggle(KYRN_ST_S_KEY2);
 }
-#endif
 
-#if defined(KYR_ENABLE_SKEY3)
 static void cwkey_straight_s_key3_listen(int note) {
   if (note_get(KYRN_HW_S_KEY3) != note_get(KYRN_ST_S_KEY3)) note_toggle(KYRN_ST_S_KEY3);
 }
-#endif
 
 static void cwkey_straight_tune_listen(int note) {
   if (note_get(KYRN_MIDI_IN_TUNE) != note_get(KYRN_ST_TUNE)) note_toggle(KYRN_ST_TUNE);
 }  
 
-#if defined(KYR_ENABLE_BUT)
-static void cwkey_straight_but_listen(int note) {
-  if (note_get(KYRN_HW_BUT) != note_get(KYRN_ST_BUT)) note_toggle(KYRN_ST_BUT);
-}
-#endif
+static void cwkey_straight_sample(void) {}
 
 static void cwkey_straight_setup(void) {
   note_listen(KYRN_HW_S_KEY, cwkey_straight_s_key_listen);
   note_listen(KYRN_MIDI_IN_TUNE, cwkey_straight_tune_listen);
-
-#if defined(KYR_ENABLE_SKEY2)
   note_listen(KYRN_HW_S_KEY2, cwkey_straight_s_key2_listen);
-#endif
-
-#if defined(KYR_ENABLE_SKEY3)
   note_listen(KYRN_HW_S_KEY3, cwkey_straight_s_key3_listen);
-#endif
-
-#if defined(KYR_ENABLE_BUT)
-  note_listen(KYRN_HW_BUT, cwkey_straight_but_listen);
-#endif
 }
 
-static void cwkey_straight_loop(void) {
-}
+static void cwkey_straight_loop(void) {}

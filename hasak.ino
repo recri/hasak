@@ -24,15 +24,20 @@
  */
 
 #include <Arduino.h>
-static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_PINS; }
+
+//static int pin_valid(int pin) { return PIN_VALID(pin); }
+//static int pin_analog(int pin) { return PIN_ANALOG(pin); }
+//static int pin_i2s(int pin) { return PIN_I2S(pin); }
+//static int pin_i2c(int pin) { return PIN_I2C(pin); }
+//static int pin_nothing(void) { return 127; }
+
 #include "config.h"		// configuration
 #include "cwmorse.h"		// morse code table
 #include "linkage.h"		// forward references, linkage, and conversions
+#include "listener.h"		// linked lists of functions, after_idle listener
 #include "audio.h"		// audio graph
 #undef READ_ONLY		// trash from the audio library includes
 #include "timing.h"		// timing counters
-#include "every_any.h"		// every_any period implementation
-#include "after_idle.h"		// after_idle implementation
 #include "midi.h"		// midi interface
 #include "define.h"		// define MIDI note, ctrl, and nrpn flags FIX.ME rename midi_defs.h
 #include "codec.h"		// handle the audio hardware
@@ -50,8 +55,6 @@ static int pin_valid(int pin) { return (unsigned)pin < (unsigned)CORE_NUM_TOTAL_
 #include "adcmap.h"		// input adc nrpns -> keyer parameter nrpns
 #include "pin.h"		// input pin states -> input pin notes rename
 #include "pout.h"		// output pin notes -> output pins
-
-// #include "instring.h"	// input strings from MIDI
 // #include "outstring.h"	// output strings to MIDI
 // #include "cwinkey.h"		// FIX.ME - make it work
 #include "diagnostics.h"
@@ -78,49 +81,68 @@ static void interrupt() {
 
 void setup(void) {
   Serial.begin(115200);
-
-  /* FIX.ME - these go in outpin.h */
-  pinMode(KYR_KEY_OUT_PIN, OUTPUT); digitalWrite(KYR_KEY_OUT_PIN, 1);
-  pinMode(KYR_PTT_OUT_PIN, OUTPUT); digitalWrite(KYR_PTT_OUT_PIN, 1);
-
-  /* FIX.ME - these go in audio.h - audio_setup() */
-  AudioMemory(40);
-
+  while ( ! Serial);
   // nrpn_set_default(KYRP_SET_DEFAULT);
-  nrpn_set(KYRP_VOLUME, -200);
+  // nrpn_set(KYRP_VOLUME, -200);
 
+  Serial.printf("before listener_setup()\n");
+  listener_setup();
+  Serial.printf("before midi_setup()\n");
   midi_setup();
+  Serial.printf("before define_setup()\n");
   define_setup();
+  Serial.printf("before codec_setup()\n");
   codec_setup();
+  Serial.printf("before codec_enable()\n");
   codec_enable();
+  Serial.printf("before nrpn_setup()\n");
   nrpn_setup();
-
-  /*
-  ** set an interval timer to latch inputs into the audio update loop.
-  */
-  static IntervalTimer timer;
-  timer.priority(96);
-  timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
-
+  Serial.printf("before timing_setup()\n");
   timing_setup();		// start your timers
-  every_any_setup();
-  after_idle_setup();
-
+  Serial.printf("before adc_setup()\n");
   adc_setup();
+  Serial.printf("before adcmap_setup()\n");
   adcmap_setup();
+  Serial.printf("before pin_setup()\n");
   pin_setup();
+  Serial.printf("before pout_setup()\n");
   pout_setup();
+  Serial.printf("before cwkey_straight_setup()\n");
   cwkey_straight_setup();
+  Serial.printf("before cwkey_paddle_setup()\n");
   cwkey_paddle_setup();
+  Serial.printf("before cwkey_text_setup()\n");
   cwkey_text_setup();
+  Serial.printf("before cwarbiter_setup()\n");
   cwarbiter_setup();
+  Serial.printf("before cwstptt_setup()\n");
   cwstptt_setup();
+  Serial.printf("before cwptt_setup()\n");
   cwptt_setup();
+  Serial.printf("before cwroute_setup()\n");
   cwroute_setup();
+  Serial.printf("before cwdetime_setup()\n");
   cwdetime_setup();
+  Serial.printf("before cwdecode_setup()\n");
   cwdecode_setup();
   // cwinkey_setup();
+  Serial.printf("before diagnostics_setup()\n");
   diagnostics_setup();
+
+  //
+  // now start
+  //
+
+  Serial.printf("before nrpn_set_default()\n");
+  nrpn_set_default();
+  /* FIX.ME - these go in audio.h - audio_setup() */
+  Serial.printf("before AudioMemory(40)\n");
+  AudioMemory(40);
+  /*  interval timer to latch inputs into the audio update loop. */
+  static IntervalTimer timer;
+  timer.priority(96);
+  Serial.printf("before timer.begin\n");
+  timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 }
 
 /*
@@ -130,25 +152,37 @@ void setup(void) {
 void loop(void) {
   timing_loop();		// accumulate counts
   midi_loop();			// drain midi input
-  codec_loop();
-  define_loop();
-  nrpn_loop();
-  pout_loop();
+  // codec_loop();
+  // define_loop();
+  // nrpn_loop();
+  // pout_loop();
   pin_loop();
   adc_loop();
-  adcmap_loop();
-  cwkey_straight_loop();
-  cwkey_paddle_loop();
-  cwkey_text_loop();
-  cwarbiter_loop();		// arbitration of keyer events
-  cwstptt_loop();			// probably
-  cwptt_loop();			// key generated ptt
-  cwroute_loop();
-  cwdetime_loop();
-  cwdecode_loop();
+  // adcmap_loop();
+  // cwkey_straight_loop();
+  // cwkey_paddle_loop();
+  // cwkey_text_loop();
+  // cwarbiter_loop();		// arbitration of keyer events
+  // cwstptt_loop();			// probably
+  // cwptt_loop();			// key generated ptt
+  // cwroute_loop();
+  // cwdetime_loop();
+  // cwdecode_loop();
   // cwwinkey_loop();		// winkey
-  every_any_loop();		// run every sample
-  after_idle_loop();		// run once at end of loop()
+  static elapsedSamples counter;
+  if ((int)counter >= 0) {
+    counter = -1;
+    // cwkey_straight_sample();
+    cwkey_paddle_sample();
+    cwkey_text_sample();
+    cwarbiter_sample();
+    cwstptt_sample();
+    cwptt_sample();
+    // cwroute_sample();
+    // cwdetime_sample();
+    // cwdecode_sample();
+  }
+  listener_loop();
   diagnostics_loop();		// console
 }
 

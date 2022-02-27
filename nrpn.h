@@ -59,7 +59,7 @@ static hasak_t hasak = {
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
-static void nrpn_update_keyer_timing(void) {
+static void nrpn_update_keyer_timing(int numb) {
   const int wordDits = 50;
   const int sampleRate = AUDIO_SAMPLE_RATE;
   const float wpm = nrpn_get(KYRP_SPEED)+nrpn_get(KYRP_SPEED_FRAC)*7.8125e-3f;
@@ -176,7 +176,7 @@ static void nrpn_write_eeprom(int nrpn) {
       Serial.printf("nrpn_write_eeprom hasak.msgs[%d] == %d != %d\n", i, value, hasak.msgs[i]);
     }
   }
-  nrpn_echo(nrpn, error ? 0 : 1);
+  nrpn_send(nrpn, error ? 0 : 1);
 #endif
 }
 
@@ -189,7 +189,7 @@ static void nrpn_read_eeprom(int nrpn) {
 	data.header2[i] != data.header3[i] || 
 	data.header3[i] != hasak.header[i]) {
       /* signal failure */
-      nrpn_echo(nrpn, 0);
+      nrpn_send(nrpn, 0);
       return;
     }
   /* apply nrpns */
@@ -199,7 +199,7 @@ static void nrpn_read_eeprom(int nrpn) {
   for (int i = 0; i < sizeof(data.msgs); i += 1)
     hasak.msgs[i] = data.msgs[i];
   /* signal success */
-  nrpn_echo(nrpn, 1);
+  nrpn_send(nrpn, 1);
 #endif
 }
 
@@ -208,21 +208,21 @@ static void nrpn_read_eeprom(int nrpn) {
 */
 static int nrpn_echo_index;
 
-static void nrpn_echo_all_step(void) {
+static void nrpn_echo_all_step(int number) {
   if (nrpn_echo_index < KYRP_LAST) {
     if (nrpn_get(nrpn_echo_index) != KYRV_NOT_SET)
-      nrpn_echo(nrpn_echo_index, nrpn_get(nrpn_echo_index));
+      nrpn_send(nrpn_echo_index, nrpn_get(nrpn_echo_index));
     nrpn_echo_index += 1;
     after_idle(nrpn_echo_all_step);
   } else {
-    nrpn_echo(KYRP_ECHO_ALL, 0);
+    nrpn_send(KYRP_ECHO_ALL, 0);
     nrpn_echo_index = -1;
   }
 }
 
 static void nrpn_echo_all(int nrpn) {
   nrpn_echo_index = 0;
-  nrpn_echo_all_step();
+  nrpn_echo_all_step(-1);
 }
 
 /*
@@ -239,7 +239,7 @@ static void nrpn_send_text(int nrpn) {
   } else {
     Serial.printf("unexpected nrpn %d in nrpn_send_text\n", nrpn);
   }
-  nrpn_echo(nrpn, value&127);
+  nrpn_send(nrpn, value&127);
 }
 
 /*
@@ -249,13 +249,13 @@ static void nrpn_msg_handler(int nrpn) {
   const int value = nrpn_get(nrpn);
   if (nrpn == KYRP_MSG_INDEX) { 
     hasak.index = value%sizeof(hasak.msgs);
-    nrpn_echo(nrpn, hasak.index);
+    nrpn_send(nrpn, hasak.index);
   } else if (nrpn == KYRP_MSG_WRITE) {
-    nrpn_echo(nrpn, value&127);
+    nrpn_send(nrpn, value&127);
     hasak.msgs[hasak.index++] = value&127;
     hasak.index %= sizeof(hasak.msgs);
   } else if (nrpn == KYRP_MSG_READ) { 
-    nrpn_echo(nrpn, hasak.msgs[hasak.index++]);
+    nrpn_send(nrpn, hasak.msgs[hasak.index++]);
     hasak.index %= sizeof(hasak.msgs);
   } else {
     Serial.printf("unexpected nrpn %d in nrpn_msg_handler\n", nrpn);
@@ -305,7 +305,7 @@ static int nrpn_id_cpu(void) {
 static void nrpn_query(int nrpn) {
   const int value = nrpn_get(nrpn);
   if (nrpn_is_valid(value) && nrpn_get(value) != KYRV_NOT_SET)
-    nrpn_echo(nrpn, nrpn_get(value));
+    nrpn_send(nrpn, nrpn_get(value));
 }
        
 static void nrpn_unset(int nrpn) {
@@ -324,10 +324,10 @@ static void nrpn_string_handler(int nrpn) {
 ** this where we initialize the keyer nrpns
 */
 
-static void nrpn_set_default(int nrpn) {
+static void nrpn_set_default(void) {
 
   nrpn_set(KYRP_CHANNEL, KYR_CHANNEL);
-  nrpn_set(KYRP_ST_ENABLE, 1);
+  nrpn_set(KYRP_ST_ENABLE, KYR_ENABLE_ST);
   nrpn_set(KYRP_TX_ENABLE, KYR_ENABLE_TX);
   nrpn_set(KYRP_IQ_ENABLE, 0);
   nrpn_set(KYRP_PTT_REQUIRE, 0);
@@ -389,39 +389,23 @@ static void nrpn_set_default(int nrpn) {
   xnrpn_set(KYRP_XIQ_FREQ, 600);
   nrpn_set(KYRP_IQ_USB, 1);
 
-  nrpn_set(KYRP_PIN0_PIN, -1);
-  nrpn_set(KYRP_PIN0_NOTE, -1);
-  nrpn_set(KYRP_PIN1_PIN, -1);
-  nrpn_set(KYRP_PIN1_NOTE, -1);
-  nrpn_set(KYRP_PIN2_PIN, -1);
-  nrpn_set(KYRP_PIN2_NOTE, -1);
-  nrpn_set(KYRP_PIN3_PIN, -1);
-  nrpn_set(KYRP_PIN3_NOTE, -1);
+  nrpn_set(KYRP_PIN0_PIN, KYR_L_PAD_PIN);  // left paddle pin
+  nrpn_set(KYRP_PIN1_PIN, KYR_R_PAD_PIN);  // right paddle pin
+  nrpn_set(KYRP_PIN2_PIN, KYR_S_KEY_PIN);  // straight key pin
+  nrpn_set(KYRP_PIN3_PIN, KYR_EXT_PTT_PIN);  // external ptt switch pin
   nrpn_set(KYRP_PIN4_PIN, -1);
-  nrpn_set(KYRP_PIN4_NOTE, -1);
   nrpn_set(KYRP_PIN5_PIN, -1);
-  nrpn_set(KYRP_PIN5_NOTE, -1);
   nrpn_set(KYRP_PIN6_PIN, -1);
-  nrpn_set(KYRP_PIN6_NOTE, -1);
   nrpn_set(KYRP_PIN7_PIN, -1);
-  nrpn_set(KYRP_PIN7_NOTE, -1);
 
-  nrpn_set(KYRP_POUT0_PIN, -1);
-  nrpn_set(KYRP_POUT0_NOTE, -1);
-  nrpn_set(KYRP_POUT1_PIN, -1);
-  nrpn_set(KYRP_POUT1_NOTE, -1);
+  nrpn_set(KYRP_POUT0_PIN, KYR_KEY_OUT_PIN); // key out, maybe ptt out
+  nrpn_set(KYRP_POUT1_PIN, KYR_PTT_OUT_PIN); // ptt out, maybe key out
   nrpn_set(KYRP_POUT2_PIN, -1);
-  nrpn_set(KYRP_POUT2_NOTE, -1);
   nrpn_set(KYRP_POUT3_PIN, -1);
-  nrpn_set(KYRP_POUT3_NOTE, -1);
   nrpn_set(KYRP_POUT4_PIN, -1);
-  nrpn_set(KYRP_POUT4_NOTE, -1);
   nrpn_set(KYRP_POUT5_PIN, -1);
-  nrpn_set(KYRP_POUT5_NOTE, -1);
   nrpn_set(KYRP_POUT6_PIN, -1);
-  nrpn_set(KYRP_POUT6_NOTE, -1);
   nrpn_set(KYRP_POUT7_PIN, -1);
-  nrpn_set(KYRP_POUT7_NOTE, -1);
 
   nrpn_set(KYRP_ADC0_PIN, KYR_VOLUME_POT);
   nrpn_set(KYRP_ADC0_NRPN, KYRV_ADC_VOLUME);
@@ -457,6 +441,10 @@ static void nrpn_set_default(int nrpn) {
 
 }
 
+static void nrpn_set_default_shim(int nrpn) {
+  nrpn_set_default();
+}
+
 static void nrpn_setup(void) {
   /* bootstrap controller */
   nrpn_listen(KYRP_ID_JSON, nrpn_id_json);
@@ -480,7 +468,7 @@ static void nrpn_setup(void) {
   /* commands */
   nrpn_listen(KYRP_WRITE_EEPROM, nrpn_write_eeprom);
   nrpn_listen(KYRP_READ_EEPROM, nrpn_read_eeprom);
-  nrpn_listen(KYRP_SET_DEFAULT, nrpn_set_default);
+  nrpn_listen(KYRP_SET_DEFAULT, nrpn_set_default_shim);
   nrpn_listen(KYRP_ECHO_ALL, nrpn_echo_all);
   nrpn_listen(KYRP_SEND_TEXT, nrpn_send_text);
   nrpn_listen(KYRP_SEND_TEXT2, nrpn_send_text);
@@ -495,11 +483,6 @@ static void nrpn_setup(void) {
   nrpn_set(KYRP_EEPROM_LENGTH, nrpn_eeprom_length());;
   nrpn_set(KYRP_ID_CPU, nrpn_id_cpu());
   nrpn_set(KYRP_ID_CODEC, codec_identify());
-
-  /* set the default settings */
-  nrpn_set_default(KYRP_SET_DEFAULT);
-
-  /* possibly, probe the EEPROM for saved settings and restore them */
 }
 
 static void nrpn_loop(void) {}

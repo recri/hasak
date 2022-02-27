@@ -119,5 +119,4 @@ typedef elapsed<timing_samples> elapsedSamples; // sample times
 typedef elapsed<timing_loops> elapsedLoops; // executions of arduino loop()
 typedef elapsed<timing_updates> elapsedUpdates; // audio library buffer cycles
 
-
 #endif

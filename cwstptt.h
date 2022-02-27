@@ -36,7 +36,7 @@ static void cwstptt_sidetone_listener(int note) {
   cwstptt_tail_counter = 0;	/* reset the element timer */
 }
 
-static void cwstptt_every_sample(void) {
+static void cwstptt_sample(void) {
   const unsigned tail = xnrpn_get(KYRP_XPER_IWS); /* 7 dit word space tail */
   if (note_get(KYRN_PTT_ST) &&		      /* ptt st is on */
       note_get(KYRN_KEY_ST) == 0 &&	      /* key st is off */
@@ -46,8 +46,7 @@ static void cwstptt_every_sample(void) {
 
 static void cwstptt_setup(void) {
   note_listen(KYRN_KEY_ST, cwstptt_sidetone_listener);
-  every_sample(cwstptt_every_sample);
+  // every_sample(cwstptt_every_sample);
 }
 
-static void cwstptt_loop(void) {
-}
+static void cwstptt_loop(void) {}

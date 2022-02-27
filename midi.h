@@ -25,17 +25,12 @@
 
 #include "src/midi.h"
 
-static Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN> midi(usbMIDI, 1);
+static Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN> midi(usbMIDI);
 
 // not until I'm sure it's needed
 // #ifdef __cplusplus
 // extern "C" {
 // #endif
-
-#define midi_listener_t Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN>::listener_t
-#define note_listen(n, f) {static midi_listener_t t(f); midi.note_listen(n,&t);}
-#define ctrl_listen(c, f) {static midi_listener_t t(f); midi.ctrl_listen(c,&t);}
-#define nrpn_listen(p, f) {static midi_listener_t t(f); midi.nrpn_listen(p,&t);}
 
 static int midi_flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
   return midi.flags_encode(input_enable, output_enable, echo_enable, read_only);
@@ -51,6 +46,11 @@ static int note_invalid(const int note, const char *who) {
 
 static int note_is_valid(int note) { return midi.note_is_valid(note); }
   
+static void note_listen(int note, void (*f)(int)) { 
+  if (note_is_valid(note)) midi.note_listen(note, f);
+  else note_invalid(note, "note_listen");
+}
+
 static int note_get(int note) { 
   return note_is_valid(note) ? midi.note_get(note) : note_invalid(note, "note_get");
 }
@@ -63,11 +63,11 @@ static void note_set(int note, int value) {
     note_invalid(note, "note_set");
 }
 
-static void note_echo(int note, int value) {
+static void note_send(int note, int value) {
   if (note_is_valid(note))
-    midi.note_echo(note, value);
+    midi.note_send(note, value);
   else
-    note_invalid(note, "note_echo");
+    note_invalid(note, "note_send");
 }
 
 /* define a note */
@@ -97,6 +97,11 @@ static int ctrl_invalid(const int ctrl, const char *who) {
 
 static int ctrl_is_valid(int ctrl) { return midi.ctrl_is_valid(ctrl); }
   
+static void ctrl_listen(int ctrl, void (*f)(int)) {
+  if (ctrl_is_valid(ctrl)) midi.ctrl_listen(ctrl, f);
+  else ctrl_invalid(ctrl, "ctrl_listen");
+}
+
 static int ctrl_get(int ctrl) { 
   return ctrl_is_valid(ctrl) ? midi.ctrl_get(ctrl) : ctrl_invalid(ctrl, "ctrl_get");
 }
@@ -108,11 +113,11 @@ static void ctrl_set(int ctrl, int value) {
     ctrl_invalid(ctrl, "ctrl_set");
 }
 
-static void ctrl_echo(int ctrl, int value) { 
+static void ctrl_send(int ctrl, int value) { 
   if (ctrl_is_valid(ctrl))
-    midi.ctrl_echo(ctrl, value);
+    midi.ctrl_send(ctrl, value);
   else
-    ctrl_invalid(ctrl, "ctrl_echo");
+    ctrl_invalid(ctrl, "ctrl_send");
 }
 
 /* define a ctrl */
@@ -148,6 +153,11 @@ static int nrpn_is_valid(const int nrpn) {
   return midi.nrpn_is_valid(nrpn);
 }
 
+static void nrpn_listen(int nrpn, void (*f)(int)) { 
+  if (nrpn_is_valid(nrpn)) midi.nrpn_listen(nrpn, f);
+  else nrpn_invalid(nrpn, "nrpn_listen");
+}
+
 /* fetch a nrpn */
 static int nrpn_get(const int nrpn) { 
   return nrpn_is_valid(nrpn) ? midi.nrpn_get(nrpn) : nrpn_invalid(nrpn, "nrpn_get");
@@ -166,11 +176,20 @@ static inline void nrpn_set(const int nrpn, const int value) {
     nrpn_invalid(nrpn, "nrpn_set");
 }
 
-static inline void nrpn_echo(const int nrpn, const int value) {
+/* increment a nrpn */
+static inline void nrpn_incr(const int nrpn) {
   if (nrpn_is_valid(nrpn))
-    midi.nrpn_echo(nrpn, value);
+    midi.nrpn_incr(nrpn);
   else
-    nrpn_invalid(nrpn, "nrpn_echo");
+    nrpn_invalid(nrpn, "nrpn_incr");
+}
+
+/* send a nrpn */
+static inline void nrpn_send(const int nrpn, const int value) {
+  if (nrpn_is_valid(nrpn))
+    midi.nrpn_send(nrpn, value);
+  else
+    nrpn_invalid(nrpn, "nrpn_send");
 }
 
 /* set an xnrpn */
@@ -182,12 +201,13 @@ static inline void xnrpn_set(const int nrpn, const int value) {
     xnrpn_invalid(nrpn, "xnrpn_set");
 }
 
-static inline void xnrpn_echo(const int nrpn, const int value) {
+/* send an xnrpn */
+static inline void xnrpn_send(const int nrpn, const int value) {
   if (nrpn_is_valid(nrpn+1)) {
-    midi.nrpn_echo(nrpn, (value>>14)&0x3fff);
-    midi.nrpn_echo(nrpn+1, value&0x3fff);
+    midi.nrpn_send(nrpn, (value>>14)&0x3fff);
+    midi.nrpn_send(nrpn+1, value&0x3fff);
   } else
-    xnrpn_invalid(nrpn, "xnrpn_echo");
+    xnrpn_invalid(nrpn, "xnrpn_send");
 }
 
 /* define a nrpn */
@@ -212,7 +232,26 @@ int get_xnrpn(int xnrpn) { return xnrpn_get(xnrpn); }
 ** setup and loop.
 */
 
-static void midi_setup(void) { midi.setup(); }
+static void midi_setup(void) { 
+  midi.setup();
+  nrpn_set(KYRP_CHANNEL, KYR_CHANNEL);
+  nrpn_set(KYRP_INPUT_ENABLE, 1);
+  nrpn_set(KYRP_OUTPUT_ENABLE, 1);
+  nrpn_set(KYRP_ECHO_ENABLE, 1);
+  nrpn_set(KYRP_LISTENER_ENABLE, 1);
+  nrpn_set(KYRP_MIDI_INPUTS, 0);
+  nrpn_set(KYRP_MIDI_OUTPUTS, 0);
+  nrpn_set(KYRP_MIDI_ECHOES, 0);
+  nrpn_set(KYRP_MIDI_SENDS, 0);
+  nrpn_set(KYRP_MIDI_NOTES, 0);
+  nrpn_set(KYRP_MIDI_CTRLS, 0);
+  nrpn_set(KYRP_MIDI_NRPNS, 0);
+  //nrpn_set(KYRP_LISTENER_LISTS, 0);
+  //nrpn_set(KYRP_LISTENER_NODES, 0);
+  //nrpn_set(KYRP_LISTENER_CALLS, 0);
+  //nrpn_set(KYRP_LISTENER_FIRES, 0);
+  //nrpn_set(KYRP_LISTENER_LOOPS, 0);
+}
 
 static void midi_loop(void) { midi.loop(); }
     

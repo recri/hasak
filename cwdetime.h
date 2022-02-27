@@ -146,11 +146,12 @@ static void cwdetime_listen(int note) {
   }
 }
 
+static void cwdetime_sample(void) {}
+
 static void cwdetime_setup(void) {
   cwdetime_data.wpm = 15;
   cwdetime_data.estimate = cwdetime_wpm_to_dit(cwdetime_data.wpm);
   note_listen(KYRN_KEY_ST, cwdetime_listen);
 }
 
-static void cwdetime_loop(void) {
-}
+static void cwdetime_loop(void) {}

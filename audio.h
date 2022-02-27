@@ -19,7 +19,7 @@
 // inputs
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
-#if KYR_ENABLE_HDW_IN > 0
+#if defined(KYR_ENABLE_HDW_IN)
 AudioInputAnalog	hdw_in;	// headset switch detect
 #endif
 
@@ -98,7 +98,7 @@ AudioOutputI2S          i2s_out;
 AudioConnection		patchCord11c(l_i2s_out, 0, i2s_out, 0);
 AudioConnection		patchCord11d(r_i2s_out, 0, i2s_out, 1);
 
-#if KYR_ENABLE_HDW_OUT > 1
+#if defined(KYR_ENABLE_HDW_OUT)
 #if defined(TEENSY31) || defined(TEENSY32)
 AudioOutputAnalog	hdw_out;
 AudioConnection		patchCord11e(l_hdw_out, 0, hdw_out, 0);

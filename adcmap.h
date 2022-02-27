@@ -94,4 +94,4 @@ static void adcmap_setup(void) {
   nrpn_listen(KYRP_ADC7_VAL, adcmap_value);
 }
 
-static void adcmap_loop(void) {}
+// static void adcmap_loop(void) {}

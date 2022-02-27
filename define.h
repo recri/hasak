@@ -43,10 +43,26 @@ static void define_define(void) {
     case KYRN_MIDI_ST_VOL:	note_define(note, 0, 1, 1, 1, 0); break;
     case KYRN_MIDI_ST_FREQ:	note_define(note, 0, 1, 1, 1, 0); break;
     case KYRN_MIDI_SPEED:	note_define(note, 0, 1, 1, 1, 0); break;
-    case KYRN_HW_L_PAD:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_R_PAD:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_EXT_PTT:	note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN0:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN1:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN2:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN3:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN4:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN5:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN6:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_PIN7:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT0:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT1:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT2:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT3:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT4:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT5:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT6:		note_define(note, 0, 0, 0, 0, 0); break;
+    case KYRN_POUT7:		note_define(note, 0, 0, 0, 0, 0); break;
+      //case KYRN_HW_L_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // alias KYRN_PIN?
+      //case KYRN_HW_R_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
+      //case KYRN_HW_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
+      //case KYRN_HW_EXT_PTT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
     case KYRN_HW_TUNE:		note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_HW_L_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_HW_R_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
@@ -55,8 +71,8 @@ static void define_define(void) {
     case KYRN_HW_L_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_HW_R_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_HW_S_KEY3:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_KEY_OUT:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_PTT_OUT:	note_define(note, 0, 0, 0, 0, 0); break;
+      //case KYRN_HW_KEY_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // alias KYRN_POUT?
+      //case KYRN_HW_PTT_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
     case KYRN_HW_KEY_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_HW_PTT_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_AU_ST_KEY:	note_define(note, 0, 0, 0, 0, 0); break;
@@ -80,22 +96,6 @@ static void define_define(void) {
     case KYRN_TXT_TEXT2:	note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_ELT_DEC:		note_define(note, 0, 0, 0, 0, 0); break;
     case KYRN_TXT_DEC:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN0:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN1:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN2:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN3:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN4:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN5:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN6:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN7:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT0:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT1:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT2:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT3:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT4:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT5:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT6:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT7:		note_define(note, 0, 0, 0, 0, 0); break;
     default: Serial.printf("default_setup: overlooked note %d\n", note); break;
   }
   for (int ctrl = 0; ctrl < KYR_N_CTRL; ctrl += 1)
@@ -173,8 +173,8 @@ static void define_define(void) {
     case KYRP_OUTPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_ECHO_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_LISTENER_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_IN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_OUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case KYRP_PIN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case KYRP_POUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_ADC_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_ST_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_TX_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
@@ -220,7 +220,7 @@ static void define_define(void) {
     case KYRP_AUTO_IWS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PAD_KEYER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
 
-    case KYRP_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // readonly
+    case KYRP_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // readonly
     case KYRP_MIXER_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_MIXER_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_FREQ_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
@@ -236,38 +236,22 @@ static void define_define(void) {
     case KYRP_IQ_USB:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
 
     case KYRP_PIN0_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN0_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN1_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN1_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN2_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN2_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN3_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN3_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN4_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN4_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN5_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN5_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN6_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN6_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_PIN7_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_PIN7_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
 
     case KYRP_POUT0_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT0_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT1_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT1_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT2_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT2_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT3_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT3_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT4_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT4_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT5_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT5_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT6_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT6_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_POUT7_PIN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_POUT7_NOTE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
 
     case KYRP_ADC0_PIN:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case KYRP_ADC0_VAL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;

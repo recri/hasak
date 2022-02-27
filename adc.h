@@ -43,27 +43,24 @@ static void adc_update(int i, int pin, int nrpn) {
   nrpn_set(nrpn, raw_value);			/* save the new value */
 }
 
-static void adc_milli(void) {
+static void adc_milli(int nrpn) {
   static uint16_t count = 0;
   if ( ! nrpn_get(KYRP_ADC_ENABLE)) return;
   count += 1;
   if ((count % nrpn_get(KYRP_ADC_RATE)) != 0) return; /* FIX.ME - is this what ADC_RATE means? */
-  switch ((count/nrpn_get(KYRP_ADC_RATE)) % 8) {
-  case 0: adc_update(0, nrpn_get(KYRP_ADC0_PIN), KYRP_ADC0_VAL); break;
-  case 1: adc_update(1, nrpn_get(KYRP_ADC1_PIN), KYRP_ADC1_VAL); break;
-  case 2: adc_update(2, nrpn_get(KYRP_ADC2_PIN), KYRP_ADC2_VAL); break;
-  case 3: adc_update(3, nrpn_get(KYRP_ADC3_PIN), KYRP_ADC3_VAL); break;
-  case 4: adc_update(4, nrpn_get(KYRP_ADC4_PIN), KYRP_ADC4_VAL); break;
-  case 5: adc_update(5, nrpn_get(KYRP_ADC5_PIN), KYRP_ADC5_VAL); break;
-  case 6: adc_update(6, nrpn_get(KYRP_ADC6_PIN), KYRP_ADC6_VAL); break;
-  case 7: adc_update(7, nrpn_get(KYRP_ADC7_PIN), KYRP_ADC7_VAL); break;
-  default: break;
-  }
+  int i = (count/nrpn_get(KYRP_ADC_RATE)) % 8;
+  int pin_nrpn = KYRP_ADC0_PIN+i*(KYRP_ADC1_PIN-KYRP_ADC0_PIN);
+  int val_nrpn = KYRP_ADC0_VAL+i*(KYRP_ADC1_VAL-KYRP_ADC0_VAL);
+  adc_update(i, nrpn_get(pin_nrpn), val_nrpn);
 }
 
 static void adc_setup(void) {
-  every_milli(adc_milli);
 }
 
 static void adc_loop(void) {
+  static elapsedMillis milliCounter;
+  if ((int)milliCounter >= 0) {
+    milliCounter = -1;
+    adc_milli(-1);
+  }
 }

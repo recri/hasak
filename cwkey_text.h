@@ -38,30 +38,19 @@
 #include "src/keyer_text.h"
 
 static KeyerText cwkey_text(KYRN_TXT_TEXT, KYRN_ST_TEXT);
-
-static void cwkey_text_listen(int note) { cwkey_text.receive(); }
-
-static void cwkey_text_clock(void) { cwkey_text.clock(1); }
-
-#if KYR_N_TEXT > 1
 static KeyerText cwkey_text2(KYRN_TXT_TEXT2, KYRN_ST_TEXT2);
 
+static void cwkey_text_listen(int note) { cwkey_text.receive(); }
 static void cwkey_text2_listen(int note) { cwkey_text2.receive(); }
 
-static void cwkey_text2_clock(void) { cwkey_text2.clock(1); }
-#endif
+static void cwkey_text_sample(void) { 
+  cwkey_text.clock(1);
+  cwkey_text2.clock(1);
+}
 
 static void cwkey_text_setup(void) {
-
   note_listen(cwkey_text.text_note, cwkey_text_listen);
-  every_sample(cwkey_text_clock);
-
-#if KYR_N_TEXT > 1
   note_listen(cwkey_text2.text_note, cwkey_text2_listen);
-  every_sample(cwkey_text2_clock);
-#endif
-
 }
 
-static void cwkey_text_loop(void) {
-}
+static void cwkey_text_loop(void) {}

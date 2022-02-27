@@ -25,27 +25,28 @@
 
 /*
  * digital pin output
+ * the KYR_N_NOTE notes that generate digital pin transitions
+ * match the KYR_N_NOTE nrpns that specify the pin for output
+ * so either the note or the nrpn suffice to compute the other
+ 
  */
-
-static void pout_key_hw_key_out(int note) {
-  digitalWriteFast(KYR_KEY_OUT_PIN,  nrpn_get(KYRP_POUT_LOGIC) ? note_get(KYRN_HW_KEY_OUT) : ! note_get(KYRN_HW_KEY_OUT));
+static void pout_note_listener(int note) { 
+  const int pin = nrpn_get(note-KYRN_POUT0+KYRP_POUT0_PIN);
+  if (pin_valid(pin))
+    digitalWriteFast(pin, 1^nrpn_get(KYRP_POUT_LOGIC)^note_get(note));
 }
 
-static void pout_key_hw_ptt_out(int note) {
-  digitalWriteFast(KYR_PTT_OUT_PIN, nrpn_get(KYRP_POUT_LOGIC) ? note_get(KYRN_HW_PTT_OUT) : ! note_get(KYRN_HW_PTT_OUT));
+static void pout_pin_listener(int nrpn) {
+  const int pin = nrpn_get(nrpn);
+  if (pin_valid(pin))
+    pinMode(pin, OUTPUT);
 }
 
 static void pout_setup(void) {
-  pinMode(KYR_PTT_OUT_PIN, OUTPUT); 
-  digitalWrite(KYR_PTT_OUT_PIN, ! nrpn_get(KYRP_POUT_LOGIC));
-  note_listen(KYRN_HW_KEY_OUT, pout_key_hw_key_out);
-
-  pinMode(KYR_KEY_OUT_PIN, OUTPUT);
-  digitalWrite(KYR_PTT_OUT_PIN, ! nrpn_get(KYRP_POUT_LOGIC));
-  note_listen(KYRN_HW_PTT_OUT, pout_key_hw_ptt_out);
-
-  // FIX.ME additional input configuration awaiting listener_node_t free list
+  for (int i = 0; i < KYR_N_POUT; i += 1) {
+    nrpn_listen(KYRP_POUT0_PIN+i, pout_pin_listener);
+    note_listen(KYRN_POUT0+i, pout_note_listener);
+  }
 }
 
-static void pout_loop(void) {
-}
+static void pout_loop(void) {}
