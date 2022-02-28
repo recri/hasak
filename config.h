@@ -781,7 +781,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /* definitions of ADC targets, these had undefined symbols when placed immediately after KYRP_PADC* */
 #define KYRV_PADC_NOTHING	(KYRP_NOTHING) /* {type val label None title {pot controls nothing} value-of KYRP_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_VOLUME		(KYRP_VOLUME) /* {type val label Volume title {pot controls master volume} value-of KYRP_PADC*_NRP property adcControls} */
+#define KYRV_PADC_VOLUME	(KYRP_VOLUME) /* {type val label Volume title {pot controls master volume} value-of KYRP_PADC*_NRP property adcControls} */
 #define KYRV_PADC_LEVEL		(KYRP_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_TONE		(KYRP_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_PADC*_NRPN property adcControls} */
@@ -791,7 +791,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYRV_PADC_TAIL_TIME	(KYRP_TAIL_TIME) /* {type val label PTTTail title KYRP_TAIL_TIME value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_RISE_TIME	(KYRP_RISE_TIME) /* {type val label Rise title KYRP_RISE_TIME value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_FALL_TIME	(KYRP_FALL_TIME) /* {type val label Fall title KYRP_FALL_TIME value-of KYRP_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_WEIGHT		(KYRP_WEIGHT) /* {type val label Weight title KYRP_WEIGHT value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_WEIGHT	(KYRP_WEIGHT) /* {type val label Weight title KYRP_WEIGHT value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_RATIO		(KYRP_RATIO) /* {type val label Ratio title KYRP_RATIO value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_SPEED_FRAC	(KYRP_SPEED_FRAC) /* {type val label Frac title KYRP_SPEED_FRAC value-of KYRP_PADC*_NRPN property adcControls} */
 #define KYRV_PADC_CODEC_VOLUME	(KYRP_CODEC_VOLUME) /* {type val label Frac title KYRP_CODEC_VOLUME value-of KYRP_PADC*_NRPN property adcControls} */

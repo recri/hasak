@@ -229,7 +229,7 @@ static uint8_t diag_logging = 0;
 
 char diag_debug_buffer[4][256];
 
-struct { short nrpn; const char*name; } diag_nrpn[] = {
+static struct { short nrpn; const char*name; } diag_nrpn[] = {
   -1, "MIDI",
   KYRP_MIDI_INPUTS, "_INPUTS",
   KYRP_MIDI_OUTPUTS, "_OUTPUTS",
@@ -366,6 +366,7 @@ struct { short nrpn; const char*name; } diag_nrpn[] = {
 
   0, NULL
 };
+
 void diag_nrpn_report(void) {
   int n = 0;
   for (int i = 0; diag_nrpn[i].nrpn != 0; i += 1) {

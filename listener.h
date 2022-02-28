@@ -64,6 +64,19 @@ static void listener_add(listener_t **head, void (*listener)(int)) {
   *head = p;
 }
 
+static int listener_remove(listener_t **head, void (*listener)(int)) {
+  while (*head != NULL) {
+    listener_t *p = *head;
+    if (p->listener == listener) {
+      *head = p->next;
+      listener_free(p);
+      return 1;
+    }
+    head = &p->next;
+  }
+  return 0;
+}
+
 static int listener_invoke(listener_t *p, int arg) {
   int n = 0;
   while (p != NULL) {

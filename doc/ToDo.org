@@ -1,4 +1,53 @@
 * Todo list as of 2022-02-24
+[ ] get a makefile build to escape from the Arduino nonsense.
+[x] need an unlisten() api for switching listener targets
+[x] add unlisten to src/midi.h
+[x] add listen_remove to listeners.h
+[ ] should midi.h include the after_idle handling?  midi_loop2()?
+[ ] need the oldvalue in the listener sometimes, changes
+	the signatures of all the functions.
+[x] change the call to invoke_listeners to include oldvalue
+[ ] change the signature of listener to void (*f)(int,int)
+[ ] change all the listeners to match
+[ ] fix the broken text keyer
+[x] fix the broken speed control
+[ ] DEBOUNCE should be % of dit
+[ ] or should there be another control which controls
+	the paddle's DITDAH perception, the Winkey PaddlePoint
+	acts to debounce the paddle pressed or released, but it also 
+	locks the other paddle sense for the same period.  
+[ ] There is a littlefs wrapper for the Teensy, 
+	but writing to program flash disables interrupts 
+	for the duration, writing EEPROM probably does
+	the same. But a RAM fs would be different.  And the
+	Teensy 4.1 can have additional memory.
+[ ] eeprom is wear leveling on write, so it's actually writing
+	more than one location, so writing a page at a time
+	is unlikely to get any economy of scale.
+	but loading an eeprom image in memory and passing it
+	to a background loop process that does one byte per
+	loop might work well.
+[ ] write the string mechanism.
+[ ] test the json transfer mechanism.
+[ ] redo mixer automation ramps as every_buffer(listener) that resets the mixer.gain()
+	can use the ramp code.
+[ ] move the ramp code into src from src/Audio.
+[ ] use the ramp code for keyed oscillator.
+[ ] make the keyed oscillator handle negative frequencies.
+[ ] make a "boolean" flag to mark note, ctrl, and nrpn values
+	as boolean values.  Might store them more efficiently.
+[x] rewrite src/midi.h to eliminate the hoist() interface.
+[x] make a high range of nrpns for internal use, not saved,
+	but potentially observable to watch the operation.
+	move xper_dit etc there.
+[ ] move the midi.h modulating nrpns into the front and have midi.h
+	use them directly. KYRP_CHANNEL, KYRP_ECHO_ENABLE.
+[x] make a low range of nrpns for the midi controller exclusively
+[x] put live values into the NRPN array, loops, samples, updates, millis
+	and fire listeners on them to call functions at regular periods
+[x] insert Steve's WM8960 nrpns into the ephemeral block
+[x] make a listener node allocator, so we can make listeners inside loops,
+	or in functions with note, ctrl, or nrpn parameters.
 [x] find and fix the bug that breaks the left paddle.
 [x] test that the json.h file produces legit json string
 	with json_pp.
@@ -9,30 +58,10 @@
 	into the target nrpn, using the target nrpn
 	to identify the mapping and filter out no change.
 [x] refactor inpin -> in, outpin -> out, inadc -> adc
-[ ] refactor adc into padc.
-[ ] make the pin_listener for padc, make sure the pin is a valid pin
+[x] refactor adc into padc.
+[x] make the pin_listener for padc, make sure the pin is a valid pin
 [x] initialize pins in define at 127.
-[ ] I guess adcmap.h needs to refactor, too.
-[ ] write the string mechanism.
-[ ] test the json transfer mechanism.
-[ ] redo mixer automation ramps as every_buffer(listener) that resets the mixer.gain()
-	can use the ramp code.
-[ ] move the ramp code into src from src/Audio.
-[ ] use the ramp code for keyed oscillator.
-[ ] make the keyed oscillator handle negative frequencies.
-[ ] make a "boolean" flag to mark note, ctrl, and nrpn values
-	as boolean values.  Might store them more efficiently.
-[x] make a high range of nrpns for internal use, not saved,
-	but potentially observable to watch the operation.
-	move xper_dit etc there.
-[x] make a low range of nrpns for the midi controller exclusively
-[ ] move the midi.h modulating nrpns into the front and have midi.h
-	use them directly. KYRP_CHANNEL, KYRP_ECHO_ENABLE.
-[x] put live values into the NRPN array, loops, samples, updates, millis
-	and fire listeners on them to call functions at regular periods
-[x] insert Steve's WM8960 nrpns into the ephemeral block
-[x] make a listener node allocator, so we can make listeners inside loops,
-	or in functions with note, ctrl, or nrpn parameters.
+[x] I guess adcmap.h needs to refactor, too.
 * Todo list as of 2022-02-14
 [x] if KYRF_NONE was > than all real fists, 
 	then the test for not sending from my_fist would be

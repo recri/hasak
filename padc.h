@@ -57,10 +57,11 @@ static void padc_pin_listener(int nrpn) {
     nrpn_set(nrpn, 127); // this should trigger a loop detection in HasakMidi
     return;
   }
+  Serial.printf("padc_pin_listener(%d)\n", nrpn);
   const int i = (nrpn-KYRP_PADC0_PIN)/(KYRP_PADC1_PIN-KYRP_PADC0_PIN);
   if (padc_adc[i] != NULL) {
     delete padc_adc[i];
-    padc_adc[i];
+    padc_adc[i] = NULL;
   }
   padc_adc[i] = new ResponsiveAnalogRead(pin, true, 0.001f);
   padc_adc[i]->setActivityThreshold(8.0f);

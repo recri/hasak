@@ -39,257 +39,151 @@ template <int _N_NOTE, int _N_CTRL, int _N_NRPN> class Midi {
 
  public:
 
-  static const int N_NOTE = _N_NOTE;
+  static const int N_NOTE = _N_NOTE; // the number of notes
 
-  static const int N_CTRL = _N_CTRL;
+  static const int N_CTRL = _N_CTRL; // the number of control changes (CC)
 
-  static const int N_NRPN = _N_NRPN;
+  static const int N_NRPN = _N_NRPN; // the number of nonregistered parameter numbers (NRPN)
+
+  const uint8_t INPUT_ENABLE = 0x80; // flags[] bit that permits input of value
+
+  const uint8_t OUTPUT_ENABLE = 0x40; // flags[] bit that permits output of value
+
+  const uint8_t ECHO_ENABLE = 0x20; // flags[] bit that permits echo of value
+
+  const uint8_t READ_ONLY = 0x10; // flags[] bit that prevents writing from input
+
+  Midi(usb_midi_class _usbMIDI) : usbMIDI(_usbMIDI) {}
 
 private:
+
+  static const int NOTE = 0;	// note type in generics
+
+  static const int CTRL = 1;	// CC type in generics
+
+  static const int NRPN = 2;	// NRPN type in generics
+
+  static const int NRPN_CC_MSB = 99; // CC used to encode NRPN
+
+  static const int NRPN_CC_LSB = 98; // CC used to encode NRPN
+
+  static const int NRPN_VAL_MSB = 6; // CC used to encode NRPN
+
+  static const int NRPN_VAL_LSB = 38; // CC used to encode NRPN
+
+  usb_midi_class usbMIDI;	// the midi interface
+
+  int8_t notes[N_NOTE];		// the note values
+
+  int8_t ctrls[N_CTRL];		// the CC values
+
+  int16_t nrpns[N_NRPN];	// the NRPN values
+
+  const uint8_t LISTENER_ACTIVE = 0x08; // flags[] bit that marks invoke_listener active on chain
+
+  uint8_t flags[N_NOTE+N_CTRL+N_NRPN]; // flags[] values
+
+  listener_t *listeners[N_NOTE+N_CTRL+N_NRPN]; // listener lists
+
+  //
+  // core operations, unguarded, unqualified, undecorated
+  //
   
-  static const int NOTE = 0;
-
-  static const int CTRL = 1;
-
-  static const int NRPN = 2;
-
-  static const int NRPN_CC_MSB = 99;
-
-  static const int NRPN_CC_LSB = 98;
-
-  static const int NRPN_VAL_MSB = 6;
-
-  static const int NRPN_VAL_LSB = 38;
-
- public:
-
-  Midi(usb_midi_class _usbMIDI) : usbMIDI(_usbMIDI) {
+  // get a value
+  int _get(int type, int tindex) { 
+    switch (type) {
+    case NOTE: return notes[tindex];
+    case CTRL: return ctrls[tindex];
+    case NRPN: return nrpns[tindex];
+    default: Serial.printf("midi._get(%d, %d) invalid type %d\n", type, tindex, type); return -1;
+    }
   }
-
- private:
-
-  usb_midi_class usbMIDI;
-
-  int8_t notes[N_NOTE];
-  int8_t ctrls[N_CTRL];
-  int16_t nrpns[N_NRPN];
-
-  int get(int index, int type, int tindex) { 
-    return type == NOTE ? notes[tindex] : type == CTRL ? ctrls[tindex] : nrpns[tindex]; 
-  }
-
-  void _set(int index, int value, int type, int tindex) {
+  // set a value
+  void _set(int type, int tindex, int value) {
     switch (type) {
     case NOTE: notes[tindex] = value; break;
     case CTRL: ctrls[tindex] = value; break;
     case NRPN: nrpns[tindex] = value; break;
-    default:
-      Serial.printf("midi._set(%d, %d, %d, %d) invalid type %d\n", index, value, type, tindex, type);
+    default: Serial.printf("midi._set(%d, %d, %d) invalid type %d\n", type, tindex, value, type); break;
     }
   }
-
-  // no direct references to values[] beyond this point
-  
-  void set(int index, int value, int type, int tindex) {
-    // Serial.printf("midi.set(%d, %d, %d, %d)\n", index, value, type, tindex);
-    _set(index, value, type, tindex);
-    invoke_listeners(index, type, tindex);
-    send(index, get(index,type,tindex), type, tindex);
-  }
-
-  void set_from_input(int index, int value, int type, int tindex) {
-    if ( ! (flags[index]&READ_ONLY)) _set(index, value, type, tindex);
-    invoke_listeners(index, type, tindex);
-    if (flags[index]&ECHO_ENABLE) send(index, get(index, type, tindex), type, tindex);
-  }
-
-  void unset(int index, int type, int tindex) {
-    _set(index, -1, type, tindex);
-  }
-
-  void send(int index, int value, int type, int tindex) {
-    if (value == -1) return;
-    if ( ! (flags[index]&OUTPUT_ENABLE)) return;
+  // increment a value
+  void _incr(int type, int tindex, int value) {
     switch (type) {
-    case NOTE: 
-      usbMIDI.sendNoteOn(tindex, value, nrpn_get(KYRP_CHANNEL));
-      break;
-    case CTRL:
-      usbMIDI.sendControlChange(tindex, value, nrpn_get(KYRP_CHANNEL));
-      break;
-    case NRPN:
-      usbMIDI.beginNrpn(tindex, nrpn_get(KYRP_CHANNEL));
-      usbMIDI.sendNrpnValue(value, nrpn_get(KYRP_CHANNEL));
-      break;
-    default:
-      Serial.printf("midi.send(%d, %d, %d, %d) invalid type %d\n", index, value, type, tindex, type);
-      break;
+    case NOTE: notes[tindex] += value; notes[tindex] &= 0x7f; break;
+    case CTRL: ctrls[tindex] += value; ctrls[tindex] &= 0x7f; break;
+    case NRPN: nrpns[tindex] += value; nrpns[tindex] &= 0x3fff; break;
+    default: Serial.printf("midi._incr(%d, %d, %d) invalid type %d\n", type, tindex, value, type); break;
     }
   }
-
-  void define(int index, int value, int input_enable, int output_enable, int echo_enable, int read_only, int type, int tindex) {
-    set(index, value, type, tindex);
-    flags[index] = flags_encode(input_enable, output_enable, echo_enable, read_only);
+  // send a value
+  void _send(int type, int tindex, int value) {
+    const int channel = nrpn_get(KYRP_CHANNEL);
+    switch (type) {
+    case NOTE: usbMIDI.sendNoteOn(tindex, value, channel); break;
+    case CTRL: usbMIDI.sendControlChange(tindex, value, channel); break;
+    case NRPN: usbMIDI.beginNrpn(tindex, channel); usbMIDI.sendNrpnValue(value, channel); break;
+    default: Serial.printf("midi._send(%d, %d, %d, %d) invalid type %d\n", type, tindex, value, type); break;
+    }
   }
-  
-  int note_hoist(int note) { return note; }
-
-  int note_lower(int index) { return note_is_valid(index) ? index : -1; }
-
-  int ctrl_hoist(int ctrl) { return N_NOTE+ctrl; }
-
-  int ctrl_lower(int index) { return ctrl_is_valid(index-N_NOTE) ? index-N_NOTE : -1; }
-
-  int nrpn_hoist(int nrpn) { return N_NOTE+N_CTRL+nrpn; }
-
-  int nrpn_lower(int index) { return nrpn_is_valid(index-(N_NOTE+N_CTRL)) ? index-(N_NOTE+N_CTRL) : -1; }
-
-  int lower(int index) {
-    return (unsigned)index < N_NOTE ? index : (unsigned)index < N_NOTE+N_CTRL ? index-N_NOTE : index - (N_NOTE+N_CTRL);
+  // hoist an index into the unified index
+  int _hoist(int type, int tindex) {
+    switch (type) {
+    case NOTE: return tindex;
+    case CTRL: return N_NOTE+tindex;
+    case NRPN: return N_NOTE+N_CTRL+tindex;
+    default: Serial.printf("midi._hoist(%d, %d) invalid type %d\n", type, tindex, type); return -1;
+    }
   }
-
-  int lower_type(int index) {
-    return (unsigned)index < N_NOTE ? NOTE : (unsigned)index < N_NOTE+N_CTRL ? CTRL : NRPN;
+  // get the flags on a value
+  int _flags_get(int type, int tindex) { 
+    return flags[_hoist(type,tindex)];
   }
-  
- public:
-
-  int note_is_valid(int note) { return (unsigned)note < N_NOTE; }
-
-  int note_get(int note) { return note_is_valid(note) ? get(note_hoist(note), NOTE, note) : -1; }
-
-  void note_set(int note, int value) { if (note_is_valid(note)) set(note_hoist(note), value&0x7f, NOTE, note); }
-
-  void note_unset(int note) { if (note_is_valid(note)) unset(note_hoist(note), NOTE, note); }
-
-  void note_send(int note, int value) { if (note_is_valid(note)) send(note_hoist(note), value&0x7f, NOTE, note); }
-
-  void note_define(int note, int value,
-		   int input_enable, int output_enable, 
-		   int echo_enable, int read_only) {
-    if (note_is_valid(note))
-      define(note_hoist(note), value&0x7f, input_enable, output_enable, echo_enable, read_only, NOTE, note);
-  }
-
-  bool ctrl_is_valid(int ctrl) { return (unsigned)ctrl < N_CTRL; }
-
-  int ctrl_get(int ctrl) { return ctrl_is_valid(ctrl) ? get(ctrl_hoist(ctrl), CTRL, ctrl) : -1; }
-
-  void ctrl_set(int ctrl, int value) { if (ctrl_is_valid(ctrl)) set(ctrl_hoist(ctrl), value&0x7f, CTRL, ctrl); }
-
-  void ctrl_unset(int ctrl) { if (ctrl_is_valid(ctrl)) unset(ctrl_hoist(ctrl), CTRL, ctrl); }
-
-  void ctrl_send(int ctrl, int value) { if (ctrl_is_valid(ctrl)) send(ctrl_hoist(ctrl), value&0x7f, CTRL, ctrl); }
-
-  void ctrl_define(int ctrl, int value,
-		   int input_enable, int output_enable, 
-		   int echo_enable, int read_only) {
-    if (ctrl_is_valid(ctrl))
-      define(ctrl_hoist(ctrl), value&0x7f, input_enable, output_enable, echo_enable, read_only, CTRL, ctrl);
-  }
-
-  bool nrpn_is_valid(int nrpn) { return (unsigned)nrpn < N_NRPN; }
-
-  int16_t nrpn_get(int nrpn) { return nrpn_is_valid(nrpn) ? get(nrpn_hoist(nrpn), NRPN, nrpn) : -1; }
-
-  void nrpn_set(int nrpn, int value) { if (nrpn_is_valid(nrpn)) set(nrpn_hoist(nrpn), value&0x3fff, NRPN, nrpn); }
-
-  void nrpn_unset(int nrpn) { if (nrpn_is_valid(nrpn)) unset(nrpn_hoist(nrpn), NRPN, nrpn); }
-
-  void nrpn_send(int nrpn, int value) { if (nrpn_is_valid(nrpn)) send(nrpn_hoist(nrpn), value&0x3fff, NRPN, nrpn); }
-
-  void nrpn_incr(int nrpn, int n=1) { if (nrpn_is_valid(nrpn)) nrpn_set(nrpn, nrpn_get(nrpn)+n); }
-
-  void nrpn_define(int nrpn, int value,
-		   int input_enable, int output_enable, 
-		   int echo_enable, int read_only) {
-    if (nrpn_is_valid(nrpn))
-      define(nrpn_hoist(nrpn), value&0x3fff, input_enable, output_enable, echo_enable, read_only, NRPN, nrpn);
-  }
-
- private:
-
-  uint8_t flags[N_NOTE+N_CTRL+N_NRPN];
-
-  int flags_get(int index) { return flags[index]; }
-
-  void flags_set(int index, int value) { 
+  // set the flags on a value
+  void _flags_set(int type, int tindex, int value) { 
+    const int index = _hoist(type,tindex);
     flags[index] &= ~(INPUT_ENABLE|OUTPUT_ENABLE|ECHO_ENABLE|READ_ONLY);
     flags[index] |= value & (INPUT_ENABLE|OUTPUT_ENABLE|ECHO_ENABLE|READ_ONLY);
   }
-  
- public:
 
-  const uint8_t INPUT_ENABLE = 0x80;
-
-  const uint8_t OUTPUT_ENABLE = 0x40;
-
-  const uint8_t ECHO_ENABLE = 0x20;
-
-  const uint8_t READ_ONLY = 0x10;
-
- private: 
-
-  const uint8_t LISTENER_ACTIVE = 0x08;
-
- public:
-
-  int note_flags_get(int note) { return note_is_valid(note) ? flags_get(note_hoist(note)) : -1; }
-
-  void note_flags_set(int note, int value) { if (note_is_valid(note)) flags_set(note_hoist(note), value); }
-
-  int ctrl_flags_get(int ctrl) { return ctrl_is_valid(ctrl) ? flags_get(ctrl_hoist(ctrl)) : -1; }
-
-  void ctrl_flags_set(int ctrl, int value) { ctrl_is_valid(ctrl) ? flags_set(ctrl_hoist(ctrl), value) : -1; }
-
-  int nrpn_flags_get(int nrpn) { return nrpn_is_valid(nrpn) ? flags_get(nrpn_hoist(nrpn)) : -1; }
-
-  void nrpn_flags_set(int nrpn, int value) { nrpn_is_valid(nrpn) ? flags_set(nrpn_hoist(nrpn), value) : -1; }
-
-  int flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
-    return (input_enable ? INPUT_ENABLE : 0) | 
-      (output_enable ? OUTPUT_ENABLE : 0) |
-      (echo_enable ? ECHO_ENABLE : 0) |
-      (read_only ? READ_ONLY : 0);
-  }
-
-public:
-
-  void index_listen(const int index, void (*f)(int)) {
+  //
+  // middle level interface
+  //
+  // is a value enabled for input
+  bool input_enabled(int type, int tindex) { return (_flags_get(type, tindex) & INPUT_ENABLE) != 0; }
+  // is a value enabled for output
+  bool output_enabled(int type, int tindex) { return (_flags_get(type, tindex) & OUTPUT_ENABLE) != 0; }
+  // is a value enabled for echo
+  bool echo_enabled(int type, int tindex) { return (_flags_get(type, tindex) & ECHO_ENABLE) != 0; }
+  // is a value enabled for remote writing
+  bool write_enabled(int type, int tindex) { return (_flags_get(type, tindex) & READ_ONLY) == 0; }
+  // listen to a note, ctrl, or nrpn
+  void listen(int type, int tindex, void (*f)(int)) {
+    const int index = _hoist(type, tindex);
     if (listeners[index] == NULL) nrpn_incr(KYRP_LISTENER_LISTS);
     nrpn_incr(KYRP_LISTENER_NODES);
     listener_add(&listeners[index], f);
   }
-
-private:
-  /*
-  ** could do this with a 1 byte listener chain id
-  ** per index rather than a full pointer per index
-  */
-  listener_t *listeners[N_NOTE+N_CTRL+N_NRPN];
-
-public:
-
-  void note_listen(const int note, void (*f)(int)) {
-    if (note_is_valid(note)) index_listen(note_hoist(note), f);
-  }
-  
-  void ctrl_listen(const int ctrl, void (*f)(int)) {
-    if (ctrl_is_valid(ctrl)) index_listen(ctrl_hoist(ctrl), f);
-  }
-  
-  void nrpn_listen(const int nrpn, void (*f)(int)) {
-    if (nrpn_is_valid(nrpn)) index_listen(nrpn_hoist(nrpn), f);
-  }
-  
- private:
-
-  void invoke_listeners(int index, int type, int tindex) {
-    if (flags[index]&LISTENER_ACTIVE) {
+  // remove a previously installed listener
+  void unlisten(int type, int tindex, void (*f)(int)) {
+    const int index = _hoist(type, tindex);
+    if (flags[index]&LISTENER_ACTIVE) // may be able to remove this restriction
       nrpn_incr(KYRP_LISTENER_LOOPS);
+    else if (listeners[index] != NULL) {
+      if (listener_remove(&listeners[index], f))
+	nrpn_incr(KYRP_LISTENER_NODES, -1);
+      if (listeners[index] == NULL)
+	nrpn_incr(KYRP_LISTENER_LISTS, -1);
+    }
+  }
+  // invoke listeners on a value
+  void invoke_listeners(int type, int tindex, int oldvalue) {
+    const int index = _hoist(type, tindex);
+    if (flags[index]&LISTENER_ACTIVE) {
+      nrpn_incr(KYRP_LISTENER_LOOPS); // may not re-enter a listener chain
     } else {
       flags[index] |= LISTENER_ACTIVE;
-      int n = listener_invoke(listeners[index], tindex);
+      int n = listener_invoke(listeners[index], tindex); // add oldvalue
       if (n > 0) {
 	nrpn_incr(KYRP_LISTENER_FIRES);
 	nrpn_incr(KYRP_LISTENER_CALLS, n);
@@ -297,50 +191,176 @@ public:
       flags[index] &= ~LISTENER_ACTIVE;
     }
   }
+  //
+  // guarded, qualified, and decorated versions
+  // type and tindex have been guarded
+  //
+  // get from any source
+  int get(int type, int tindex) { return _get(type, tindex); }
+  // set from device origin
+  void set(int type, int tindex, int value) {
+    // Serial.printf("midi.set(%d, %d, %d, %d)\n", index, value, type, tindex);
+    const int oldvalue = _get(type, tindex);
+    _set(type, tindex, value);
+    if (nrpn_get(KYRP_LISTENER_ENABLE)) 
+      invoke_listeners(type, tindex, oldvalue);
+    if (nrpn_get(KYRP_OUTPUT_ENABLE) && output_enabled(type, tindex))
+      _send(type, tindex, _get(type,tindex));
+  }
+  // unset from device origin, not sure if this is useful
+  void unset(int type, int tindex) { _set(type, tindex, -1); }
+  // set from input received
+  void set_from_input(int type, int tindex, int value) {
+    const int oldvalue = _get(type, tindex);
+    if (write_enabled(type,tindex)) 
+      _set(type, tindex, value);
+    if (nrpn_get(KYRP_LISTENER_ENABLE))
+      invoke_listeners(type, tindex, oldvalue);
+    if (nrpn_get(KYRP_OUTPUT_ENABLE) && nrpn_get(KYRP_ECHO_ENABLE) && echo_enabled(type,tindex))
+      _send(type, tindex, _get(type, tindex));
+  }
+  // send from device origin
+  void send(int type, int tindex, int value) {
+    if (nrpn_get(KYRP_OUTPUT_ENABLE) && output_enabled(type, tindex) && value != -1) _send(type, tindex, value);
+  }
+  // definition of initial value and flags from device
+  void define(int type, int tindex, int value, int input_enable, int output_enable, int echo_enable, int read_only) {
+    _set(type, tindex, value);
+    _flags_set(type, tindex, flags_encode(input_enable, output_enable, echo_enable, read_only));
+  }
   
- public:
+ public:			// external interface
 
-  void setup(void) {
-    for (int i = note_hoist(0); i < nrpn_hoist(N_NRPN); i += 1) {
-      _set(i, -1, lower_type(i), lower(i));
-      flags[i] = 0;
-      listeners[i] = NULL;
-    }
+  // notes interface
+
+  int note_is_valid(int note) { return (unsigned)note < N_NOTE; }
+
+  int note_get(int note) { return note_is_valid(note) ? get(NOTE, note) : -1; }
+
+  void note_set(int note, int value) { if (note_is_valid(note)) set(NOTE, note, value&0x7f); }
+
+  void note_unset(int note) { if (note_is_valid(note)) unset(NOTE, note); }
+
+  void note_send(int note, int value) { if (note_is_valid(note)) send(NOTE, note, value&0x7f); }
+
+  void note_define(int note, int value, int input_enable, int output_enable, int echo_enable, int read_only) {
+    if (note_is_valid(note)) define(NOTE, note, value&0x7f, input_enable, output_enable, echo_enable, read_only);
   }
 
+  int note_flags_get(int note) { return note_is_valid(note) ? _flags_get(NOTE, note) : -1; }
+
+  void note_flags_set(int note, int value) { if (note_is_valid(note)) _flags_set(NOTE, note, value); }
+
+  void note_listen(const int note, void (*f)(int)) { if (note_is_valid(note)) listen(NOTE, note, f); }
+  
+  void note_unlisten(const int note, void (*f)(int)) { if (note_is_valid(note)) unlisten(NOTE, note, f); }
+  
+  // ctrl interface
+
+  bool ctrl_is_valid(int ctrl) { return (unsigned)ctrl < N_CTRL; }
+
+  int ctrl_get(int ctrl) { return ctrl_is_valid(ctrl) ? get(CTRL, ctrl) : -1; }
+
+  void ctrl_set(int ctrl, int value) { if (ctrl_is_valid(ctrl)) set(CTRL, ctrl, value&0x7f); }
+
+  void ctrl_unset(int ctrl) { if (ctrl_is_valid(ctrl)) unset(CTRL, ctrl); }
+
+  void ctrl_send(int ctrl, int value) { if (ctrl_is_valid(ctrl)) send(CTRL, ctrl, value&0x7f); }
+
+  void ctrl_define(int ctrl, int value, int input_enable, int output_enable, int echo_enable, int read_only) {
+    if (ctrl_is_valid(ctrl)) define(CTRL, ctrl, value&0x7f, input_enable, output_enable, echo_enable, read_only);
+  }
+
+  int ctrl_flags_get(int ctrl) { return ctrl_is_valid(ctrl) ? _flags_get(CTRL, ctrl) : -1; }
+
+  void ctrl_flags_set(int ctrl, int value) { ctrl_is_valid(ctrl) ? _flags_set(CTRL, ctrl, value) : -1; }
+
+  void ctrl_listen(const int ctrl, void (*f)(int)) { if (ctrl_is_valid(ctrl)) listen(CTRL, ctrl, f); }
+  
+  void ctrl_unlisten(const int ctrl, void (*f)(int)) { if (ctrl_is_valid(ctrl)) unlisten(CTRL, ctrl, f); }
+  
+  // nrpn interface
+  
+  bool nrpn_is_valid(int nrpn) { return (unsigned)nrpn < N_NRPN; }
+
+  int16_t nrpn_get(int nrpn) { return nrpn_is_valid(nrpn) ? get(NRPN, nrpn) : -1; }
+
+  void nrpn_set(int nrpn, int value) { if (nrpn_is_valid(nrpn)) set(NRPN, nrpn, value&0x3fff); }
+
+  void nrpn_unset(int nrpn) { if (nrpn_is_valid(nrpn)) unset(NRPN, nrpn); }
+
+  void nrpn_send(int nrpn, int value) { if (nrpn_is_valid(nrpn)) send(NRPN, nrpn, value&0x3fff); }
+
+  void nrpn_incr(int nrpn, int n=1) { if (nrpn_is_valid(nrpn)) nrpn_set(nrpn, nrpn_get(nrpn)+n); }
+
+  void nrpn_define(int nrpn, int value, int input_enable, int output_enable, int echo_enable, int read_only) {
+    if (nrpn_is_valid(nrpn)) define(NRPN, nrpn, value&0x3fff, input_enable, output_enable, echo_enable, read_only);
+  }
+
+  int nrpn_flags_get(int nrpn) { return nrpn_is_valid(nrpn) ? _flags_get(NRPN, nrpn) : -1; }
+
+  void nrpn_flags_set(int nrpn, int value) { nrpn_is_valid(nrpn) ? _flags_set(NRPN, nrpn, value) : -1; }
+
+  void nrpn_listen(const int nrpn, void (*f)(int)) { if (nrpn_is_valid(nrpn)) listen(NRPN, nrpn, f); }
+
+  void nrpn_unlisten(const int nrpn, void (*f)(int)) { if (nrpn_is_valid(nrpn)) unlisten(NRPN, nrpn, f); }
+
+  // miscellaneous interface
+
+  int flags_encode(int input_enable, int output_enable, int echo_enable, int read_only) {
+    return (input_enable ? INPUT_ENABLE : 0) | (output_enable ? OUTPUT_ENABLE : 0) |
+      (echo_enable ? ECHO_ENABLE : 0) | (read_only ? READ_ONLY : 0);
+  }
+
+  // setup, verify expectations
+
+  void setup(void) {
+    // all values, flags, and listeners should be initialized to zeroes
+    // check that it's true
+    for (int note = 0; note < N_NOTE; note += 1)
+      if (note_get(note) != 0 || note_flags_get(note) != 0 || listeners[_hoist(NOTE, note)] != NULL)
+	Serial.printf("note %d not initialized\n", note);
+    for (int ctrl = 0; ctrl < N_CTRL; ctrl += 1)
+      if (ctrl_get(ctrl) != 0 || ctrl_flags_get(ctrl) != 0 || listeners[_hoist(CTRL, ctrl)] != NULL)
+	Serial.printf("ctrl %d not initialized\n", ctrl);
+    for (int nrpn = 0; nrpn < N_NRPN; nrpn += 1)
+      if (nrpn_get(nrpn) != 0 || nrpn_flags_get(nrpn) != 0 || listeners[_hoist(NRPN, nrpn)] != NULL)
+	Serial.printf("nrpn %d not initialized\n", nrpn);
+  }
+
+  // loop, read and dispatch incoming midi messages
+
   void loop(void) {
-    /* dispatch incoming midi */
     while (usbMIDI.read(nrpn_get(KYRP_CHANNEL))) {
-      const int type = usbMIDI.getType();
-      if (type == usbMIDI.ControlChange) {
-	const int ctrl = usbMIDI.getData1();
-	if ( ! ctrl_is_valid(ctrl)) continue;
-	const int index = ctrl_hoist(ctrl);
-	if ( ! (flags[index]&INPUT_ENABLE)) continue;
-	set_from_input(index, usbMIDI.getData2(), CTRL, ctrl);
-	/* 
-	** recognize nrpns, could do from a listener,
-	** but I can't figure out how to set one up
-	** from inside the class.
-	*/
-	if (ctrl == NRPN_VAL_LSB) {
-	  const int nrpn = (nrpn_get(NRPN_CC_MSB)<<7)|nrpn_get(NRPN_CC_LSB);
-	  if (nrpn_is_valid(nrpn))
-	    set_from_input(nrpn_hoist(nrpn), (nrpn_get(NRPN_VAL_MSB)<<7)|nrpn_get(NRPN_VAL_LSB), NRPN, nrpn);
+      if (nrpn_get(KYRP_INPUT_ENABLE)) { // apply global input enable
+
+	const int type = usbMIDI.getType();
+
+	if (type == usbMIDI.NoteOn) {
+
+	  const int note = usbMIDI.getData1();
+	  if (note_is_valid(note) && input_enabled(NOTE, note))
+	    set_from_input(NOTE, note, usbMIDI.getData2());
+
+	} else if (type == usbMIDI.NoteOff) {
+
+	  const int note = usbMIDI.getData1();
+	  if (note_is_valid(note) && input_enabled(NOTE, note))
+	    set_from_input(NOTE, note, 0);
+
+	} else if (type == usbMIDI.ControlChange) {
+
+	  const int ctrl = usbMIDI.getData1();
+	  if (ctrl_is_valid(ctrl) && input_enabled(CTRL, ctrl)) {
+	    set_from_input(CTRL, ctrl, usbMIDI.getData2());
+
+	    if (ctrl == NRPN_VAL_LSB) {
+	      const int nrpn = (ctrl_get(NRPN_CC_MSB)<<7)|ctrl_get(NRPN_CC_LSB);
+	      if (nrpn_is_valid(nrpn) && input_enabled(NRPN, nrpn))
+		set_from_input(NRPN, nrpn, (ctrl_get(NRPN_VAL_MSB)<<7)|ctrl_get(NRPN_VAL_LSB));
+	    }
+	  }
 	}
-      } else if (type == usbMIDI.NoteOn) {
-	const int note = usbMIDI.getData1();
-	if ( ! note_is_valid(note)) continue;
-	const int index = note_hoist(note);
-	if ( ! (flags[index]&INPUT_ENABLE)) continue;
-	set_from_input(index, usbMIDI.getData2(), NOTE, note);
-	continue;
-      } else if (type == usbMIDI.NoteOff) {
-	const int note = usbMIDI.getData1();
-	if ( ! note_is_valid(note)) continue;
-	const int index = note_hoist(note);
-	if ( ! (flags[index]&INPUT_ENABLE)) continue;
-	set_from_input(note, 0, NOTE, note);
       }
     }
   }

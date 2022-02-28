@@ -45,34 +45,34 @@ static void padcmap_value(int nrpn) {
   int min, max;
   int nrpn2 = nrpn_get(nrpn+1);
   switch (nrpn2) {
-  case KYRV_PADC_NOTHING: return;
-  case KYRV_PADC_VOLUME:
-  case KYRV_PADC_LEVEL:
+  case KYRP_NOTHING: return;
+  case KYRP_VOLUME:
+  case KYRP_LEVEL:
   case KYRP_IQ_LEVEL:
   case KYRP_I2S_LEVEL:
   case KYRP_HDW_LEVEL:
   case KYRP_CODEC_VOLUME:
     min = KYR_PADC_VOLUME_MIN; max = KYR_PADC_VOLUME_MAX; break;
-  case KYRV_PADC_TONE:
+  case KYRP_TONE:
     min = KYR_PADC_TONE_MIN; max = KYR_PADC_TONE_MAX; break;
-  case KYRV_PADC_SPEED:
-  case KYRV_PADC_FARNS:
+  case KYRP_SPEED:
+  case KYRP_FARNS:
     min = KYR_PADC_SPEED_MIN; max = KYR_PADC_SPEED_MAX; break;
-  case KYRV_PADC_SPEED_FRAC:
+  case KYRP_SPEED_FRAC:
     min = KYR_PADC_FRAC_MIN; max = KYR_PADC_FRAC_MAX; break;
   case KYRP_ST_BALANCE:
   case KYRP_IQ_BALANCE:
-  case KYRV_PADC_COMP:
+  case KYRP_COMP:
     min = KYR_PADC_BAL_MIN; max = KYR_PADC_BAL_MAX; break;
-  case KYRV_PADC_HEAD_TIME:
-  case KYRV_PADC_TAIL_TIME:
-  case KYRV_PADC_RISE_TIME:
-  case KYRV_PADC_FALL_TIME:
+  case KYRP_HEAD_TIME:
+  case KYRP_TAIL_TIME:
+  case KYRP_RISE_TIME:
+  case KYRP_FALL_TIME:
   case KYRP_MIXER_SLEW_TIME:
   case KYRP_FREQ_SLEW_TIME:
     min = KYR_PADC_TIME_MIN; max = KYR_PADC_TIME_MAX; break;
-  case KYRV_PADC_WEIGHT:
-  case KYRV_PADC_RATIO:
+  case KYRP_WEIGHT:
+  case KYRP_RATIO:
     min = KYR_PADC_RATIO_MIN; max = KYR_PADC_RATIO_MAX; break;
   default: return;
   }
@@ -85,7 +85,7 @@ static void padcmap_value(int nrpn) {
   
 static void padcmap_setup(void) {
   for (int i = 0; i < KYR_N_PADC; i += 1)
-    nrpn_listen(KYRP_PADC0_VAL+i, padcmap_value);
+    nrpn_listen(KYRP_PADC0_VAL+i*(KYRP_PADC1_VAL-KYRP_PADC0_VAL), padcmap_value);
 }
 
 // static void adcmap_loop(void) {}

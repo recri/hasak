@@ -79,6 +79,8 @@ static void nrpn_update_keyer_timing(int numb) {
         int32_t ticksPerIls = (3  -w) * ticksPerBaseDit-c+0.5;
         int32_t ticksPerIws = (7  -w) * ticksPerBaseDit-c+0.5;
     
+  // Serial.printf("recompute_morse settings\n");
+
   //
   // Farnsworth timing: stretch inter-character and inter-word pauses
   // to reduce wpm to the specified farnsworth speed.
@@ -109,6 +111,7 @@ static void nrpn_update_keyer_timing(int numb) {
 ** trigger a morse timing update when any of the required values changes.
 */
 static void nrpn_recompute_morse(int nrpn) {
+  // Serial.printf("recompute_morse setting handler\n");
   after_idle(nrpn_update_keyer_timing);
 }
 
