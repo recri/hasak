@@ -32,7 +32,7 @@ static void cwdecode_sample(void) {}
 
 static void cwdecode_setup(void) {}
 
-static void cwdecode_loop(void) {}
+//static void cwdecode_loop(void) {}
 
 /* the decode part still in javascript, using a different table */
 #if 0

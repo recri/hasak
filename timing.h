@@ -58,6 +58,8 @@ static uint32_t timing_isrCpuCyclesRaw;
 static uint32_t timing_isrCyclesPerAudioBuffer;
 static uint32_t timing_isrCyclesPerAudioBufferMax;
 
+static void timing_setup(void) {}
+
 static void timing_loop(void) {
   timing_loopCounter += 1;		/* one trip through the loop */
   
@@ -85,9 +87,6 @@ static void timing_loop(void) {
     /* this discards an early transient observed when the audio library initializes */
     if (timing_cpuCyclesPerAudioBufferMax > 100000) timing_cpuCyclesPerAudioBufferMax = timing_cpuCyclesPerAudioBuffer;
   }
-}
-
-static void timing_setup(void) {
 }
 
 static float timing_percent(uint32_t cpuCycles) {

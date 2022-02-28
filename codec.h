@@ -76,4 +76,4 @@ static void codec_setup(void) {
   nrpn_listen(KYRP_INPUT_LEVEL, codec_listener);
 }
 
-static void codec_loop(void) {}
+//static void codec_loop(void) {}

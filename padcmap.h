@@ -26,54 +26,54 @@
 /*
 ** adcmap endpoints for pot mapping.
 */
-#define KYR_ADC_VOLUME_MAX -320 /* -32dB */
-#define KYR_ADC_VOLUME_MIN 0	/*  0dB */
-#define KYR_ADC_TONE_MAX 2500	/*  250.0Hz */
-#define KYR_ADC_TONE_MIN 12500	/* 1250.0Hz */
-#define KYR_ADC_SPEED_MAX 5	/* 5 wpm */
-#define KYR_ADC_SPEED_MIN 55	/* 55 wpm */
-#define KYR_ADC_FRAC_MAX 0	/* 0/128th */
-#define KYR_ADC_FRAC_MIN 127	/* 127/128th */
-#define KYR_ADC_BAL_MAX -8192
-#define KYR_ADC_BAL_MIN 8191
-#define KYR_ADC_TIME_MAX 0
-#define KYR_ADC_TIME_MIN 16383
-#define KYR_ADC_RATIO_MIN 25
-#define KYR_ADC_RATIO_MAX 75
+#define KYR_PADC_VOLUME_MAX -320 /* -32dB */
+#define KYR_PADC_VOLUME_MIN 0	/*  0dB */
+#define KYR_PADC_TONE_MAX 2500	/*  250.0Hz */
+#define KYR_PADC_TONE_MIN 12500	/* 1250.0Hz */
+#define KYR_PADC_SPEED_MAX 5	/* 5 wpm */
+#define KYR_PADC_SPEED_MIN 55	/* 55 wpm */
+#define KYR_PADC_FRAC_MAX 0	/* 0/128th */
+#define KYR_PADC_FRAC_MIN 127	/* 127/128th */
+#define KYR_PADC_BAL_MAX -8192
+#define KYR_PADC_BAL_MIN 8191
+#define KYR_PADC_TIME_MAX 0
+#define KYR_PADC_TIME_MIN 16383
+#define KYR_PADC_RATIO_MIN 25
+#define KYR_PADC_RATIO_MAX 75
 
-static void adcmap_value(int nrpn) {
+static void padcmap_value(int nrpn) {
   int min, max;
   int nrpn2 = nrpn_get(nrpn+1);
   switch (nrpn2) {
-  case KYRV_ADC_NOTHING: return;
-  case KYRV_ADC_VOLUME:
-  case KYRV_ADC_LEVEL:
+  case KYRV_PADC_NOTHING: return;
+  case KYRV_PADC_VOLUME:
+  case KYRV_PADC_LEVEL:
   case KYRP_IQ_LEVEL:
   case KYRP_I2S_LEVEL:
   case KYRP_HDW_LEVEL:
   case KYRP_CODEC_VOLUME:
-    min = KYR_ADC_VOLUME_MIN; max = KYR_ADC_VOLUME_MAX; break;
-  case KYRV_ADC_TONE:
-    min = KYR_ADC_TONE_MIN; max = KYR_ADC_TONE_MAX; break;
-  case KYRV_ADC_SPEED:
-  case KYRV_ADC_FARNS:
-    min = KYR_ADC_SPEED_MIN; max = KYR_ADC_SPEED_MAX; break;
-  case KYRV_ADC_SPEED_FRAC:
-    min = KYR_ADC_FRAC_MIN; max = KYR_ADC_FRAC_MAX; break;
+    min = KYR_PADC_VOLUME_MIN; max = KYR_PADC_VOLUME_MAX; break;
+  case KYRV_PADC_TONE:
+    min = KYR_PADC_TONE_MIN; max = KYR_PADC_TONE_MAX; break;
+  case KYRV_PADC_SPEED:
+  case KYRV_PADC_FARNS:
+    min = KYR_PADC_SPEED_MIN; max = KYR_PADC_SPEED_MAX; break;
+  case KYRV_PADC_SPEED_FRAC:
+    min = KYR_PADC_FRAC_MIN; max = KYR_PADC_FRAC_MAX; break;
   case KYRP_ST_BALANCE:
   case KYRP_IQ_BALANCE:
-  case KYRV_ADC_COMP:
-    min = KYR_ADC_BAL_MIN; max = KYR_ADC_BAL_MAX; break;
-  case KYRV_ADC_HEAD_TIME:
-  case KYRV_ADC_TAIL_TIME:
-  case KYRV_ADC_RISE_TIME:
-  case KYRV_ADC_FALL_TIME:
+  case KYRV_PADC_COMP:
+    min = KYR_PADC_BAL_MIN; max = KYR_PADC_BAL_MAX; break;
+  case KYRV_PADC_HEAD_TIME:
+  case KYRV_PADC_TAIL_TIME:
+  case KYRV_PADC_RISE_TIME:
+  case KYRV_PADC_FALL_TIME:
   case KYRP_MIXER_SLEW_TIME:
   case KYRP_FREQ_SLEW_TIME:
-    min = KYR_ADC_TIME_MIN; max = KYR_ADC_TIME_MAX; break;
-  case KYRV_ADC_WEIGHT:
-  case KYRV_ADC_RATIO:
-    min = KYR_ADC_RATIO_MIN; max = KYR_ADC_RATIO_MAX; break;
+    min = KYR_PADC_TIME_MIN; max = KYR_PADC_TIME_MAX; break;
+  case KYRV_PADC_WEIGHT:
+  case KYRV_PADC_RATIO:
+    min = KYR_PADC_RATIO_MIN; max = KYR_PADC_RATIO_MAX; break;
   default: return;
   }
   int p = nrpn_get(nrpn);		/* fetch adc reading */
@@ -83,15 +83,9 @@ static void adcmap_value(int nrpn) {
   nrpn_set(nrpn2, n);			/* set the new value */
 }
   
-static void adcmap_setup(void) {
-  nrpn_listen(KYRP_ADC0_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC1_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC2_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC3_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC4_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC5_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC6_VAL, adcmap_value);
-  nrpn_listen(KYRP_ADC7_VAL, adcmap_value);
+static void padcmap_setup(void) {
+  for (int i = 0; i < KYR_N_PADC; i += 1)
+    nrpn_listen(KYRP_PADC0_VAL+i, padcmap_value);
 }
 
 // static void adcmap_loop(void) {}

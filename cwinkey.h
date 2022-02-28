@@ -24,7 +24,7 @@
  */
 #if ! defined(KYR_ENABLE_WINKEY)
 void cwinkey_setup(void) { }
-void cwinkey_loop(void) { }
+//void cwinkey_loop(void) { }
 #else
 ////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -452,7 +452,7 @@ static byte cwinkey_get_speed_pot(void) {
 // This is the WinKey state machine
 //
 ///////////////////////////////////////
-void cwinkey_state_machine() {
+void cwinkey_state_machine(int nrpn) {
   uint8_t byte;
   static int OldWKstatus=-1;           // this is to detect status changes
   static int OldSpeedPot=-1;           // this is to detect Speed pot changes
@@ -601,10 +601,9 @@ void cwinkey_state_machine() {
  ** Winkey interface
  ***************************************************************/
 static void cwinkey_setup(void) {
+  nrpn_listen(KYRP_MILLI, winkey_state_machine);
 }
 
-static void cwinkey_loop(void) {
-  winkey_state_machine();
-}
+//static void cwinkey_loop(void) {}
 
 #endif

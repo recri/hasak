@@ -51,4 +51,4 @@ static void cwkey_straight_setup(void) {
   note_listen(KYRN_HW_S_KEY3, cwkey_straight_s_key3_listen);
 }
 
-static void cwkey_straight_loop(void) {}
+//static void cwkey_straight_loop(void) {}

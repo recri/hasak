@@ -32,14 +32,13 @@
  */
 static void pout_note_listener(int note) { 
   const int pin = nrpn_get(note-KYRN_POUT0+KYRP_POUT0_PIN);
-  if (pin_valid(pin))
+  if (nrpn_get(KYRP_PIN_ENABLE) && pin_valid(pin))
     digitalWriteFast(pin, 1^nrpn_get(KYRP_POUT_LOGIC)^note_get(note));
 }
 
 static void pout_pin_listener(int nrpn) {
   const int pin = nrpn_get(nrpn);
-  if (pin_valid(pin))
-    pinMode(pin, OUTPUT);
+  if (pin_valid(pin)) pinMode(pin, OUTPUT);
 }
 
 static void pout_setup(void) {
@@ -49,4 +48,4 @@ static void pout_setup(void) {
   }
 }
 
-static void pout_loop(void) {}
+// static void pout_loop(void) {}

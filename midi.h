@@ -57,7 +57,7 @@ static int note_get(int note) {
 
 static void note_set(int note, int value) { 
   if (note_is_valid(note)) {
-    Serial.printf("note_set(%d, %d)\n", note, value);
+    // Serial.printf("note_set(%d, %d)\n", note, value);
     midi.note_set(note, value);
   } else
     note_invalid(note, "note_set");
@@ -176,6 +176,14 @@ static inline void nrpn_set(const int nrpn, const int value) {
     nrpn_invalid(nrpn, "nrpn_set");
 }
 
+/* unset a nrpn */
+static inline void nrpn_unset(const int nrpn) {
+  if (nrpn_is_valid(nrpn))
+    midi.nrpn_unset(nrpn);
+  else
+    nrpn_invalid(nrpn, "nrpn_unset");
+}
+
 /* increment a nrpn */
 static inline void nrpn_incr(const int nrpn) {
   if (nrpn_is_valid(nrpn))
@@ -246,11 +254,17 @@ static void midi_setup(void) {
   nrpn_set(KYRP_MIDI_NOTES, 0);
   nrpn_set(KYRP_MIDI_CTRLS, 0);
   nrpn_set(KYRP_MIDI_NRPNS, 0);
-  //nrpn_set(KYRP_LISTENER_LISTS, 0);
-  //nrpn_set(KYRP_LISTENER_NODES, 0);
-  //nrpn_set(KYRP_LISTENER_CALLS, 0);
-  //nrpn_set(KYRP_LISTENER_FIRES, 0);
-  //nrpn_set(KYRP_LISTENER_LOOPS, 0);
+  nrpn_set(KYRP_LISTENER_LISTS, 0);
+  nrpn_set(KYRP_LISTENER_NODES, 0);
+  nrpn_set(KYRP_LISTENER_CALLS, 0);
+  nrpn_set(KYRP_LISTENER_FIRES, 0);
+  nrpn_set(KYRP_LISTENER_LOOPS, 0);
+  nrpn_set(KYRP_LOOP, 0);
+  nrpn_set(KYRP_SAMPLE, 0);
+  nrpn_set(KYRP_UPDATE, 0);
+  nrpn_set(KYRP_MILLI, 0);
+  nrpn_set(KYRP_10MILLI, 0);
+  nrpn_set(KYRP_100MILLI, 0);
 }
 
 static void midi_loop(void) { midi.loop(); }

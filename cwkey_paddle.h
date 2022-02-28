@@ -48,7 +48,7 @@ static void cwkey_paddle3_listen(int note) {
     note_toggle(KYRN_ST_PAD3);
 }
 
-static void cwkey_paddle_sample(void) {
+static void cwkey_paddle_sample(int nrpn) {
   if (note_get(KYRN_ST_PAD) != cwkey_paddle.clock(note_get(KYRN_HW_L_PAD), note_get(KYRN_HW_R_PAD), 1))
     note_toggle(KYRN_ST_PAD);
   if (note_get(KYRN_ST_PAD2) != cwkey_paddle2.clock(note_get(KYRN_HW_L_PAD2), note_get(KYRN_HW_R_PAD2), 1))
@@ -57,7 +57,6 @@ static void cwkey_paddle_sample(void) {
     note_toggle(KYRN_ST_PAD3);
 }
 
-
 static void cwkey_paddle_setup(void) {
   note_listen(KYRN_HW_L_PAD, cwkey_paddle_listen);
   note_listen(KYRN_HW_R_PAD, cwkey_paddle_listen);
@@ -65,6 +64,7 @@ static void cwkey_paddle_setup(void) {
   note_listen(KYRN_HW_R_PAD2, cwkey_paddle2_listen);
   note_listen(KYRN_HW_L_PAD3, cwkey_paddle3_listen);
   note_listen(KYRN_HW_R_PAD3, cwkey_paddle3_listen);
+  nrpn_listen(KYRP_SAMPLE, cwkey_paddle_sample);
 }
 
-static void cwkey_paddle_loop(void) {}
+// static void cwkey_paddle_loop(void) {}

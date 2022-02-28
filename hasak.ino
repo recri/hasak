@@ -25,6 +25,7 @@
 
 #include <Arduino.h>
 
+//these are defined in config.h now, near the cpu detect code
 //static int pin_valid(int pin) { return PIN_VALID(pin); }
 //static int pin_analog(int pin) { return PIN_ANALOG(pin); }
 //static int pin_i2s(int pin) { return PIN_I2S(pin); }
@@ -51,8 +52,8 @@
 #include "cwkey_straight.h"	// hardware switch -> straight key sidetone
 #include "cwkey_paddle.h"	// hardare paddle -> iambic keyed sidetone
 #include "cwkey_text.h"		// ascii characters -> mechanically keyed sidetone
-#include "adc.h"		// input adc states -> input adc nrpns FIX.ME rename inadc.h
-#include "adcmap.h"		// input adc nrpns -> keyer parameter nrpns
+#include "padc.h"		// input adc states -> input adc nrpns
+#include "padcmap.h"		// input adc nrpns -> keyer parameter nrpns
 #include "pin.h"		// input pin states -> input pin notes rename
 #include "pout.h"		// output pin notes -> output pins
 // #include "outstring.h"	// output strings to MIDI
@@ -81,67 +82,46 @@ static void interrupt() {
 
 void setup(void) {
   Serial.begin(115200);
-  while ( ! Serial);
-  // nrpn_set_default(KYRP_SET_DEFAULT);
-  // nrpn_set(KYRP_VOLUME, -200);
-
-  Serial.printf("before listener_setup()\n");
-  listener_setup();
-  Serial.printf("before midi_setup()\n");
-  midi_setup();
-  Serial.printf("before define_setup()\n");
-  define_setup();
-  Serial.printf("before codec_setup()\n");
-  codec_setup();
-  Serial.printf("before codec_enable()\n");
-  codec_enable();
-  Serial.printf("before nrpn_setup()\n");
-  nrpn_setup();
-  Serial.printf("before timing_setup()\n");
+  // while ( ! Serial);
+  listener_setup();		// set up listener free list
+  midi_setup();			// initialize the midi interface
+  define_setup();		// define our notes ctrls and nrpns
+  codec_setup();		// let the code install handlers
+  codec_enable();		// enable the coded
+  nrpn_setup();			// set up nrpn handlers
   timing_setup();		// start your timers
-  Serial.printf("before adc_setup()\n");
-  adc_setup();
-  Serial.printf("before adcmap_setup()\n");
-  adcmap_setup();
-  Serial.printf("before pin_setup()\n");
-  pin_setup();
-  Serial.printf("before pout_setup()\n");
-  pout_setup();
-  Serial.printf("before cwkey_straight_setup()\n");
-  cwkey_straight_setup();
-  Serial.printf("before cwkey_paddle_setup()\n");
-  cwkey_paddle_setup();
-  Serial.printf("before cwkey_text_setup()\n");
-  cwkey_text_setup();
-  Serial.printf("before cwarbiter_setup()\n");
-  cwarbiter_setup();
-  Serial.printf("before cwstptt_setup()\n");
-  cwstptt_setup();
-  Serial.printf("before cwptt_setup()\n");
-  cwptt_setup();
-  Serial.printf("before cwroute_setup()\n");
-  cwroute_setup();
-  Serial.printf("before cwdetime_setup()\n");
-  cwdetime_setup();
-  Serial.printf("before cwdecode_setup()\n");
-  cwdecode_setup();
-  // cwinkey_setup();
-  Serial.printf("before diagnostics_setup()\n");
-  diagnostics_setup();
+  padc_setup();			// nrpn/note handlers for analog pins
+  padcmap_setup();		// mapping adc values into parameters
+  pin_setup();			// nrpn/note handlers for digital inputs
+  pout_setup();			// nrpn/note handlers for digital outputs
+  cwkey_straight_setup();	// straight key keyer(s)
+  cwkey_paddle_setup();		// paddle keyer(s)
+  cwkey_text_setup();		// nrpn/note handlers for text keyers
+  cwarbiter_setup();		// arbitrate who gets the key
+  cwstptt_setup();		// simple sidetone ptt signal
+  cwptt_setup();		// full cw ptt generation
+  cwroute_setup();		// note handlers to route cw notes into and out of
+  cwdetime_setup();		// incomplete sidetone detimer into elements
+  cwdecode_setup();		// very incomplete sidetone element decoder
+  // cwinkey_setup();		// winkey emulation
+  diagnostics_setup();		// diagnostics console
 
   //
   // now start
+  // before this point setting parameters with nrpn_set()
+  // might not work correctly, because they might not trigger
+  // the handler.  The *_setup functions set a lot of listeners
+  // to implement parameters.
   //
 
-  Serial.printf("before nrpn_set_default()\n");
-  nrpn_set_default();
-  /* FIX.ME - these go in audio.h - audio_setup() */
-  Serial.printf("before AudioMemory(40)\n");
+  nrpn_set_default();		// set the default parameters
+
+  /* FIX.ME - shouldn't this go into audio.h - audio_setup() */
   AudioMemory(40);
+
   /*  interval timer to latch inputs into the audio update loop. */
   static IntervalTimer timer;
   timer.priority(96);
-  Serial.printf("before timer.begin\n");
   timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 }
 
@@ -156,9 +136,9 @@ void loop(void) {
   // define_loop();
   // nrpn_loop();
   // pout_loop();
-  pin_loop();
-  adc_loop();
-  // adcmap_loop();
+  // pin_loop();
+  // padc_loop();
+  // padcmap_loop();
   // cwkey_straight_loop();
   // cwkey_paddle_loop();
   // cwkey_text_loop();
@@ -169,20 +149,35 @@ void loop(void) {
   // cwdetime_loop();
   // cwdecode_loop();
   // cwwinkey_loop();		// winkey
-  static elapsedSamples counter;
-  if ((int)counter >= 0) {
-    counter = -1;
-    // cwkey_straight_sample();
-    cwkey_paddle_sample();
-    cwkey_text_sample();
-    cwarbiter_sample();
-    cwstptt_sample();
-    cwptt_sample();
-    // cwroute_sample();
-    // cwdetime_sample();
-    // cwdecode_sample();
+
+  // counter update
+  
+  { nrpn_incr(KYRP_LOOP);	// update loop counter
   }
-  listener_loop();
+  { static elapsedSamples counter; // update sample counter
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(KYRP_SAMPLE);
+      // cwkey_paddle_sample();
+      // cwkey_text_sample();
+      // cwarbiter_sample();
+      // cwstptt_sample();
+      // cwptt_sample();
+    }
+  }
+
+  { static elapsedUpdates counter; // update buffer update counter
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(KYRP_UPDATE); }
+  }
+  { static elapsedMillis counter; // update millisecond counter
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(KYRP_MILLI); }
+  }
+  { static elapsedMillis counter; // update 10 millisecond counter
+    if ((int)counter >= 0) { counter = -10; nrpn_incr(KYRP_10MILLI); }
+  }
+  { static elapsedMillis counter; // update 100 millisecond counter
+    if ((int)counter >= 0) { counter = -100; nrpn_incr(KYRP_100MILLI); }
+  }
+
+  listener_loop();		// after idle dispatch
   diagnostics_loop();		// console
 }
 

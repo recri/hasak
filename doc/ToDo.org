@@ -1,4 +1,5 @@
 * Todo list as of 2022-02-24
+[x] find and fix the bug that breaks the left paddle.
 [x] test that the json.h file produces legit json string
 	with json_pp.
 [x] refactor adc to report input raw reads to a fixed nrpn.
@@ -8,6 +9,10 @@
 	into the target nrpn, using the target nrpn
 	to identify the mapping and filter out no change.
 [x] refactor inpin -> in, outpin -> out, inadc -> adc
+[ ] refactor adc into padc.
+[ ] make the pin_listener for padc, make sure the pin is a valid pin
+[x] initialize pins in define at 127.
+[ ] I guess adcmap.h needs to refactor, too.
 [ ] write the string mechanism.
 [ ] test the json transfer mechanism.
 [ ] redo mixer automation ramps as every_buffer(listener) that resets the mixer.gain()
@@ -15,18 +20,18 @@
 [ ] move the ramp code into src from src/Audio.
 [ ] use the ramp code for keyed oscillator.
 [ ] make the keyed oscillator handle negative frequencies.
-[ ] make a boolean flag to mark note, ctrl, and nrpn values
+[ ] make a "boolean" flag to mark note, ctrl, and nrpn values
 	as boolean values.  Might store them more efficiently.
-[ ] make a high range of nrpns for internal use, not saved,
+[x] make a high range of nrpns for internal use, not saved,
 	but potentially observable to watch the operation.
 	move xper_dit etc there.
 [x] make a low range of nrpns for the midi controller exclusively
 [ ] move the midi.h modulating nrpns into the front and have midi.h
 	use them directly. KYRP_CHANNEL, KYRP_ECHO_ENABLE.
-[ ] put live values into the NRPN array, loops, samples, updates, millis
-	and fire listeners on them to implement every_any!
+[x] put live values into the NRPN array, loops, samples, updates, millis
+	and fire listeners on them to call functions at regular periods
 [x] insert Steve's WM8960 nrpns into the ephemeral block
-[ ] make a listener node allocator, so we can make listeners inside loops,
+[x] make a listener node allocator, so we can make listeners inside loops,
 	or in functions with note, ctrl, or nrpn parameters.
 * Todo list as of 2022-02-14
 [x] if KYRF_NONE was > than all real fists, 

@@ -154,4 +154,4 @@ static void cwdetime_setup(void) {
   note_listen(KYRN_KEY_ST, cwdetime_listen);
 }
 
-static void cwdetime_loop(void) {}
+//static void cwdetime_loop(void) {}

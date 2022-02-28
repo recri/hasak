@@ -229,7 +229,154 @@ static uint8_t diag_logging = 0;
 
 char diag_debug_buffer[4][256];
 
+struct { short nrpn; const char*name; } diag_nrpn[] = {
+  -1, "MIDI",
+  KYRP_MIDI_INPUTS, "_INPUTS",
+  KYRP_MIDI_OUTPUTS, "_OUTPUTS",
+  KYRP_MIDI_ECHOES, "_ECHOES",
+  KYRP_MIDI_SENDS, "_SENDS",
+  KYRP_MIDI_NOTES, "_NOTES",
+  KYRP_MIDI_CTRLS, "_CTRLS",
+  KYRP_MIDI_NRPNS, "_NRPNS",
+  -1, "LISTENER", 
+  KYRP_LISTENER_NODES, "_NODES",
+  KYRP_LISTENER_LISTS, "_LISTS",
+  KYRP_LISTENER_CALLS, "_CALLS",
+  KYRP_LISTENER_FIRES, "_FIRES",
+  KYRP_LISTENER_LOOPS, "_LOOPS",
+  -1, "COUNTS",
+  KYRP_LOOP, "LOOP",
+  KYRP_SAMPLE, "SAMPLE",
+  KYRP_UPDATE, "UPDATE",
+  KYRP_MILLI, "1MS",
+  KYRP_10MILLI, "10MS",
+  KYRP_100MILLI, "100MS",
+
+  -1, "MIDI",
+  KYRP_CHANNEL, "CHANNEL",
+  KYRP_INPUT_ENABLE, "IN_EN",
+  KYRP_OUTPUT_ENABLE, "OUT_EN",
+  KYRP_ECHO_ENABLE, "ECHO_EN",
+  KYRP_LISTENER_ENABLE, "LISTEN_EN",
+
+  -1, "ENABLE",
+  KYRP_PIN_ENABLE, "PIN_EN",
+  KYRP_POUT_ENABLE, "POUT_EN",
+  KYRP_PADC_ENABLE, "ADC_EN",
+  KYRP_ST_ENABLE, "ST_EN",
+  KYRP_TX_ENABLE, "TX_EN",
+  KYRP_IQ_ENABLE, "IQ_EN",
+  KYRP_PTT_REQUIRE, "PTT_REQ",
+
+  -1, "ENABLE",
+  KYRP_RKEY_ENABLE, "RKEY_EN",
+  KYRP_CW_AUTOPTT, "APTT",
+  KYRP_RX_MUTE, "RX_MUTE",
+  KYRP_MIC_HWPTT, "MIC_HWPTT",
+  KYRP_CW_HWPTT, "CW_HWPTT",
+  KYRP_HDW_IN_ENABLE, "HDW_IN_EN",
+  KYRP_HDW_OUT_ENABLE, "HDW_OUT_EN",
+
+  -1, "LEVELS",
+  KYRP_VOLUME, "MAIN",
+  KYRP_LEVEL, "ST",
+  KYRP_IQ_LEVEL, "IQ",
+  KYRP_I2S_LEVEL, "I2S",
+  KYRP_HDW_LEVEL, "HDW",
+  KYRP_ST_BALANCE, "ST_BAL",
+  KYRP_IQ_BALANCE, "IQ_BAL",
+
+  -1, "KEY",
+  KYRP_TONE, "TON",
+  KYRP_SPEED, "SPD",
+  KYRP_SPEED_FRAC, "_FRAC",
+  KYRP_WEIGHT, "WGT",
+  KYRP_RATIO, "RAT",
+  KYRP_FARNS, "FRNS",
+  KYRP_COMP, "COMP",
+
+  -1, "PTT",
+  KYRP_HEAD_TIME, "HEAD",
+  KYRP_TAIL_TIME, "TAIL",
+  KYRP_HANG_TIME, "HANG",
+
+  -1, "SHAPE",
+  KYRP_RISE_TIME, "RISE",
+  KYRP_RISE_RAMP, "RAMP",
+  KYRP_FALL_TIME, "FALL",
+  KYRP_FALL_RAMP, "RAMP",
+
+  -1, "PAD", 
+  KYRP_PAD_MODE, "_MODE",
+  KYRP_PAD_SWAP, "_SWAP",
+  KYRP_PAD_ADAPT, "_ADAPT",
+  KYRP_AUTO_ILS, "AILS",
+  KYRP_AUTO_IWS, "AIWS",
+  KYRP_PAD_KEYER, "_KEYER",
+
+  -1, "MISC",
+  KYRP_ACTIVE_ST, "ACTIVE_ST",
+  KYRP_MIXER_SLEW_RAMP, "L_SLEW_RMP",
+  KYRP_MIXER_SLEW_TIME, "L_SLEW",
+  KYRP_FREQ_SLEW_RAMP, "F_SLEW_RMP",
+  KYRP_FREQ_SLEW_TIME, "F_SLEW",
+
+  -1, "MISC",
+  KYRP_MIX_ENABLE, "MIX_EN",
+  KYRP_MIX_ENABLE_L, "MIX_EN_L",
+  KYRP_MIX_ENABLE_R, "MIX_EN_R",
+  KYRP_PIN_DEBOUNCE, "PIN_DEB",
+  KYRP_POUT_LOGIC, "POUT_LOG",
+  KYRP_PADC_RATE, "ADC_RATE",
+  KYRP_XIQ_FREQ, "XIQ_FREQ",
+  KYRP_XIQ_FREQ+1, "",
+  
+  KYRP_IQ_USB, "IQ_USB",
+
+  -1, "PIN",
+  KYRP_PIN0_PIN, "P0",
+  KYRP_PIN1_PIN, "P1",
+  KYRP_PIN2_PIN, "P2",
+  KYRP_PIN3_PIN, "P3",
+  KYRP_PIN4_PIN, "P4",
+  KYRP_PIN5_PIN, "P5",
+  KYRP_PIN6_PIN, "P6",
+  KYRP_PIN7_PIN, "P7",
+
+  -1, "POUT",
+  KYRP_POUT0_PIN, "P0",
+  KYRP_POUT1_PIN, "P1",
+  KYRP_POUT2_PIN, "P2",
+  KYRP_POUT3_PIN, "P3",
+  KYRP_POUT4_PIN, "P4",
+  KYRP_POUT5_PIN, "P5",
+  KYRP_POUT6_PIN, "P6",
+  KYRP_POUT7_PIN, "P7",
+
+  -1, "ADC",
+  KYRP_PADC0_PIN, "P0", KYRP_PADC0_VAL, "V", KYRP_PADC0_NRPN, "N",
+  KYRP_PADC1_PIN, "P1", KYRP_PADC1_VAL, "V", KYRP_PADC1_NRPN, "N",
+  KYRP_PADC2_PIN, "P2", KYRP_PADC2_VAL, "V", KYRP_PADC2_NRPN, "N",
+  KYRP_PADC3_PIN, "P3", KYRP_PADC3_VAL, "V", KYRP_PADC3_NRPN, "N",
+  -1, "ADC",
+  KYRP_PADC4_PIN, "P4", KYRP_PADC4_VAL, "V", KYRP_PADC4_NRPN, "N",
+  KYRP_PADC5_PIN, "P5", KYRP_PADC5_VAL, "V", KYRP_PADC5_NRPN, "N",
+  KYRP_PADC6_PIN, "P6", KYRP_PADC6_VAL, "V", KYRP_PADC6_NRPN, "N",
+  KYRP_PADC7_PIN, "P7", KYRP_PADC7_VAL, "V", KYRP_PADC7_NRPN, "N",
+
+  0, NULL
+};
 void diag_nrpn_report(void) {
+  int n = 0;
+  for (int i = 0; diag_nrpn[i].nrpn != 0; i += 1) {
+    if (++n > 14) { Serial.printf("\n"); n = 0; }
+    if (diag_nrpn[i].nrpn == -1) {
+      Serial.printf("\n%s: ", diag_nrpn[i].name); n = 0;
+    } else
+      Serial.printf(" %s %d,", diag_nrpn[i].name, nrpn_get(diag_nrpn[i].nrpn));
+  }
+  Serial.printf("\n");
+#if 0
   Serial.printf("\tVOLUME %.2f", nrpn_to_db(nrpn_get(KYRP_VOLUME)));
   Serial.printf("\tINPUT_SELECT %d", nrpn_get(KYRP_INPUT_SELECT));
   Serial.printf("\tINPUT_LEVEL %.2f", nrpn_to_db(nrpn_get(KYRP_INPUT_LEVEL)));
@@ -266,16 +413,16 @@ void diag_nrpn_report(void) {
   Serial.printf("\tCHANNEL %d", nrpn_get(KYRP_CHANNEL));
   Serial.println("");
 
-  Serial.printf("\tADC_ENABLE %d", nrpn_get(KYRP_ADC_ENABLE));
-  Serial.printf("\tADC*_NRPN %d", nrpn_get(KYRP_ADC0_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC1_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC2_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC3_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_ADC4_NRPN));
+  Serial.printf("\tPADC_ENABLE %d", nrpn_get(KYRP_PADC_ENABLE));
+  Serial.printf("\tPADC*_NRPN %d", nrpn_get(KYRP_PADC0_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_PADC1_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_PADC2_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_PADC3_NRPN));
+  Serial.printf(" %d", nrpn_get(KYRP_PADC4_NRPN));
   Serial.println();
 
   /* 64 morse code translations */
-  Serial.printf("\tMIX_ENABLE 0x%04x", nrpn_get(KYRP_MIX_ENABLE));
+h  Serial.printf("\tMIX_ENABLE 0x%04x", nrpn_get(KYRP_MIX_ENABLE));
   Serial.println();
 
   Serial.printf("\tUSB_L0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L0)));
@@ -328,6 +475,7 @@ void diag_nrpn_report(void) {
   Serial.printf("\tILS %ld", xnrpn_get(KYRP_XPER_ILS));
   Serial.printf("\tIWS %ld", xnrpn_get(KYRP_XPER_IWS));
   Serial.println("");
+#endif
 }
 
 static char *diag_read_line() {

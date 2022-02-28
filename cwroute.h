@@ -80,8 +80,6 @@ static void cwroute_ptt_out_listener(int note) {
   }
 }
 
-static void cwroute_sample(void) {}
-
 static void cwroute_setup(void) {
   note_listen(KYRN_MIDI_IN_TUNE, cwroute_midi_tune_listener);
   note_listen(KYRN_KEY_ST, cwroute_sidetone_listener);
@@ -89,4 +87,4 @@ static void cwroute_setup(void) {
   note_listen(KYRN_PTT_OUT, cwroute_ptt_out_listener);
 }
 
-static void cwroute_loop(void) {}
+//static void cwroute_loop(void) {}

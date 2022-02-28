@@ -103,8 +103,9 @@ private:
     if (flags[index]&ECHO_ENABLE) send(index, get(index, type, tindex), type, tindex);
   }
 
-
-  void incr(int index, int type, int tindex, int n = 1) { set(index, get(index, type, tindex)+n, type, tindex); }
+  void unset(int index, int type, int tindex) {
+    _set(index, -1, type, tindex);
+  }
 
   void send(int index, int value, int type, int tindex) {
     if (value == -1) return;
@@ -157,47 +158,53 @@ private:
 
   int note_get(int note) { return note_is_valid(note) ? get(note_hoist(note), NOTE, note) : -1; }
 
-  void note_set(int note, int value) { if (note_is_valid(note)) set(note_hoist(note), value, NOTE, note); }
+  void note_set(int note, int value) { if (note_is_valid(note)) set(note_hoist(note), value&0x7f, NOTE, note); }
 
-  void note_send(int note, int value) { if (note_is_valid(note)) send(note_hoist(note), value, NOTE, note); }
+  void note_unset(int note) { if (note_is_valid(note)) unset(note_hoist(note), NOTE, note); }
+
+  void note_send(int note, int value) { if (note_is_valid(note)) send(note_hoist(note), value&0x7f, NOTE, note); }
 
   void note_define(int note, int value,
 		   int input_enable, int output_enable, 
 		   int echo_enable, int read_only) {
     if (note_is_valid(note))
-      define(note_hoist(note), value, input_enable, output_enable, echo_enable, read_only, NOTE, note);
+      define(note_hoist(note), value&0x7f, input_enable, output_enable, echo_enable, read_only, NOTE, note);
   }
 
   bool ctrl_is_valid(int ctrl) { return (unsigned)ctrl < N_CTRL; }
 
   int ctrl_get(int ctrl) { return ctrl_is_valid(ctrl) ? get(ctrl_hoist(ctrl), CTRL, ctrl) : -1; }
 
-  void ctrl_set(int ctrl, int value) { if (ctrl_is_valid(ctrl)) set(ctrl_hoist(ctrl), value, CTRL, ctrl); }
+  void ctrl_set(int ctrl, int value) { if (ctrl_is_valid(ctrl)) set(ctrl_hoist(ctrl), value&0x7f, CTRL, ctrl); }
 
-  void ctrl_send(int ctrl, int value) { if (ctrl_is_valid(ctrl)) send(ctrl_hoist(ctrl), value, CTRL, ctrl); }
+  void ctrl_unset(int ctrl) { if (ctrl_is_valid(ctrl)) unset(ctrl_hoist(ctrl), CTRL, ctrl); }
+
+  void ctrl_send(int ctrl, int value) { if (ctrl_is_valid(ctrl)) send(ctrl_hoist(ctrl), value&0x7f, CTRL, ctrl); }
 
   void ctrl_define(int ctrl, int value,
 		   int input_enable, int output_enable, 
 		   int echo_enable, int read_only) {
     if (ctrl_is_valid(ctrl))
-      define(ctrl_hoist(ctrl), value, input_enable, output_enable, echo_enable, read_only, CTRL, ctrl);
+      define(ctrl_hoist(ctrl), value&0x7f, input_enable, output_enable, echo_enable, read_only, CTRL, ctrl);
   }
 
   bool nrpn_is_valid(int nrpn) { return (unsigned)nrpn < N_NRPN; }
 
   int16_t nrpn_get(int nrpn) { return nrpn_is_valid(nrpn) ? get(nrpn_hoist(nrpn), NRPN, nrpn) : -1; }
 
-  void nrpn_set(int nrpn, int value) { if (nrpn_is_valid(nrpn)) set(nrpn_hoist(nrpn), value, NRPN, nrpn); }
+  void nrpn_set(int nrpn, int value) { if (nrpn_is_valid(nrpn)) set(nrpn_hoist(nrpn), value&0x3fff, NRPN, nrpn); }
 
-  void nrpn_send(int nrpn, int value) { if (nrpn_is_valid(nrpn)) send(nrpn_hoist(nrpn), value, NRPN, nrpn); }
+  void nrpn_unset(int nrpn) { if (nrpn_is_valid(nrpn)) unset(nrpn_hoist(nrpn), NRPN, nrpn); }
 
-  void nrpn_incr(int nrpn, int n=1) { if (nrpn_is_valid(nrpn)) incr(nrpn_hoist(nrpn), NRPN, nrpn, n); }
+  void nrpn_send(int nrpn, int value) { if (nrpn_is_valid(nrpn)) send(nrpn_hoist(nrpn), value&0x3fff, NRPN, nrpn); }
+
+  void nrpn_incr(int nrpn, int n=1) { if (nrpn_is_valid(nrpn)) nrpn_set(nrpn, nrpn_get(nrpn)+n); }
 
   void nrpn_define(int nrpn, int value,
 		   int input_enable, int output_enable, 
 		   int echo_enable, int read_only) {
     if (nrpn_is_valid(nrpn))
-      define(nrpn_hoist(nrpn), value, input_enable, output_enable, echo_enable, read_only, NRPN, nrpn);
+      define(nrpn_hoist(nrpn), value&0x3fff, input_enable, output_enable, echo_enable, read_only, NRPN, nrpn);
   }
 
  private:

@@ -61,12 +61,12 @@
 //#define KYR_ENABLE_HDW_IN 1 /* {type def title {Should we enable a hardware input input channel}} */
 
 /* enable winkey emulator, but don't, it doesn't work */
-#define KYR_ENABLE_WINKEY 1  /* {type def title {Should we enable the winkey emulator}} */
+#define KYR_ENABLEx_WINKEY 1  /* {type def title {Should we enable the winkey emulator}} */
 
 /* numbers of configurable modules that are implemented */
 /* *** don't change these unless you're prepared to modify all the code that's wired to their values *** */
 #define KYR_N_PIN	8 /* {type def title {number of digital input pins that can be configured}} */
-#define KYR_N_ADC	8 /* {type def title {number of analog input pins that can be configured}} */
+#define KYR_N_PADC	8 /* {type def title {number of analog input pins that can be configured}} */
 #define KYR_N_POUT	8 /* {type def title {number of digital output pins that can be configured}} */
 #define KYR_N_SKEY	3 /* {type def title {number of straight key inputs that can be configured}} */
 #define KYR_N_PADDLE	3 /* {type def title {number of iambic keyer inputs that can be configured}} */
@@ -495,7 +495,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define KYRP_PIN_ENABLE		(KYRP_ENABLE+0) /* {type ctrl label Input title {enable input pin processing} property keyerInput} */ 
 #define KYRP_POUT_ENABLE	(KYRP_ENABLE+1) /* {type ctrl label Output title {enable output pin processing} property keyerOutput} */ 
-#define KYRP_ADC_ENABLE		(KYRP_ENABLE+2) /* {type ctrl label Adc title {enable adc input pin processing} property keyerAdc} */ 
+#define KYRP_PADC_ENABLE	(KYRP_ENABLE+2) /* {type ctrl label Adc title {enable adc input pin processing} property keyerAdc} */ 
 #define KYRP_ST_ENABLE		(KYRP_ENABLE+3) /* {type nrpn label ST title {enable sidetone generation} range {0 1} property sidetoneEnable} */
 #define KYRP_TX_ENABLE		(KYRP_ENABLE+4) /* {type nrpn label TX title {enable TX ouputs} range {0 1} property txEnable} */
 #define KYRP_IQ_ENABLE		(KYRP_ENABLE+5) /* {type nrpn label IQ title {enable IQ generation} range {0 1} property iqEnable} */
@@ -575,7 +575,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYRP_MIX_ENABLE_R	(KYRP_MISC+7) /* {type nrpn sub short label OutMixR title {output mixer right enable bits, shorthand} range {0 4095} property outputEnableRight} */
 #define KYRP_PIN_DEBOUNCE	(KYRP_MISC+8) /* {type nrpn label Deb title {debounce period} range {0 16383} unit samples property pinDebounce} */
 #define KYRP_POUT_LOGIC		(KYRP_MISC+9) /* {type nrpn label OutLog title {output pin logic} range {0 1} property pinLogic} */
-#define KYRP_ADC_RATE		(KYRP_MISC+10) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit samples* property adc2Control valuesProperty adcControls} */
+#define KYRP_PADC_RATE		(KYRP_MISC+10) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit samples* property adc2Control valuesProperty adcControls} */
 #define KYRP_XIQ_FREQ		(KYRP_MISC+11) /* {type nrpn sub ext title {IQ frequency} units hz/10 range {-480000 480000}} */
 #define KYRP_IQ_USB		(KYRP_MISC+13) /* {type nrpn title {IQ upper sideband} range {0 1}} */
 
@@ -601,34 +601,34 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYRP_POUT6_PIN	(KYRP_POUT+6)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
 #define KYRP_POUT7_PIN	(KYRP_POUT+7)  /* {type nrpn label Pin title {output hardware pin to latch} range {-1 127} property outpinPin} */
 
-#define KYRP_ADC	(KYRP_POUT+KYR_N_POUT) /* {type rel title {base of hardware analog input pin block}} */
+#define KYRP_PADC	(KYRP_POUT+KYR_N_POUT) /* {type rel title {base of hardware analog input pin block}} */
 
-#define KYRP_ADC0_PIN	(KYRP_ADC+0) /* {type nrpn label adc0Pin title {hardware pin for adc0} range {-1 127} property adc0Pin} */
-#define KYRP_ADC0_VAL	(KYRP_ADC+1) /* {type nrpn label adc0Val title {analog value for adc0} range {0 1023} property adc0Val} */
-#define KYRP_ADC0_NRPN	(KYRP_ADC+2) /* {type nrpn label adc0Nrpn title {nrpn connected to adc0} values KYRV_ADC_* property adc0Nrpn} */
-#define KYRP_ADC1_PIN	(KYRP_ADC0_PIN+3) /* {type nrpn label adc1Pin title {hardware pin for adc1} range {-1 127} property adc1Pin} */
-#define KYRP_ADC1_VAL	(KYRP_ADC0_VAL+3) /* {type nrpn label adc1Val title {analog value for adc1} range {0 1023} property adc1Val} */
-#define KYRP_ADC1_NRPN	(KYRP_ADC0_NRPN+3) /* {type nrpn label adc1Nrpn title {nrpn connected to adc1} values KYRV_ADC_* property adc1Nrpn} */
-#define KYRP_ADC2_PIN	(KYRP_ADC1_PIN+3) /* {type nrpn label adc2Pin title {hardware pin for adc2} range {-1 127} property adc2Pin} */
-#define KYRP_ADC2_VAL	(KYRP_ADC1_VAL+3) /* {type nrpn label adc2Val title {analog value for adc2} range {0 1023} property adc2Val} */
-#define KYRP_ADC2_NRPN	(KYRP_ADC1_NRPN+3) /* {type nrpn label adc2Nrpn title {nrpn connected to adc2} values KYRV_ADC_* property adc2Nrpn} */
-#define KYRP_ADC3_PIN	(KYRP_ADC2_PIN+3) /* {type nrpn label adc3Pin title {hardware pin for adc3} range {-1 127} property adc3Pin} */
-#define KYRP_ADC3_VAL	(KYRP_ADC2_VAL+3) /* {type nrpn label adc3Val title {analog value for adc3} range {0 1023} property adc3Val} */
-#define KYRP_ADC3_NRPN	(KYRP_ADC2_NRPN+3) /* {type nrpn label adc3Nrpn title {nrpn connected to adc3} values KYRV_ADC_* property adc3Nrpn} */
-#define KYRP_ADC4_PIN	(KYRP_ADC3_PIN+3) /* {type nrpn label adc4Pin title {hardware pin for adc4} range {-1 127} property adc4Pin} */
-#define KYRP_ADC4_VAL	(KYRP_ADC3_VAL+3) /* {type nrpn label adc4Val title {analog value for adc4} range {0 1023} property adc4Val} */
-#define KYRP_ADC4_NRPN	(KYRP_ADC3_NRPN+3) /* {type nrpn label adc4Nrpn title {nrpn connected to adc4} values KYRV_ADC_* property adc4Nrpn} */
-#define KYRP_ADC5_PIN	(KYRP_ADC4_PIN+3) /* {type nrpn label adc5Pin title {hardware pin for adc5} range {-1 127} property adc5Pin} */
-#define KYRP_ADC5_VAL	(KYRP_ADC4_VAL+3) /* {type nrpn label adc5Val title {analog value for adc5} range {0 1023} property adc5Val} */
-#define KYRP_ADC5_NRPN	(KYRP_ADC4_NRPN+3) /* {type nrpn label adc5Nrpn title {nrpn connected to adc5} values KYRV_ADC_* property adc5Nrpn} */
-#define KYRP_ADC6_PIN	(KYRP_ADC5_PIN+3) /* {type nrpn label adc6Pin title {hardware pin for adc6} range {-1 127} property adc6Pin} */
-#define KYRP_ADC6_VAL	(KYRP_ADC5_VAL+3) /* {type nrpn label adc6Val title {analog value for adc6} range {0 1023} property adc6Val} */
-#define KYRP_ADC6_NRPN	(KYRP_ADC5_NRPN+3) /* {type nrpn label adc6Nrpn title {nrpn connected to adc6} values KYRV_ADC_* property adc6Nrpn} */
-#define KYRP_ADC7_PIN	(KYRP_ADC6_PIN+3) /* {type nrpn label adc7Pin title {hardware pin for adc7} range {-1 127} property adc7Pin} */
-#define KYRP_ADC7_VAL	(KYRP_ADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
-#define KYRP_ADC7_NRPN	(KYRP_ADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values KYRV_ADC_* property adc7Nrpn} */
+#define KYRP_PADC0_PIN	(KYRP_PADC+0) /* {type nrpn label adc0Pin title {hardware pin for adc0} range {-1 127} property adc0Pin} */
+#define KYRP_PADC0_VAL	(KYRP_PADC+1) /* {type nrpn label adc0Val title {analog value for adc0} range {0 1023} property adc0Val} */
+#define KYRP_PADC0_NRPN	(KYRP_PADC+2) /* {type nrpn label adc0Nrpn title {nrpn connected to adc0} values KYRV_PADC_* property adc0Nrpn} */
+#define KYRP_PADC1_PIN	(KYRP_PADC0_PIN+3) /* {type nrpn label adc1Pin title {hardware pin for adc1} range {-1 127} property adc1Pin} */
+#define KYRP_PADC1_VAL	(KYRP_PADC0_VAL+3) /* {type nrpn label adc1Val title {analog value for adc1} range {0 1023} property adc1Val} */
+#define KYRP_PADC1_NRPN	(KYRP_PADC0_NRPN+3) /* {type nrpn label adc1Nrpn title {nrpn connected to adc1} values KYRV_PADC_* property adc1Nrpn} */
+#define KYRP_PADC2_PIN	(KYRP_PADC1_PIN+3) /* {type nrpn label adc2Pin title {hardware pin for adc2} range {-1 127} property adc2Pin} */
+#define KYRP_PADC2_VAL	(KYRP_PADC1_VAL+3) /* {type nrpn label adc2Val title {analog value for adc2} range {0 1023} property adc2Val} */
+#define KYRP_PADC2_NRPN	(KYRP_PADC1_NRPN+3) /* {type nrpn label adc2Nrpn title {nrpn connected to adc2} values KYRV_PADC_* property adc2Nrpn} */
+#define KYRP_PADC3_PIN	(KYRP_PADC2_PIN+3) /* {type nrpn label adc3Pin title {hardware pin for adc3} range {-1 127} property adc3Pin} */
+#define KYRP_PADC3_VAL	(KYRP_PADC2_VAL+3) /* {type nrpn label adc3Val title {analog value for adc3} range {0 1023} property adc3Val} */
+#define KYRP_PADC3_NRPN	(KYRP_PADC2_NRPN+3) /* {type nrpn label adc3Nrpn title {nrpn connected to adc3} values KYRV_PADC_* property adc3Nrpn} */
+#define KYRP_PADC4_PIN	(KYRP_PADC3_PIN+3) /* {type nrpn label adc4Pin title {hardware pin for adc4} range {-1 127} property adc4Pin} */
+#define KYRP_PADC4_VAL	(KYRP_PADC3_VAL+3) /* {type nrpn label adc4Val title {analog value for adc4} range {0 1023} property adc4Val} */
+#define KYRP_PADC4_NRPN	(KYRP_PADC3_NRPN+3) /* {type nrpn label adc4Nrpn title {nrpn connected to adc4} values KYRV_PADC_* property adc4Nrpn} */
+#define KYRP_PADC5_PIN	(KYRP_PADC4_PIN+3) /* {type nrpn label adc5Pin title {hardware pin for adc5} range {-1 127} property adc5Pin} */
+#define KYRP_PADC5_VAL	(KYRP_PADC4_VAL+3) /* {type nrpn label adc5Val title {analog value for adc5} range {0 1023} property adc5Val} */
+#define KYRP_PADC5_NRPN	(KYRP_PADC4_NRPN+3) /* {type nrpn label adc5Nrpn title {nrpn connected to adc5} values KYRV_PADC_* property adc5Nrpn} */
+#define KYRP_PADC6_PIN	(KYRP_PADC5_PIN+3) /* {type nrpn label adc6Pin title {hardware pin for adc6} range {-1 127} property adc6Pin} */
+#define KYRP_PADC6_VAL	(KYRP_PADC5_VAL+3) /* {type nrpn label adc6Val title {analog value for adc6} range {0 1023} property adc6Val} */
+#define KYRP_PADC6_NRPN	(KYRP_PADC5_NRPN+3) /* {type nrpn label adc6Nrpn title {nrpn connected to adc6} values KYRV_PADC_* property adc6Nrpn} */
+#define KYRP_PADC7_PIN	(KYRP_PADC6_PIN+3) /* {type nrpn label adc7Pin title {hardware pin for adc7} range {-1 127} property adc7Pin} */
+#define KYRP_PADC7_VAL	(KYRP_PADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
+#define KYRP_PADC7_NRPN	(KYRP_PADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values KYRV_PADC_* property adc7Nrpn} */
 
-#define KYRP_MORSE	(KYRP_ADC+KYR_N_ADC*3) /* {type rel title {morse code table base}} */
+#define KYRP_MORSE	(KYRP_PADC+KYR_N_PADC*3) /* {type rel title {morse code table base}} */
 
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through `, with many holes */
@@ -779,22 +779,22 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define KYR_N_NRPN		(KYRP_LAST)   /* {type def title {number of nrpns defined}} */
 
-/* definitions of ADC targets, these had undefined symbols when placed immediately after KYRP_ADC* */
-#define KYRV_ADC_NOTHING	(KYRP_NOTHING) /* {type val label None title {pot controls nothing} value-of KYRP_ADCMAP*_CONTROL property adcControls} */
-#define KYRV_ADC_VOLUME		(KYRP_VOLUME) /* {type val label Volume title {pot controls master volume} value-of KYRP_ADC*_CONTROL property adcControls} */
-#define KYRV_ADC_LEVEL		(KYRP_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of KYRP_ADC*_CONTROL property adcControls} */
-#define KYRV_ADC_TONE		(KYRP_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of KYRP_ADC*_CONTROL property adcControls} */
-#define KYRV_ADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_ADC*_CONTROL property adcControls} */
-#define KYRV_ADC_FARNS		(KYRP_FARNS) /* {type val label Farnsworth title {pot controls keyer Farnsworh speed} value-of KYRP_ADC*_CONTROL property adcControls} */
-#define KYRV_ADC_COMP		(KYRP_COMP) /* {type val label Comp title {}} */
-#define KYRV_ADC_HEAD_TIME	(KYRP_HEAD_TIME) /* {type val label PTTHead title KYRP_HEAD_TIME} */
-#define KYRV_ADC_TAIL_TIME	(KYRP_TAIL_TIME) /* {type val label PTTTail title KYRP_TAIL_TIME} */
-#define KYRV_ADC_RISE_TIME	(KYRP_RISE_TIME) /* {type val label Rise title KYRP_RISE_TIME} */
-#define KYRV_ADC_FALL_TIME	(KYRP_FALL_TIME) /* {type val label Fall title KYRP_FALL_TIME} */
-#define KYRV_ADC_WEIGHT		(KYRP_WEIGHT) /* {type val label Weight title KYRP_WEIGHT} */
-#define KYRV_ADC_RATIO		(KYRP_RATIO) /* {type val label Ratio title KYRP_RATIO} */
-#define KYRV_ADC_SPEED_FRAC	(KYRP_SPEED_FRAC) /* {type val label Frac title KYRP_SPEED_FRAC} */
-#define KYRV_ADC_CODEC_VOLUME	(KYRP_CODEC_VOLUME) /* {type val label Frac title KYRP_CODEC_VOLUME} */
+/* definitions of ADC targets, these had undefined symbols when placed immediately after KYRP_PADC* */
+#define KYRV_PADC_NOTHING	(KYRP_NOTHING) /* {type val label None title {pot controls nothing} value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_VOLUME		(KYRP_VOLUME) /* {type val label Volume title {pot controls master volume} value-of KYRP_PADC*_NRP property adcControls} */
+#define KYRV_PADC_LEVEL		(KYRP_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_TONE		(KYRP_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_SPEED		(KYRP_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_FARNS		(KYRP_FARNS) /* {type val label Farnsworth title {pot controls keyer Farnsworh speed} value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_COMP		(KYRP_COMP) /* {type val label Comp title {} value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_HEAD_TIME	(KYRP_HEAD_TIME) /* {type val label PTTHead title KYRP_HEAD_TIME value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_TAIL_TIME	(KYRP_TAIL_TIME) /* {type val label PTTTail title KYRP_TAIL_TIME value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_RISE_TIME	(KYRP_RISE_TIME) /* {type val label Rise title KYRP_RISE_TIME value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_FALL_TIME	(KYRP_FALL_TIME) /* {type val label Fall title KYRP_FALL_TIME value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_WEIGHT		(KYRP_WEIGHT) /* {type val label Weight title KYRP_WEIGHT value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_RATIO		(KYRP_RATIO) /* {type val label Ratio title KYRP_RATIO value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_SPEED_FRAC	(KYRP_SPEED_FRAC) /* {type val label Frac title KYRP_SPEED_FRAC value-of KYRP_PADC*_NRPN property adcControls} */
+#define KYRV_PADC_CODEC_VOLUME	(KYRP_CODEC_VOLUME) /* {type val label Frac title KYRP_CODEC_VOLUME value-of KYRP_PADC*_NRPN property adcControls} */
 
 /* end of defined nrpns */
 /* end of config.h */
