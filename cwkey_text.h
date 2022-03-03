@@ -40,16 +40,16 @@
 static KeyerText cwkey_text(KYRN_TXT_TEXT, KYRN_ST_TEXT);
 static KeyerText cwkey_text2(KYRN_TXT_TEXT2, KYRN_ST_TEXT2);
 
-static void cwkey_text_listen(int note) { cwkey_text.receive(); }
-static void cwkey_text2_listen(int note) { cwkey_text2.receive(); }
+static void cwkey_text_listen(int note, int _) { cwkey_text.receive(); }
+static void cwkey_text2_listen(int note, int _) { cwkey_text2.receive(); }
 
-static void cwkey_text_sample(int nrpn) { 
-  cwkey_text.clock(1);
-  cwkey_text2.clock(1);
+static void cwkey_text_sample(int nrpn, int _) { 
+  cwkey_text.clock();
+  cwkey_text2.clock();
 }
 
 static void cwkey_text_setup(void) {
   note_listen(cwkey_text.text_note, cwkey_text_listen);
   note_listen(cwkey_text2.text_note, cwkey_text2_listen);
-  note_listen(KYRP_SAMPLE, cwkey_text_sample);
+  nrpn_listen(KYRP_SAMPLE, cwkey_text_sample);
 }

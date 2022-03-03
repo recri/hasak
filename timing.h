@@ -22,10 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef _timing_h
-#define _timing_h
 
-#include "src/elapsed_counter.h"
+#include "timers.h"
 
 /*
 ** Timing - keep track of 
@@ -97,25 +95,7 @@ static float timing_percent_max(uint32_t cpuCyclesMax) {
   return 100*(float)cpuCyclesMax/(float)timing_cpuCyclesPerAudioBufferMax;
 }
 
-static unsigned long timing_loops() { return timing_loopCounter; }
-static unsigned long timing_samples() { return timing_sampleCounter; }
-static unsigned long timing_updates() { return timing_updateCounter; }
+unsigned long timing_loops() { return timing_loopCounter; }
+unsigned long timing_samples() { return timing_sampleCounter; }
+unsigned long timing_updates() { return timing_updateCounter; }
 
-/*
-** These types, like the Teensy supplied elapsedMicros and elapsedMillis, 
-** allow you to easily count elapsed time periods.
-** First off, llocate the instance in storage that will persist, so external
-** or static.
-** Then set the instance to zero, and then it will always read the number of
-** units that have elapsed since you set it to zero.
-** You can also initialize to a negative number and read it with an (int) cast,
-** it will count up from the negative value to zero and then continue counting.
-*/
-
-typedef elapsed<micros> myElaspedMicros; // microseconds, for comparison to Teensy elapsedMicros
-typedef elapsed<millis> myElapsedMillis; // milliseconds, for comparison to Teensy elapsedMillis
-typedef elapsed<timing_samples> elapsedSamples; // sample times
-typedef elapsed<timing_loops> elapsedLoops; // executions of arduino loop()
-typedef elapsed<timing_updates> elapsedUpdates; // audio library buffer cycles
-
-#endif

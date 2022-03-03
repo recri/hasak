@@ -62,7 +62,7 @@ static void codec_wm8960_set(const int16_t nrpn, const int16_t value) {
   }
 }
 
-static void codec_listener(const int nrpn) {
+static void codec_listener(const int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (codec_sgtl5000) codec_sgtl5000_set(nrpn, value);
   if (codec_wm8960) codec_wm8960_set(nrpn, value);

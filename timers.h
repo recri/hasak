@@ -22,30 +22,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef _timers_h
+#define _timers_h
+
+#include "src/elapsed_counter.h"
+
+extern unsigned long timing_loops();
+extern unsigned long timing_samples();
+extern unsigned long timing_updates();
 
 /*
-** sidetone ptt timing, just a simple tail
+** These types, like the Teensy supplied elapsedMicros and elapsedMillis, 
+** allow you to easily count elapsed time periods.
+** First off, llocate the instance in storage that will persist, so external
+** or static.
+** Then set the instance to zero, and then it will always read the number of
+** units that have elapsed since you set it to zero.
+** You can also initialize to a negative number and read it with an (int) cast,
+** it will count up from the negative value to zero and then continue counting.
 */
 
-static elapsedSamples cwstptt_tail_counter; /* count up the tail time */
+typedef elapsed<micros> myElaspedMicros; // microseconds, for comparison to Teensy elapsedMicros
+typedef elapsed<millis> myElapsedMillis; // milliseconds, for comparison to Teensy elapsedMillis
+typedef elapsed<timing_samples> elapsedSamples; // sample times
+typedef elapsed<timing_loops> elapsedLoops; // executions of arduino loop()
+typedef elapsed<timing_updates> elapsedUpdates; // audio library buffer cycles
 
-static void cwstptt_sidetone_listener(int note, int _) {
-  if (note_get(KYRN_KEY_ST) &&	/* sidetone on */
-      ! note_get(KYRN_PTT_ST))  /* sidetone ptt not on */
-      note_toggle(KYRN_PTT_ST);	/* start sidetone ptt */
-  cwstptt_tail_counter = -xnrpn_get(KYRP_XPER_IWS); /* 7 dit word space tail */	/* reset the element timer */
-}
-
-static void cwstptt_sample(int nrpn, int _) {
-  if (note_get(KYRN_PTT_ST) != 0 &&   /* ptt st is on */
-      note_get(KYRN_KEY_ST) == 0 &&   /* key st is off */
-      (int)cwstptt_tail_counter >= 0) /* tail has expired */
-    note_toggle(KYRN_PTT_ST);	      /* ptt off */
-}
-
-static void cwstptt_setup(void) {
-  note_listen(KYRN_KEY_ST, cwstptt_sidetone_listener);
-  nrpn_listen(KYRP_SAMPLE, cwstptt_sample);
-}
-
-// static void cwstptt_loop(void) {}
+#endif

@@ -69,7 +69,7 @@ static float cwdetime_wpm_to_dit(float wpm) {
   return cwdetime_dit_to_wpm(wpm);
 }
 
-static void cwdetime_listen(int note) {
+static void cwdetime_listen(int note, int _) {
   uint32_t this_frame = timing_samples();
   int observation = this_frame-cwdetime_data.frame;
   cwdetime_data.frame = this_frame;
@@ -146,12 +146,8 @@ static void cwdetime_listen(int note) {
   }
 }
 
-static void cwdetime_sample(void) {}
-
 static void cwdetime_setup(void) {
   cwdetime_data.wpm = 15;
   cwdetime_data.estimate = cwdetime_wpm_to_dit(cwdetime_data.wpm);
   note_listen(KYRN_KEY_ST, cwdetime_listen);
 }
-
-//static void cwdetime_loop(void) {}

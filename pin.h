@@ -27,7 +27,7 @@
  * digital pin input
  */
 
-static void pin_sample(int nrpn) {
+static void pin_sample(int nrpn, int _) {
 
   /* KYR_N_PIN digital input pins which can be wired up */
   /* assumes that the pin and note nrpns occur in a contiguous block */
@@ -50,7 +50,7 @@ static void pin_sample(int nrpn) {
   }
 }
 
-static void pin_pin_listener(int nrpn) {
+static void pin_pin_listener(int nrpn, int _) {
   const int pin = nrpn_get(nrpn);
   if (pin_valid(pin))
     pinMode(pin, INPUT_PULLUP);

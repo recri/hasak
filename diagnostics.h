@@ -214,15 +214,17 @@ static char *diag_random_text(void) {
 static const char *diag_text_send_ptr = NULL;
 static const char *diag_text2_send_ptr = NULL;
 
-static int diag_send_some_text(const char *text, KeyerText& input) {
-  if (text == NULL) return 0;
-  if (*text == 0) return 0;
-  if ( ! input.valid_vox()) return 0;
+static char *diag_send_some_text(const char *text, KeyerText& input) {
+  if (text == NULL) return NULL;
+  if (*text == 0) return NULL;
+  if ( ! input.valid_vox()) return NULL;
   while (*text != 0 && input.can_send_text()) {
     // Serial.printf("sending %d\n", *text);
     input.send_text(*text++);
   }
-  return *text != 0 && input.valid_vox();
+  if ( ! input.valid_vox())
+    return NULL;
+  return text;
 }
 
 static uint8_t diag_logging = 0;
@@ -501,9 +503,11 @@ void diagnostics_loop() {
 	Serial.printf("%s\n", diag_debug_buffer[i]);
 	diag_debug_buffer[i][0] = 0;
       }
-  if ( ! diag_send_some_text(diag_text_send_ptr, cwkey_text)) diag_text_send_ptr = NULL;
+  if (diag_text_send_ptr)
+    diag_text_send_ptr = diag_send_some_text(diag_text_send_ptr, cwkey_text);
 #if KYR_N_TEXT > 1
-  if ( ! diag_send_some_text(diag_text2_send_ptr, cwkey_text2)) diag_text2_send_ptr = NULL;
+  if (diag_text2_send_ptr)
+    diag_text2_send_ptr = diag_send_some_text(diag_text2_send_ptr, cwkey_text2);
 #endif
   
   if (elapsed_test) {

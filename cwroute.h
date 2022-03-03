@@ -28,12 +28,12 @@
 ** final sidetone, key out, and ptt out routing.
 */
 
-static void cwroute_midi_tune_listener(int note) {
+static void cwroute_midi_tune_listener(int note, int _) {
   if (nrpn_get(KYRP_RKEY_ENABLE))
     note_set(KYRN_ST_TUNE, note_get(KYRN_MIDI_IN_TUNE) != 0);
 }
 
-static void cwroute_sidetone_listener(int note) {
+static void cwroute_sidetone_listener(int note, int _) {
   /* KYRN_KEY_ST can be routed to:
   ** KYRN_AU_ST_KEY to make a tone
   ** KYRN_MIDI_OUT_ST to make a midi note
@@ -45,7 +45,7 @@ static void cwroute_sidetone_listener(int note) {
   }
 }
 
-static void cwroute_key_out_listener(int note) {
+static void cwroute_key_out_listener(int note, int _) {
   /* KYRN_KEY_OUT can be routed to
   ** KYRN_MIDI_OUT_KEY to produce a midi note
   ** KYRN_HW_KEY_OUT to change a pin state
@@ -65,7 +65,7 @@ static void cwroute_key_out_listener(int note) {
   }
 }
 
-static void cwroute_ptt_out_listener(int note) {
+static void cwroute_ptt_out_listener(int note, int _) {
   /* ptt out can be routed to
   ** KYRN_MIDI_OUT_PTT to generate an external midi note
   ** KYRN_HW_PTT_OUT and/or KYRN_HW_PTT_OUT2 to change a pin state

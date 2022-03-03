@@ -27,37 +27,31 @@
 
 static ResponsiveAnalogRead *padc_adc[KYR_N_PADC];
 
-static void padc_milli(int nrpn) {
+static void padc_milli(int nrpn, int _) {
   static uint16_t count = 0;
   if ( ! nrpn_get(KYRP_PADC_ENABLE)) return;
   count += 1;
   for (int i = 0; i <= KYR_N_PADC; i += 1) {
-    /* if no reader for this channel, continue */ 
-    if (padc_adc[i] == NULL) continue; 
-    /* if it's our turn to update, update the reader */
-    /* each reader gets updated once every 8ms */
-    if ((count % KYR_N_PADC) == i) padc_adc[i]->update();
-    /* if it isn't our turn to getValue, continue */
-    /* we getValue once every KYRP_PADC_RATE ms */ 
-    if ((count % nrpn_get(KYRP_PADC_RATE)) != i) continue; 
-    /* get the current value from the reader */
-    int16_t raw_value = padc_adc[i]->getValue();
-    /* compute the value nrpn where we keep the value */
-    int val_nrpn = KYRP_PADC0_VAL+i*(KYRP_PADC1_VAL-KYRP_PADC0_VAL);
-    /* if the value has not changed, continue */
-    if (raw_value == nrpn_get(val_nrpn)) continue; 
-    /* set the new value */    
-    nrpn_set(val_nrpn, raw_value);
+    if (padc_adc[i] != NULL) {
+      if ((count % KYR_N_PADC) == i) 
+	padc_adc[i]->update();
+      if ((count % nrpn_get(KYRP_PADC_RATE)) == i) {
+	int16_t raw_value = padc_adc[i]->getValue();
+	int val_nrpn = KYRP_PADC0_VAL+i*(KYRP_PADC1_VAL-KYRP_PADC0_VAL);
+	if (raw_value != nrpn_get(val_nrpn))
+	  nrpn_set(val_nrpn, raw_value);
+      }
+    }
   }
 }
 
-static void padc_pin_listener(int nrpn) {
+static void padc_pin_listener(int nrpn, int _) {
   const int pin = nrpn_get(nrpn);
   if ( ! pin_valid(pin) || ! pin_analog(pin) || pin_i2s(pin) || pin_i2c(pin)) {
     nrpn_set(nrpn, 127); // this should trigger a loop detection in HasakMidi
     return;
   }
-  Serial.printf("padc_pin_listener(%d)\n", nrpn);
+  // Serial.printf("padc_pin_listener(%d)\n", nrpn);
   const int i = (nrpn-KYRP_PADC0_PIN)/(KYRP_PADC1_PIN-KYRP_PADC0_PIN);
   if (padc_adc[i] != NULL) {
     delete padc_adc[i];
@@ -74,5 +68,3 @@ static void padc_setup(void) {
     nrpn_listen(KYRP_PADC0_PIN+i*(KYRP_PADC1_PIN-KYRP_PADC0_PIN), padc_pin_listener);
   nrpn_listen(KYRP_MILLI, padc_milli);
 }
-
-// static void adc_loop(void) {}

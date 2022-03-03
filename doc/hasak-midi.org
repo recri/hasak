@@ -1,0 +1,68 @@
+* The hasak midi interface.
+** This is the specification of the hasak MIDI interface.
+*** The 'MIDI channel' refers to the stream of messages on the hardware MIDI interface.
+*** The 'device' refers to the code which executes on the hardware device side of the interface.
+*** The 'interface' refers to the HasakMidi class which manages the interactions between
+	the MIDI channel and the device.
+** the interface listens and sends on one MIDI channel.
+*** the channel is initialized to 10 and can only be set to a valid channel number from 1 to 16.
+*** the echo of a message which changes the channel will happen on the new channel.
+** the interface listens to a range of notes from 0 to N_NOTES-1.
+*** note values are stored in an array of int8_t.
+*** valid note values range from 0 to 127
+** the interface listens to a range of control change messages  from 0 to N_CTRLS-1.
+*** ctrl values are stored in an array of int8_t.
+*** N_CTRLS must be at least 100.
+*** valid ctrl values range from 0 to 127
+** the interface listens to a range of nonregistered parameter numbers from 0 to N_NRPNS-1.
+*** nrpns values are stored in an array of int16_t.
+*** valid nrpn values range from 0 to 16383
+** values by itself means note values, ctrl values, and nrpn values collectively.
+*** that is, the interface treats them all the same.
+** the values can be set by MIDI messages received from the MIDI channel
+**** in which case the same message may be echoed back to the MIDI channel with the current value.
+** the values can be set by the device 
+*** in which case the MIDI message that would set the value may be sent to the MIDI channel with the current value.
+** the interface has three global flags which modify the general case
+*** if GLOBAL_INPUT_ENABLE is set, then the interface accepts input from the MIDI channel.
+**** this flag cannot be modified from the MIDI interface.
+*** if GLOBAL_OUTPUT_ENABLE is set, then the interface generates output to the MIDI channel.
+**** this flag cannot be modified from the MIDI interface.
+*** if GLOBAL_ECHO_ENABLE is set, then inputs accepted will be echoed back if output is generated.
+** each value has four flags which modify the general case.
+*** if the INPUT_ENABLE flag is set for a value, then the interface accepts value input from the MIDI channel
+*** if the OUTPUT_ENABLE flag is set for a value, then the interface generates value output to the MIDI channel.
+*** if the ECHO_ENABLE flag is set for a value, then an accepted input value will echo the value to the MIDI channel,
+**** but only if OUTPUT_ENABLE is set for the value.
+**** and it will be the interface value that is echoed, which may not be the accepted input.
+*** if the WRITE_ENABLE flag is set for a value, then accepted inputs will write the value.
+*** these flags cannot be directly modified from the MIDI channel
+**** they are set by the device when it initializes the interface
+**** and the device may alter them at any time.
+** the device may attach listener functions to individual notes, ctrls, or nrpns
+** the device may also attach listener functions to all notes, all ctrls, or all nrpns
+** listeners are triggered when a value is set or almost set
+*** set by the device
+*** set by an input accepted from the MIDI channel
+*** or almost set by an input accepted from the MIDI channel, because WRITE_ENABLE prevented the set. 
+*** it does not matter if the new value is the same as or different from the old value.
+** multiple listeners can be attached to the same trigger
+** listeners may set values, which will fire the listeners to the value, but reentrancy is prevented
+*** values are marked as LISTEN_ACTIVE when the listeners are invoked
+*** a set to a value which is marked LISTEN_ACTIVE simply sets the value
+*** this should be avoided because the exact result may depend on the order of the listeners to the value.
+** listeners may also be set to run once at the end of the current ~loop()~
+** general details of listeners
+*** a listener is a function with the signature ~void listener(int, int)
+*** the first ~int~ parameter is the note, ctrl, or nrpn firing
+*** the second ~int~ parameter is the previous value
+**** ~note_listen(int note, void (\*f)(int, int))~ sets a listener to the specified note.
+**** ~ctrl_listen(int ctrl, void (\*f)(int, int))~ sets a listener to the specified ctrl.
+**** ~nrpn_listen(int nrpn, void (\*f)(int, int))~ sets a listener to the specified nrpn.
+**** ~note_listen_all(void (\*f)(int, int))~ sets a listener to all notes.
+**** ~ctrl_listen_all(void (\*f)(int, int))~ sets a listener to all ctrls.
+**** ~nrpn_listen_all(void (\*f)(int, int))~ sets a listener to all nrpns..
+**** ~after_idle(void (\*f)(int, int))~ will fire the function once at the end of the current ~loop()~
+*** there can be multiple listeners installed on any condition
+*** multiple listeners get executed in reverse order of their installation.
+**** though to execute in order of installation isn't much harder to implement.

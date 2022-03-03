@@ -31,6 +31,9 @@
 
 #define KYR_NRPN_SIZE		(KYR_N_NRPN*sizeof(int16_t))
 #define KYR_MSG_SIZE		(EEPROM_BYTES-KYR_NRPN_SIZE-6*sizeof(int16_t))
+#define KYR_SAMPLE_RATE		(((uint16_t)AUDIO_SAMPLE_RATE)/100)
+#define KYR_EEPROM_LENGTH	(EEPROM.length())
+#define KYR_ID_CPU		(TEENSY_CPU_ID)
 
 typedef struct {
   /* header for eeprom */
@@ -59,7 +62,7 @@ static hasak_t hasak = {
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
-static void nrpn_update_keyer_timing(int numb) {
+static void nrpn_update_keyer_timing(int numb, int _) {
   const int wordDits = 50;
   const int sampleRate = AUDIO_SAMPLE_RATE;
   const float wpm = nrpn_get(KYRP_SPEED)+nrpn_get(KYRP_SPEED_FRAC)*7.8125e-3f;
@@ -110,7 +113,7 @@ static void nrpn_update_keyer_timing(int numb) {
 /*
 ** trigger a morse timing update when any of the required values changes.
 */
-static void nrpn_recompute_morse(int nrpn) {
+static void nrpn_recompute_morse(int nrpn, int _) {
   // Serial.printf("recompute_morse setting handler\n");
   after_idle(nrpn_update_keyer_timing);
 }
@@ -130,7 +133,7 @@ static void nrpn_recompute_morse(int nrpn) {
 ** addresses left mixer channel (i%4)+(i/4)*8
 ** and addresses right mixer channel (i%4)+(i/4)*8+4
 */
-static void nrpn_recompute_mixer_enables(int nrpn) {
+static void nrpn_recompute_mixer_enables(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   for (int i = 0; i < 12; i += 1) {
     const int l = (i%4)+(i/4)*8;
@@ -152,7 +155,7 @@ static void nrpn_recompute_mixer_enables(int nrpn) {
 /* 
 ** EEPROM functions.  Disabled.
 */
-static void nrpn_write_eeprom(int nrpn) {
+static void nrpn_write_eeprom(int nrpn, int _) {
 #if 0
   hasak_eeprom_image_t data;
   int error = 0;
@@ -183,7 +186,7 @@ static void nrpn_write_eeprom(int nrpn) {
 #endif
 }
 
-static void nrpn_read_eeprom(int nrpn) {
+static void nrpn_read_eeprom(int nrpn, int _) {
 #if 0
   hasak_eeprom_image_t data;
   EEPROM.get(0, data);
@@ -211,8 +214,8 @@ static void nrpn_read_eeprom(int nrpn) {
 */
 static int nrpn_echo_index;
 
-static void nrpn_echo_all_step(int number) {
-  if (nrpn_echo_index < KYRP_LAST) {
+static void nrpn_echo_all_step(int _, int  __) {
+  if (nrpn_echo_index < KYRP_LAST_SAVED) {
     if (nrpn_get(nrpn_echo_index) != KYRV_NOT_SET)
       nrpn_send(nrpn_echo_index, nrpn_get(nrpn_echo_index));
     nrpn_echo_index += 1;
@@ -223,15 +226,15 @@ static void nrpn_echo_all_step(int number) {
   }
 }
 
-static void nrpn_echo_all(int nrpn) {
-  nrpn_echo_index = 0;
-  nrpn_echo_all_step(-1);
+static void nrpn_echo_all(int nrpn, int _) {
+  nrpn_echo_index = KYRP_SAVED;
+  after_idle(nrpn_echo_all_step);
 }
 
 /*
 ** feed the text keyers
 */
-static void nrpn_send_text(int nrpn) {
+static void nrpn_send_text(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (nrpn == KYRP_SEND_TEXT) {
     note_set(KYRN_TXT_TEXT, value&127);
@@ -248,7 +251,7 @@ static void nrpn_send_text(int nrpn) {
 /*
 ** maintain the message buffers
 */
-static void nrpn_msg_handler(int nrpn) {
+static void nrpn_msg_handler(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (nrpn == KYRP_MSG_INDEX) { 
     hasak.index = value%sizeof(hasak.msgs);
@@ -265,62 +268,20 @@ static void nrpn_msg_handler(int nrpn) {
   }
 }
     
-/*
-** values for storing as readonly information.
-*/
-
-static int nrpn_eeprom_length(void) {
-  return EEPROM.length();
-}
-
-static int nrpn_nrpn_size(void) {
-  return KYR_N_NRPN*sizeof(int16_t);
-}
-
-static int nrpn_msg_size(void) {
-  return nrpn_eeprom_length()-3*3*sizeof(int16_t)-nrpn_nrpn_size();
-}
-
-static int nrpn_sample_rate(void) {
-  return ((uint16_t)AUDIO_SAMPLE_RATE)/100;
-}
-
-static int nrpn_id_cpu(void) {
-#if defined(TEENSY30)
-  return 30;
-#elif defined(TEENSY31)
-  return 31;
-#elif defined(TEENSY32)
-  return 32;
-#elif defined(TEENSY35)
-  return 35;
-#elif defined(TEENSY36)
-  return 36;
-#elif defined(TEENSY40)
-  return 40;
-#elif defined(TEENSY41)
-  return 41;
-#else
-  return 0;
-#endif
-}
-
-static void nrpn_query(int nrpn) {
+static void nrpn_query(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (nrpn_is_valid(value) && nrpn_get(value) != KYRV_NOT_SET)
     nrpn_send(nrpn, nrpn_get(value));
 }
        
-static void nrpn_unset_listener(int nrpn) {
+static void nrpn_unset_listener(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (nrpn_is_valid(value))
     nrpn_set(nrpn, KYRV_NOT_SET);
 }
 
-static void nrpn_id_json(int nrpn) {
-}
-
-static void nrpn_string_handler(int nrpn) {
+static void nrpn_id_json(int nrpn, int _) {
+  string_id_json(json_string, sizeof(json_string)-1);
 }
 
 /*
@@ -452,16 +413,13 @@ static void nrpn_set_default(void) {
 
 }
 
-static void nrpn_set_default_shim(int nrpn) {
+static void nrpn_set_default_shim(int nrpn, int _) {
   nrpn_set_default();
 }
 
 static void nrpn_setup(void) {
   /* bootstrap controller */
   nrpn_listen(KYRP_ID_JSON, nrpn_id_json);
-  nrpn_listen(KYRP_STRING_BEGIN, nrpn_string_handler);
-  nrpn_listen(KYRP_STRING_END, nrpn_string_handler);
-  nrpn_listen(KYRP_STRING_BYTE, nrpn_string_handler);
 
   /* morse timing update, listen for changes */
   nrpn_listen(KYRP_SPEED, nrpn_recompute_morse);
@@ -488,11 +446,11 @@ static void nrpn_setup(void) {
   nrpn_listen(KYRP_MSG_READ, nrpn_msg_handler);
 
   /* information set in the nrpn array so it will be echoed */
-  nrpn_set(KYRP_NRPN_SIZE, nrpn_nrpn_size());
-  nrpn_set(KYRP_MSG_SIZE, nrpn_msg_size());
-  nrpn_set(KYRP_SAMPLE_RATE, nrpn_sample_rate());
-  nrpn_set(KYRP_EEPROM_LENGTH, nrpn_eeprom_length());;
-  nrpn_set(KYRP_ID_CPU, nrpn_id_cpu());
+  nrpn_set(KYRP_NRPN_SIZE, KYR_NRPN_SIZE);
+  nrpn_set(KYRP_MSG_SIZE, KYR_MSG_SIZE);
+  nrpn_set(KYRP_SAMPLE_RATE, KYR_SAMPLE_RATE);
+  nrpn_set(KYRP_EEPROM_LENGTH, KYR_EEPROM_LENGTH);;
+  nrpn_set(KYRP_ID_CPU, KYR_ID_CPU);
   nrpn_set(KYRP_ID_CODEC, codec_identify());
 }
 

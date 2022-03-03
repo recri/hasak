@@ -32,7 +32,7 @@
 
 static int cwarbiter_change_over = 0;
 
-static void cwarbiter_any_st(const int note) {
+static void cwarbiter_any_st(const int note, int _) {
   // Serial.printf("cwarbiter_any_st(%d) active %d\n", note, nrpn_get(KYRP_ACTIVE_ST));
 
   /* case 0 - change over to new active note in progress */
@@ -81,11 +81,11 @@ static void cwarbiter_any_st(const int note) {
   return;
 }
 
-static void cwarbiter_release(const int note) {
+static void cwarbiter_release(const int note, int _) {
   nrpn_set(KYRP_ACTIVE_ST, KYRN_ST_NONE);
 }
 
-static void cwarbiter_sample(int nrpn) {
+static void cwarbiter_sample(int nrpn, int _) {
   /* if we preempted a sounding note we have to allow one sample of sidetone off
    * to trigger the fall ramp in the audio graph */
   if (cwarbiter_change_over && ++cwarbiter_change_over > 32) {

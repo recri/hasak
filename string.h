@@ -72,21 +72,79 @@ length of the session.
 **	a dynamic string, like a saved message
 */
 typedef struct {
-  char *location;
-  int local, size, index;
-} string_endpoint_t
+  int open, id, target, length, sent, rcvd, last, stalled;
+  const char *string;
+} string_endpoint_t;
 
-static void string_begin_listener(int nrpn) {
+#define STRING_N_ENDPOINT 1
+static string_endpoint_t string_endpoint[STRING_N_ENDPOINT];
+
+static void string_after_idle(int nrpn, int _) {
+  int nopen = 0;
+  for (int i = 0; i < STRING_N_ENDPOINT; i += 1) {
+    string_endpoint_t *p = &string_endpoint[i];
+    if (p->open) {				        // endpoint active
+      nopen += 1;
+      if (p->sent == p->length) {			// all sent
+	if (p->rcvd == p->length) {			// all rcvd
+	  nrpn_send(KYRP_STRING_END, (p->id<<7)|p->target);	// end string
+	  p->open = 0;					// close endpoint
+	  nopen -= 1;					// note close
+	}
+      } else if (p->sent == 0 ||			// nothing sent or
+		 (p->rcvd > 0 && (p->last&0x7f) > 1)) {	// last ack has space
+	nrpn_send(KYRP_STRING_BYTE, (p->id << 7) | p->string[p->sent++]);
+      } else {						// we're stalled
+	p->stalled += 1;
+      }
+    }
+  }
+  if (nopen > 0)
+    after_idle(string_after_idle);
 }
 
-static void string_end_listener(int nrpn) {
+static void string_start(string_endpoint_t *p) {
+  p->open = 1;
+  nrpn_send(KYRP_STRING_START, (p->id << 7) | p->target);
+  after_idle(string_after_idle);
 }
 
-static void string_byte_listener(int nrpn) {
+static void string_byte(const int payload) {
+  int id = payload>>7;
+  if (id >= 0 || id < STRING_N_ENDPOINT) {
+    string_endpoint_t *p = &string_endpoint[id];
+    p->rcvd += 1;
+    p->last = payload;
+  }
+}	
+
+static void string_id_json(const char *string, int length) {
+  string_endpoint_t *p = &string_endpoint[0];
+  p->open = 0;
+  p->id = 0;			// json end point
+  p->target = 0;		// json target
+  p->length = length;		// string length
+  p->string = string;		// string bytes
+  p->sent = 0;			// number sent
+  p->rcvd = 0;			// number acknowledged
+  p->last = 0;			// last acknowledgement
+  p->stalled = 0;		// stalled waiting for acknowledgement
+  nrpn_send(KYRP_ID_JSON, (p->id << 7) | p->target);
+  string_start(p);
+}
+
+static void string_start_listener(int nrpn, int _) {
+}
+
+static void string_end_listener(int nrpn, int _) {
+}
+
+static void string_byte_listener(int nrpn, int _) {
+  string_byte(nrpn_get(nrpn));
 }
 
 static void string_setup(void) {
-  note_listen(KYRP_STRING_BEGIN, string_begin_listener);
+  nrpn_listen(KYRP_STRING_START, string_start_listener);
   nrpn_listen(KYRP_STRING_END, string_end_listener);
   nrpn_listen(KYRP_STRING_BYTE, string_byte_listener);
 }

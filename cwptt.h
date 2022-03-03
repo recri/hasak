@@ -33,11 +33,11 @@ static RingBuffer<uint32_t,256> cwptt_delay_line;
 static unsigned long cwptt_tail_time;
 static byte cwptt_tail_time_is_stale = 1; /* flag for initial computation */
 
-static void cwptt_nrpn_listener(int nrpn) {
+static void cwptt_nrpn_listener(int nrpn, int _) {
   cwptt_tail_time_is_stale = 1;	/* flag for recompute */
 }
 
-static void cwptt_sidetone_listener(int note) {
+static void cwptt_sidetone_listener(int note, int _) {
   if (note_get(KYRN_KEY_ST))	/* sidetone is on */
     if ( ! note_get(KYRN_PTT_OUT))
       note_toggle(KYRN_PTT_OUT);
@@ -48,11 +48,11 @@ static void cwptt_sidetone_listener(int note) {
     Serial.printf("cwptt_listener, delay line overflow, reduce speed or ptt head time\n");
 }
 
-static void cwptt_key_out_listener(int note) {
+static void cwptt_key_out_listener(int note, int _) {
   cwptt_tail_counter = 0;	     /* reset the element timer */
 }
 
-static void cwptt_sample(int nrpn) {
+static void cwptt_sample(int nrpn, int _) {
   if (cwptt_tail_time_is_stale) {
     cwptt_tail_time_is_stale = 0;
     cwptt_tail_time = max(nrpn_get(KYRP_TAIL_TIME), nrpn_get(KYRP_HANG_TIME)*xnrpn_get(KYRP_XPER_DIT));

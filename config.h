@@ -456,32 +456,34 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYRP_FIRST		0 /* {type rel title {base of nrpns}} */
 
 #define KYRP_NOTHING		(KYRP_FIRST+0) /* {type nrpn title {nothng parameter value, zero is not a valid parameter} property nothing} */
-#define KYRP_ID_JSON		(KYRP_FIRST+1) /* {type nrpn sub cmd title {send the JSON string which describes the keyer} property idJSON} */
-#define KYRP_STRING_BEGIN	(KYRP_FIRST+2) /* {type nrpn sub cmd title {begin a string transfer} property stringBegin} */
-#define KYRP_STRING_END		(KYRP_FIRST+3) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
-#define KYRP_STRING_BYTE	(KYRP_FIRST+4) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define KYRP_ID_DEVICE           (KYRP_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer} */
+#define KYRP_ID_VERSION		(KYRP_FIRST+2) /* {type nrpn title {identify this keyer version for the correspondent} property idVersion} */
+#define KYRP_ID_JSON		(KYRP_FIRST+3) /* {type nrpn sub cmd title {send the JSON string which describes the keyer} property idJSON} */
+#define KYRP_STRING_START	(KYRP_FIRST+4) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
+#define KYRP_STRING_END		(KYRP_FIRST+5) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
+#define KYRP_STRING_BYTE	(KYRP_FIRST+6) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
 
-#define KYRP_MIDI_INPUTS	(KYRP_FIRST+5) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
-#define KYRP_MIDI_OUTPUTS	(KYRP_FIRST+6) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
-#define KYRP_MIDI_ECHOES	(KYRP_FIRST+7) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
-#define KYRP_MIDI_SENDS		(KYRP_FIRST+8) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
-#define KYRP_MIDI_NOTES		(KYRP_FIRST+9) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define KYRP_MIDI_CTRLS		(KYRP_FIRST+10) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define KYRP_MIDI_NRPNS		(KYRP_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define KYRP_LISTENER_NODES     (KYRP_FIRST+12) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
-#define KYRP_LISTENER_LISTS	(KYRP_FIRST+13) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
-#define KYRP_LISTENER_CALLS	(KYRP_FIRST+14) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
-#define KYRP_LISTENER_FIRES	(KYRP_FIRST+15) /* {type nrpn sub info title {number of listener lists called} listen 0} */
-#define KYRP_LISTENER_LOOPS	(KYRP_FIRST+16) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
-#define KYRP_STATS_RESET	(KYRP_FIRST+17) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
-#define KYRP_LOOP		(KYRP_FIRST+18) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
-#define KYRP_SAMPLE		(KYRP_FIRST+19) /* {type nrpn sub info title {sample counter, 48000Hz}} */
-#define KYRP_UPDATE		(KYRP_FIRST+20) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
-#define KYRP_MILLI		(KYRP_FIRST+21) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
-#define KYRP_10MILLI		(KYRP_FIRST+22) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
-#define KYRP_100MILLI		(KYRP_FIRST+23) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
+#define KYRP_MIDI_INPUTS	(KYRP_FIRST+7) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
+#define KYRP_MIDI_OUTPUTS	(KYRP_FIRST+8) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
+#define KYRP_MIDI_ECHOES	(KYRP_FIRST+9) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
+#define KYRP_MIDI_SENDS		(KYRP_FIRST+10) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
+#define KYRP_MIDI_NOTES		(KYRP_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define KYRP_MIDI_CTRLS		(KYRP_FIRST+12) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define KYRP_MIDI_NRPNS		(KYRP_FIRST+13) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define KYRP_LISTENER_NODES     (KYRP_FIRST+14) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
+#define KYRP_LISTENER_LISTS	(KYRP_FIRST+15) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
+#define KYRP_LISTENER_CALLS	(KYRP_FIRST+16) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
+#define KYRP_LISTENER_FIRES	(KYRP_FIRST+17) /* {type nrpn sub info title {number of listener lists called} listen 0} */
+#define KYRP_LISTENER_LOOPS	(KYRP_FIRST+18) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
+#define KYRP_STATS_RESET	(KYRP_FIRST+19) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
+#define KYRP_LOOP		(KYRP_FIRST+20) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
+#define KYRP_SAMPLE		(KYRP_FIRST+21) /* {type nrpn sub info title {sample counter, 48000Hz}} */
+#define KYRP_UPDATE		(KYRP_FIRST+22) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
+#define KYRP_MILLI		(KYRP_FIRST+23) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
+#define KYRP_10MILLI		(KYRP_FIRST+24) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
+#define KYRP_100MILLI		(KYRP_FIRST+25) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
 
-#define KYRP_SAVED		(KYRP_FIRST+24) /* {type rel title {base of saved NRPN parameters}} */
+#define KYRP_SAVED		(KYRP_FIRST+26) /* {type rel title {base of saved NRPN parameters}} */
 
 #define KYRP_SECOND		(KYRP_SAVED) /* {type rel title {base of persistent midi.h parameters}} */
 
@@ -575,7 +577,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYRP_MIX_ENABLE_R	(KYRP_MISC+7) /* {type nrpn sub short label OutMixR title {output mixer right enable bits, shorthand} range {0 4095} property outputEnableRight} */
 #define KYRP_PIN_DEBOUNCE	(KYRP_MISC+8) /* {type nrpn label Deb title {debounce period} range {0 16383} unit samples property pinDebounce} */
 #define KYRP_POUT_LOGIC		(KYRP_MISC+9) /* {type nrpn label OutLog title {output pin logic} range {0 1} property pinLogic} */
-#define KYRP_PADC_RATE		(KYRP_MISC+10) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit samples* property adc2Control valuesProperty adcControls} */
+#define KYRP_PADC_RATE		(KYRP_MISC+10) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit ms property adc2Control valuesProperty adcControls} */
 #define KYRP_XIQ_FREQ		(KYRP_MISC+11) /* {type nrpn sub ext title {IQ frequency} units hz/10 range {-480000 480000}} */
 #define KYRP_IQ_USB		(KYRP_MISC+13) /* {type nrpn title {IQ upper sideband} range {0 1}} */
 
@@ -723,7 +725,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYRV_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of KYRP_INPUT_SELECT property inputSelects} */
 #define KYRP_INPUT_LEVEL	(KYRP_CODEC+2) /* {type nrpn label InLvl title {input level} range {-128 24} unit dB/10 property inputLevel} */
 
-#define KYRP_SAVE_END		(KYRP_CODEC+3) /* {type rel title {base of soft params}} */
+#define KYRP_LAST_SAVED		(KYRP_CODEC+3) /* {type rel title {end of persistent params}} */
 
 #define KYRP_WM8960		(KYRP_CODEC+3) /* {type rel title {base of WM8960 commands}} */
 

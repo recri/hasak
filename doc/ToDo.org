@@ -1,16 +1,44 @@
 * Todo list as of 2022-02-24
+[ ] move the indivdual mixer levels into ephemeral NRPNs
+	compute them from enable bits and named level
+	and balance controls.
+[ ] keep a separate array of current levels and current targets
+	and current points in ramps.
+[ ] make the enable_lr bits the primary enable record
+[?] make the mixer audio class accept raw mixer multipliers
+	in addition to float gains?
+[ ] rename KYRP_* to NRPN_*, KYRN_* to NOTE_*, KYRC_* to CTRL_*
+[?] note_listen_all(my_listener) listens to all notes
+[?] ctrl_listen_all(my_listener) listens to all ctrls
+[?] nrpn_listen_all(my_listener) listens to all nrpns
+[ ] omit ephemeral NPRPs from JSON
+[ ] timer is an add on, explains how to implement millis
+	leaves the rest to the user
+[ ] move debounce into the straight key note handler.
+[ ] paddle key listener can have a different debouncer
+	one which listens to the output of the keyer
+	and adjusts the 'stickiness' of the paddles
+	to influence A/B mode timing, which has always
+	been hostage to the vagaries of sample/latch
+	timing.
+[ ]  The paddle keyer may emit 'element notes' of '.', '-',
+	and ' ' which get later keyed to 'on' and 'off'.
+	Inter-element space is omitted, one ' ' is an
+	inter-letter space, two ' ' in a row make an
+	inter-word space.
+[ ] listener heads move into listener.h, a byte token
+[ ] write the string mechanism.
+[ ] test the json transfer mechanism.
 [ ] get a makefile build to escape from the Arduino nonsense.
-[x] need an unlisten() api for switching listener targets
-[x] add unlisten to src/midi.h
-[x] add listen_remove to listeners.h
+[ ] move the time counters out of the src/midi.h block
+	someone might want different periods, or none.
+[ ] need additional ptt modules?
+[ ] need commands for adding and removing note routing
+	reimplement cwroute.h as programmed
 [ ] should midi.h include the after_idle handling?  midi_loop2()?
 [ ] need the oldvalue in the listener sometimes, changes
-	the signatures of all the functions.
-[x] change the call to invoke_listeners to include oldvalue
-[ ] change the signature of listener to void (*f)(int,int)
-[ ] change all the listeners to match
-[ ] fix the broken text keyer
-[x] fix the broken speed control
+	the signatures of all the callback functions, though I
+	think that -fpermissive allows it.
 [ ] DEBOUNCE should be % of dit
 [ ] or should there be another control which controls
 	the paddle's DITDAH perception, the Winkey PaddlePoint
@@ -27,8 +55,6 @@
 	but loading an eeprom image in memory and passing it
 	to a background loop process that does one byte per
 	loop might work well.
-[ ] write the string mechanism.
-[ ] test the json transfer mechanism.
 [ ] redo mixer automation ramps as every_buffer(listener) that resets the mixer.gain()
 	can use the ramp code.
 [ ] move the ramp code into src from src/Audio.
@@ -42,6 +68,15 @@
 	move xper_dit etc there.
 [ ] move the midi.h modulating nrpns into the front and have midi.h
 	use them directly. KYRP_CHANNEL, KYRP_ECHO_ENABLE.
+[-] move the nrpn echo index into the ephemeral nrpns?
+[x] need an unlisten() api for switching listener targets
+[x] add unlisten to src/midi.h
+[x] add listen_remove to listeners.h
+[x] change the call to invoke_listeners to include oldvalue
+[x] change the signature of listener to void (*f)(int,int)
+[x] change all the listeners to match
+[x] fix the broken text keyer
+[x] fix the broken speed control
 [x] make a low range of nrpns for the midi controller exclusively
 [x] put live values into the NRPN array, loops, samples, updates, millis
 	and fire listeners on them to call functions at regular periods

@@ -41,7 +41,7 @@
 #define KYR_PADC_RATIO_MIN 25
 #define KYR_PADC_RATIO_MAX 75
 
-static void padcmap_value(int nrpn) {
+static void padcmap_value(int nrpn, int _) {
   int min, max;
   int nrpn2 = nrpn_get(nrpn+1);
   switch (nrpn2) {

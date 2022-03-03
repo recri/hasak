@@ -42,6 +42,7 @@
 #include "midi.h"		// midi interface
 #include "define.h"		// define MIDI note, ctrl, and nrpn flags FIX.ME rename midi_defs.h
 #include "codec.h"		// handle the audio hardware
+#include "string.h"		// string handler
 #include "nrpn.h"		// default values and listeners for nrpns
 #include "cwdecode.h"		// decode cw element stream -> ascii
 #include "cwdetime.h"		// detime cw key line -> element stream
@@ -56,7 +57,6 @@
 #include "padcmap.h"		// input adc nrpns -> keyer parameter nrpns
 #include "pin.h"		// input pin states -> input pin notes rename
 #include "pout.h"		// output pin notes -> output pins
-// #include "outstring.h"	// output strings to MIDI
 // #include "cwinkey.h"		// FIX.ME - make it work
 #include "diagnostics.h"
 
@@ -87,7 +87,8 @@ void setup(void) {
   midi_setup();			// initialize the midi interface
   define_setup();		// define our notes ctrls and nrpns
   codec_setup();		// let the code install handlers
-  codec_enable();		// enable the coded
+  codec_enable();		// enable the codec
+  string_setup();		// set up string handlers
   nrpn_setup();			// set up nrpn handlers
   timing_setup();		// start your timers
   padc_setup();			// nrpn/note handlers for analog pins

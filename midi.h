@@ -46,12 +46,12 @@ static int note_invalid(const int note, const char *who) {
 
 static int note_is_valid(int note) { return midi.note_is_valid(note); }
   
-static void note_listen(int note, void (*f)(int)) { 
+static void note_listen(int note, void (*f)(int,int)) { 
   if (note_is_valid(note)) midi.note_listen(note, f);
   else note_invalid(note, "note_listen");
 }
 
-static void note_unlisten(int note, void (*f)(int)) { 
+static void note_unlisten(int note, void (*f)(int,int)) { 
   if (note_is_valid(note)) midi.note_unlisten(note, f);
   else note_invalid(note, "note_unlisten");
 }
@@ -102,12 +102,12 @@ static int ctrl_invalid(const int ctrl, const char *who) {
 
 static int ctrl_is_valid(int ctrl) { return midi.ctrl_is_valid(ctrl); }
   
-static void ctrl_listen(int ctrl, void (*f)(int)) {
+static void ctrl_listen(int ctrl, void (*f)(int,int)) {
   if (ctrl_is_valid(ctrl)) midi.ctrl_listen(ctrl, f);
   else ctrl_invalid(ctrl, "ctrl_listen");
 }
 
-static void ctrl_unlisten(int ctrl, void (*f)(int)) {
+static void ctrl_unlisten(int ctrl, void (*f)(int,int)) {
   if (ctrl_is_valid(ctrl)) midi.ctrl_unlisten(ctrl, f);
   else ctrl_invalid(ctrl, "ctrl_unlisten");
 }
@@ -163,12 +163,12 @@ static int nrpn_is_valid(const int nrpn) {
   return midi.nrpn_is_valid(nrpn);
 }
 
-static void nrpn_listen(int nrpn, void (*f)(int)) { 
+static void nrpn_listen(int nrpn, void (*f)(int,int)) { 
   if (nrpn_is_valid(nrpn)) midi.nrpn_listen(nrpn, f);
   else nrpn_invalid(nrpn, "nrpn_listen");
 }
 
-static void nrpn_unlisten(int nrpn, void (*f)(int)) { 
+static void nrpn_unlisten(int nrpn, void (*f)(int,int)) { 
   if (nrpn_is_valid(nrpn)) midi.nrpn_unlisten(nrpn, f);
   else nrpn_invalid(nrpn, "nrpn_unlisten");
 }

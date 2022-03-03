@@ -158,14 +158,14 @@ private:
   // is a value enabled for remote writing
   bool write_enabled(int type, int tindex) { return (_flags_get(type, tindex) & READ_ONLY) == 0; }
   // listen to a note, ctrl, or nrpn
-  void listen(int type, int tindex, void (*f)(int)) {
+  void listen(int type, int tindex, void (*f)(int,int)) {
     const int index = _hoist(type, tindex);
     if (listeners[index] == NULL) nrpn_incr(KYRP_LISTENER_LISTS);
     nrpn_incr(KYRP_LISTENER_NODES);
     listener_add(&listeners[index], f);
   }
   // remove a previously installed listener
-  void unlisten(int type, int tindex, void (*f)(int)) {
+  void unlisten(int type, int tindex, void (*f)(int,int)) {
     const int index = _hoist(type, tindex);
     if (flags[index]&LISTENER_ACTIVE) // may be able to remove this restriction
       nrpn_incr(KYRP_LISTENER_LOOPS);
@@ -183,7 +183,7 @@ private:
       nrpn_incr(KYRP_LISTENER_LOOPS); // may not re-enter a listener chain
     } else {
       flags[index] |= LISTENER_ACTIVE;
-      int n = listener_invoke(listeners[index], tindex); // add oldvalue
+      int n = listener_invoke(listeners[index], tindex, oldvalue);
       if (n > 0) {
 	nrpn_incr(KYRP_LISTENER_FIRES);
 	nrpn_incr(KYRP_LISTENER_CALLS, n);
@@ -251,9 +251,9 @@ private:
 
   void note_flags_set(int note, int value) { if (note_is_valid(note)) _flags_set(NOTE, note, value); }
 
-  void note_listen(const int note, void (*f)(int)) { if (note_is_valid(note)) listen(NOTE, note, f); }
+  void note_listen(const int note, void (*f)(int,int)) { if (note_is_valid(note)) listen(NOTE, note, f); }
   
-  void note_unlisten(const int note, void (*f)(int)) { if (note_is_valid(note)) unlisten(NOTE, note, f); }
+  void note_unlisten(const int note, void (*f)(int,int)) { if (note_is_valid(note)) unlisten(NOTE, note, f); }
   
   // ctrl interface
 
@@ -275,9 +275,9 @@ private:
 
   void ctrl_flags_set(int ctrl, int value) { ctrl_is_valid(ctrl) ? _flags_set(CTRL, ctrl, value) : -1; }
 
-  void ctrl_listen(const int ctrl, void (*f)(int)) { if (ctrl_is_valid(ctrl)) listen(CTRL, ctrl, f); }
+  void ctrl_listen(const int ctrl, void (*f)(int,int)) { if (ctrl_is_valid(ctrl)) listen(CTRL, ctrl, f); }
   
-  void ctrl_unlisten(const int ctrl, void (*f)(int)) { if (ctrl_is_valid(ctrl)) unlisten(CTRL, ctrl, f); }
+  void ctrl_unlisten(const int ctrl, void (*f)(int,int)) { if (ctrl_is_valid(ctrl)) unlisten(CTRL, ctrl, f); }
   
   // nrpn interface
   
@@ -301,9 +301,9 @@ private:
 
   void nrpn_flags_set(int nrpn, int value) { nrpn_is_valid(nrpn) ? _flags_set(NRPN, nrpn, value) : -1; }
 
-  void nrpn_listen(const int nrpn, void (*f)(int)) { if (nrpn_is_valid(nrpn)) listen(NRPN, nrpn, f); }
+  void nrpn_listen(const int nrpn, void (*f)(int,int)) { if (nrpn_is_valid(nrpn)) listen(NRPN, nrpn, f); }
 
-  void nrpn_unlisten(const int nrpn, void (*f)(int)) { if (nrpn_is_valid(nrpn)) unlisten(NRPN, nrpn, f); }
+  void nrpn_unlisten(const int nrpn, void (*f)(int,int)) { if (nrpn_is_valid(nrpn)) unlisten(NRPN, nrpn, f); }
 
   // miscellaneous interface
 
