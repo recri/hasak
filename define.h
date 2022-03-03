@@ -145,143 +145,143 @@ static void define_define(void) {
     }
   for (int nrpn = 0; nrpn < KYR_N_NRPN; nrpn += 1)
     switch (nrpn) {		//          nrpn, v, i, o, e, ro
-    case KYRP_NOTHING:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_ID_JSON:		nrpn_define(nrpn, 0, 1, 1, 0, 1); break; // in, out, no echo, no write : cmd
-    case KYRP_STRING_START:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
-    case KYRP_STRING_END:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
-    case KYRP_STRING_BYTE:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
-    case KYRP_MIDI_INPUTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_MIDI_OUTPUTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_MIDI_ECHOES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_MIDI_SENDS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_MIDI_NOTES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_MIDI_CTRLS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_MIDI_NRPNS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_LISTENER_NODES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_LISTENER_LISTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_LISTENER_CALLS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_LISTENER_FIRES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_LISTENER_LOOPS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case KYRP_STATS_RESET:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : command
-    case KYRP_LOOP:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters FIX.ME move these to keyer ephemera
-    case KYRP_SAMPLE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case KYRP_UPDATE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case KYRP_MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case KYRP_10MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case KYRP_100MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case KYRP_CHANNEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_INPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_OUTPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_ECHO_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_LISTENER_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_NOTHING:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_ID_JSON:		nrpn_define(nrpn, 0, 1, 1, 0, 1); break; // in, out, no echo, no write : cmd
+    case NRPN_STRING_START:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
+    case NRPN_STRING_END:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
+    case NRPN_STRING_BYTE:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
+    case NRPN_MIDI_INPUTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_OUTPUTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_ECHOES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_SENDS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_NOTES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_CTRLS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_NRPNS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_NODES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_LISTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_CALLS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_FIRES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_LOOPS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_STATS_RESET:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : command
+    case NRPN_LOOP:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters FIX.ME move these to keyer ephemera
+    case NRPN_SAMPLE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
+    case NRPN_UPDATE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
+    case NRPN_MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
+    case NRPN_10MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
+    case NRPN_100MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
+    case NRPN_CHANNEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_INPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_OUTPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_ECHO_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_LISTENER_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
 
-    case KYRP_PIN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_POUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_PADC_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_ST_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_TX_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_IQ_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_PTT_REQUIRE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_RKEY_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_CW_AUTOPTT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_RX_MUTE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIC_HWPTT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_CW_HWPTT:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_HDW_IN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_HDW_OUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_PIN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_POUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_PADC_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_ST_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_TX_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_IQ_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_PTT_REQUIRE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_RKEY_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_CW_AUTOPTT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_RX_MUTE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIC_HWPTT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_CW_HWPTT:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_HDW_IN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_HDW_OUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
 
-    case KYRP_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_IQ_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_I2S_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_HDW_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_ST_BALANCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_IQ_BALANCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_IQ_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_I2S_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_HDW_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_ST_BALANCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_IQ_BALANCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_TONE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_SPEED:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_WEIGHT:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_RATIO:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_FARNS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_COMP:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_SPEED_FRAC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_TONE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_SPEED:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_WEIGHT:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_RATIO:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_FARNS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_COMP:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_SPEED_FRAC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_HEAD_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_TAIL_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_HANG_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_HEAD_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_TAIL_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_HANG_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_RISE_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_FALL_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_RISE_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_FALL_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_RISE_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_FALL_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_RISE_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_FALL_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_PAD_MODE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PAD_SWAP:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_PAD_ADAPT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_AUTO_ILS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_AUTO_IWS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_PAD_KEYER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PAD_MODE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PAD_SWAP:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_PAD_ADAPT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_AUTO_ILS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_AUTO_IWS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_PAD_KEYER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_MIXER_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIXER_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_FREQ_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_FREQ_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, macro
-    case KYRP_MIX_ENABLE_L:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, macro
-    case KYRP_MIX_ENABLE_R:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, macro
-    case KYRP_PIN_DEBOUNCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT_LOGIC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_PADC_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_XIQ_FREQ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_XIQ_FREQ+1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_IQ_USB:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_MIXER_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIXER_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_FREQ_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_FREQ_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, macro
+    case NRPN_MIX_ENABLE_L:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, macro
+    case NRPN_MIX_ENABLE_R:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, macro
+    case NRPN_PIN_DEBOUNCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT_LOGIC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_PADC_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_XIQ_FREQ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_XIQ_FREQ+1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_IQ_USB:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
 
-    case KYRP_PIN0_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN1_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN2_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN3_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN4_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN5_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN6_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PIN7_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN0_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN1_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN2_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN3_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN4_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN5_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN6_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PIN7_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_POUT0_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT1_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT2_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT3_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT4_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT5_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT6_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_POUT7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT0_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT1_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT2_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT3_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT4_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT5_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT6_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_POUT7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_PADC0_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC0_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC0_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC1_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC1_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC1_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC2_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC2_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC2_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC3_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC3_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC3_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC4_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC4_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC4_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC5_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC5_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC5_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC6_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC6_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC6_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC7_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_PADC7_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC0_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC0_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC0_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC1_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC1_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC1_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC2_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC2_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC2_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC3_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC3_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC3_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC4_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC4_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC4_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC5_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC5_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC5_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC6_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC6_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC6_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC7_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC7_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
       /* morse code block */
-#define M(N) (KYRP_MORSE+(N))
+#define M(N) (NRPN_MORSE+(N))
     case M( 0+0): case M( 0+1): case M( 0+2): case M( 0+3): case M( 0+4): case M( 0+5): case M( 0+6): case M( 0+7):
     case M( 8+0): case M( 8+1): case M( 8+2): case M( 8+3): case M( 8+4): case M( 8+5): case M( 8+6): case M( 8+7):
     case M(16+0): case M(16+1): case M(16+2): case M(16+3): case M(16+4): case M(16+5): case M(16+6): case M(16+7):
@@ -292,104 +292,104 @@ static void define_define(void) {
     case M(56+0): case M(56+1): case M(56+2): case M(56+3): case M(56+4): case M(56+5): case M(56+6): case M(56+7):
 #undef M
 				nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_MIX_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_MIX_EN_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case KYRP_MIX_EN_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
 
-    case KYRP_CODEC_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case KYRP_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_CODEC_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case KYRP_WM8960_ENABLE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_HEADPHONE_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_HEADPHONE_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_SPEAKER_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_SPEAKER_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_DISABLE_ADCHPF:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_ENABLE_MICBIAS:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_ENABLE_ALC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_MIC_POWER:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_LINEIN_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_RAW_MASK:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_RAW_DATA:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_WM8960_RAW_WRITE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_ENABLE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_HEADPHONE_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_HEADPHONE_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_SPEAKER_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_SPEAKER_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_DISABLE_ADCHPF:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_ENABLE_MICBIAS:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_ENABLE_ALC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_MIC_POWER:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_LINEIN_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_RAW_MASK:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_RAW_DATA:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_RAW_WRITE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
 
-    case KYRP_WRITE_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
-    case KYRP_READ_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
-    case KYRP_SET_DEFAULT:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
-    case KYRP_ECHO_ALL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case KYRP_SEND_TEXT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case KYRP_SEND_TEXT2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case KYRP_MSG_INDEX:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case KYRP_MSG_WRITE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case KYRP_MSG_READ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
+    case NRPN_WRITE_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
+    case NRPN_READ_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
+    case NRPN_SET_DEFAULT:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
+    case NRPN_ECHO_ALL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_SEND_TEXT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
+    case NRPN_SEND_TEXT2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
+    case NRPN_MSG_INDEX:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
+    case NRPN_MSG_WRITE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
+    case NRPN_MSG_READ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
 
-    case KYRP_NRPN_SIZE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_MSG_SIZE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_SAMPLE_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_EEPROM_LENGTH:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_ID_CPU:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case KYRP_ID_CODEC:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_NRPN_SIZE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_MSG_SIZE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_SAMPLE_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_EEPROM_LENGTH:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_ID_CPU:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_ID_CODEC:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
 
-    case KYRP_XPER_DIT:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_DIT+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_DAH:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_DAH+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_IES:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_IES+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_ILS:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_ILS+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_IWS:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
-    case KYRP_XPER_IWS+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_DIT:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_DIT+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_DAH:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_DAH+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_IES:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_IES+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_ILS:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_ILS+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_IWS:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
+    case NRPN_XPER_IWS+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
 
     default: 
       Serial.printf("default_setup: overlooked nrpn %d\n", nrpn); break;

@@ -51,5 +51,5 @@ static void cwkey_text_sample(int nrpn, int _) {
 static void cwkey_text_setup(void) {
   note_listen(cwkey_text.text_note, cwkey_text_listen);
   note_listen(cwkey_text2.text_note, cwkey_text2_listen);
-  nrpn_listen(KYRP_SAMPLE, cwkey_text_sample);
+  nrpn_listen(NRPN_SAMPLE, cwkey_text_sample);
 }

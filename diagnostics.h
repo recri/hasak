@@ -46,8 +46,8 @@ static void diag_sreport(void) {
   Serial.printf("\ttime %f(s), sample rate %f(sps) buffer size %d(bytes) F_CPU %.1f(MHz)\n", 
 		diag_totalTime/1e6, AUDIO_SAMPLE_RATE, AUDIO_BLOCK_SAMPLES, F_CPU/1e6f);
   Serial.printf("\tdit/dah/ies/ils/iws %ld/%ld/%ld/%ld/%ld samples\n",
-		xnrpn_get(KYRP_XPER_DIT), xnrpn_get(KYRP_XPER_DAH),
-		xnrpn_get(KYRP_XPER_IES), xnrpn_get(KYRP_XPER_ILS), xnrpn_get(KYRP_XPER_IWS));
+		xnrpn_get(NRPN_XPER_DIT), xnrpn_get(NRPN_XPER_DAH),
+		xnrpn_get(NRPN_XPER_IES), xnrpn_get(NRPN_XPER_ILS), xnrpn_get(NRPN_XPER_IWS));
   // Serial.printf("\tnote %5d %5d nrpn %5d %5d\n", kyr_recv_note, kyr_send_note, kyr_recv_nrpn, kyr_send_nrpn);
   diag_report("total", AudioStream::cpu_cycles_total, AudioStream::cpu_cycles_total_max);
   diag_report("isr", timing_isrCyclesPerAudioBuffer, timing_isrCyclesPerAudioBufferMax);
@@ -125,7 +125,7 @@ static void diag_Sreset(void) {
 
 /* debounce details */
 static void diag_dreport(void) {
-  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(nrpn_get(KYRP_PIN_DEBOUNCE)), nrpn_get(KYRP_PIN_DEBOUNCE));
+  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(nrpn_get(NRPN_PIN_DEBOUNCE)), nrpn_get(NRPN_PIN_DEBOUNCE));
 }
 
 static const char *diag_lorem = 
@@ -189,12 +189,12 @@ static void diag_mixer_dump_one(const char *lbl, RAudioMixer4& mix, int level, i
 }
 
 static void diag_mixer_dump(void) {
-  diag_mixer_dump_one("l_usb_out", l_usb_out, KYRP_MIX_USB_L0,KYRP_MIX_EN_USB_L0);
-  diag_mixer_dump_one("r_usb_out", r_usb_out, KYRP_MIX_USB_R0,KYRP_MIX_EN_USB_R0);
-  diag_mixer_dump_one("l_i2s_out", l_i2s_out, KYRP_MIX_I2S_L0,KYRP_MIX_EN_I2S_L0);
-  diag_mixer_dump_one("r_i2s_out", r_i2s_out, KYRP_MIX_I2S_R0,KYRP_MIX_EN_I2S_R0);
-  diag_mixer_dump_one("l_hdw_out", l_hdw_out, KYRP_MIX_HDW_L0,KYRP_MIX_EN_HDW_L0);
-  diag_mixer_dump_one("r_hdw_out", r_hdw_out, KYRP_MIX_HDW_R0,KYRP_MIX_EN_HDW_R0);
+  diag_mixer_dump_one("l_usb_out", l_usb_out, NRPN_MIX_USB_L0,NRPN_MIX_EN_USB_L0);
+  diag_mixer_dump_one("r_usb_out", r_usb_out, NRPN_MIX_USB_R0,NRPN_MIX_EN_USB_R0);
+  diag_mixer_dump_one("l_i2s_out", l_i2s_out, NRPN_MIX_I2S_L0,NRPN_MIX_EN_I2S_L0);
+  diag_mixer_dump_one("r_i2s_out", r_i2s_out, NRPN_MIX_I2S_R0,NRPN_MIX_EN_I2S_R0);
+  diag_mixer_dump_one("l_hdw_out", l_hdw_out, NRPN_MIX_HDW_L0,NRPN_MIX_EN_HDW_L0);
+  diag_mixer_dump_one("r_hdw_out", r_hdw_out, NRPN_MIX_HDW_R0,NRPN_MIX_EN_HDW_R0);
 }
 static char diag_random_char(void) {
   char c;
@@ -214,7 +214,7 @@ static char *diag_random_text(void) {
 static const char *diag_text_send_ptr = NULL;
 static const char *diag_text2_send_ptr = NULL;
 
-static char *diag_send_some_text(const char *text, KeyerText& input) {
+static const char *diag_send_some_text(const char *text, KeyerText& input) {
   if (text == NULL) return NULL;
   if (*text == 0) return NULL;
   if ( ! input.valid_vox()) return NULL;
@@ -233,138 +233,138 @@ char diag_debug_buffer[4][256];
 
 static struct { short nrpn; const char*name; } diag_nrpn[] = {
   -1, "MIDI",
-  KYRP_MIDI_INPUTS, "_INPUTS",
-  KYRP_MIDI_OUTPUTS, "_OUTPUTS",
-  KYRP_MIDI_ECHOES, "_ECHOES",
-  KYRP_MIDI_SENDS, "_SENDS",
-  KYRP_MIDI_NOTES, "_NOTES",
-  KYRP_MIDI_CTRLS, "_CTRLS",
-  KYRP_MIDI_NRPNS, "_NRPNS",
+  NRPN_MIDI_INPUTS, "_INPUTS",
+  NRPN_MIDI_OUTPUTS, "_OUTPUTS",
+  NRPN_MIDI_ECHOES, "_ECHOES",
+  NRPN_MIDI_SENDS, "_SENDS",
+  NRPN_MIDI_NOTES, "_NOTES",
+  NRPN_MIDI_CTRLS, "_CTRLS",
+  NRPN_MIDI_NRPNS, "_NRPNS",
   -1, "LISTENER", 
-  KYRP_LISTENER_NODES, "_NODES",
-  KYRP_LISTENER_LISTS, "_LISTS",
-  KYRP_LISTENER_CALLS, "_CALLS",
-  KYRP_LISTENER_FIRES, "_FIRES",
-  KYRP_LISTENER_LOOPS, "_LOOPS",
+  NRPN_LISTENER_NODES, "_NODES",
+  NRPN_LISTENER_LISTS, "_LISTS",
+  NRPN_LISTENER_CALLS, "_CALLS",
+  NRPN_LISTENER_FIRES, "_FIRES",
+  NRPN_LISTENER_LOOPS, "_LOOPS",
   -1, "COUNTS",
-  KYRP_LOOP, "LOOP",
-  KYRP_SAMPLE, "SAMPLE",
-  KYRP_UPDATE, "UPDATE",
-  KYRP_MILLI, "1MS",
-  KYRP_10MILLI, "10MS",
-  KYRP_100MILLI, "100MS",
+  NRPN_LOOP, "LOOP",
+  NRPN_SAMPLE, "SAMPLE",
+  NRPN_UPDATE, "UPDATE",
+  NRPN_MILLI, "1MS",
+  NRPN_10MILLI, "10MS",
+  NRPN_100MILLI, "100MS",
 
   -1, "MIDI",
-  KYRP_CHANNEL, "CHANNEL",
-  KYRP_INPUT_ENABLE, "IN_EN",
-  KYRP_OUTPUT_ENABLE, "OUT_EN",
-  KYRP_ECHO_ENABLE, "ECHO_EN",
-  KYRP_LISTENER_ENABLE, "LISTEN_EN",
+  NRPN_CHANNEL, "CHANNEL",
+  NRPN_INPUT_ENABLE, "IN_EN",
+  NRPN_OUTPUT_ENABLE, "OUT_EN",
+  NRPN_ECHO_ENABLE, "ECHO_EN",
+  NRPN_LISTENER_ENABLE, "LISTEN_EN",
 
   -1, "ENABLE",
-  KYRP_PIN_ENABLE, "PIN_EN",
-  KYRP_POUT_ENABLE, "POUT_EN",
-  KYRP_PADC_ENABLE, "ADC_EN",
-  KYRP_ST_ENABLE, "ST_EN",
-  KYRP_TX_ENABLE, "TX_EN",
-  KYRP_IQ_ENABLE, "IQ_EN",
-  KYRP_PTT_REQUIRE, "PTT_REQ",
+  NRPN_PIN_ENABLE, "PIN_EN",
+  NRPN_POUT_ENABLE, "POUT_EN",
+  NRPN_PADC_ENABLE, "ADC_EN",
+  NRPN_ST_ENABLE, "ST_EN",
+  NRPN_TX_ENABLE, "TX_EN",
+  NRPN_IQ_ENABLE, "IQ_EN",
+  NRPN_PTT_REQUIRE, "PTT_REQ",
 
   -1, "ENABLE",
-  KYRP_RKEY_ENABLE, "RKEY_EN",
-  KYRP_CW_AUTOPTT, "APTT",
-  KYRP_RX_MUTE, "RX_MUTE",
-  KYRP_MIC_HWPTT, "MIC_HWPTT",
-  KYRP_CW_HWPTT, "CW_HWPTT",
-  KYRP_HDW_IN_ENABLE, "HDW_IN_EN",
-  KYRP_HDW_OUT_ENABLE, "HDW_OUT_EN",
+  NRPN_RKEY_ENABLE, "RKEY_EN",
+  NRPN_CW_AUTOPTT, "APTT",
+  NRPN_RX_MUTE, "RX_MUTE",
+  NRPN_MIC_HWPTT, "MIC_HWPTT",
+  NRPN_CW_HWPTT, "CW_HWPTT",
+  NRPN_HDW_IN_ENABLE, "HDW_IN_EN",
+  NRPN_HDW_OUT_ENABLE, "HDW_OUT_EN",
 
   -1, "LEVELS",
-  KYRP_VOLUME, "MAIN",
-  KYRP_LEVEL, "ST",
-  KYRP_IQ_LEVEL, "IQ",
-  KYRP_I2S_LEVEL, "I2S",
-  KYRP_HDW_LEVEL, "HDW",
-  KYRP_ST_BALANCE, "ST_BAL",
-  KYRP_IQ_BALANCE, "IQ_BAL",
+  NRPN_VOLUME, "MAIN",
+  NRPN_LEVEL, "ST",
+  NRPN_IQ_LEVEL, "IQ",
+  NRPN_I2S_LEVEL, "I2S",
+  NRPN_HDW_LEVEL, "HDW",
+  NRPN_ST_BALANCE, "ST_BAL",
+  NRPN_IQ_BALANCE, "IQ_BAL",
 
   -1, "KEY",
-  KYRP_TONE, "TON",
-  KYRP_SPEED, "SPD",
-  KYRP_SPEED_FRAC, "_FRAC",
-  KYRP_WEIGHT, "WGT",
-  KYRP_RATIO, "RAT",
-  KYRP_FARNS, "FRNS",
-  KYRP_COMP, "COMP",
+  NRPN_TONE, "TON",
+  NRPN_SPEED, "SPD",
+  NRPN_SPEED_FRAC, "_FRAC",
+  NRPN_WEIGHT, "WGT",
+  NRPN_RATIO, "RAT",
+  NRPN_FARNS, "FRNS",
+  NRPN_COMP, "COMP",
 
   -1, "PTT",
-  KYRP_HEAD_TIME, "HEAD",
-  KYRP_TAIL_TIME, "TAIL",
-  KYRP_HANG_TIME, "HANG",
+  NRPN_HEAD_TIME, "HEAD",
+  NRPN_TAIL_TIME, "TAIL",
+  NRPN_HANG_TIME, "HANG",
 
   -1, "SHAPE",
-  KYRP_RISE_TIME, "RISE",
-  KYRP_RISE_RAMP, "RAMP",
-  KYRP_FALL_TIME, "FALL",
-  KYRP_FALL_RAMP, "RAMP",
+  NRPN_RISE_TIME, "RISE",
+  NRPN_RISE_RAMP, "RAMP",
+  NRPN_FALL_TIME, "FALL",
+  NRPN_FALL_RAMP, "RAMP",
 
   -1, "PAD", 
-  KYRP_PAD_MODE, "_MODE",
-  KYRP_PAD_SWAP, "_SWAP",
-  KYRP_PAD_ADAPT, "_ADAPT",
-  KYRP_AUTO_ILS, "AILS",
-  KYRP_AUTO_IWS, "AIWS",
-  KYRP_PAD_KEYER, "_KEYER",
+  NRPN_PAD_MODE, "_MODE",
+  NRPN_PAD_SWAP, "_SWAP",
+  NRPN_PAD_ADAPT, "_ADAPT",
+  NRPN_AUTO_ILS, "AILS",
+  NRPN_AUTO_IWS, "AIWS",
+  NRPN_PAD_KEYER, "_KEYER",
 
   -1, "MISC",
-  KYRP_ACTIVE_ST, "ACTIVE_ST",
-  KYRP_MIXER_SLEW_RAMP, "L_SLEW_RMP",
-  KYRP_MIXER_SLEW_TIME, "L_SLEW",
-  KYRP_FREQ_SLEW_RAMP, "F_SLEW_RMP",
-  KYRP_FREQ_SLEW_TIME, "F_SLEW",
+  NRPN_ACTIVE_ST, "ACTIVE_ST",
+  NRPN_MIXER_SLEW_RAMP, "L_SLEW_RMP",
+  NRPN_MIXER_SLEW_TIME, "L_SLEW",
+  NRPN_FREQ_SLEW_RAMP, "F_SLEW_RMP",
+  NRPN_FREQ_SLEW_TIME, "F_SLEW",
 
   -1, "MISC",
-  KYRP_MIX_ENABLE, "MIX_EN",
-  KYRP_MIX_ENABLE_L, "MIX_EN_L",
-  KYRP_MIX_ENABLE_R, "MIX_EN_R",
-  KYRP_PIN_DEBOUNCE, "PIN_DEB",
-  KYRP_POUT_LOGIC, "POUT_LOG",
-  KYRP_PADC_RATE, "ADC_RATE",
-  KYRP_XIQ_FREQ, "XIQ_FREQ",
-  KYRP_XIQ_FREQ+1, "",
+  NRPN_MIX_ENABLE, "MIX_EN",
+  NRPN_MIX_ENABLE_L, "MIX_EN_L",
+  NRPN_MIX_ENABLE_R, "MIX_EN_R",
+  NRPN_PIN_DEBOUNCE, "PIN_DEB",
+  NRPN_POUT_LOGIC, "POUT_LOG",
+  NRPN_PADC_RATE, "ADC_RATE",
+  NRPN_XIQ_FREQ, "XIQ_FREQ",
+  NRPN_XIQ_FREQ+1, "",
   
-  KYRP_IQ_USB, "IQ_USB",
+  NRPN_IQ_USB, "IQ_USB",
 
   -1, "PIN",
-  KYRP_PIN0_PIN, "P0",
-  KYRP_PIN1_PIN, "P1",
-  KYRP_PIN2_PIN, "P2",
-  KYRP_PIN3_PIN, "P3",
-  KYRP_PIN4_PIN, "P4",
-  KYRP_PIN5_PIN, "P5",
-  KYRP_PIN6_PIN, "P6",
-  KYRP_PIN7_PIN, "P7",
+  NRPN_PIN0_PIN, "P0",
+  NRPN_PIN1_PIN, "P1",
+  NRPN_PIN2_PIN, "P2",
+  NRPN_PIN3_PIN, "P3",
+  NRPN_PIN4_PIN, "P4",
+  NRPN_PIN5_PIN, "P5",
+  NRPN_PIN6_PIN, "P6",
+  NRPN_PIN7_PIN, "P7",
 
   -1, "POUT",
-  KYRP_POUT0_PIN, "P0",
-  KYRP_POUT1_PIN, "P1",
-  KYRP_POUT2_PIN, "P2",
-  KYRP_POUT3_PIN, "P3",
-  KYRP_POUT4_PIN, "P4",
-  KYRP_POUT5_PIN, "P5",
-  KYRP_POUT6_PIN, "P6",
-  KYRP_POUT7_PIN, "P7",
+  NRPN_POUT0_PIN, "P0",
+  NRPN_POUT1_PIN, "P1",
+  NRPN_POUT2_PIN, "P2",
+  NRPN_POUT3_PIN, "P3",
+  NRPN_POUT4_PIN, "P4",
+  NRPN_POUT5_PIN, "P5",
+  NRPN_POUT6_PIN, "P6",
+  NRPN_POUT7_PIN, "P7",
 
   -1, "ADC",
-  KYRP_PADC0_PIN, "P0", KYRP_PADC0_VAL, "V", KYRP_PADC0_NRPN, "N",
-  KYRP_PADC1_PIN, "P1", KYRP_PADC1_VAL, "V", KYRP_PADC1_NRPN, "N",
-  KYRP_PADC2_PIN, "P2", KYRP_PADC2_VAL, "V", KYRP_PADC2_NRPN, "N",
-  KYRP_PADC3_PIN, "P3", KYRP_PADC3_VAL, "V", KYRP_PADC3_NRPN, "N",
+  NRPN_PADC0_PIN, "P0", NRPN_PADC0_VAL, "V", NRPN_PADC0_NRPN, "N",
+  NRPN_PADC1_PIN, "P1", NRPN_PADC1_VAL, "V", NRPN_PADC1_NRPN, "N",
+  NRPN_PADC2_PIN, "P2", NRPN_PADC2_VAL, "V", NRPN_PADC2_NRPN, "N",
+  NRPN_PADC3_PIN, "P3", NRPN_PADC3_VAL, "V", NRPN_PADC3_NRPN, "N",
   -1, "ADC",
-  KYRP_PADC4_PIN, "P4", KYRP_PADC4_VAL, "V", KYRP_PADC4_NRPN, "N",
-  KYRP_PADC5_PIN, "P5", KYRP_PADC5_VAL, "V", KYRP_PADC5_NRPN, "N",
-  KYRP_PADC6_PIN, "P6", KYRP_PADC6_VAL, "V", KYRP_PADC6_NRPN, "N",
-  KYRP_PADC7_PIN, "P7", KYRP_PADC7_VAL, "V", KYRP_PADC7_NRPN, "N",
+  NRPN_PADC4_PIN, "P4", NRPN_PADC4_VAL, "V", NRPN_PADC4_NRPN, "N",
+  NRPN_PADC5_PIN, "P5", NRPN_PADC5_VAL, "V", NRPN_PADC5_NRPN, "N",
+  NRPN_PADC6_PIN, "P6", NRPN_PADC6_VAL, "V", NRPN_PADC6_NRPN, "N",
+  NRPN_PADC7_PIN, "P7", NRPN_PADC7_VAL, "V", NRPN_PADC7_NRPN, "N",
 
   0, NULL
 };
@@ -380,103 +380,103 @@ void diag_nrpn_report(void) {
   }
   Serial.printf("\n");
 #if 0
-  Serial.printf("\tVOLUME %.2f", nrpn_to_db(nrpn_get(KYRP_VOLUME)));
-  Serial.printf("\tINPUT_SELECT %d", nrpn_get(KYRP_INPUT_SELECT));
-  Serial.printf("\tINPUT_LEVEL %.2f", nrpn_to_db(nrpn_get(KYRP_INPUT_LEVEL)));
+  Serial.printf("\tVOLUME %.2f", nrpn_to_db(nrpn_get(NRPN_VOLUME)));
+  Serial.printf("\tINPUT_SELECT %d", nrpn_get(NRPN_INPUT_SELECT));
+  Serial.printf("\tINPUT_LEVEL %.2f", nrpn_to_db(nrpn_get(NRPN_INPUT_LEVEL)));
   Serial.println("");
-  Serial.printf("\tPTT_EN %d", nrpn_get(KYRP_PTT_REQUIRE));
-  Serial.printf("\tTX_EN %d", nrpn_get(KYRP_TX_ENABLE));
-  Serial.printf("\tST_EN %d", nrpn_get(KYRP_ST_ENABLE));
-  Serial.printf("\tIQ_EN %d", nrpn_get(KYRP_IQ_ENABLE));
-  Serial.printf("\tIQ_BAL %d", signed_value(nrpn_get(KYRP_IQ_BALANCE)));
-  Serial.printf("\tST_BAL %d", nrpn_get(KYRP_ST_BALANCE));
-  Serial.println("");
-
-  Serial.printf("\tDEBOUNCE %d", nrpn_get(KYRP_PIN_DEBOUNCE));
-
-  Serial.printf("\tHEAD_TIME %d", nrpn_get(KYRP_HEAD_TIME));
-  Serial.printf("\tTAIL_TIME %d", nrpn_get(KYRP_TAIL_TIME));
-  Serial.printf("\tHANG_TIME %d", nrpn_get(KYRP_HANG_TIME));
+  Serial.printf("\tPTT_EN %d", nrpn_get(NRPN_PTT_REQUIRE));
+  Serial.printf("\tTX_EN %d", nrpn_get(NRPN_TX_ENABLE));
+  Serial.printf("\tST_EN %d", nrpn_get(NRPN_ST_ENABLE));
+  Serial.printf("\tIQ_EN %d", nrpn_get(NRPN_IQ_ENABLE));
+  Serial.printf("\tIQ_BAL %d", signed_value(nrpn_get(NRPN_IQ_BALANCE)));
+  Serial.printf("\tST_BAL %d", nrpn_get(NRPN_ST_BALANCE));
   Serial.println("");
 
-  Serial.printf("\tRISE_TIME %d", nrpn_get(KYRP_RISE_TIME));
-  Serial.printf("\tFALL_TIME %d", nrpn_get(KYRP_FALL_TIME));
-  Serial.printf("\tRISE_RAMP %d", nrpn_get(KYRP_RISE_RAMP));
-  Serial.printf("\tFALL_RAMP %d", nrpn_get(KYRP_FALL_RAMP));
+  Serial.printf("\tDEBOUNCE %d", nrpn_get(NRPN_PIN_DEBOUNCE));
+
+  Serial.printf("\tHEAD_TIME %d", nrpn_get(NRPN_HEAD_TIME));
+  Serial.printf("\tTAIL_TIME %d", nrpn_get(NRPN_TAIL_TIME));
+  Serial.printf("\tHANG_TIME %d", nrpn_get(NRPN_HANG_TIME));
   Serial.println("");
 
-  Serial.printf("\tPAD_MODE %d", nrpn_get(KYRP_PAD_MODE));
-  Serial.printf("\tPAD_SWAP %d", nrpn_get(KYRP_PAD_SWAP));
-  Serial.printf("\tPAD_ADAPT %d", nrpn_get(KYRP_PAD_ADAPT));
-  Serial.printf("\tAUTO_ILS %d", nrpn_get(KYRP_AUTO_ILS));
-  Serial.printf("\tAUTO_IWS %d", nrpn_get(KYRP_AUTO_IWS));
-  Serial.printf("\tPAD_KEYER %d", nrpn_get(KYRP_PAD_KEYER));
+  Serial.printf("\tRISE_TIME %d", nrpn_get(NRPN_RISE_TIME));
+  Serial.printf("\tFALL_TIME %d", nrpn_get(NRPN_FALL_TIME));
+  Serial.printf("\tRISE_RAMP %d", nrpn_get(NRPN_RISE_RAMP));
+  Serial.printf("\tFALL_RAMP %d", nrpn_get(NRPN_FALL_RAMP));
   Serial.println("");
 
-  Serial.printf("\tCHANNEL %d", nrpn_get(KYRP_CHANNEL));
+  Serial.printf("\tPAD_MODE %d", nrpn_get(NRPN_PAD_MODE));
+  Serial.printf("\tPAD_SWAP %d", nrpn_get(NRPN_PAD_SWAP));
+  Serial.printf("\tPAD_ADAPT %d", nrpn_get(NRPN_PAD_ADAPT));
+  Serial.printf("\tAUTO_ILS %d", nrpn_get(NRPN_AUTO_ILS));
+  Serial.printf("\tAUTO_IWS %d", nrpn_get(NRPN_AUTO_IWS));
+  Serial.printf("\tPAD_KEYER %d", nrpn_get(NRPN_PAD_KEYER));
   Serial.println("");
 
-  Serial.printf("\tPADC_ENABLE %d", nrpn_get(KYRP_PADC_ENABLE));
-  Serial.printf("\tPADC*_NRPN %d", nrpn_get(KYRP_PADC0_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_PADC1_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_PADC2_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_PADC3_NRPN));
-  Serial.printf(" %d", nrpn_get(KYRP_PADC4_NRPN));
+  Serial.printf("\tCHANNEL %d", nrpn_get(NRPN_CHANNEL));
+  Serial.println("");
+
+  Serial.printf("\tPADC_ENABLE %d", nrpn_get(NRPN_PADC_ENABLE));
+  Serial.printf("\tPADC*_NRPN %d", nrpn_get(NRPN_PADC0_NRPN));
+  Serial.printf(" %d", nrpn_get(NRPN_PADC1_NRPN));
+  Serial.printf(" %d", nrpn_get(NRPN_PADC2_NRPN));
+  Serial.printf(" %d", nrpn_get(NRPN_PADC3_NRPN));
+  Serial.printf(" %d", nrpn_get(NRPN_PADC4_NRPN));
   Serial.println();
 
   /* 64 morse code translations */
-h  Serial.printf("\tMIX_ENABLE 0x%04x", nrpn_get(KYRP_MIX_ENABLE));
+h  Serial.printf("\tMIX_ENABLE 0x%04x", nrpn_get(NRPN_MIX_ENABLE));
   Serial.println();
 
-  Serial.printf("\tUSB_L0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_L3)));
+  Serial.printf("\tUSB_L0 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_L0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_L1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_L2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_L3)));
 
-  Serial.printf("\tR0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_USB_R3)));
+  Serial.printf("\tR0 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_R0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_R1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_R2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_USB_R3)));
   Serial.println();
 
-  Serial.printf("\tI2S_L0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_L3)));
+  Serial.printf("\tI2S_L0 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_L0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_L1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_L2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_L3)));
 
-  Serial.printf("\tR0 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R0)));
-  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R1)));
-  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R2)));
-  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(KYRP_MIX_I2S_R3)));
+  Serial.printf("\tR0 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_R0)));
+  Serial.printf("\t1 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_R1)));
+  Serial.printf("\t2 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_R2)));
+  Serial.printf("\t3 %.2f", nrpn_to_db(nrpn_get(NRPN_MIX_I2S_R3)));
   Serial.println();
 
-  Serial.printf("\tHDW_L0 %d", nrpn_get(KYRP_MIX_HDW_L0));
-  Serial.printf("\t1 %d", nrpn_get(KYRP_MIX_HDW_L1));
-  Serial.printf("\t2 %d", nrpn_get(KYRP_MIX_HDW_L2));
-  Serial.printf("\t3 %d", nrpn_get(KYRP_MIX_HDW_L3));
+  Serial.printf("\tHDW_L0 %d", nrpn_get(NRPN_MIX_HDW_L0));
+  Serial.printf("\t1 %d", nrpn_get(NRPN_MIX_HDW_L1));
+  Serial.printf("\t2 %d", nrpn_get(NRPN_MIX_HDW_L2));
+  Serial.printf("\t3 %d", nrpn_get(NRPN_MIX_HDW_L3));
 
-  Serial.printf("\tR0 %d", nrpn_get(KYRP_MIX_HDW_R0));
-  Serial.printf("\t1 %d", nrpn_get(KYRP_MIX_HDW_R1));
-  Serial.printf("\t2 %d", nrpn_get(KYRP_MIX_HDW_R2));
-  Serial.printf("\t3 %d", nrpn_get(KYRP_MIX_HDW_R3));
+  Serial.printf("\tR0 %d", nrpn_get(NRPN_MIX_HDW_R0));
+  Serial.printf("\t1 %d", nrpn_get(NRPN_MIX_HDW_R1));
+  Serial.printf("\t2 %d", nrpn_get(NRPN_MIX_HDW_R2));
+  Serial.printf("\t3 %d", nrpn_get(NRPN_MIX_HDW_R3));
   Serial.println();
 
-  Serial.printf("\tTONE %.1f", nrpn_to_hertz(nrpn_get(KYRP_TONE)));
-  Serial.printf("\tLEVEL %.2f", nrpn_to_db(nrpn_get(KYRP_LEVEL)));
-  Serial.printf("\tSPEED %d", nrpn_get(KYRP_SPEED));
-  Serial.printf("\tSPEED_FRAC %d", nrpn_get(KYRP_SPEED_FRAC));
-  Serial.printf("\tFARNS %d", nrpn_get(KYRP_FARNS));
-  Serial.printf("\tWEIGHT %d", nrpn_get(KYRP_WEIGHT));
-  Serial.printf("\tRATIO %d", nrpn_get(KYRP_RATIO));
-  Serial.printf("\tCOMP %.2f", samples_to_ms(nrpn_get(KYRP_COMP)));
+  Serial.printf("\tTONE %.1f", nrpn_to_hertz(nrpn_get(NRPN_TONE)));
+  Serial.printf("\tLEVEL %.2f", nrpn_to_db(nrpn_get(NRPN_LEVEL)));
+  Serial.printf("\tSPEED %d", nrpn_get(NRPN_SPEED));
+  Serial.printf("\tSPEED_FRAC %d", nrpn_get(NRPN_SPEED_FRAC));
+  Serial.printf("\tFARNS %d", nrpn_get(NRPN_FARNS));
+  Serial.printf("\tWEIGHT %d", nrpn_get(NRPN_WEIGHT));
+  Serial.printf("\tRATIO %d", nrpn_get(NRPN_RATIO));
+  Serial.printf("\tCOMP %.2f", samples_to_ms(nrpn_get(NRPN_COMP)));
   Serial.print("\n\t");
   
   /* keyer timings in samples for paddle and text keyers - scratch values */
-  Serial.printf("\tDIT %ld", xnrpn_get(KYRP_XPER_DIT));
-  Serial.printf("\tDAH %ld", xnrpn_get(KYRP_XPER_DAH));
-  Serial.printf("\tIES %ld", xnrpn_get(KYRP_XPER_IES));
-  Serial.printf("\tILS %ld", xnrpn_get(KYRP_XPER_ILS));
-  Serial.printf("\tIWS %ld", xnrpn_get(KYRP_XPER_IWS));
+  Serial.printf("\tDIT %ld", xnrpn_get(NRPN_XPER_DIT));
+  Serial.printf("\tDAH %ld", xnrpn_get(NRPN_XPER_DAH));
+  Serial.printf("\tIES %ld", xnrpn_get(NRPN_XPER_IES));
+  Serial.printf("\tILS %ld", xnrpn_get(NRPN_XPER_ILS));
+  Serial.printf("\tIWS %ld", xnrpn_get(NRPN_XPER_IWS));
   Serial.println("");
 #endif
 }

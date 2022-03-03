@@ -153,10 +153,10 @@ void loop(void) {
 
   // counter update
   
-  { nrpn_incr(KYRP_LOOP);	// update loop counter
+  { nrpn_incr(NRPN_LOOP);	// update loop counter
   }
   { static elapsedSamples counter; // update sample counter
-    if ((int)counter >= 0) { counter = -1; nrpn_incr(KYRP_SAMPLE);
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_SAMPLE);
       // cwkey_paddle_sample();
       // cwkey_text_sample();
       // cwarbiter_sample();
@@ -166,16 +166,16 @@ void loop(void) {
   }
 
   { static elapsedUpdates counter; // update buffer update counter
-    if ((int)counter >= 0) { counter = -1; nrpn_incr(KYRP_UPDATE); }
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_UPDATE); }
   }
   { static elapsedMillis counter; // update millisecond counter
-    if ((int)counter >= 0) { counter = -1; nrpn_incr(KYRP_MILLI); }
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_MILLI); }
   }
   { static elapsedMillis counter; // update 10 millisecond counter
-    if ((int)counter >= 0) { counter = -10; nrpn_incr(KYRP_10MILLI); }
+    if ((int)counter >= 0) { counter = -10; nrpn_incr(NRPN_10MILLI); }
   }
   { static elapsedMillis counter; // update 100 millisecond counter
-    if ((int)counter >= 0) { counter = -100; nrpn_incr(KYRP_100MILLI); }
+    if ((int)counter >= 0) { counter = -100; nrpn_incr(NRPN_100MILLI); }
   }
 
   listener_loop();		// after idle dispatch

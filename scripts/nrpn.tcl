@@ -6,7 +6,7 @@
 # or write a javascript dictionary
 
 proc evaluate {expr values} {
-    while {[regexp {KYR[A-Z]?_[A-Z0-9_]+} $expr match]} {
+    while {[regexp {(NOTE|CTRL|NRPN|KYR[A-Z]?)_[A-Z0-9_]+} $expr match]} {
 	set expr [regsub $match $expr [dict get $values $match value]]
     }
     expr $expr
@@ -104,12 +104,12 @@ proc jsformat-all {values} {
 		}
 		^KYRN_.*$ { lappend kyrn [jsformat-any $key $table] }
 		^KYRC_.*$ { lappend kyrc [jsformat-any $key $table] }
-		^KYRP_.*$ { 
+		^NRPN_.*$ { 
 		    # skip the output mixers
-		    if {[string match KYRP_MIX_USB* $key]} continue
-		    if {[string match KYRP_MIX_I2S* $key]} continue
-		    if {[string match KYRP_MIX_HDW* $key]} continue
-		    if {[string match KYRP_MIX_EN_* $key]} continue
+		    if {[string match NRPN_MIX_USB* $key]} continue
+		    if {[string match NRPN_MIX_I2S* $key]} continue
+		    if {[string match NRPN_MIX_HDW* $key]} continue
+		    if {[string match NRPN_MIX_EN_* $key]} continue
 		    lappend kyrp [jsformat-any $key $table]
 		    if {$type in {nrpn opts}} {
 			lappend prop "[jsq $property]: \"$key\""
@@ -185,13 +185,16 @@ proc main {argv} {
     set globs {}
     foreach line [split [string trim $data] \n] {
 	dict set lines [dict size $lines] $line
-	if { ! [regexp {^#define[ \t]+(KYR[A-Z]?_[A-Z0-9_]*)[ \t]+([^ \t]*)([ \t]+(.*))?$} $line all name value rest1 rest]} {
+	if { ! [regexp {^#define[ \t]+(NOTE|CTRL|NRPN|KYR[A-Z]?)(_[A-Z0-9_]*)[ \t]+([^ \t]*)([ \t]+(.*))?$} $line all prefix suffix value rest1 rest]} {
 	    # puts "mismatch: $line"
 	    continue
 	}
+	set name $prefix$suffix
 	set vwid [expr {max($vwid, [string length $name])}]
 	# dict set values $name name $name
-	dict set values $name value [evaluate $value $values]
+	if {[catch {dict set values $name value [evaluate $value $values]} error]} {
+	    error "evaluating line $line: $::errorInfo"
+	}
 	dict set values $name orig-value $value 
 	if { ! [regexp {/\*\s*{(.*)}\s*\*/} $rest all comment]} {
 	    puts "missing comment1 {$line}"
@@ -246,11 +249,11 @@ proc main {argv} {
     }
     # add in the duplicated keyer voice instances
     if {0} {
-    set kmin [dict get $values KYRP_VOX_NONE value]
-    set kmax [dict get $values KYRP_VOX_TUNE value]
+    set kmin [dict get $values NRPN_VOX_NONE value]
+    set kmax [dict get $values NRPN_VOX_TUNE value]
     #puts "min $kmin max $kmax"
-    foreach block [lrange [dict keys $values KYRP_VOX_*] 1 end] {
-	foreach name [dict keys $values KYRP_*] {
+    foreach block [lrange [dict keys $values NRPN_VOX_*] 1 end] {
+	foreach name [dict keys $values NRPN_*] {
 	    set v [dict get $values $name value]
 	    #set c [dict get $values $name class]
 	    #set t [dict get $values $name type]
@@ -288,7 +291,7 @@ proc main {argv} {
 	}
 	dups {
 	    set dups [dict create]
-	    foreach key [dict keys $values KYRP_*] {
+	    foreach key [dict keys $values NRPN_*] {
 		if {[dict get $values $key type] eq {nrpn}} {
 		    dict lappend dups [dict get $values $key value] $key
 		}
@@ -317,8 +320,8 @@ proc main {argv} {
 		dict with table {
 		    if {$type in {nrpn rel}} {
 			if {$value < $cursor} {
-			    if {[string match KYRP_*VOX_OFFSET $name]} continue
-			    if {$name in {KYRP_VOX_NONE}} {
+			    if {[string match NRPN_*VOX_OFFSET $name]} continue
+			    if {$name in {NRPN_VOX_NONE}} {
 				set cursor $value
 				continue
 			    }
@@ -330,9 +333,9 @@ proc main {argv} {
 			} elseif {$value >= 1000} {
 			    continue
 			} else {
-			    if {$name in {KYRP_MORSE KYRP_MIXER KYRP_VOX_NONE}} {
+			    if {$name in {NRPN_MORSE NRPN_MIXER NRPN_VOX_NONE}} {
 				set cursor $value
-			    } elseif {$name in {KYRP_VOX_TUNE KYRP_VOX_S_KEY KYRP_VOX_PAD KYRP_VOX_WINK KYRP_VOX_KYR KYRP_VOX_BUT KYRP_LAST} &&
+			    } elseif {$name in {NRPN_VOX_TUNE NRPN_VOX_S_KEY NRPN_VOX_PAD NRPN_VOX_WINK NRPN_VOX_KYR NRPN_VOX_BUT NRPN_LAST} &&
 				      $value == $cursor+8} {
 				set cursor $value
 			    } else {

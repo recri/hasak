@@ -71,13 +71,13 @@ public:
   // fetch the current parameters for the rise ramp, and fall ramp
   // oscillatar may vary
   void start_rise() {
-    rate = 0xFFFFFFFFu / get_nrpn(KYRP_RISE_TIME); // ramp rise time in samples
-    fall_rate = 0xFFFFFFFFu / get_nrpn(KYRP_FALL_TIME); // ramp fall time in samples
-    table = get_table(get_nrpn(KYRP_RISE_RAMP));
-    fall_table = get_table(get_nrpn(KYRP_FALL_RAMP));
+    rate = 0xFFFFFFFFu / get_nrpn(NRPN_RISE_TIME); // ramp rise time in samples
+    fall_rate = 0xFFFFFFFFu / get_nrpn(NRPN_FALL_TIME); // ramp fall time in samples
+    table = get_table(get_nrpn(NRPN_RISE_RAMP));
+    fall_table = get_table(get_nrpn(NRPN_FALL_RAMP));
     phase_I = +45.0 * (4294967296.0 / 360.0);
     phase_Q = (360-45.0) * (4294967296.0 / 360.0);
-    if (get_nrpn(KYRP_IQ_USB)) {
+    if (get_nrpn(NRPN_IQ_USB)) {
       phase_I = (360-45.0) * (4294967296.0 / 360.0);
       phase_Q = +45.0 * (4294967296.0 / 360.0); 
     }
@@ -125,10 +125,10 @@ public:
     scale = (phase >> 8) & 0xFFFF;
     val2 *= scale;
     val1 *= 0x10000 - scale;
-    return tenthdbtolinear127(signed_value(get_nrpn(KYRP_LEVEL)))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
+    return tenthdbtolinear127(signed_value(get_nrpn(NRPN_LEVEL)))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
   }
   uint32_t phase_increment(void) {
-    return get_nrpn(KYRP_TONE) * 0.1f * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
+    return get_nrpn(NRPN_TONE) * 0.1f * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
   }
   virtual void update(void);
 private:

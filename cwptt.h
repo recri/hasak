@@ -43,7 +43,7 @@ static void cwptt_sidetone_listener(int note, int _) {
       note_toggle(KYRN_PTT_OUT);
   // queue element for possibly later replay
   if (cwptt_delay_line.can_put())
-    cwptt_delay_line.put(timing_samples()+nrpn_get(KYRP_HEAD_TIME));
+    cwptt_delay_line.put(timing_samples()+nrpn_get(NRPN_HEAD_TIME));
   else
     Serial.printf("cwptt_listener, delay line overflow, reduce speed or ptt head time\n");
 }
@@ -55,7 +55,7 @@ static void cwptt_key_out_listener(int note, int _) {
 static void cwptt_sample(int nrpn, int _) {
   if (cwptt_tail_time_is_stale) {
     cwptt_tail_time_is_stale = 0;
-    cwptt_tail_time = max(nrpn_get(KYRP_TAIL_TIME), nrpn_get(KYRP_HANG_TIME)*xnrpn_get(KYRP_XPER_DIT));
+    cwptt_tail_time = max(nrpn_get(NRPN_TAIL_TIME), nrpn_get(NRPN_HANG_TIME)*xnrpn_get(NRPN_XPER_DIT));
   }
   if (note_get(KYRN_PTT_OUT) &&		      /* ptt tx is on */
       note_get(KYRN_KEY_OUT) == 0 &&	      /* key tx is off */
@@ -71,12 +71,12 @@ static void cwptt_sample(int nrpn, int _) {
 
 static void cwptt_setup(void) {
   cwptt_tail_time_is_stale = 1;			    // flag for recompute
-  nrpn_listen(KYRP_TAIL_TIME, cwptt_nrpn_listener); // and reflag when necessary
-  nrpn_listen(KYRP_HANG_TIME, cwptt_nrpn_listener); // and reflag when necessary
-  nrpn_listen(KYRP_XPER_DIT+1, cwptt_nrpn_listener); // and reflag when necessary
+  nrpn_listen(NRPN_TAIL_TIME, cwptt_nrpn_listener); // and reflag when necessary
+  nrpn_listen(NRPN_HANG_TIME, cwptt_nrpn_listener); // and reflag when necessary
+  nrpn_listen(NRPN_XPER_DIT+1, cwptt_nrpn_listener); // and reflag when necessary
   note_listen(KYRN_KEY_ST, cwptt_sidetone_listener);
   note_listen(KYRN_KEY_OUT, cwptt_key_out_listener);
-  nrpn_listen(KYRP_SAMPLE, cwptt_sample);
+  nrpn_listen(NRPN_SAMPLE, cwptt_sample);
 }
 
 // static void cwptt_loop(void) {}

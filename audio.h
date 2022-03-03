@@ -39,12 +39,12 @@ AudioConnection		patchCord3b(au_key_out, 1, key_ramp, 0);  // transmit key line
 // passing in nrpns for the gain and enable parameters for each channel
 // and slew paramters common to all channels
 // 
-RAudioMixer4              l_usb_out(KYRP_MIX_USB_L0,KYRP_MIX_EN_USB_L0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
-RAudioMixer4              r_usb_out(KYRP_MIX_USB_R0,KYRP_MIX_EN_USB_R0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
-RAudioMixer4              l_i2s_out(KYRP_MIX_I2S_L0,KYRP_MIX_EN_I2S_L0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
-RAudioMixer4              r_i2s_out(KYRP_MIX_I2S_R0,KYRP_MIX_EN_I2S_R0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
-RAudioMixer4              l_hdw_out(KYRP_MIX_HDW_L0,KYRP_MIX_EN_HDW_L0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
-RAudioMixer4              r_hdw_out(KYRP_MIX_HDW_R0,KYRP_MIX_EN_HDW_R0,KYRP_MIXER_SLEW_RAMP,KYRP_MIXER_SLEW_TIME);
+RAudioMixer4              l_usb_out(NRPN_MIX_USB_L0,NRPN_MIX_EN_USB_L0,NRPN_MIXER_SLEW_RAMP,NRPN_MIXER_SLEW_TIME);
+RAudioMixer4              r_usb_out(NRPN_MIX_USB_R0,NRPN_MIX_EN_USB_R0,NRPN_MIXER_SLEW_RAMP,NRPN_MIXER_SLEW_TIME);
+RAudioMixer4              l_i2s_out(NRPN_MIX_I2S_L0,NRPN_MIX_EN_I2S_L0,NRPN_MIXER_SLEW_RAMP,NRPN_MIXER_SLEW_TIME);
+RAudioMixer4              r_i2s_out(NRPN_MIX_I2S_R0,NRPN_MIX_EN_I2S_R0,NRPN_MIXER_SLEW_RAMP,NRPN_MIXER_SLEW_TIME);
+RAudioMixer4              l_hdw_out(NRPN_MIX_HDW_L0,NRPN_MIX_EN_HDW_L0,NRPN_MIXER_SLEW_RAMP,NRPN_MIXER_SLEW_TIME);
+RAudioMixer4              r_hdw_out(NRPN_MIX_HDW_R0,NRPN_MIX_EN_HDW_R0,NRPN_MIXER_SLEW_RAMP,NRPN_MIXER_SLEW_TIME);
 // output mixer pointers in order of output mixer nrpns
 RAudioMixer4		*mix_out[6] = {
   &l_usb_out, &r_usb_out, &l_i2s_out, &r_i2s_out, &l_hdw_out, &r_hdw_out

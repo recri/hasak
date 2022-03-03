@@ -89,7 +89,7 @@ void AudioInputByte::update(void)
       } else if (*bp != last) {
 	sum += last = *bp++;
 	// no debouncing because these are clean digital inputs now.
-	debounce = 0; // get_nrpn(KYRP_DEBOUNCE)
+	debounce = 0; // get_nrpn(NRPN_DEBOUNCE)
       } else {
 	sum += *bp++;
       }

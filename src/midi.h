@@ -118,7 +118,7 @@ private:
   }
   // send a value
   void _send(int type, int tindex, int value) {
-    const int channel = nrpn_get(KYRP_CHANNEL);
+    const int channel = nrpn_get(NRPN_CHANNEL);
     switch (type) {
     case NOTE: usbMIDI.sendNoteOn(tindex, value, channel); break;
     case CTRL: usbMIDI.sendControlChange(tindex, value, channel); break;
@@ -160,33 +160,33 @@ private:
   // listen to a note, ctrl, or nrpn
   void listen(int type, int tindex, void (*f)(int,int)) {
     const int index = _hoist(type, tindex);
-    if (listeners[index] == NULL) nrpn_incr(KYRP_LISTENER_LISTS);
-    nrpn_incr(KYRP_LISTENER_NODES);
+    if (listeners[index] == NULL) nrpn_incr(NRPN_LISTENER_LISTS);
+    nrpn_incr(NRPN_LISTENER_NODES);
     listener_add(&listeners[index], f);
   }
   // remove a previously installed listener
   void unlisten(int type, int tindex, void (*f)(int,int)) {
     const int index = _hoist(type, tindex);
     if (flags[index]&LISTENER_ACTIVE) // may be able to remove this restriction
-      nrpn_incr(KYRP_LISTENER_LOOPS);
+      nrpn_incr(NRPN_LISTENER_LOOPS);
     else if (listeners[index] != NULL) {
       if (listener_remove(&listeners[index], f))
-	nrpn_incr(KYRP_LISTENER_NODES, -1);
+	nrpn_incr(NRPN_LISTENER_NODES, -1);
       if (listeners[index] == NULL)
-	nrpn_incr(KYRP_LISTENER_LISTS, -1);
+	nrpn_incr(NRPN_LISTENER_LISTS, -1);
     }
   }
   // invoke listeners on a value
   void invoke_listeners(int type, int tindex, int oldvalue) {
     const int index = _hoist(type, tindex);
     if (flags[index]&LISTENER_ACTIVE) {
-      nrpn_incr(KYRP_LISTENER_LOOPS); // may not re-enter a listener chain
+      nrpn_incr(NRPN_LISTENER_LOOPS); // may not re-enter a listener chain
     } else {
       flags[index] |= LISTENER_ACTIVE;
       int n = listener_invoke(listeners[index], tindex, oldvalue);
       if (n > 0) {
-	nrpn_incr(KYRP_LISTENER_FIRES);
-	nrpn_incr(KYRP_LISTENER_CALLS, n);
+	nrpn_incr(NRPN_LISTENER_FIRES);
+	nrpn_incr(NRPN_LISTENER_CALLS, n);
       }
       flags[index] &= ~LISTENER_ACTIVE;
     }
@@ -202,9 +202,9 @@ private:
     // Serial.printf("midi.set(%d, %d, %d, %d)\n", index, value, type, tindex);
     const int oldvalue = _get(type, tindex);
     _set(type, tindex, value);
-    if (nrpn_get(KYRP_LISTENER_ENABLE)) 
+    if (nrpn_get(NRPN_LISTENER_ENABLE)) 
       invoke_listeners(type, tindex, oldvalue);
-    if (nrpn_get(KYRP_OUTPUT_ENABLE) && output_enabled(type, tindex))
+    if (nrpn_get(NRPN_OUTPUT_ENABLE) && output_enabled(type, tindex))
       _send(type, tindex, _get(type,tindex));
   }
   // unset from device origin, not sure if this is useful
@@ -214,14 +214,14 @@ private:
     const int oldvalue = _get(type, tindex);
     if (write_enabled(type,tindex)) 
       _set(type, tindex, value);
-    if (nrpn_get(KYRP_LISTENER_ENABLE))
+    if (nrpn_get(NRPN_LISTENER_ENABLE))
       invoke_listeners(type, tindex, oldvalue);
-    if (nrpn_get(KYRP_OUTPUT_ENABLE) && nrpn_get(KYRP_ECHO_ENABLE) && echo_enabled(type,tindex))
+    if (nrpn_get(NRPN_OUTPUT_ENABLE) && nrpn_get(NRPN_ECHO_ENABLE) && echo_enabled(type,tindex))
       _send(type, tindex, _get(type, tindex));
   }
   // send from device origin
   void send(int type, int tindex, int value) {
-    if (nrpn_get(KYRP_OUTPUT_ENABLE) && output_enabled(type, tindex) && value != -1) _send(type, tindex, value);
+    if (nrpn_get(NRPN_OUTPUT_ENABLE) && output_enabled(type, tindex) && value != -1) _send(type, tindex, value);
   }
   // definition of initial value and flags from device
   void define(int type, int tindex, int value, int input_enable, int output_enable, int echo_enable, int read_only) {
@@ -331,8 +331,8 @@ private:
   // loop, read and dispatch incoming midi messages
 
   void loop(void) {
-    while (usbMIDI.read(nrpn_get(KYRP_CHANNEL))) {
-      if (nrpn_get(KYRP_INPUT_ENABLE)) { // apply global input enable
+    while (usbMIDI.read(nrpn_get(NRPN_CHANNEL))) {
+      if (nrpn_get(NRPN_INPUT_ENABLE)) { // apply global input enable
 
 	const int type = usbMIDI.getType();
 

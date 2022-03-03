@@ -29,7 +29,7 @@
 */
 
 static void cwroute_midi_tune_listener(int note, int _) {
-  if (nrpn_get(KYRP_RKEY_ENABLE))
+  if (nrpn_get(NRPN_RKEY_ENABLE))
     note_set(KYRN_ST_TUNE, note_get(KYRN_MIDI_IN_TUNE) != 0);
 }
 
@@ -38,7 +38,7 @@ static void cwroute_sidetone_listener(int note, int _) {
   ** KYRN_AU_ST_KEY to make a tone
   ** KYRN_MIDI_OUT_ST to make a midi note
   */
-  if (nrpn_get(KYRP_ST_ENABLE)) {
+  if (nrpn_get(NRPN_ST_ENABLE)) {
     note_set(KYRN_AU_ST_KEY, note_get(KYRN_KEY_ST));
   // if (nrpn_get(NRPN_MIDI_KEY_ENABLE))
     note_set(KYRN_MIDI_OUT_ST, note_get(KYRN_KEY_ST) ? KYRV_EXT_NOTE_ON : KYRV_EXT_NOTE_OFF);
@@ -53,14 +53,14 @@ static void cwroute_key_out_listener(int note, int _) {
   ** KYRN_AU_IQ_KEY to key an IQ oscillator
   ** the last works best if you also route the IQ oscillator to usb_out and back to the host SDR.
   */
-  if (nrpn_get(KYRP_TX_ENABLE)) {
-    if (nrpn_get(KYRP_IQ_ENABLE))
+  if (nrpn_get(NRPN_TX_ENABLE)) {
+    if (nrpn_get(NRPN_IQ_ENABLE))
       note_set(KYRN_AU_IQ_KEY, note_get(KYRN_KEY_OUT));
-    // if (nrpn_get(KYRP_MIDI_KEY_ENABLE))
+    // if (nrpn_get(NRPN_MIDI_KEY_ENABLE))
     note_set(KYRN_MIDI_OUT_KEY, note_get(KYRN_KEY_OUT) ? KYRV_EXT_NOTE_ON : KYRV_EXT_NOTE_OFF);
-    // if (nrpn_get(KYRP_HW_KEY_ENABLE))
+    // if (nrpn_get(NRPN_HW_KEY_ENABLE))
     note_set(KYRN_HW_KEY_OUT, note_get(KYRN_KEY_OUT));
-    // if (nrpn_get(KYRP_HW_KEY2_ENABLE))
+    // if (nrpn_get(NRPN_HW_KEY2_ENABLE))
     note_set(KYRN_HW_KEY_OUT2, note_get(KYRN_KEY_OUT));
   }
 }
@@ -70,12 +70,12 @@ static void cwroute_ptt_out_listener(int note, int _) {
   ** KYRN_MIDI_OUT_PTT to generate an external midi note
   ** KYRN_HW_PTT_OUT and/or KYRN_HW_PTT_OUT2 to change a pin state
   */
-  if (nrpn_get(KYRP_TX_ENABLE)) {
-    // if (nrpn_get(KYRP_MIDI_PTT_ENABLE)) ?
+  if (nrpn_get(NRPN_TX_ENABLE)) {
+    // if (nrpn_get(NRPN_MIDI_PTT_ENABLE)) ?
     note_set(KYRN_MIDI_OUT_PTT, note_get(KYRN_PTT_OUT) ? KYRV_EXT_NOTE_ON : KYRV_EXT_NOTE_OFF);
-    // if (nrpn_get(KYRP_HW_KEY_PTT_ENABLE)) ?
+    // if (nrpn_get(NRPN_HW_KEY_PTT_ENABLE)) ?
     note_set(KYRN_HW_PTT_OUT, note_get(KYRN_PTT_OUT));
-    // if (nrpn_get(KYRP_HW_KEY_PTT2_ENABLE)) ?
+    // if (nrpn_get(NRPN_HW_KEY_PTT2_ENABLE)) ?
     note_set(KYRN_HW_PTT_OUT2, note_get(KYRN_PTT_OUT));
   }
 }

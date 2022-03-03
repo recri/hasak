@@ -142,30 +142,30 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
     //   b3:    swap paddles
     //   b2:    echo characters received from the serial line as they are transmitted
     //
-    if (nrpn_get(KYRP_PAD_SWAP) != PADDLE_SWAP(v))
-      nrpn_set(KYRP_PAD_SWAP, PADDLE_SWAP(v) != 0);
-    if (nrpn_get(KYRP_PAD_KEYER) != KYRV_KEYER_VK6PH)
-      nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
+    if (nrpn_get(NRPN_PAD_SWAP) != PADDLE_SWAP(v))
+      nrpn_set(NRPN_PAD_SWAP, PADDLE_SWAP(v) != 0);
+    if (nrpn_get(NRPN_PAD_KEYER) != KYRV_KEYER_VK6PH)
+      nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_VK6PH);
     if (ULTIMATIC(v)) {
-      if (nrpn_get(KYRP_PAD_ADAPT) != KYRV_ADAPT_ULTIMATIC)
-	nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_ULTIMATIC);
-      if (nrpn_get(KYRP_PAD_MODE) != KYRV_MODE_A)
-	nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
+      if (nrpn_get(NRPN_PAD_ADAPT) != KYRV_ADAPT_ULTIMATIC)
+	nrpn_set(NRPN_PAD_ADAPT, KYRV_ADAPT_ULTIMATIC);
+      if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_A)
+	nrpn_set(NRPN_PAD_MODE, KYRV_MODE_A);
     } else {
-      if (nrpn_get(KYRP_PAD_ADAPT) != KYRV_ADAPT_NORMAL)
-	nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
+      if (nrpn_get(NRPN_PAD_ADAPT) != KYRV_ADAPT_NORMAL)
+	nrpn_set(NRPN_PAD_ADAPT, KYRV_ADAPT_NORMAL);
       switch (PADDLE_MODE(v)) {
       case 0:
-	if (nrpn_get(KYRP_PAD_MODE) != KYRV_MODE_B)
-	  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_B);
+	if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_B)
+	  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_B);
 	break;
       case 1: 
-	if (nrpn_get(KYRP_PAD_MODE) != KYRV_MODE_A)
-	  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
+	if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_A)
+	  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_A);
 	break;
       case 3:
-	if (nrpn_get(KYRP_PAD_MODE) != KYRV_MODE_S)
-	  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_S);
+	if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_S)
+	  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_S);
 	break;
       }
     }
@@ -178,8 +178,8 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
     //static uint8_t Speed=0;                 // CW speed (zero means: use speed pot)
     // speed: 0 means use speed pot
     // Speed=byte;
-    if (nrpn_get(KYRP_SPEED) != v)
-      nrpn_set(KYRP_SPEED, v);	// FIX.ME, what if no speed pot and v == 0
+    if (nrpn_get(NRPN_SPEED) != v)
+      nrpn_set(NRPN_SPEED, v);	// FIX.ME, what if no speed pot and v == 0
     break;
   case WK_SIDETONE:
     //static uint8_t Sidetone=5;              // 800 Hz
@@ -187,8 +187,8 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
     // myfreq=4000/(Sidetone & 0x0F);
     // sidetonefrequency(myfreq);     
     v = 4000/(v & 0x0F);
-    if (nrpn_get(KYRP_TONE) != v)
-      nrpn_set(KYRP_TONE, v);
+    if (nrpn_get(NRPN_TONE) != v)
+      nrpn_set(NRPN_TONE, v);
     break;
   case WK_WEIGHT:
     //static uint8_t Weight=50;               // used to modify dit/dah length
@@ -197,22 +197,22 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
     // if (byte > 90) byte=90;
     // Weight=byte;
     v = max(10, min(90, v));
-    if (nrpn_get(KYRP_WEIGHT) != v)
-      nrpn_set(KYRP_WEIGHT, v);			// FIX.ME, this is a wider range of values than ctrlr implements
+    if (nrpn_get(NRPN_WEIGHT) != v)
+      nrpn_set(NRPN_WEIGHT, v);			// FIX.ME, this is a wider range of values than ctrlr implements
     break;
   case WK_PTT_LEAD_IN:
     //static uint8_t LeadIn=15;               // PTT Lead-in time (in units of 10 ms)
     // unit == 10ms
     v = 10*v;
-    if (nrpn_get(KYRP_HEAD_TIME) != v)
-      nrpn_set(KYRP_HEAD_TIME, v);
+    if (nrpn_get(NRPN_HEAD_TIME) != v)
+      nrpn_set(NRPN_HEAD_TIME, v);
     break;
   case WK_PTT_TAIL:
     //static uint8_t Tail=0;                  // PTT tail (in 10 ms), zero means "use hang bits"
     // unit == 10ms
     v = 10*v;
-    if (nrpn_get(KYRP_TAIL_TIME) != v)
-      nrpn_set(KYRP_TAIL_TIME, v);
+    if (nrpn_get(NRPN_TAIL_TIME) != v)
+      nrpn_set(NRPN_TAIL_TIME, v);
     break;
   case WK_MIN_WPM:
     //static uint8_t MinWPM=5;                // CW speed when speed pot maximally CCW
@@ -232,8 +232,8 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
   case WK_COMPENSATION:
     //static uint8_t Compensation=0;          // Used to modify dit/dah lengths
     v = 10*v;
-    if (nrpn_get(KYRP_COMP) != v)
-      nrpn_set(KYRP_COMP, v);
+    if (nrpn_get(NRPN_COMP) != v)
+      nrpn_set(NRPN_COMP, v);
     break;
   case WK_FARNSWORTH:
     //static uint8_t Farnsworth=10;           // Farnsworth speed (10 means: no Farnsworth)
@@ -241,22 +241,22 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
     // if (byte > 99) byte=99;
     // Farnsworth=byte;
     v = max(10, min(99, v));
-    if (nrpn_get(KYRP_FARNS) != v)
-      nrpn_set(KYRP_FARNS, v);
+    if (nrpn_get(NRPN_FARNS) != v)
+      nrpn_set(NRPN_FARNS, v);
     break;
   case WK_PADDLE_POINT:
     //static uint8_t PaddlePoint;             // debounce refractory period
     v = 10*v;				      // convert ms to tenth ms
-    if (nrpn_get(KYRP_DEBOUNCE) != v)
-      nrpn_set(KYRP_DEBOUNCE, v);
+    if (nrpn_get(NRPN_DEBOUNCE) != v)
+      nrpn_set(NRPN_DEBOUNCE, v);
     break;
   case WK_RATIO:
     //static uint8_t Ratio=50;                // dah/dit ratio = (3*ratio)/50
     // if (byte < 33) byte=33;
     // if (byte > 66) byte=66;
     v = max(33, min(66, v));
-    if (nrpn_get(KYRP_RATIO) != v)
-      nrpn_set(KYRP_RATIO, v);
+    if (nrpn_get(NRPN_RATIO) != v)
+      nrpn_set(NRPN_RATIO, v);
     break;
   case WK_PIN_CONFIG:
     //static uint8_t PinConfig=0x23;          // PTT and side tone enabled, 1.67 word space hang time
@@ -274,11 +274,11 @@ static int cwinkey_get(cwinkey_property_t p) {
   switch (p) {
   case WK_MODE_REGISTER: {
     int v = 0;
-    if (nrpn_get(KYRP_PAD_SWAP)) v |= 0x08;
-    if (nrpn_get(KYRP_PAD_ADAPT) == KYRV_ADAPT_ULTIMATIC)
+    if (nrpn_get(NRPN_PAD_SWAP)) v |= 0x08;
+    if (nrpn_get(NRPN_PAD_ADAPT) == KYRV_ADAPT_ULTIMATIC)
       v |= 0x20;
     else 
-      switch (nrpn_get(KYRP_PAD_MODE)) {
+      switch (nrpn_get(NRPN_PAD_MODE)) {
       case KYRV_MODE_A: v |= 0x10; break;
       case KYRV_MODE_B: v |= 0x00; break;
       case KYRV_MODE_S: v |= 0x30; break;
@@ -287,18 +287,18 @@ static int cwinkey_get(cwinkey_property_t p) {
     // SERIAL_ECHO FIX.ME
     return v;
     }
-  case WK_SPEED:	return nrpn_get(KYRP_SPEED);
-  case WK_SIDETONE:	return (int)(nrpn_get(KYRP_TONE)/4000.0);
-  case WK_WEIGHT:	return nrpn_get(KYRP_WEIGHT);
-  case WK_PTT_LEAD_IN:	return nrpn_get(KYRP_HEAD_TIME)/10;
-  case WK_PTT_TAIL:	return nrpn_get(KYRP_TAIL_TIME)/10;
+  case WK_SPEED:	return nrpn_get(NRPN_SPEED);
+  case WK_SIDETONE:	return (int)(nrpn_get(NRPN_TONE)/4000.0);
+  case WK_WEIGHT:	return nrpn_get(NRPN_WEIGHT);
+  case WK_PTT_LEAD_IN:	return nrpn_get(NRPN_HEAD_TIME)/10;
+  case WK_PTT_TAIL:	return nrpn_get(NRPN_TAIL_TIME)/10;
   case WK_MIN_WPM:	return 0; // FIX.ME
   case WK_WPM_RANGE:	return 0; // FIX.ME
   case WK_EXTENSION:    return 0;
-  case WK_COMPENSATION: return nrpn_get(KYRP_COMP)/10;
-  case WK_FARNSWORTH:	return nrpn_get(KYRP_FARNS);
-  case WK_PADDLE_POINT: return nrpn_get(KYRP_DEBOUNCE)/10;
-  case WK_RATIO:	return nrpn_get(KYRP_RATIO);
+  case WK_COMPENSATION: return nrpn_get(NRPN_COMP)/10;
+  case WK_FARNSWORTH:	return nrpn_get(NRPN_FARNS);
+  case WK_PADDLE_POINT: return nrpn_get(NRPN_DEBOUNCE)/10;
+  case WK_RATIO:	return nrpn_get(NRPN_RATIO);
   case WK_PIN_CONFIG: {
     int v = 0;
     return v;
@@ -368,7 +368,7 @@ static void cwinkey_update_eeprom(byte inum, byte data) { }
 static void cwinkey_set_pausing(uint8_t byte) { }
 
 // see if the keyer is idle
-static int cwinkey_keyer_idle(void) { return nrpn_get(KYRP_ACTIVE_ST) > KYRN_TEXT_ST; }
+static int cwinkey_keyer_idle(void) { return nrpn_get(NRPN_ACTIVE_ST) > KYRN_TEXT_ST; }
 
 // tune on/off
 static void cwinkey_tune(int byte) {
@@ -601,7 +601,7 @@ void cwinkey_state_machine(int nrpn) {
  ** Winkey interface
  ***************************************************************/
 static void cwinkey_setup(void) {
-  nrpn_listen(KYRP_MILLI, winkey_state_machine);
+  nrpn_listen(NRPN_MILLI, winkey_state_machine);
 }
 
 //static void cwinkey_loop(void) {}

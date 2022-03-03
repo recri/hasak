@@ -257,29 +257,29 @@ int get_xnrpn(int xnrpn) { return xnrpn_get(xnrpn); }
 
 static void midi_setup(void) { 
   midi.setup();
-  nrpn_set(KYRP_CHANNEL, KYR_CHANNEL);
-  nrpn_set(KYRP_INPUT_ENABLE, 1);
-  nrpn_set(KYRP_OUTPUT_ENABLE, 1);
-  nrpn_set(KYRP_ECHO_ENABLE, 1);
-  nrpn_set(KYRP_LISTENER_ENABLE, 1);
-  nrpn_set(KYRP_MIDI_INPUTS, 0);
-  nrpn_set(KYRP_MIDI_OUTPUTS, 0);
-  nrpn_set(KYRP_MIDI_ECHOES, 0);
-  nrpn_set(KYRP_MIDI_SENDS, 0);
-  nrpn_set(KYRP_MIDI_NOTES, 0);
-  nrpn_set(KYRP_MIDI_CTRLS, 0);
-  nrpn_set(KYRP_MIDI_NRPNS, 0);
-  nrpn_set(KYRP_LISTENER_LISTS, 0);
-  nrpn_set(KYRP_LISTENER_NODES, 0);
-  nrpn_set(KYRP_LISTENER_CALLS, 0);
-  nrpn_set(KYRP_LISTENER_FIRES, 0);
-  nrpn_set(KYRP_LISTENER_LOOPS, 0);
-  nrpn_set(KYRP_LOOP, 0);
-  nrpn_set(KYRP_SAMPLE, 0);
-  nrpn_set(KYRP_UPDATE, 0);
-  nrpn_set(KYRP_MILLI, 0);
-  nrpn_set(KYRP_10MILLI, 0);
-  nrpn_set(KYRP_100MILLI, 0);
+  nrpn_set(NRPN_CHANNEL, KYR_CHANNEL);
+  nrpn_set(NRPN_INPUT_ENABLE, 1);
+  nrpn_set(NRPN_OUTPUT_ENABLE, 1);
+  nrpn_set(NRPN_ECHO_ENABLE, 1);
+  nrpn_set(NRPN_LISTENER_ENABLE, 1);
+  nrpn_set(NRPN_MIDI_INPUTS, 0);
+  nrpn_set(NRPN_MIDI_OUTPUTS, 0);
+  nrpn_set(NRPN_MIDI_ECHOES, 0);
+  nrpn_set(NRPN_MIDI_SENDS, 0);
+  nrpn_set(NRPN_MIDI_NOTES, 0);
+  nrpn_set(NRPN_MIDI_CTRLS, 0);
+  nrpn_set(NRPN_MIDI_NRPNS, 0);
+  nrpn_set(NRPN_LISTENER_LISTS, 0);
+  nrpn_set(NRPN_LISTENER_NODES, 0);
+  nrpn_set(NRPN_LISTENER_CALLS, 0);
+  nrpn_set(NRPN_LISTENER_FIRES, 0);
+  nrpn_set(NRPN_LISTENER_LOOPS, 0);
+  nrpn_set(NRPN_LOOP, 0);
+  nrpn_set(NRPN_SAMPLE, 0);
+  nrpn_set(NRPN_UPDATE, 0);
+  nrpn_set(NRPN_MILLI, 0);
+  nrpn_set(NRPN_10MILLI, 0);
+  nrpn_set(NRPN_100MILLI, 0);
 }
 
 static void midi_loop(void) { midi.loop(); }

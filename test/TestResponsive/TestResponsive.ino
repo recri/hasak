@@ -38,17 +38,17 @@ int16_t values[16] = {
 
 int get_nrpn(int nrpn) {
   switch (nrpn) {
-  case KYRP_MIX_EN_USB_L0: return values[0];
-  case KYRP_MIX_USB_L0: return values[1];
-  case KYRP_MIX_SLEW_TIME: return values[2];
-  case KYRP_MIX_SLEW_RAMP: return values[3];;
+  case NRPN_MIX_EN_USB_L0: return values[0];
+  case NRPN_MIX_USB_L0: return values[1];
+  case NRPN_MIX_SLEW_TIME: return values[2];
+  case NRPN_MIX_SLEW_RAMP: return values[3];;
   default: return 0;
   }
 }
 
-PlainRamp pramp(KYRP_MIX_SLEW_RAMP, KYRP_MIX_SLEW_TIME);
-ResponsiveRamp rramp(KYRP_MIX_SLEW_RAMP, KYRP_MIX_SLEW_TIME, 0);
-ResponsiveGainRamp gramp(KYRP_MIX_USB_L0, KYRP_MIX_EN_USB_L0, KYRP_MIX_SLEW_RAMP, KYRP_MIX_SLEW_TIME);
+PlainRamp pramp(NRPN_MIX_SLEW_RAMP, NRPN_MIX_SLEW_TIME);
+ResponsiveRamp rramp(NRPN_MIX_SLEW_RAMP, NRPN_MIX_SLEW_TIME, 0);
+ResponsiveGainRamp gramp(NRPN_MIX_USB_L0, NRPN_MIX_EN_USB_L0, NRPN_MIX_SLEW_RAMP, NRPN_MIX_SLEW_TIME);
 
 void setup(void) {
   Serial.begin(115200);

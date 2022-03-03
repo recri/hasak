@@ -29,15 +29,15 @@ static ResponsiveAnalogRead *padc_adc[KYR_N_PADC];
 
 static void padc_milli(int nrpn, int _) {
   static uint16_t count = 0;
-  if ( ! nrpn_get(KYRP_PADC_ENABLE)) return;
+  if ( ! nrpn_get(NRPN_PADC_ENABLE)) return;
   count += 1;
   for (int i = 0; i <= KYR_N_PADC; i += 1) {
     if (padc_adc[i] != NULL) {
       if ((count % KYR_N_PADC) == i) 
 	padc_adc[i]->update();
-      if ((count % nrpn_get(KYRP_PADC_RATE)) == i) {
+      if ((count % nrpn_get(NRPN_PADC_RATE)) == i) {
 	int16_t raw_value = padc_adc[i]->getValue();
-	int val_nrpn = KYRP_PADC0_VAL+i*(KYRP_PADC1_VAL-KYRP_PADC0_VAL);
+	int val_nrpn = NRPN_PADC0_VAL+i*(NRPN_PADC1_VAL-NRPN_PADC0_VAL);
 	if (raw_value != nrpn_get(val_nrpn))
 	  nrpn_set(val_nrpn, raw_value);
       }
@@ -52,7 +52,7 @@ static void padc_pin_listener(int nrpn, int _) {
     return;
   }
   // Serial.printf("padc_pin_listener(%d)\n", nrpn);
-  const int i = (nrpn-KYRP_PADC0_PIN)/(KYRP_PADC1_PIN-KYRP_PADC0_PIN);
+  const int i = (nrpn-NRPN_PADC0_PIN)/(NRPN_PADC1_PIN-NRPN_PADC0_PIN);
   if (padc_adc[i] != NULL) {
     delete padc_adc[i];
     padc_adc[i] = NULL;
@@ -65,6 +65,6 @@ static void padc_pin_listener(int nrpn, int _) {
 
 static void padc_setup(void) {
   for (int i = 0; i < KYR_N_POUT; i += 1)
-    nrpn_listen(KYRP_PADC0_PIN+i*(KYRP_PADC1_PIN-KYRP_PADC0_PIN), padc_pin_listener);
-  nrpn_listen(KYRP_MILLI, padc_milli);
+    nrpn_listen(NRPN_PADC0_PIN+i*(NRPN_PADC1_PIN-NRPN_PADC0_PIN), padc_pin_listener);
+  nrpn_listen(NRPN_MILLI, padc_milli);
 }

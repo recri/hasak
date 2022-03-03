@@ -33,17 +33,17 @@ static void pin_sample(int nrpn, int _) {
   /* assumes that the pin and note nrpns occur in a contiguous block */
   /* ah, inverted logic, pins are active low, notes are active high */
   /* debounce by ignoring changes for a period of time */
-  if ( ! nrpn_get(KYRP_PIN_ENABLE)) return;
+  if ( ! nrpn_get(NRPN_PIN_ENABLE)) return;
   static elapsedSamples debounce[KYR_N_PIN];
   for (int i = 0; i < KYR_N_PIN; i += 1) {
-    const int pin = nrpn_get(KYRP_PIN0_PIN+i);
+    const int pin = nrpn_get(NRPN_PIN0_PIN+i);
     if (pin_valid(pin)) {
       if ((int)debounce[i] >= 0) {
 	const int note = KYRN_PIN0+i;
 	debounce[i] = 0;
 	if (digitalReadFast(pin) == note_get(note)) {
 	  note_toggle(note);
-	  debounce[i] = -nrpn_get(KYRP_PIN_DEBOUNCE);
+	  debounce[i] = -nrpn_get(NRPN_PIN_DEBOUNCE);
 	}
       }
     }
@@ -58,8 +58,8 @@ static void pin_pin_listener(int nrpn, int _) {
 
 static void pin_setup(void) {
   for (int i = 0; i < KYR_N_PIN; i += 1)
-    nrpn_listen(KYRP_PIN0_PIN+i, pin_pin_listener);
-  nrpn_listen(KYRP_SAMPLE, pin_sample);
+    nrpn_listen(NRPN_PIN0_PIN+i, pin_pin_listener);
+  nrpn_listen(NRPN_SAMPLE, pin_sample);
 }
 
 // static void pin_loop(void) {}

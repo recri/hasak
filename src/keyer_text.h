@@ -62,13 +62,13 @@ public:
     timing_element = key_none;
   }
 
-  int valid_vox(void) { return st_note <= nrpn_get(KYRP_ACTIVE_ST); }
+  int valid_vox(void) { return st_note <= nrpn_get(NRPN_ACTIVE_ST); }
   
   // sounding or timing a space
-  int sounding(void) { return st_note == nrpn_get(KYRP_ACTIVE_ST); }
+  int sounding(void) { return st_note == nrpn_get(NRPN_ACTIVE_ST); }
 
   uint8_t map_text(uint8_t value) {
-    if (value-33 >= 0 && value-33 < 64 && nrpn_get(KYRP_MORSE+value-33) != 1)
+    if (value-33 >= 0 && value-33 < 64 && nrpn_get(NRPN_MORSE+value-33) != 1)
       return value;
     if ('a' <= value && value <= 'z') // a-z => A-Z
       return value-32;
@@ -123,7 +123,7 @@ public:
 	} else if (value == '\e') { // prosign together the next two characters
 	  prosign += 1;
 	} else {
-	  code = nrpn_get(KYRP_MORSE+value-33);
+	  code = nrpn_get(NRPN_MORSE+value-33);
 	  if (code > 1)
 	    timing_element = key_ies;
 	}

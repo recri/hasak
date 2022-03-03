@@ -44,20 +44,20 @@ static void codec_enable(void) {
 
 static void codec_sgtl5000_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
-  case KYRP_VOLUME: sgtl5000.volume(tenthdbtolinear(signed_value(value))); break;
-  case KYRP_INPUT_LEVEL: sgtl5000.inputLevel(tenthdbtolinear(signed_value(value))); break;
-  case KYRP_INPUT_SELECT: sgtl5000.inputSelect(value); break;
+  case NRPN_VOLUME: sgtl5000.volume(tenthdbtolinear(signed_value(value))); break;
+  case NRPN_INPUT_LEVEL: sgtl5000.inputLevel(tenthdbtolinear(signed_value(value))); break;
+  case NRPN_INPUT_SELECT: sgtl5000.inputSelect(value); break;
   default: Serial.printf("uncaught sgtl5000 codec nrpn #%d with value %d\n", nrpn, value); break;
   }
 }
 
 static void codec_wm8960_set(const int16_t nrpn, const int16_t value) {
   switch (nrpn) {
-  case KYRP_VOLUME: 
+  case NRPN_VOLUME: 
     // Serial.printf("set volume %d -> %f\n", signed_value(value), tenthdbtolinear(signed_value(value))/127.0);
     wm8960.volume(tenthdbtolinear127(signed_value(value))/127.0); break;
-  case KYRP_INPUT_LEVEL: wm8960.inputLevel(tenthdbtolinear(signed_value(value))); break;
-  case KYRP_INPUT_SELECT: wm8960.inputSelect(value); break;
+  case NRPN_INPUT_LEVEL: wm8960.inputLevel(tenthdbtolinear(signed_value(value))); break;
+  case NRPN_INPUT_SELECT: wm8960.inputSelect(value); break;
   default: Serial.printf("uncaught wm8960 codec nrpn #%d with value %d\n", nrpn, value); break;
   }
 }
@@ -71,9 +71,9 @@ static void codec_listener(const int nrpn, int _) {
 
 static void codec_setup(void) {
   /* set nrpn listeners for our functions */
-  nrpn_listen(KYRP_VOLUME, codec_listener);
-  nrpn_listen(KYRP_INPUT_SELECT, codec_listener);
-  nrpn_listen(KYRP_INPUT_LEVEL, codec_listener);
+  nrpn_listen(NRPN_VOLUME, codec_listener);
+  nrpn_listen(NRPN_INPUT_SELECT, codec_listener);
+  nrpn_listen(NRPN_INPUT_LEVEL, codec_listener);
 }
 
 //static void codec_loop(void) {}

@@ -87,13 +87,13 @@ static void string_after_idle(int nrpn, int _) {
       nopen += 1;
       if (p->sent == p->length) {			// all sent
 	if (p->rcvd == p->length) {			// all rcvd
-	  nrpn_send(KYRP_STRING_END, (p->id<<7)|p->target);	// end string
+	  nrpn_send(NRPN_STRING_END, (p->id<<7)|p->target);	// end string
 	  p->open = 0;					// close endpoint
 	  nopen -= 1;					// note close
 	}
       } else if (p->sent == 0 ||			// nothing sent or
 		 (p->rcvd > 0 && (p->last&0x7f) > 1)) {	// last ack has space
-	nrpn_send(KYRP_STRING_BYTE, (p->id << 7) | p->string[p->sent++]);
+	nrpn_send(NRPN_STRING_BYTE, (p->id << 7) | p->string[p->sent++]);
       } else {						// we're stalled
 	p->stalled += 1;
       }
@@ -105,7 +105,7 @@ static void string_after_idle(int nrpn, int _) {
 
 static void string_start(string_endpoint_t *p) {
   p->open = 1;
-  nrpn_send(KYRP_STRING_START, (p->id << 7) | p->target);
+  nrpn_send(NRPN_STRING_START, (p->id << 7) | p->target);
   after_idle(string_after_idle);
 }
 
@@ -129,7 +129,7 @@ static void string_id_json(const char *string, int length) {
   p->rcvd = 0;			// number acknowledged
   p->last = 0;			// last acknowledgement
   p->stalled = 0;		// stalled waiting for acknowledgement
-  nrpn_send(KYRP_ID_JSON, (p->id << 7) | p->target);
+  nrpn_send(NRPN_ID_JSON, (p->id << 7) | p->target);
   string_start(p);
 }
 
@@ -144,9 +144,9 @@ static void string_byte_listener(int nrpn, int _) {
 }
 
 static void string_setup(void) {
-  nrpn_listen(KYRP_STRING_START, string_start_listener);
-  nrpn_listen(KYRP_STRING_END, string_end_listener);
-  nrpn_listen(KYRP_STRING_BYTE, string_byte_listener);
+  nrpn_listen(NRPN_STRING_START, string_start_listener);
+  nrpn_listen(NRPN_STRING_END, string_end_listener);
+  nrpn_listen(NRPN_STRING_BYTE, string_byte_listener);
 }
 
 // static void cwstptt_loop(void) {}

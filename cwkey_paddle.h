@@ -64,7 +64,7 @@ static void cwkey_paddle_setup(void) {
   note_listen(KYRN_HW_R_PAD2, cwkey_paddle2_listen);
   note_listen(KYRN_HW_L_PAD3, cwkey_paddle3_listen);
   note_listen(KYRN_HW_R_PAD3, cwkey_paddle3_listen);
-  nrpn_listen(KYRP_SAMPLE, cwkey_paddle_sample);
+  nrpn_listen(NRPN_SAMPLE, cwkey_paddle_sample);
 }
 
 // static void cwkey_paddle_loop(void) {}

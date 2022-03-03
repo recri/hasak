@@ -65,11 +65,11 @@ static hasak_t hasak = {
 static void nrpn_update_keyer_timing(int numb, int _) {
   const int wordDits = 50;
   const int sampleRate = AUDIO_SAMPLE_RATE;
-  const float wpm = nrpn_get(KYRP_SPEED)+nrpn_get(KYRP_SPEED_FRAC)*7.8125e-3f;
-  const int weight = nrpn_get(KYRP_WEIGHT);
-  const int ratio = nrpn_get(KYRP_RATIO);
-  const int compensation = signed_value(nrpn_get(KYRP_COMP));
-  const int farnsworth = nrpn_get(KYRP_FARNS);;
+  const float wpm = nrpn_get(NRPN_SPEED)+nrpn_get(NRPN_SPEED_FRAC)*7.8125e-3f;
+  const int weight = nrpn_get(NRPN_WEIGHT);
+  const int ratio = nrpn_get(NRPN_RATIO);
+  const int compensation = signed_value(nrpn_get(NRPN_COMP));
+  const int farnsworth = nrpn_get(NRPN_FARNS);;
   // const float ms_per_dit = (1000 * 60) / (wpm * wordDits);
   const float r = (ratio-50)*0.01;
   const float w = (weight-50)*0.01;
@@ -98,16 +98,16 @@ static void nrpn_update_keyer_timing(int numb, int _) {
   /* Serial.printf("morse_keyer base dit %ld, dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
      ticksPerBaseDit, ticksPerDit, ticksPerDah, ticksPerIes, ticksPerIls, ticksPerIws); */
   // AudioNoInterrupts();
-  xnrpn_set(KYRP_XPER_DIT, ticksPerDit);
-  xnrpn_set(KYRP_XPER_DAH, ticksPerDah);
-  xnrpn_set(KYRP_XPER_IES, ticksPerIes);
-  xnrpn_set(KYRP_XPER_ILS, ticksPerIls);
-  xnrpn_set(KYRP_XPER_IWS, ticksPerIws);
+  xnrpn_set(NRPN_XPER_DIT, ticksPerDit);
+  xnrpn_set(NRPN_XPER_DAH, ticksPerDah);
+  xnrpn_set(NRPN_XPER_IES, ticksPerIes);
+  xnrpn_set(NRPN_XPER_ILS, ticksPerIls);
+  xnrpn_set(NRPN_XPER_IWS, ticksPerIws);
   // AudioInterrupts();
   /* Serial.printf("morse_keyer dit %ld, dah %ld, ies %ld, ils %ld, iws %ld\n", 
-     get_vox_xnrpn(vox, KYRP_XPER_DIT), get_vox_xnrpn(vox, KYRP_XPER_DAH),
-     get_vox_xnrpn(vox, KYRP_XPER_IES), get_vox_xnrpn(vox, KYRP_XPER_ILS),
-     get_vox_xnrpn(vox, KYRP_XPER_IWS)); */
+     get_vox_xnrpn(vox, NRPN_XPER_DIT), get_vox_xnrpn(vox, NRPN_XPER_DAH),
+     get_vox_xnrpn(vox, NRPN_XPER_IES), get_vox_xnrpn(vox, NRPN_XPER_ILS),
+     get_vox_xnrpn(vox, NRPN_XPER_IWS)); */
 }
 
 /*
@@ -120,9 +120,9 @@ static void nrpn_recompute_morse(int nrpn, int _) {
 
 /*
 ** expand mixer shorthand bits to individual mixer channel nrpns
-** nrpn == KYRP_MIX_ENABLE then set left and right according to bits
-** nrpn == KYRP_MIX_ENABLE_L then set left according to bits
-** nrpn == KYRP_MIX_ENABLE_R then set right according to bits
+** nrpn == NRPN_MIX_ENABLE then set left and right according to bits
+** nrpn == NRPN_MIX_ENABLE_L then set left according to bits
+** nrpn == NRPN_MIX_ENABLE_R then set right according to bits
 ** in each case the mask has 12 bits and ranges from 0 to 4095
 ** in each case we have 4 bits for usb, i2s, and hdw out mixers
 ** the order of the mixers and enables is:
@@ -139,13 +139,13 @@ static void nrpn_recompute_mixer_enables(int nrpn, int _) {
     const int l = (i%4)+(i/4)*8;
     const int r = l+4;
     const int v = (value & (1<<(11-i))) != 0;
-    if (nrpn == KYRP_MIX_ENABLE) {
-      nrpn_set(KYRP_MIXER2+l, v);
-      nrpn_set(KYRP_MIXER2+r, v);
-    } else if (nrpn == KYRP_MIX_ENABLE_L) {
-      nrpn_set(KYRP_MIXER2+l, v);
-    } else if (nrpn == KYRP_MIX_ENABLE_R) {
-      nrpn_set(KYRP_MIXER2+r, v);
+    if (nrpn == NRPN_MIX_ENABLE) {
+      nrpn_set(NRPN_MIXER2+l, v);
+      nrpn_set(NRPN_MIXER2+r, v);
+    } else if (nrpn == NRPN_MIX_ENABLE_L) {
+      nrpn_set(NRPN_MIXER2+l, v);
+    } else if (nrpn == NRPN_MIX_ENABLE_R) {
+      nrpn_set(NRPN_MIXER2+r, v);
     } else {
       Serial.printf("bad nrpn %d in nrpn_recompute_mixer_enables\n");
     }
@@ -161,13 +161,13 @@ static void nrpn_write_eeprom(int nrpn, int _) {
   int error = 0;
   for (int i = 0; i < 2; i += 1)
     data.header1[i] = data.header2[i] = data.header3[i] = hasak.header[i];
-  for (int i = 0; i < KYRP_LAST; i += 1)
+  for (int i = 0; i < NRPN_LAST; i += 1)
     data.nrpns[i] = nrpn_get(i);
   for (unsigned i = 0; i < sizeof(data.msgs); i += 1)
     data.msgs[i] = hasak.msgs[i];
   EEPROM.put(0, data);
   /* verify */
-  for (int i = 0; i < KYRP_LAST; i += 1) {
+  for (int i = 0; i < NRPN_LAST; i += 1) {
     int16_t value;
     EEPROM.get(sizeof(data.header1)+i*sizeof(int16_t), value);
     if (value != data.nrpn[i]) {
@@ -199,7 +199,7 @@ static void nrpn_read_eeprom(int nrpn, int _) {
       return;
     }
   /* apply nrpns */
-  for (int n = 0; n < KYRP_LAST; n += 1)
+  for (int n = 0; n < NRPN_LAST; n += 1)
     nrpn_set(n, data.nrpns[n]);
   /* copy msgs */
   for (int i = 0; i < sizeof(data.msgs); i += 1)
@@ -215,19 +215,19 @@ static void nrpn_read_eeprom(int nrpn, int _) {
 static int nrpn_echo_index;
 
 static void nrpn_echo_all_step(int _, int  __) {
-  if (nrpn_echo_index < KYRP_LAST_SAVED) {
+  if (nrpn_echo_index < NRPN_LAST_SAVED) {
     if (nrpn_get(nrpn_echo_index) != KYRV_NOT_SET)
       nrpn_send(nrpn_echo_index, nrpn_get(nrpn_echo_index));
     nrpn_echo_index += 1;
     after_idle(nrpn_echo_all_step);
   } else {
-    nrpn_send(KYRP_ECHO_ALL, 0);
+    nrpn_send(NRPN_ECHO_ALL, 0);
     nrpn_echo_index = -1;
   }
 }
 
 static void nrpn_echo_all(int nrpn, int _) {
-  nrpn_echo_index = KYRP_SAVED;
+  nrpn_echo_index = NRPN_SAVED;
   after_idle(nrpn_echo_all_step);
 }
 
@@ -236,10 +236,10 @@ static void nrpn_echo_all(int nrpn, int _) {
 */
 static void nrpn_send_text(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
-  if (nrpn == KYRP_SEND_TEXT) {
+  if (nrpn == NRPN_SEND_TEXT) {
     note_set(KYRN_TXT_TEXT, value&127);
     // keyer_text.send_text(value&127);
-  } else if (nrpn == KYRP_SEND_TEXT2) {
+  } else if (nrpn == NRPN_SEND_TEXT2) {
     note_set(KYRN_TXT_TEXT2, value&127);
     // keyer_text2.send_text(value&127);
   } else {
@@ -253,14 +253,14 @@ static void nrpn_send_text(int nrpn, int _) {
 */
 static void nrpn_msg_handler(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
-  if (nrpn == KYRP_MSG_INDEX) { 
+  if (nrpn == NRPN_MSG_INDEX) { 
     hasak.index = value%sizeof(hasak.msgs);
     nrpn_send(nrpn, hasak.index);
-  } else if (nrpn == KYRP_MSG_WRITE) {
+  } else if (nrpn == NRPN_MSG_WRITE) {
     nrpn_send(nrpn, value&127);
     hasak.msgs[hasak.index++] = value&127;
     hasak.index %= sizeof(hasak.msgs);
-  } else if (nrpn == KYRP_MSG_READ) { 
+  } else if (nrpn == NRPN_MSG_READ) { 
     nrpn_send(nrpn, hasak.msgs[hasak.index++]);
     hasak.index %= sizeof(hasak.msgs);
   } else {
@@ -290,126 +290,126 @@ static void nrpn_id_json(int nrpn, int _) {
 
 static void nrpn_set_default(void) {
 
-  nrpn_set(KYRP_CHANNEL, KYR_CHANNEL);
-  nrpn_set(KYRP_INPUT_ENABLE, 1);
-  nrpn_set(KYRP_OUTPUT_ENABLE, 1);
-  nrpn_set(KYRP_ECHO_ENABLE, 1);
-  nrpn_set(KYRP_LISTENER_ENABLE, 1);
+  nrpn_set(NRPN_CHANNEL, KYR_CHANNEL);
+  nrpn_set(NRPN_INPUT_ENABLE, 1);
+  nrpn_set(NRPN_OUTPUT_ENABLE, 1);
+  nrpn_set(NRPN_ECHO_ENABLE, 1);
+  nrpn_set(NRPN_LISTENER_ENABLE, 1);
   
-  nrpn_set(KYRP_PIN_ENABLE, 1);
-  nrpn_set(KYRP_POUT_ENABLE, 1);
-  nrpn_set(KYRP_PADC_ENABLE, 1);
-  nrpn_set(KYRP_ST_ENABLE, KYR_ENABLE_ST);
-  nrpn_set(KYRP_TX_ENABLE, KYR_ENABLE_TX);
-  nrpn_set(KYRP_IQ_ENABLE, 0);
-  nrpn_set(KYRP_PTT_REQUIRE, 0);
-  nrpn_set(KYRP_RKEY_ENABLE, 1);
-  nrpn_set(KYRP_CW_AUTOPTT, 1);
-  nrpn_set(KYRP_ECHO_ENABLE, 1);
-  nrpn_set(KYRP_RX_MUTE, 0);
-  nrpn_set(KYRP_MIC_HWPTT, 0);
-  nrpn_set(KYRP_CW_HWPTT, 1);
-  nrpn_set(KYRP_HDW_IN_ENABLE, 1);
-  nrpn_set(KYRP_HDW_OUT_ENABLE, 1);
+  nrpn_set(NRPN_PIN_ENABLE, 1);
+  nrpn_set(NRPN_POUT_ENABLE, 1);
+  nrpn_set(NRPN_PADC_ENABLE, 1);
+  nrpn_set(NRPN_ST_ENABLE, KYR_ENABLE_ST);
+  nrpn_set(NRPN_TX_ENABLE, KYR_ENABLE_TX);
+  nrpn_set(NRPN_IQ_ENABLE, 0);
+  nrpn_set(NRPN_PTT_REQUIRE, 0);
+  nrpn_set(NRPN_RKEY_ENABLE, 1);
+  nrpn_set(NRPN_CW_AUTOPTT, 1);
+  nrpn_set(NRPN_ECHO_ENABLE, 1);
+  nrpn_set(NRPN_RX_MUTE, 0);
+  nrpn_set(NRPN_MIC_HWPTT, 0);
+  nrpn_set(NRPN_CW_HWPTT, 1);
+  nrpn_set(NRPN_HDW_IN_ENABLE, 1);
+  nrpn_set(NRPN_HDW_OUT_ENABLE, 1);
 
-  nrpn_set(KYRP_VOLUME, 0);
-  nrpn_set(KYRP_LEVEL, 0);	/* dB/10, centiBel */
-  nrpn_set(KYRP_IQ_LEVEL, 0);
-  nrpn_set(KYRP_I2S_LEVEL, 0);
-  nrpn_set(KYRP_HDW_LEVEL, 0);
-  nrpn_set(KYRP_ST_BALANCE, 0);
-  nrpn_set(KYRP_IQ_BALANCE, 0);
+  nrpn_set(NRPN_VOLUME, 0);
+  nrpn_set(NRPN_LEVEL, 0);	/* dB/10, centiBel */
+  nrpn_set(NRPN_IQ_LEVEL, 0);
+  nrpn_set(NRPN_I2S_LEVEL, 0);
+  nrpn_set(NRPN_HDW_LEVEL, 0);
+  nrpn_set(NRPN_ST_BALANCE, 0);
+  nrpn_set(NRPN_IQ_BALANCE, 0);
 
   /* keyer defaults */
-  nrpn_set(KYRP_TONE, 600);	/* Hz */
-  nrpn_set(KYRP_SPEED, 18);	/* wpm */
-  nrpn_set(KYRP_SPEED_FRAC, 0);	/* wpm 1/128ths */
-  nrpn_set(KYRP_WEIGHT, 50);	/* percent */
-  nrpn_set(KYRP_RATIO, 50);	/* percent */
-  nrpn_set(KYRP_COMP,ms_to_samples(0));	/* 0 samples */
-  nrpn_set(KYRP_FARNS, 0);	/* wpm */
+  nrpn_set(NRPN_TONE, 600);	/* Hz */
+  nrpn_set(NRPN_SPEED, 18);	/* wpm */
+  nrpn_set(NRPN_SPEED_FRAC, 0);	/* wpm 1/128ths */
+  nrpn_set(NRPN_WEIGHT, 50);	/* percent */
+  nrpn_set(NRPN_RATIO, 50);	/* percent */
+  nrpn_set(NRPN_COMP,ms_to_samples(0));	/* 0 samples */
+  nrpn_set(NRPN_FARNS, 0);	/* wpm */
   
-  nrpn_set(KYRP_HEAD_TIME, ms_to_samples(0));	// 0 ms
-  nrpn_set(KYRP_TAIL_TIME, ms_to_samples(0));	// 0 ms
-  nrpn_set(KYRP_HANG_TIME, 0);	/* 0 dits */
-  nrpn_set(KYRP_RISE_TIME, ms_to_samples(5));	// 5.0 ms
-  nrpn_set(KYRP_FALL_TIME, ms_to_samples(5));	// 5.0 ms
-  nrpn_set(KYRP_RISE_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(KYRP_FALL_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(KYRP_PAD_MODE, KYRV_MODE_A);
-  nrpn_set(KYRP_PAD_SWAP, 0);
-  nrpn_set(KYRP_PAD_ADAPT, KYRV_ADAPT_NORMAL);
-  nrpn_set(KYRP_AUTO_ILS, 1);
-  nrpn_set(KYRP_AUTO_IWS, 0);
-  nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_VK6PH);
-  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_AD5DZ);
-  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_ND7PA);
-  // nrpn_set(KYRP_PAD_KEYER, KYRV_KEYER_K1EL);
+  nrpn_set(NRPN_HEAD_TIME, ms_to_samples(0));	// 0 ms
+  nrpn_set(NRPN_TAIL_TIME, ms_to_samples(0));	// 0 ms
+  nrpn_set(NRPN_HANG_TIME, 0);	/* 0 dits */
+  nrpn_set(NRPN_RISE_TIME, ms_to_samples(5));	// 5.0 ms
+  nrpn_set(NRPN_FALL_TIME, ms_to_samples(5));	// 5.0 ms
+  nrpn_set(NRPN_RISE_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(NRPN_FALL_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_A);
+  nrpn_set(NRPN_PAD_SWAP, 0);
+  nrpn_set(NRPN_PAD_ADAPT, KYRV_ADAPT_NORMAL);
+  nrpn_set(NRPN_AUTO_ILS, 1);
+  nrpn_set(NRPN_AUTO_IWS, 0);
+  nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_VK6PH);
+  // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_AD5DZ);
+  // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_ND7PA);
+  // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_K1EL);
 
-  nrpn_set(KYRP_ACTIVE_ST, KYRN_ST_NONE);
-  nrpn_set(KYRP_MIXER_SLEW_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(KYRP_MIXER_SLEW_TIME, 128);
-  nrpn_set(KYRP_FREQ_SLEW_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(KYRP_FREQ_SLEW_TIME,	128);
-  nrpn_set(KYRP_PIN_DEBOUNCE, 1000);
-  nrpn_set(KYRP_POUT_LOGIC, 1);
-  nrpn_set(KYRP_PADC_RATE, 10);
-  xnrpn_set(KYRP_XIQ_FREQ, 600);
-  nrpn_set(KYRP_IQ_USB, 1);
+  nrpn_set(NRPN_ACTIVE_ST, KYRN_ST_NONE);
+  nrpn_set(NRPN_MIXER_SLEW_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(NRPN_MIXER_SLEW_TIME, 128);
+  nrpn_set(NRPN_FREQ_SLEW_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(NRPN_FREQ_SLEW_TIME,	128);
+  nrpn_set(NRPN_PIN_DEBOUNCE, 1000);
+  nrpn_set(NRPN_POUT_LOGIC, 1);
+  nrpn_set(NRPN_PADC_RATE, 10);
+  xnrpn_set(NRPN_XIQ_FREQ, 600);
+  nrpn_set(NRPN_IQ_USB, 1);
 
-  nrpn_set(KYRP_PIN0_PIN, KYR_L_PAD_PIN);  // left paddle pin
-  nrpn_set(KYRP_PIN1_PIN, KYR_R_PAD_PIN);  // right paddle pin
-  nrpn_set(KYRP_PIN2_PIN, KYR_S_KEY_PIN);  // straight key pin
-  nrpn_set(KYRP_PIN3_PIN, KYR_EXT_PTT_PIN);  // external ptt switch pin
-  nrpn_set(KYRP_PIN4_PIN, 127);
-  nrpn_set(KYRP_PIN5_PIN, 127);
-  nrpn_set(KYRP_PIN6_PIN, 127);
-  nrpn_set(KYRP_PIN7_PIN, 127);
+  nrpn_set(NRPN_PIN0_PIN, KYR_L_PAD_PIN);  // left paddle pin
+  nrpn_set(NRPN_PIN1_PIN, KYR_R_PAD_PIN);  // right paddle pin
+  nrpn_set(NRPN_PIN2_PIN, KYR_S_KEY_PIN);  // straight key pin
+  nrpn_set(NRPN_PIN3_PIN, KYR_EXT_PTT_PIN);  // external ptt switch pin
+  nrpn_set(NRPN_PIN4_PIN, 127);
+  nrpn_set(NRPN_PIN5_PIN, 127);
+  nrpn_set(NRPN_PIN6_PIN, 127);
+  nrpn_set(NRPN_PIN7_PIN, 127);
 
-  nrpn_set(KYRP_POUT0_PIN, KYR_KEY_OUT_PIN); // key out, maybe ptt out
-  nrpn_set(KYRP_POUT1_PIN, KYR_PTT_OUT_PIN); // ptt out, maybe key out
-  nrpn_set(KYRP_POUT2_PIN, 127);
-  nrpn_set(KYRP_POUT3_PIN, 127);
-  nrpn_set(KYRP_POUT4_PIN, 127);
-  nrpn_set(KYRP_POUT5_PIN, 127);
-  nrpn_set(KYRP_POUT6_PIN, 127);
-  nrpn_set(KYRP_POUT7_PIN, 127);
+  nrpn_set(NRPN_POUT0_PIN, KYR_KEY_OUT_PIN); // key out, maybe ptt out
+  nrpn_set(NRPN_POUT1_PIN, KYR_PTT_OUT_PIN); // ptt out, maybe key out
+  nrpn_set(NRPN_POUT2_PIN, 127);
+  nrpn_set(NRPN_POUT3_PIN, 127);
+  nrpn_set(NRPN_POUT4_PIN, 127);
+  nrpn_set(NRPN_POUT5_PIN, 127);
+  nrpn_set(NRPN_POUT6_PIN, 127);
+  nrpn_set(NRPN_POUT7_PIN, 127);
 
-  nrpn_set(KYRP_PADC0_PIN, KYR_VOLUME_POT);
-  nrpn_set(KYRP_PADC0_NRPN, KYRV_PADC_VOLUME);
-  nrpn_set(KYRP_PADC1_PIN, KYR_ST_VOL_POT);
-  nrpn_set(KYRP_PADC1_NRPN, KYRV_PADC_LEVEL);
-  nrpn_set(KYRP_PADC2_PIN, KYR_ST_FREQ_POT);
-  nrpn_set(KYRP_PADC2_NRPN, KYRV_PADC_TONE);
-  nrpn_set(KYRP_PADC3_PIN, KYR_SPEED_POT);
-  nrpn_set(KYRP_PADC3_NRPN, KYRV_PADC_SPEED);
-  nrpn_set(KYRP_PADC4_PIN, 127);
-  nrpn_set(KYRP_PADC4_NRPN, -1);
-  nrpn_set(KYRP_PADC5_PIN, 1);
-  nrpn_set(KYRP_PADC5_NRPN, -1);
-  nrpn_set(KYRP_PADC6_PIN, 127);
-  nrpn_set(KYRP_PADC6_NRPN, -1);
-  nrpn_set(KYRP_PADC7_PIN, 127);
-  nrpn_set(KYRP_PADC7_NRPN, -1);
+  nrpn_set(NRPN_PADC0_PIN, KYR_VOLUME_POT);
+  nrpn_set(NRPN_PADC0_NRPN, KYRV_PADC_VOLUME);
+  nrpn_set(NRPN_PADC1_PIN, KYR_ST_VOL_POT);
+  nrpn_set(NRPN_PADC1_NRPN, KYRV_PADC_LEVEL);
+  nrpn_set(NRPN_PADC2_PIN, KYR_ST_FREQ_POT);
+  nrpn_set(NRPN_PADC2_NRPN, KYRV_PADC_TONE);
+  nrpn_set(NRPN_PADC3_PIN, KYR_SPEED_POT);
+  nrpn_set(NRPN_PADC3_NRPN, KYRV_PADC_SPEED);
+  nrpn_set(NRPN_PADC4_PIN, 127);
+  nrpn_set(NRPN_PADC4_NRPN, -1);
+  nrpn_set(NRPN_PADC5_PIN, 1);
+  nrpn_set(NRPN_PADC5_NRPN, -1);
+  nrpn_set(NRPN_PADC6_PIN, 127);
+  nrpn_set(NRPN_PADC6_NRPN, -1);
+  nrpn_set(NRPN_PADC7_PIN, 127);
+  nrpn_set(NRPN_PADC7_NRPN, -1);
 
   /* morse code table */
-  /* change this to NOTSET, pull NOTSET values from morse[i-KYRP_MORSE] */
-  for (int i = 0; i < 64; i += 1) nrpn_set(KYRP_MORSE+i, cwmorse[i]);
+  /* change this to NOTSET, pull NOTSET values from morse[i-NRPN_MORSE] */
+  for (int i = 0; i < 64; i += 1) nrpn_set(NRPN_MORSE+i, cwmorse[i]);
 
   /* output mixers */
-  for (int i = KYRP_MIXER; i < KYRP_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
+  for (int i = NRPN_MIXER; i < NRPN_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
 
   /* output mixers enable */
-  for (int i = KYRP_MIXER2; i < KYRP_MIXER2+24; i += 1) nrpn_set(i, 0); /* muted */
+  for (int i = NRPN_MIXER2; i < NRPN_MIXER2+24; i += 1) nrpn_set(i, 0); /* muted */
 
-  nrpn_set(KYRP_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits.IQ to usb, usb+sidetone to i2s and hdw
-  nrpn_set(KYRP_MIX_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
-  nrpn_set(KYRP_MIX_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
+  nrpn_set(NRPN_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits.IQ to usb, usb+sidetone to i2s and hdw
+  nrpn_set(NRPN_MIX_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
+  nrpn_set(NRPN_MIX_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
 
   /* codec */
-  nrpn_set(KYRP_VOLUME, 0);
-  nrpn_set(KYRP_INPUT_SELECT, 0);
-  nrpn_set(KYRP_INPUT_LEVEL, 0);
+  nrpn_set(NRPN_VOLUME, 0);
+  nrpn_set(NRPN_INPUT_SELECT, 0);
+  nrpn_set(NRPN_INPUT_LEVEL, 0);
 
 }
 
@@ -419,39 +419,39 @@ static void nrpn_set_default_shim(int nrpn, int _) {
 
 static void nrpn_setup(void) {
   /* bootstrap controller */
-  nrpn_listen(KYRP_ID_JSON, nrpn_id_json);
+  nrpn_listen(NRPN_ID_JSON, nrpn_id_json);
 
   /* morse timing update, listen for changes */
-  nrpn_listen(KYRP_SPEED, nrpn_recompute_morse);
-  nrpn_listen(KYRP_SPEED_FRAC, nrpn_recompute_morse);
-  nrpn_listen(KYRP_WEIGHT, nrpn_recompute_morse);
-  nrpn_listen(KYRP_RATIO, nrpn_recompute_morse);
-  nrpn_listen(KYRP_COMP, nrpn_recompute_morse);
-  nrpn_listen(KYRP_FARNS, nrpn_recompute_morse);
+  nrpn_listen(NRPN_SPEED, nrpn_recompute_morse);
+  nrpn_listen(NRPN_SPEED_FRAC, nrpn_recompute_morse);
+  nrpn_listen(NRPN_WEIGHT, nrpn_recompute_morse);
+  nrpn_listen(NRPN_RATIO, nrpn_recompute_morse);
+  nrpn_listen(NRPN_COMP, nrpn_recompute_morse);
+  nrpn_listen(NRPN_FARNS, nrpn_recompute_morse);
 
   /* mixer enable update, listen for changes */
-  nrpn_listen(KYRP_MIX_ENABLE, nrpn_recompute_mixer_enables);
-  nrpn_listen(KYRP_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
-  nrpn_listen(KYRP_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
+  nrpn_listen(NRPN_MIX_ENABLE, nrpn_recompute_mixer_enables);
+  nrpn_listen(NRPN_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
+  nrpn_listen(NRPN_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
 
   /* commands */
-  nrpn_listen(KYRP_WRITE_EEPROM, nrpn_write_eeprom);
-  nrpn_listen(KYRP_READ_EEPROM, nrpn_read_eeprom);
-  nrpn_listen(KYRP_SET_DEFAULT, nrpn_set_default_shim);
-  nrpn_listen(KYRP_ECHO_ALL, nrpn_echo_all);
-  nrpn_listen(KYRP_SEND_TEXT, nrpn_send_text);
-  nrpn_listen(KYRP_SEND_TEXT2, nrpn_send_text);
-  nrpn_listen(KYRP_MSG_INDEX, nrpn_msg_handler);
-  nrpn_listen(KYRP_MSG_WRITE, nrpn_msg_handler);
-  nrpn_listen(KYRP_MSG_READ, nrpn_msg_handler);
+  nrpn_listen(NRPN_WRITE_EEPROM, nrpn_write_eeprom);
+  nrpn_listen(NRPN_READ_EEPROM, nrpn_read_eeprom);
+  nrpn_listen(NRPN_SET_DEFAULT, nrpn_set_default_shim);
+  nrpn_listen(NRPN_ECHO_ALL, nrpn_echo_all);
+  nrpn_listen(NRPN_SEND_TEXT, nrpn_send_text);
+  nrpn_listen(NRPN_SEND_TEXT2, nrpn_send_text);
+  nrpn_listen(NRPN_MSG_INDEX, nrpn_msg_handler);
+  nrpn_listen(NRPN_MSG_WRITE, nrpn_msg_handler);
+  nrpn_listen(NRPN_MSG_READ, nrpn_msg_handler);
 
   /* information set in the nrpn array so it will be echoed */
-  nrpn_set(KYRP_NRPN_SIZE, KYR_NRPN_SIZE);
-  nrpn_set(KYRP_MSG_SIZE, KYR_MSG_SIZE);
-  nrpn_set(KYRP_SAMPLE_RATE, KYR_SAMPLE_RATE);
-  nrpn_set(KYRP_EEPROM_LENGTH, KYR_EEPROM_LENGTH);;
-  nrpn_set(KYRP_ID_CPU, KYR_ID_CPU);
-  nrpn_set(KYRP_ID_CODEC, codec_identify());
+  nrpn_set(NRPN_NRPN_SIZE, KYR_NRPN_SIZE);
+  nrpn_set(NRPN_MSG_SIZE, KYR_MSG_SIZE);
+  nrpn_set(NRPN_SAMPLE_RATE, KYR_SAMPLE_RATE);
+  nrpn_set(NRPN_EEPROM_LENGTH, KYR_EEPROM_LENGTH);;
+  nrpn_set(NRPN_ID_CPU, KYR_ID_CPU);
+  nrpn_set(NRPN_ID_CODEC, codec_identify());
 }
 
 //static void nrpn_loop(void) {}
