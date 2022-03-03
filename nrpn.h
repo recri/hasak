@@ -237,10 +237,10 @@ static void nrpn_echo_all(int nrpn, int _) {
 static void nrpn_send_text(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (nrpn == NRPN_SEND_TEXT) {
-    note_set(KYRN_TXT_TEXT, value&127);
+    note_set(NOTE_TXT_TEXT, value&127);
     // keyer_text.send_text(value&127);
   } else if (nrpn == NRPN_SEND_TEXT2) {
-    note_set(KYRN_TXT_TEXT2, value&127);
+    note_set(NOTE_TXT_TEXT2, value&127);
     // keyer_text2.send_text(value&127);
   } else {
     Serial.printf("unexpected nrpn %d in nrpn_send_text\n", nrpn);
@@ -346,7 +346,7 @@ static void nrpn_set_default(void) {
   // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_ND7PA);
   // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_K1EL);
 
-  nrpn_set(NRPN_ACTIVE_ST, KYRN_ST_NONE);
+  nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
   nrpn_set(NRPN_MIXER_SLEW_RAMP, KYRV_RAMP_HANN);
   nrpn_set(NRPN_MIXER_SLEW_TIME, 128);
   nrpn_set(NRPN_FREQ_SLEW_RAMP, KYRV_RAMP_HANN);

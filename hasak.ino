@@ -73,8 +73,8 @@ static void interrupt() {
   // maintain timing information
   uint32_t cycles = ARM_DWT_CYCCNT;
   // sidetone and transmit key to audio loop
-  au_st_key.send(note_get(KYRN_AU_ST_KEY));
-  au_key_out.send(note_get(KYRN_AU_IQ_KEY));
+  au_st_key.send(note_get(NOTE_AU_ST_KEY));
+  au_key_out.send(note_get(NOTE_AU_IQ_KEY));
   // maintain timing information
   timing_isrCpuCyclesRaw += ARM_DWT_CYCCNT - cycles;
   timing_sampleCounter += 1;

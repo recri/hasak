@@ -30,8 +30,8 @@
 **
 ** KYR_* are configuration definitions
 ** KYRA_* are audio related definitions, A is for Audio
-** KYRN_* are MIDI note numbers or note number relocations, N is for Note.
-** KYRC_* are MIDI control change numbers, or control number relocations, C is for Control Change
+** NOTE_* are MIDI note numbers or note number relocations, N is for Note.
+** CTRL_* are MIDI control change numbers, or control number relocations, C is for Control Change
 ** NRPN_* are MIDI NRPNs, nonregistered parameter numbers, or nrpn relocations, P is for Parameter
 ** KYRV_* are parameter values, V is for Value
 */
@@ -241,95 +241,95 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /*
 ** midi note usage
-** Notes are named with KYRN_ prefix and the following addtional conventions
-** KYRN_MIDI_* are notes that enter or exit via the MIDI interface.
-** KYRN_HW_* are notes derived from or delivered to hardware switches or latches.
-** KYRN_AU_* are notes that go into or come out of the audio library graph.
-** KYRN_ST_* are notes which serve as sidetone sources for keying.
-** KYRN_*_ST are the keyed sidetone and sidetone ptt.
-** KYRN_*_OUT are the transmitted key and transmitted ptt.
-** KYRN_TXT_* are notes with a velocity value that is a 7 bit ascii character.
-** KYRN_ELT_* are notes with velocity values chosen from ".- \t".
+** Notes are named with NOTE_ prefix and the following addtional conventions
+** NOTE_MIDI_* are notes that enter or exit via the MIDI interface.
+** NOTE_HW_* are notes derived from or delivered to hardware switches or latches.
+** NOTE_AU_* are notes that go into or come out of the audio library graph.
+** NOTE_ST_* are notes which serve as sidetone sources for keying.
+** NOTE_*_ST are the keyed sidetone and sidetone ptt.
+** NOTE_*_OUT are the transmitted key and transmitted ptt.
+** NOTE_TXT_* are notes with a velocity value that is a 7 bit ascii character.
+** NOTE_ELT_* are notes with velocity values chosen from ".- \t".
 **
 ** all the notes which simply signal on/off have velocity 1 or 0 internally.
 ** externally they use velocity 127 and 0 for on and off, KYRV_EXT_NOTE_*
 **
-** there's a group of 4 KYRN_MIDI_* notes which communicate volume, frequency, and speed
+** there's a group of 4 NOTE_MIDI_* notes which communicate volume, frequency, and speed
 ** with legacy SDR apps.
 **
-** there's a group of KYRN_TXT_* and KYRN_ELT_* which pass 7 bit ascii velocities.
+** there's a group of NOTE_TXT_* and NOTE_ELT_* which pass 7 bit ascii velocities.
 **
-** The order of the KYRN_ST_* note numbers is significant, lower numbered sidetones
+** The order of the NOTE_ST_* note numbers is significant, lower numbered sidetones
 ** have higher priority, and higher priority sidetones may take the key away from lower
 ** priority sidetones.
 */
 
 /* imported/exported signals from/to MIDI */
-#define KYRN_MIDI_OUT_KEY	0 /* {type note title {tx key out midi signal}} */
-#define KYRN_MIDI_OUT_PTT	1 /* {type note title {tx ptt out midi signal}} */
-#define KYRN_MIDI_IN_TUNE	2 /* {type note title {tune key in midi signal}} */
-#define KYRN_MIDI_OUT_ST	3 /* {type note title {sidetone out midi signal}} */
-#define KYRN_MIDI_VOL		4 /* {type note title {volume leak in/out midi}} */
-#define KYRN_MIDI_ST_VOL	5 /* {type note title {sidetone volume leak in/out midi}} */
-#define KYRN_MIDI_ST_FREQ	6 /* {type note title {sidetone frequency leak in/out midi}} */
-#define KYRN_MIDI_SPEED		7 /* {type note title {keyer speed leak in/out midi}} */
+#define NOTE_MIDI_OUT_KEY	0 /* {type note title {tx key out midi signal}} */
+#define NOTE_MIDI_OUT_PTT	1 /* {type note title {tx ptt out midi signal}} */
+#define NOTE_MIDI_IN_TUNE	2 /* {type note title {tune key in midi signal}} */
+#define NOTE_MIDI_OUT_ST	3 /* {type note title {sidetone out midi signal}} */
+#define NOTE_MIDI_VOL		4 /* {type note title {volume leak in/out midi}} */
+#define NOTE_MIDI_ST_VOL	5 /* {type note title {sidetone volume leak in/out midi}} */
+#define NOTE_MIDI_ST_FREQ	6 /* {type note title {sidetone frequency leak in/out midi}} */
+#define NOTE_MIDI_SPEED		7 /* {type note title {keyer speed leak in/out midi}} */
 
 /* Notes for KYR_N_PIN hardware input pins */
-#define KYRN_PIN0		8  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN1		9  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN2		10  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN3		11  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN4		12  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN5		13  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN6		14  /* {type nrpn title {input hardware pin note}} */
-#define KYRN_PIN7		15  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN0		8  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN1		9  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN2		10  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN3		11  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN4		12  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN5		13  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN6		14  /* {type nrpn title {input hardware pin note}} */
+#define NOTE_PIN7		15  /* {type nrpn title {input hardware pin note}} */
 
 /* notes for KYR_N_POUT hardware output pins */
-#define KYRN_POUT0		16  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT1		17  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT2		18  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT3		19  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT4		20  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT5		21  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT6		22  /* {type nrpn title {output hardware pin note}} */
-#define KYRN_POUT7		23  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT0		16  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT1		17  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT2		18  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT3		19  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT4		20  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT5		21  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT6		22  /* {type nrpn title {output hardware pin note}} */
+#define NOTE_POUT7		23  /* {type nrpn title {output hardware pin note}} */
 
 /* default imported/exported signals from/to hardware */
-#define KYRN_HW_L_PAD		KYRN_PIN0 /* {type note title {1st left paddle switch}} */
-#define KYRN_HW_R_PAD		KYRN_PIN1 /* {type note title {1st right paddle switch}} */
-#define KYRN_HW_S_KEY		KYRN_PIN2 /* {type note title {1st straight key switch}} */
-#define KYRN_HW_EXT_PTT		KYRN_PIN3 /* {type note title {1st external ptt switch}} */
-#define KYRN_HW_KEY_OUT		KYRN_POUT0 /* {type note title {hardware key out}} */
-#define KYRN_HW_PTT_OUT		KYRN_POUT1 /* {type note title {hardware ptt out}} */
+#define NOTE_HW_L_PAD		NOTE_PIN0 /* {type note title {1st left paddle switch}} */
+#define NOTE_HW_R_PAD		NOTE_PIN1 /* {type note title {1st right paddle switch}} */
+#define NOTE_HW_S_KEY		NOTE_PIN2 /* {type note title {1st straight key switch}} */
+#define NOTE_HW_EXT_PTT		NOTE_PIN3 /* {type note title {1st external ptt switch}} */
+#define NOTE_HW_KEY_OUT		NOTE_POUT0 /* {type note title {hardware key out}} */
+#define NOTE_HW_PTT_OUT		NOTE_POUT1 /* {type note title {hardware ptt out}} */
 
 /* additional signals */
-#define KYRN_HW_TUNE		24 /* {type note title {tune switch}} */
-#define KYRN_HW_L_PAD2		25 /* {type note title {2nd left paddle switch}} */
-#define KYRN_HW_R_PAD2		26 /* {type note title {2nd right paddle switch}} */
-#define KYRN_HW_S_KEY2		27 /* {type note title {2nd straight key switch}} */
-#define KYRN_HW_EXT_PTT2	28 /* {type note title {2nd external ptt switch}} */
-#define KYRN_HW_L_PAD3		29 /* {type note title {3rd left paddle switch}} */
-#define KYRN_HW_R_PAD3		30 /* {type note title {3rd right paddle switch}} */
-#define KYRN_HW_S_KEY3		31 /* {type note title {34d straight key switch}} */
-#define KYRN_HW_KEY_OUT2	32 /* {type note title {2nd hardware key out}} */
-#define KYRN_HW_PTT_OUT2	33 /* {type note title {2nd hardware ptt out}} */
+#define NOTE_HW_TUNE		24 /* {type note title {tune switch}} */
+#define NOTE_HW_L_PAD2		25 /* {type note title {2nd left paddle switch}} */
+#define NOTE_HW_R_PAD2		26 /* {type note title {2nd right paddle switch}} */
+#define NOTE_HW_S_KEY2		27 /* {type note title {2nd straight key switch}} */
+#define NOTE_HW_EXT_PTT2	28 /* {type note title {2nd external ptt switch}} */
+#define NOTE_HW_L_PAD3		29 /* {type note title {3rd left paddle switch}} */
+#define NOTE_HW_R_PAD3		30 /* {type note title {3rd right paddle switch}} */
+#define NOTE_HW_S_KEY3		31 /* {type note title {34d straight key switch}} */
+#define NOTE_HW_KEY_OUT2	32 /* {type note title {2nd hardware key out}} */
+#define NOTE_HW_PTT_OUT2	33 /* {type note title {2nd hardware ptt out}} */
 
 /* imported/exported signals from/to audio graph */
-#define KYRN_AU_ST_KEY		34 /* {type note title {keying sidetone in audio graph}} */
-#define KYRN_AU_IQ_KEY		35 /* {type note title {keying transmit in audio graph}} */
-#define KYRN_AU_DECODE		36 /* {type note title {receiving tone signal from audio graph}} */
+#define NOTE_AU_ST_KEY		34 /* {type note title {keying sidetone in audio graph}} */
+#define NOTE_AU_IQ_KEY		35 /* {type note title {keying transmit in audio graph}} */
+#define NOTE_AU_DECODE		36 /* {type note title {receiving tone signal from audio graph}} */
 
 /* sidetone source signals, ordered from highest priority to lowest */
-#define KYRN_ST_S_KEY		37 /* {type note title {straight keyed sidetone}} */
-#define KYRN_ST_S_KEY2		38 /* {type note title {2nd straight keyed sidetone}} */
-#define KYRN_ST_S_KEY3		39 /* {type note title {3rd straight keyed sidetone}} */
-#define KYRN_ST_PAD		40 /* {type note title {paddle keyed sidetone}} */
-#define KYRN_ST_PAD2		41 /* {type note title {2nd paddle keyed sidetone}} */
-#define KYRN_ST_PAD3		42 /* {type note title {3rd paddle keyed sidetone}} */
-#define KYRN_ST_TUNE		43 /* {type note title {tune switch sidetone}} */
-#define KYRN_ST_TEXT		44 /* {type note title {text keyed sidetone}} */
-#define KYRN_ST_TEXT2		45 /* {type note title {2nd text keyed sidetone}} */
-#define KYRN_ST_NONE		46 /* {type note title {no keyed sidetone}} */
+#define NOTE_ST_S_KEY		37 /* {type note title {straight keyed sidetone}} */
+#define NOTE_ST_S_KEY2		38 /* {type note title {2nd straight keyed sidetone}} */
+#define NOTE_ST_S_KEY3		39 /* {type note title {3rd straight keyed sidetone}} */
+#define NOTE_ST_PAD		40 /* {type note title {paddle keyed sidetone}} */
+#define NOTE_ST_PAD2		41 /* {type note title {2nd paddle keyed sidetone}} */
+#define NOTE_ST_PAD3		42 /* {type note title {3rd paddle keyed sidetone}} */
+#define NOTE_ST_TUNE		43 /* {type note title {tune switch sidetone}} */
+#define NOTE_ST_TEXT		44 /* {type note title {text keyed sidetone}} */
+#define NOTE_ST_TEXT2		45 /* {type note title {2nd text keyed sidetone}} */
+#define NOTE_ST_NONE		46 /* {type note title {no keyed sidetone}} */
 
 /* 
 ** the real sidetone, a copy of one of the previous sidetone sources,
@@ -339,18 +339,18 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 ** in a final step which applies NRPN_TX_ENABLE, NRPN_ST_ENABLE, KYR_IQ_ENABLE, and other
 ** mode modifications TBD.
 */
-#define KYRN_KEY_ST		47 /* {type note title {key sidetone}} */
-#define KYRN_PTT_ST		48 /* {type note title {sidetone ptt}} */
-#define KYRN_KEY_OUT		49 /* {type note title {key transmitter}} */
-#define KYRN_PTT_OUT		50 /* {type note title {keyed transmitter ptt}} */
+#define NOTE_KEY_ST		47 /* {type note title {key sidetone}} */
+#define NOTE_PTT_ST		48 /* {type note title {sidetone ptt}} */
+#define NOTE_KEY_OUT		49 /* {type note title {key transmitter}} */
+#define NOTE_PTT_OUT		50 /* {type note title {keyed transmitter ptt}} */
 
 /* A hack which happens without even thinking about it, send characters as notes */
-#define KYRN_TXT_TEXT		51 /* {type note title {note containing 7 bit ascii text for text channel}} */
-#define KYRN_TXT_TEXT2		52 /* {type note title {note containing 7 bit ascii text for 2nd text channel}} */	
+#define NOTE_TXT_TEXT		51 /* {type note title {note containing 7 bit ascii text for text channel}} */
+#define NOTE_TXT_TEXT2		52 /* {type note title {note containing 7 bit ascii text for 2nd text channel}} */	
 
 /* A decoder channel running on the sidetone key line */
-#define KYRN_ELT_DEC		53 /* {type note title {note containing 7 bit ascii element decoded from sidetone}} */
-#define KYRN_TXT_DEC		54 /* {type note title {note containing 7 bit ascii text decoded from sidetone}} */
+#define NOTE_ELT_DEC		53 /* {type note title {note containing 7 bit ascii element decoded from sidetone}} */
+#define NOTE_TXT_DEC		54 /* {type note title {note containing 7 bit ascii text decoded from sidetone}} */
 
 
 #define KYR_N_NOTE		55 /* {type def title {number of note states maintained in the keyer}} */
@@ -369,34 +369,34 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /* control change messages used */
 
-#define KYRC_MSB		6 /* {type ctrl title {MIDI control change Data Entry (MSB)}} */
-#define KYRC_MASTER_VOLUME	7 /* {type ctrl title {set master volume}} */
-#define KYRC_MASTER_BALANCE	8 /* {type ctrl title {TODO: stereo balance}} */
+#define CTRL_MSB		6 /* {type ctrl title {MIDI control change Data Entry (MSB)}} */
+#define CTRL_MASTER_VOLUME	7 /* {type ctrl title {set master volume}} */
+#define CTRL_MASTER_BALANCE	8 /* {type ctrl title {TODO: stereo balance}} */
 
-#define KYRC_MASTER_PAN		10 /* {type ctrl title {TODO: stereo position of CW tone}} */
-#define KYRC_SIDETONE_VOLUME	12 /* {type ctrl title { set sidetone volume}} */
-#define KYRC_SIDETONE_FREQUENCY	13 /* {type ctrl title {set sidetone frequency}} */
+#define CTRL_MASTER_PAN		10 /* {type ctrl title {TODO: stereo position of CW tone}} */
+#define CTRL_SIDETONE_VOLUME	12 /* {type ctrl title { set sidetone volume}} */
+#define CTRL_SIDETONE_FREQUENCY	13 /* {type ctrl title {set sidetone frequency}} */
 
-#define KYRC_INPUT_LEVEL	16 /* {type ctrl title {TODO: set input level}} */
+#define CTRL_INPUT_LEVEL	16 /* {type ctrl title {TODO: set input level}} */
 
-#define KYRC_LSB		38 /* {type ctrl title {MIDI control change Data Entry (LSB)}} */
+#define CTRL_LSB		38 /* {type ctrl title {MIDI control change Data Entry (LSB)}} */
 
-#define KYRC_ENABLE_POTS	64 /* {type ctrl title {enable/disable potentiometers}} */ 
-#define KYRC_KEYER_AUTOPTT	65 /* {type ctrl title {enable/disable auto-PTT from CW keyer}} */ 
-#define KYRC_RESPONSE		66 /* {type ctrl title {enable/disable reporting back to SDR and MIDI controller}} */ 
-#define KYRC_MUTE_CWPTT		67 /* {type ctrl title {enable/disable muting of RX audio during auto-PTT}} */ 
-#define KYRC_MICPTT_HWPTT	68 /* {type ctrl title {enable/disable that MICIN triggers the hardware PTT output}} */
-#define KYRC_CWPTT_HWPTT	69 /* {type ctrl title {enable/disable that CWPTT triggers the hardware PTT output}} */
+#define CTRL_ENABLE_POTS	64 /* {type ctrl title {enable/disable potentiometers}} */ 
+#define CTRL_KEYER_AUTOPTT	65 /* {type ctrl title {enable/disable auto-PTT from CW keyer}} */ 
+#define CTRL_RESPONSE		66 /* {type ctrl title {enable/disable reporting back to SDR and MIDI controller}} */ 
+#define CTRL_MUTE_CWPTT		67 /* {type ctrl title {enable/disable muting of RX audio during auto-PTT}} */ 
+#define CTRL_MICPTT_HWPTT	68 /* {type ctrl title {enable/disable that MICIN triggers the hardware PTT output}} */
+#define CTRL_CWPTT_HWPTT	69 /* {type ctrl title {enable/disable that CWPTT triggers the hardware PTT output}} */
 
-#define KYRC_KEYER_HANG		72 /* {type ctrl title {set Keyer hang time (if auto-PTT active)}} */ 
-#define KYRC_KEYER_LEADIN	73 /* {type ctrl title {set Keyer lead-in time (if auto-PTT active)}} */ 
-#define KYRC_CW_SPEED		74 /* {type ctrl title {set CW speed}} */ 
-#define KYRC_INPUT_SELECT	75 /* {type ctrl title {TODO:}} */
+#define CTRL_KEYER_HANG		72 /* {type ctrl title {set Keyer hang time (if auto-PTT active)}} */ 
+#define CTRL_KEYER_LEADIN	73 /* {type ctrl title {set Keyer lead-in time (if auto-PTT active)}} */ 
+#define CTRL_CW_SPEED		74 /* {type ctrl title {set CW speed}} */ 
+#define CTRL_INPUT_SELECT	75 /* {type ctrl title {TODO:}} */
 
-#define KYRC_NRPN_LSB		98 /* {type ctrl title {MIDI control change Non-registered Parameter (LSB)}} */
-#define KYRC_NRPN_MSB		99 /* {type ctrl title {MIDI control change Non-registered Parameter (MSB)}} */
+#define CTRL_NRPN_LSB		98 /* {type ctrl title {MIDI control change Non-registered Parameter (LSB)}} */
+#define CTRL_NRPN_MSB		99 /* {type ctrl title {MIDI control change Non-registered Parameter (MSB)}} */
 
-#define KYRC_SET_CHANNEL	119 /* {type ctrl title {Change the default channel to use}} */ 
+#define CTRL_SET_CHANNEL	119 /* {type ctrl title {Change the default channel to use}} */ 
 
 #define KYR_N_CTRL		120 /* {type def label N_CTRL title {Number of control change messages handled}} */
 

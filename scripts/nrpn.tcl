@@ -102,8 +102,8 @@ proc jsformat-all {values} {
 			default { lappend kyr [jsformat-any $key $table] }
 		    }
 		}
-		^KYRN_.*$ { lappend kyrn [jsformat-any $key $table] }
-		^KYRC_.*$ { lappend kyrc [jsformat-any $key $table] }
+		^NOTE_.*$ { lappend kyrn [jsformat-any $key $table] }
+		^CTRL_.*$ { lappend kyrc [jsformat-any $key $table] }
 		^NRPN_.*$ { 
 		    # skip the output mixers
 		    if {[string match NRPN_MIX_USB* $key]} continue
@@ -131,7 +131,7 @@ proc jsformat {values} {
     set ::jsquoted 0
     set v [dict get $values KYR_VERSION value]
     set d ",\n    "
-    return "// parameter map for hasak $v
+    return "// parameter map for hasak version $v
 // generated with .../hasak/doc/nrpn.tcl from .../hasak/config.h
 // do not edit, regenerated from .../hasak/config.h by .../hasak/doc/nrpn.tcl output js
 export const hasakProperties = {\n    [join [jsformat-all $values] $d]\n};"
@@ -139,7 +139,6 @@ export const hasakProperties = {\n    [join [jsformat-all $values] $d]\n};"
 
 proc jsonformat {values} {
     set ::jsquoted 1
-    set v [dict get $values KYR_VERSION value]
     set d ",\n    "
     return "{\n    [join [jsformat-all $values] $d]\n}"
 }
@@ -153,7 +152,7 @@ proc jsoninc {values} {
     set ::jsquoted 1
     set v [dict get $values KYR_VERSION value]
     set vals [jsformat-all $values]
-    set vals [lmap v $vals {if { ! [regexp {^\"KYR} $v]} continue; set v}]
+    set vals [lmap v $vals {if { ! [regexp {^\"(NOTE|CTRL|NRPN|KYR)} $v]} continue; set v}]
     set vals [lmap v $vals {c-string-escape $v}]
     set d ",\"\n    \""
     set vals [join $vals $d]

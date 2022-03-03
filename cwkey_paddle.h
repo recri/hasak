@@ -34,36 +34,36 @@ static KeyerPaddle cwkey_paddle2;
 static KeyerPaddle cwkey_paddle3;
 
 static void cwkey_paddle_listen(int note, int _) {
-  if (note_get(KYRN_ST_PAD) != cwkey_paddle.clock(note_get(KYRN_HW_L_PAD), note_get(KYRN_HW_R_PAD), 0))
-    note_toggle(KYRN_ST_PAD);
+  if (note_get(NOTE_ST_PAD) != cwkey_paddle.clock(note_get(NOTE_HW_L_PAD), note_get(NOTE_HW_R_PAD), 0))
+    note_toggle(NOTE_ST_PAD);
 }
 
 static void cwkey_paddle2_listen(int note, int _) {
-  if (note_get(KYRN_ST_PAD2) != cwkey_paddle2.clock(note_get(KYRN_HW_L_PAD2), note_get(KYRN_HW_R_PAD2), 0))
-    note_toggle(KYRN_ST_PAD2);
+  if (note_get(NOTE_ST_PAD2) != cwkey_paddle2.clock(note_get(NOTE_HW_L_PAD2), note_get(NOTE_HW_R_PAD2), 0))
+    note_toggle(NOTE_ST_PAD2);
 }
 
 static void cwkey_paddle3_listen(int note, int _) {
-  if (note_get(KYRN_ST_PAD3) != cwkey_paddle3.clock(note_get(KYRN_HW_L_PAD3), note_get(KYRN_HW_R_PAD3), 0))
-    note_toggle(KYRN_ST_PAD3);
+  if (note_get(NOTE_ST_PAD3) != cwkey_paddle3.clock(note_get(NOTE_HW_L_PAD3), note_get(NOTE_HW_R_PAD3), 0))
+    note_toggle(NOTE_ST_PAD3);
 }
 
 static void cwkey_paddle_sample(int nrpn, int _) {
-  if (note_get(KYRN_ST_PAD) != cwkey_paddle.clock(note_get(KYRN_HW_L_PAD), note_get(KYRN_HW_R_PAD), 1))
-    note_toggle(KYRN_ST_PAD);
-  if (note_get(KYRN_ST_PAD2) != cwkey_paddle2.clock(note_get(KYRN_HW_L_PAD2), note_get(KYRN_HW_R_PAD2), 1))
-    note_toggle(KYRN_ST_PAD2);
-  if (note_get(KYRN_ST_PAD3) != cwkey_paddle3.clock(note_get(KYRN_HW_L_PAD3), note_get(KYRN_HW_R_PAD3), 1))
-    note_toggle(KYRN_ST_PAD3);
+  if (note_get(NOTE_ST_PAD) != cwkey_paddle.clock(note_get(NOTE_HW_L_PAD), note_get(NOTE_HW_R_PAD), 1))
+    note_toggle(NOTE_ST_PAD);
+  if (note_get(NOTE_ST_PAD2) != cwkey_paddle2.clock(note_get(NOTE_HW_L_PAD2), note_get(NOTE_HW_R_PAD2), 1))
+    note_toggle(NOTE_ST_PAD2);
+  if (note_get(NOTE_ST_PAD3) != cwkey_paddle3.clock(note_get(NOTE_HW_L_PAD3), note_get(NOTE_HW_R_PAD3), 1))
+    note_toggle(NOTE_ST_PAD3);
 }
 
 static void cwkey_paddle_setup(void) {
-  note_listen(KYRN_HW_L_PAD, cwkey_paddle_listen);
-  note_listen(KYRN_HW_R_PAD, cwkey_paddle_listen);
-  note_listen(KYRN_HW_L_PAD2, cwkey_paddle2_listen);
-  note_listen(KYRN_HW_R_PAD2, cwkey_paddle2_listen);
-  note_listen(KYRN_HW_L_PAD3, cwkey_paddle3_listen);
-  note_listen(KYRN_HW_R_PAD3, cwkey_paddle3_listen);
+  note_listen(NOTE_HW_L_PAD, cwkey_paddle_listen);
+  note_listen(NOTE_HW_R_PAD, cwkey_paddle_listen);
+  note_listen(NOTE_HW_L_PAD2, cwkey_paddle2_listen);
+  note_listen(NOTE_HW_R_PAD2, cwkey_paddle2_listen);
+  note_listen(NOTE_HW_L_PAD3, cwkey_paddle3_listen);
+  note_listen(NOTE_HW_R_PAD3, cwkey_paddle3_listen);
   nrpn_listen(NRPN_SAMPLE, cwkey_paddle_sample);
 }
 

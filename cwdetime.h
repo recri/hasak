@@ -106,11 +106,11 @@ static void cwdetime_listen(int note, int _) {
     }
     if (guess < 500) {
       cwdetime_data.nIls += 1;
-      note_set(KYRN_ELT_DEC, ' ');
+      note_set(NOTE_ELT_DEC, ' ');
       return;
     }
     cwdetime_data.nIws += 1;
-    note_set(KYRN_ELT_DEC, '\t');
+    note_set(NOTE_ELT_DEC, '\t');
     return;
   } else {			/* end dit or dah, start of space  */
     /* the end of a dit or a dah */
@@ -137,11 +137,11 @@ static void cwdetime_listen(int note, int _) {
     const int guess = (100 * observation) / cwdetime_data.estimate; /* make a guess */
     if (guess < 200) {
       cwdetime_data.nDit += 1;
-      note_set(KYRN_ELT_DEC, '.');
+      note_set(NOTE_ELT_DEC, '.');
       return;
     }
     cwdetime_data.nDah += 1;
-    note_set(KYRN_ELT_DEC, '-');
+    note_set(NOTE_ELT_DEC, '-');
     return;
   }
 }
@@ -149,5 +149,5 @@ static void cwdetime_listen(int note, int _) {
 static void cwdetime_setup(void) {
   cwdetime_data.wpm = 15;
   cwdetime_data.estimate = cwdetime_wpm_to_dit(cwdetime_data.wpm);
-  note_listen(KYRN_KEY_ST, cwdetime_listen);
+  note_listen(NOTE_KEY_ST, cwdetime_listen);
 }

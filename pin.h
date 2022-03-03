@@ -39,7 +39,7 @@ static void pin_sample(int nrpn, int _) {
     const int pin = nrpn_get(NRPN_PIN0_PIN+i);
     if (pin_valid(pin)) {
       if ((int)debounce[i] >= 0) {
-	const int note = KYRN_PIN0+i;
+	const int note = NOTE_PIN0+i;
 	debounce[i] = 0;
 	if (digitalReadFast(pin) == note_get(note)) {
 	  note_toggle(note);

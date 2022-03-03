@@ -368,7 +368,7 @@ static void cwinkey_update_eeprom(byte inum, byte data) { }
 static void cwinkey_set_pausing(uint8_t byte) { }
 
 // see if the keyer is idle
-static int cwinkey_keyer_idle(void) { return nrpn_get(NRPN_ACTIVE_ST) > KYRN_TEXT_ST; }
+static int cwinkey_keyer_idle(void) { return nrpn_get(NRPN_ACTIVE_ST) > NOTE_TEXT_ST; }
 
 // tune on/off
 static void cwinkey_tune(int byte) {

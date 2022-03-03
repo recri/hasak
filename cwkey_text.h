@@ -37,8 +37,8 @@
 
 #include "src/keyer_text.h"
 
-static KeyerText cwkey_text(KYRN_TXT_TEXT, KYRN_ST_TEXT);
-static KeyerText cwkey_text2(KYRN_TXT_TEXT2, KYRN_ST_TEXT2);
+static KeyerText cwkey_text(NOTE_TXT_TEXT, NOTE_ST_TEXT);
+static KeyerText cwkey_text2(NOTE_TXT_TEXT2, NOTE_ST_TEXT2);
 
 static void cwkey_text_listen(int note, int _) { cwkey_text.receive(); }
 static void cwkey_text2_listen(int note, int _) { cwkey_text2.receive(); }

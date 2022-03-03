@@ -35,111 +35,111 @@ static void define_define(void) {
   */
   for (int note = 0; note < KYR_N_NOTE; note += 1)
     switch (note) {		//          note, v, i, o, e, ro
-    case KYRN_MIDI_OUT_KEY:	note_define(note, 0, 0, 1, 0, 0); break; // output
-    case KYRN_MIDI_OUT_PTT:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_MIDI_IN_TUNE:	note_define(note, 0, 1, 0, 0, 0); break; // input
-    case KYRN_MIDI_OUT_ST:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_MIDI_VOL:		note_define(note, 0, 1, 1, 1, 0); break;
-    case KYRN_MIDI_ST_VOL:	note_define(note, 0, 1, 1, 1, 0); break;
-    case KYRN_MIDI_ST_FREQ:	note_define(note, 0, 1, 1, 1, 0); break;
-    case KYRN_MIDI_SPEED:	note_define(note, 0, 1, 1, 1, 0); break;
-    case KYRN_PIN0:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN1:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN2:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN3:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN4:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN5:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN6:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PIN7:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT0:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT1:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT2:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT3:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT4:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT5:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT6:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_POUT7:		note_define(note, 0, 0, 0, 0, 0); break;
-      //case KYRN_HW_L_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // alias KYRN_PIN?
-      //case KYRN_HW_R_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
-      //case KYRN_HW_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
-      //case KYRN_HW_EXT_PTT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
-    case KYRN_HW_TUNE:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_L_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_R_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_S_KEY2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_EXT_PTT2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_L_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_R_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_S_KEY3:	note_define(note, 0, 0, 0, 0, 0); break;
-      //case KYRN_HW_KEY_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // alias KYRN_POUT?
-      //case KYRN_HW_PTT_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
-    case KYRN_HW_KEY_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_HW_PTT_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_AU_ST_KEY:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_AU_IQ_KEY:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_AU_DECODE:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_S_KEY2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_S_KEY3:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_PAD:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_PAD2:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_PAD3:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_TUNE:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_TEXT:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_TEXT2:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ST_NONE:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_KEY_ST:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PTT_ST:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_KEY_OUT:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_PTT_OUT:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_TXT_TEXT:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_TXT_TEXT2:	note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_ELT_DEC:		note_define(note, 0, 0, 0, 0, 0); break;
-    case KYRN_TXT_DEC:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_MIDI_OUT_KEY:	note_define(note, 0, 0, 1, 0, 0); break; // output
+    case NOTE_MIDI_OUT_PTT:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_MIDI_IN_TUNE:	note_define(note, 0, 1, 0, 0, 0); break; // input
+    case NOTE_MIDI_OUT_ST:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_MIDI_VOL:		note_define(note, 0, 1, 1, 1, 0); break;
+    case NOTE_MIDI_ST_VOL:	note_define(note, 0, 1, 1, 1, 0); break;
+    case NOTE_MIDI_ST_FREQ:	note_define(note, 0, 1, 1, 1, 0); break;
+    case NOTE_MIDI_SPEED:	note_define(note, 0, 1, 1, 1, 0); break;
+    case NOTE_PIN0:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN1:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN2:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN3:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN4:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN5:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN6:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PIN7:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT0:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT1:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT2:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT3:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT4:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT5:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT6:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_POUT7:		note_define(note, 0, 0, 0, 0, 0); break;
+      //case NOTE_HW_L_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_PIN?
+      //case NOTE_HW_R_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
+      //case NOTE_HW_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
+      //case NOTE_HW_EXT_PTT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
+    case NOTE_HW_TUNE:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_L_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_R_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_S_KEY2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_EXT_PTT2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_L_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_R_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_S_KEY3:	note_define(note, 0, 0, 0, 0, 0); break;
+      //case NOTE_HW_KEY_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_POUT?
+      //case NOTE_HW_PTT_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
+    case NOTE_HW_KEY_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_HW_PTT_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_AU_ST_KEY:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_AU_IQ_KEY:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_AU_DECODE:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_S_KEY2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_S_KEY3:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_PAD:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_PAD2:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_PAD3:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_TUNE:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_TEXT:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_TEXT2:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ST_NONE:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_KEY_ST:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PTT_ST:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_KEY_OUT:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_PTT_OUT:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_TXT_TEXT:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_TXT_TEXT2:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_ELT_DEC:		note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_TXT_DEC:		note_define(note, 0, 0, 0, 0, 0); break;
     default: Serial.printf("default_setup: overlooked note %d\n", note); break;
   }
   for (int ctrl = 0; ctrl < KYR_N_CTRL; ctrl += 1)
     switch (ctrl) {		//          ctrl, value,                i, o, e, ro
     case 0: case 1: case 2: case 3: case 4: case 5: 
 				ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_MSB:		ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
-    case KYRC_MASTER_VOLUME:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
-    case KYRC_MASTER_BALANCE:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_MSB:		ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_MASTER_VOLUME:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_MASTER_BALANCE:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
     case 9:			ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_MASTER_PAN:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
-    case KYRC_SIDETONE_VOLUME:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_MASTER_PAN:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_SIDETONE_VOLUME:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
     case 11:			ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_SIDETONE_FREQUENCY:ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_SIDETONE_FREQUENCY:ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
     case 14: case 15: 		ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_INPUT_LEVEL:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
+    case CTRL_INPUT_LEVEL:	ctrl_define(ctrl, 1, 1, 0, 0, 0); break;
     case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24: case 25: case 26:
     case 27: case 28: case 29: case 30: case 31: case 32: case 33: case 34: case 35: case 36:
     case 37:			ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_LSB:		ctrl_define(ctrl, 0, 1, 1, 0, 0); break;
+    case CTRL_LSB:		ctrl_define(ctrl, 0, 1, 1, 0, 0); break;
     case 39: case 40: case 41: case 42: case 43: case 44: case 45: case 46: case 47: case 48: 
     case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57: case 58: 
     case 59: case 60: case 61: case 62: case 63: 
 				ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_ENABLE_POTS:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_KEYER_AUTOPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_RESPONSE:		ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_MUTE_CWPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_MICPTT_HWPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_CWPTT_HWPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_ENABLE_POTS:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_KEYER_AUTOPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_RESPONSE:		ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_MUTE_CWPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_MICPTT_HWPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_CWPTT_HWPTT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
     case 70: case 71:		ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_KEYER_HANG:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_KEYER_LEADIN:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_CW_SPEED:		ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
-    case KYRC_INPUT_SELECT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_KEYER_HANG:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_KEYER_LEADIN:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_CW_SPEED:		ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_INPUT_SELECT:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
     case 76: case 77: case 78: case 79: case 80: case 81: case 82: case 83: case 84: case 85:
     case 86: case 87: case 88: case 89: case 90: case 91: case 92: case 93: case 94: case 95:
     case 96: case 97:		ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_NRPN_LSB:		ctrl_define(ctrl, 0, 1, 1, 0, 0); break;
-    case KYRC_NRPN_MSB:		ctrl_define(ctrl, 0, 1, 1, 0, 0); break;
+    case CTRL_NRPN_LSB:		ctrl_define(ctrl, 0, 1, 1, 0, 0); break;
+    case CTRL_NRPN_MSB:		ctrl_define(ctrl, 0, 1, 1, 0, 0); break;
     case 100: case 101: case 102: case 103: case 104: case 105: case 106: case 107: case 108: case 109:
     case 110: case 111: case 112: case 113: case 114: case 115: case 116: case 117: case 118:
 				ctrl_define(ctrl, 0, 0, 0, 0, 0); break;
-    case KYRC_SET_CHANNEL:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
+    case CTRL_SET_CHANNEL:	ctrl_define(ctrl, 0, 1, 1, 1, 0); break;
     default: 
       Serial.printf("default_setup: overlooked ctrl %d\n", ctrl); break;
     }

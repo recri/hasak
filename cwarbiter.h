@@ -45,17 +45,17 @@ static void cwarbiter_any_st(const int note, int _) {
 
   /* case 1 - continuation of active note */
   if (note == nrpn_get(NRPN_ACTIVE_ST)) {
-    if (note_get(note) != note_get(KYRN_KEY_ST))
-      note_toggle(KYRN_KEY_ST);
+    if (note_get(note) != note_get(NOTE_KEY_ST))
+      note_toggle(NOTE_KEY_ST);
     return;
   }
   // Serial.printf("not continuation of current note\n");
 
   /* case 2 - no active note, become active note */
-  if (nrpn_get(NRPN_ACTIVE_ST) == KYRN_ST_NONE) {
+  if (nrpn_get(NRPN_ACTIVE_ST) == NOTE_ST_NONE) {
     nrpn_set(NRPN_ACTIVE_ST, note);
-    if (note_get(note) != note_get(KYRN_KEY_ST))
-      note_toggle(KYRN_KEY_ST);
+    if (note_get(note) != note_get(NOTE_KEY_ST))
+      note_toggle(NOTE_KEY_ST);
     return;
   }
   // Serial.printf("not replacing no sidetone\n");
@@ -67,7 +67,7 @@ static void cwarbiter_any_st(const int note, int _) {
 
   /* case 4 - preempt active note which is sounding */
   if (note_get(nrpn_get(NRPN_ACTIVE_ST))) {
-    note_off(KYRN_KEY_ST);
+    note_off(NOTE_KEY_ST);
     nrpn_set(NRPN_ACTIVE_ST, note);
     cwarbiter_change_over = 1;
     return;
@@ -76,13 +76,13 @@ static void cwarbiter_any_st(const int note, int _) {
 
   /* case 5 - preempt active note which is silent */
   nrpn_set(NRPN_ACTIVE_ST, note);
-  if (note_get(note) != note_get(KYRN_KEY_ST))
-    note_toggle(KYRN_KEY_ST);
+  if (note_get(note) != note_get(NOTE_KEY_ST))
+    note_toggle(NOTE_KEY_ST);
   return;
 }
 
 static void cwarbiter_release(const int note, int _) {
-  nrpn_set(NRPN_ACTIVE_ST, KYRN_ST_NONE);
+  nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
 }
 
 static void cwarbiter_sample(int nrpn, int _) {
@@ -90,23 +90,23 @@ static void cwarbiter_sample(int nrpn, int _) {
    * to trigger the fall ramp in the audio graph */
   if (cwarbiter_change_over && ++cwarbiter_change_over > 32) {
     cwarbiter_change_over = 0;
-    if (note_get(nrpn_get(NRPN_ACTIVE_ST)) != note_get(KYRN_KEY_ST))
-      note_toggle(KYRN_KEY_ST);
+    if (note_get(nrpn_get(NRPN_ACTIVE_ST)) != note_get(NOTE_KEY_ST))
+      note_toggle(NOTE_KEY_ST);
   }
 }
 
 static void cwarbiter_setup(void) {
-  note_listen(KYRN_ST_S_KEY, cwarbiter_any_st);
-  note_listen(KYRN_ST_S_KEY2, cwarbiter_any_st);
-  note_listen(KYRN_ST_S_KEY3, cwarbiter_any_st);
-  note_listen(KYRN_ST_PAD, cwarbiter_any_st);
-  note_listen(KYRN_ST_PAD2, cwarbiter_any_st);
-  note_listen(KYRN_ST_PAD3, cwarbiter_any_st);
-  note_listen(KYRN_ST_TEXT, cwarbiter_any_st);
-  note_listen(KYRN_ST_TEXT2, cwarbiter_any_st);
-  note_listen(KYRN_ST_TUNE, cwarbiter_any_st);
-  note_listen(KYRN_PTT_ST, cwarbiter_release);
-  // nrpn_set(NRPN_ACTIVE_ST, KYRN_ST_NONE);
+  note_listen(NOTE_ST_S_KEY, cwarbiter_any_st);
+  note_listen(NOTE_ST_S_KEY2, cwarbiter_any_st);
+  note_listen(NOTE_ST_S_KEY3, cwarbiter_any_st);
+  note_listen(NOTE_ST_PAD, cwarbiter_any_st);
+  note_listen(NOTE_ST_PAD2, cwarbiter_any_st);
+  note_listen(NOTE_ST_PAD3, cwarbiter_any_st);
+  note_listen(NOTE_ST_TEXT, cwarbiter_any_st);
+  note_listen(NOTE_ST_TEXT2, cwarbiter_any_st);
+  note_listen(NOTE_ST_TUNE, cwarbiter_any_st);
+  note_listen(NOTE_PTT_ST, cwarbiter_release);
+  // nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
   nrpn_listen(NRPN_SAMPLE, cwarbiter_sample);
 }
 
