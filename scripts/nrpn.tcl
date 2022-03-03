@@ -27,7 +27,7 @@ proc extract-class {cmt} {
 }
 
 proc extract-units {cmt} {
-    if {[regexp {^/\*\s*([a-z]+)?\s*([a-z]+)?\s+(ms/10|µs|dits|x8k|dbdown|wpm|Hz|KYRV_RAMP_\*|KYRV_ADAPT_\*|KYRV_KEYER_\*).*->.*\*/$} $cmt all type class unit]} {
+    if {[regexp {^/\*\s*([a-z]+)?\s*([a-z]+)?\s+(ms/10|µs|dits|x8k|dbdown|wpm|Hz|VAL_RAMP_\*|VAL_ADAPT_\*|VAL_KEYER_\*).*->.*\*/$} $cmt all type class unit]} {
 	return $unit
     }
     return {}
@@ -118,7 +118,7 @@ proc jsformat-all {values} {
 			lappend nrpn "[jsq $value]: \"$key\""
 		    }
 		}
-		^KYRV_.*$ { lappend kyrv [jsformat-any $key $table] }
+		^VAL_.*$ { lappend kyrv [jsformat-any $key $table] }
 		default {
 		    puts $stderr "not matching \"$key\" in jsformat-all"
 		}
@@ -152,7 +152,7 @@ proc jsoninc {values} {
     set ::jsquoted 1
     set v [dict get $values KYR_VERSION value]
     set vals [jsformat-all $values]
-    set vals [lmap v $vals {if { ! [regexp {^\"(NOTE|CTRL|NRPN|KYR)} $v]} continue; set v}]
+    set vals [lmap v $vals {if { ! [regexp {^\"(NOTE_|CTRL_|NRPN_|VAL_|KYR_)} $v]} continue; set v}]
     set vals [lmap v $vals {c-string-escape $v}]
     set d ",\"\n    \""
     set vals [join $vals $d]
@@ -184,7 +184,7 @@ proc main {argv} {
     set globs {}
     foreach line [split [string trim $data] \n] {
 	dict set lines [dict size $lines] $line
-	if { ! [regexp {^#define[ \t]+(NOTE|CTRL|NRPN|KYR[A-Z]?)(_[A-Z0-9_]*)[ \t]+([^ \t]*)([ \t]+(.*))?$} $line all prefix suffix value rest1 rest]} {
+	if { ! [regexp {^#define[ \t]+(NOTE|CTRL|NRPN|VAL|KYR[A-Z]?)(_[A-Z0-9_]*)[ \t]+([^ \t]*)([ \t]+(.*))?$} $line all prefix suffix value rest1 rest]} {
 	    # puts "mismatch: $line"
 	    continue
 	}

@@ -7,7 +7,8 @@
 [ ] make the enable_lr bits the primary enable record
 [?] make the mixer audio class accept raw mixer multipliers
 	in addition to float gains?
-[ ] rename KYRP_* to NRPN_*, KYRN_* to NOTE_*, KYRC_* to CTRL_*
+[x] rename KYRP_* to NRPN_*, KYRN_* to NOTE_*, KYRC_* to CTRL_*
+[x] rename KYRV_* to VAL_*
 [?] note_listen_all(my_listener) listens to all notes
 [?] ctrl_listen_all(my_listener) listens to all ctrls
 [?] nrpn_listen_all(my_listener) listens to all nrpns

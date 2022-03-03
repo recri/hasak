@@ -144,28 +144,28 @@ static void cwinkey_set(cwinkey_property_t p, int v) {
     //
     if (nrpn_get(NRPN_PAD_SWAP) != PADDLE_SWAP(v))
       nrpn_set(NRPN_PAD_SWAP, PADDLE_SWAP(v) != 0);
-    if (nrpn_get(NRPN_PAD_KEYER) != KYRV_KEYER_VK6PH)
-      nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_VK6PH);
+    if (nrpn_get(NRPN_PAD_KEYER) != VAL_KEYER_VK6PH)
+      nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_VK6PH);
     if (ULTIMATIC(v)) {
-      if (nrpn_get(NRPN_PAD_ADAPT) != KYRV_ADAPT_ULTIMATIC)
-	nrpn_set(NRPN_PAD_ADAPT, KYRV_ADAPT_ULTIMATIC);
-      if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_A)
-	nrpn_set(NRPN_PAD_MODE, KYRV_MODE_A);
+      if (nrpn_get(NRPN_PAD_ADAPT) != VAL_ADAPT_ULTIMATIC)
+	nrpn_set(NRPN_PAD_ADAPT, VAL_ADAPT_ULTIMATIC);
+      if (nrpn_get(NRPN_PAD_MODE) != VAL_MODE_A)
+	nrpn_set(NRPN_PAD_MODE, VAL_MODE_A);
     } else {
-      if (nrpn_get(NRPN_PAD_ADAPT) != KYRV_ADAPT_NORMAL)
-	nrpn_set(NRPN_PAD_ADAPT, KYRV_ADAPT_NORMAL);
+      if (nrpn_get(NRPN_PAD_ADAPT) != VAL_ADAPT_NORMAL)
+	nrpn_set(NRPN_PAD_ADAPT, VAL_ADAPT_NORMAL);
       switch (PADDLE_MODE(v)) {
       case 0:
-	if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_B)
-	  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_B);
+	if (nrpn_get(NRPN_PAD_MODE) != VAL_MODE_B)
+	  nrpn_set(NRPN_PAD_MODE, VAL_MODE_B);
 	break;
       case 1: 
-	if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_A)
-	  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_A);
+	if (nrpn_get(NRPN_PAD_MODE) != VAL_MODE_A)
+	  nrpn_set(NRPN_PAD_MODE, VAL_MODE_A);
 	break;
       case 3:
-	if (nrpn_get(NRPN_PAD_MODE) != KYRV_MODE_S)
-	  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_S);
+	if (nrpn_get(NRPN_PAD_MODE) != VAL_MODE_S)
+	  nrpn_set(NRPN_PAD_MODE, VAL_MODE_S);
 	break;
       }
     }
@@ -275,13 +275,13 @@ static int cwinkey_get(cwinkey_property_t p) {
   case WK_MODE_REGISTER: {
     int v = 0;
     if (nrpn_get(NRPN_PAD_SWAP)) v |= 0x08;
-    if (nrpn_get(NRPN_PAD_ADAPT) == KYRV_ADAPT_ULTIMATIC)
+    if (nrpn_get(NRPN_PAD_ADAPT) == VAL_ADAPT_ULTIMATIC)
       v |= 0x20;
     else 
       switch (nrpn_get(NRPN_PAD_MODE)) {
-      case KYRV_MODE_A: v |= 0x10; break;
-      case KYRV_MODE_B: v |= 0x00; break;
-      case KYRV_MODE_S: v |= 0x30; break;
+      case VAL_MODE_A: v |= 0x10; break;
+      case VAL_MODE_B: v |= 0x00; break;
+      case VAL_MODE_S: v |= 0x30; break;
       }
     // PADDLE_ECHO FIX.ME
     // SERIAL_ECHO FIX.ME

@@ -136,10 +136,11 @@ public:
   const int16_t *get_table(int16_t ramp) {
     switch (ramp) {
     default:
-    case KYRV_RAMP_HANN: return hann_ramp;
-    case KYRV_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
-    case KYRV_RAMP_LINEAR: return linear_ramp;
-      // case KYRV_RAMP_GAUSSIAN: return gaussian_ramp; 
+    case VAL_RAMP_HANN: return hann_ramp;
+    case VAL_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
+    case VAL_RAMP_LINEAR: return linear_ramp;
+      // case VAL_RAMP_GAUSSIAN: return gaussian_ramp; 
+      // case VAL_RAMP_EXPONENTIAL: return exponential_ramp;
     }
   }
 
@@ -220,10 +221,11 @@ public:
   const int16_t *get_table(int16_t ramp) {
     switch (ramp) {
     default:
-    case KYRV_RAMP_HANN: return hann_ramp;
-    case KYRV_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
-    case KYRV_RAMP_LINEAR: return linear_ramp;
-      // case KYRV_RAMP_GAUSSIAN: return gaussian_ramp; 
+    case VAL_RAMP_HANN: return hann_ramp;
+    case VAL_RAMP_BLACKMAN_HARRIS: return blackman_harris_ramp;
+    case VAL_RAMP_LINEAR: return linear_ramp;
+      // case VAL_RAMP_GAUSSIAN: return gaussian_ramp; 
+      // case VAL_RAMP_EXPONENTIAL: return exponential_ramp;
     }
   }
 

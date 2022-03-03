@@ -33,7 +33,7 @@ int16_t values[16] = {
   1,
   0,
   32,
-  KYRV_RAMP_HANN
+  VAL_RAMP_HANN
 };
 
 int get_nrpn(int nrpn) {

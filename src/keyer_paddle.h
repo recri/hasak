@@ -138,10 +138,10 @@ class KeyerPaddle {
     const int dit = map[1];
     const int dah = map[2];
     switch (nrpn_get(NRPN_PAD_KEYER)) {
-    case KYRV_KEYER_AD5DZ: return ad5dz.clock(dit, dah, ticks);
-    case KYRV_KEYER_K1EL: return k1el.clock(dit, dah, ticks);
-    case KYRV_KEYER_ND7PA: return nd7pa.clock(dit, dah, ticks);
-    case KYRV_KEYER_VK6PH: return vk6ph.clock(dit, dah, ticks);
+    case VAL_KEYER_AD5DZ: return ad5dz.clock(dit, dah, ticks);
+    case VAL_KEYER_K1EL: return k1el.clock(dit, dah, ticks);
+    case VAL_KEYER_ND7PA: return nd7pa.clock(dit, dah, ticks);
+    case VAL_KEYER_VK6PH: return vk6ph.clock(dit, dah, ticks);
     default: return 0;
     }
   }

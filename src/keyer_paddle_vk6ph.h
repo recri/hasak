@@ -102,9 +102,9 @@ private:
     EXITLOOP
   };
   enum {
-    KEYER_MODE_A = KYRV_MODE_A,
-    KEYER_MODE_B = KYRV_MODE_B,
-    KEYER_STRAIGHT = KYRV_MODE_S
+    KEYER_MODE_A = VAL_MODE_A,
+    KEYER_MODE_B = VAL_MODE_B,
+    KEYER_STRAIGHT = VAL_MODE_S
   };
   bool dot_memory = 0;
   bool dash_memory = 0;

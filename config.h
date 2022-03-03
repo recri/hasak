@@ -33,7 +33,7 @@
 ** NOTE_* are MIDI note numbers or note number relocations, N is for Note.
 ** CTRL_* are MIDI control change numbers, or control number relocations, C is for Control Change
 ** NRPN_* are MIDI NRPNs, nonregistered parameter numbers, or nrpn relocations, P is for Parameter
-** KYRV_* are parameter values, V is for Value
+** VAL_* are parameter values, V is for Value
 */
 
 /* Identifier of hasak */
@@ -252,7 +252,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 ** NOTE_ELT_* are notes with velocity values chosen from ".- \t".
 **
 ** all the notes which simply signal on/off have velocity 1 or 0 internally.
-** externally they use velocity 127 and 0 for on and off, KYRV_EXT_NOTE_*
+** externally they use velocity 127 and 0 for on and off, VAL_EXT_NOTE_*
 **
 ** there's a group of 4 NOTE_MIDI_* notes which communicate volume, frequency, and speed
 ** with legacy SDR apps.
@@ -356,8 +356,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYR_N_NOTE		55 /* {type def title {number of note states maintained in the keyer}} */
 
 /* The external values of MIDI NoteOn/NoteOff, internally 0 is off and 1 is on. */
-#define KYRV_EXT_NOTE_OFF	0 /* {type val title {external note off velocity}} */
-#define KYRV_EXT_NOTE_ON	127 /* {type val title {external note on velocity}} */
+#define VAL_EXT_NOTE_OFF	0 /* {type val title {external note off velocity}} */
+#define VAL_EXT_NOTE_ON	127 /* {type val title {external note on velocity}} */
 
 /*
 ** midi control change usage.
@@ -448,9 +448,9 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 ** NRPN_EXEC - commands
 ** NRPN_INFO - information
 */
-#define KYRV_NOT_SET -1		/* {type val title {16 bit not set value}} */
-#define KYRV_MASK    0x3fff	/* {type val title {14 bit mask}} */
-#define KYRV_SIGN(v) ((((int16_t)(v))<<2)>>2) /* {type mac title {sign extend masked 14 bit to 16 bit twos complement}} */
+#define VAL_NOT_SET -1		/* {type val title {16 bit not set value}} */
+#define VAL_MASK    0x3fff	/* {type val title {14 bit mask}} */
+#define VAL_SIGN(v) ((((int16_t)(v))<<2)>>2) /* {type mac title {sign extend masked 14 bit to 16 bit twos complement}} */
 
 /* NRPN midi block, parameters common to all midi.h based firmware */
 #define NRPN_FIRST		0 /* {type rel title {base of nrpns}} */
@@ -540,37 +540,37 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_RISE_TIME		(NRPN_RAMP+0) /* {type nrpn title {key rise ramp length} range {0 16383} unit sample property keyerRiseTime} */
 #define NRPN_FALL_TIME		(NRPN_RAMP+1) /* {type nrpn title {key fall ramp length} range {0 16383} unit sample property keyerFallTime} */
-#define NRPN_RISE_RAMP		(NRPN_RAMP+2) /* {type nrpn title {key rise ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN property keyerRiseRamp valuesProperty keyerRamps} */
-#define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn title {key fall ramp} values KYRV_RAMP_* default KYRV_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
-#define KYRV_RAMP_HANN		0 /* {type val label Hann title {ramp from Hann window function, raised cosine} value-of {NRPN_*_RAMP} property keyerRamps} */
-#define KYRV_RAMP_BLACKMAN_HARRIS 1 /* {type val label {Blackman Harris} title {ramp from Blackman Harris window function} value-of {NRPN_*_RAMP} property keyerRamps} */
-#define KYRV_RAMP_LINEAR	2 /* {type val label Linear title {linear ramp, for comparison} value-of {NRPN_*_RAMP} property keyerRamps} */
+#define NRPN_RISE_RAMP		(NRPN_RAMP+2) /* {type nrpn title {key rise ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerRiseRamp valuesProperty keyerRamps} */
+#define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn title {key fall ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
+#define VAL_RAMP_HANN		0 /* {type val label Hann title {ramp from Hann window function, raised cosine} value-of {NRPN_*_RAMP} property keyerRamps} */
+#define VAL_RAMP_BLACKMAN_HARRIS 1 /* {type val label {Blackman Harris} title {ramp from Blackman Harris window function} value-of {NRPN_*_RAMP} property keyerRamps} */
+#define VAL_RAMP_LINEAR	2 /* {type val label Linear title {linear ramp, for comparison} value-of {NRPN_*_RAMP} property keyerRamps} */
 
 #define NRPN_PAD		(NRPN_RAMP+4) /* {type rel title {base of paddle keyer parameters}} */
 
-#define NRPN_PAD_MODE		(NRPN_PAD+0)	/* {type nrpn title {iambic keyer mode A/B/S} values KYRV_MODE_* default KYRV_MODE_A property paddleMode} */
-#define KYRV_MODE_A		0 /* {type val label A title {paddle keyer iambic mode A} value-of {NRPN_PAD_MODE}} */
-#define KYRV_MODE_B		1 /* {type val label B title {paddle keyer iambic mode B} value-of {NRPN_PAD_MODE}} */
-#define KYRV_MODE_S		2 /* {type val label S title {paddle keyer bug mode} value-of {NRPN_PAD_MODE}} */
+#define NRPN_PAD_MODE		(NRPN_PAD+0)	/* {type nrpn title {iambic keyer mode A/B/S} values VAL_MODE_* default VAL_MODE_A property paddleMode} */
+#define VAL_MODE_A		0 /* {type val label A title {paddle keyer iambic mode A} value-of {NRPN_PAD_MODE}} */
+#define VAL_MODE_B		1 /* {type val label B title {paddle keyer iambic mode B} value-of {NRPN_PAD_MODE}} */
+#define VAL_MODE_S		2 /* {type val label S title {paddle keyer bug mode} value-of {NRPN_PAD_MODE}} */
 #define NRPN_PAD_SWAP		(NRPN_PAD+1) /* {type nrpn title {swap paddles} range {0 1} default 0 property paddleSwapped} */
-#define NRPN_PAD_ADAPT		(NRPN_PAD+2) /* {type nrpn title {paddle adapter normal/ultimatic/single lever} values KYRV_ADAPT_* default KYRV_ADAPT_NORMAL property paddleAdapter} */
-#define KYRV_ADAPT_NORMAL	0 /* {type val label Normal title {paddle keyer unmodified} value-of {NRPN_PAD_ADAPT}} */
-#define KYRV_ADAPT_ULTIMATIC	1 /* {type val label Ultimatic title {paddle keyer modified to produce ultimatic keyer} value-of {NRPN_PAD_ADAPT}} */
-#define KYRV_ADAPT_SINGLE	2 /* {type val label Single title {paddle keyer modified to simulate single lever paddle} value-of {NRPN_PAD_ADAPT}} */
+#define NRPN_PAD_ADAPT		(NRPN_PAD+2) /* {type nrpn title {paddle adapter normal/ultimatic/single lever} values VAL_ADAPT_* default VAL_ADAPT_NORMAL property paddleAdapter} */
+#define VAL_ADAPT_NORMAL	0 /* {type val label Normal title {paddle keyer unmodified} value-of {NRPN_PAD_ADAPT}} */
+#define VAL_ADAPT_ULTIMATIC	1 /* {type val label Ultimatic title {paddle keyer modified to produce ultimatic keyer} value-of {NRPN_PAD_ADAPT}} */
+#define VAL_ADAPT_SINGLE	2 /* {type val label Single title {paddle keyer modified to simulate single lever paddle} value-of {NRPN_PAD_ADAPT}} */
 #define NRPN_AUTO_ILS		(NRPN_PAD+3) /* {type nrpn title {automatic letter space timing} range {0 1} default 1 property autoLetterSpace} */
 #define NRPN_AUTO_IWS		(NRPN_PAD+4) /* {type nrpn title {automatic word space timing} range {0 1} default 0 property autoWordSpace} */
-#define NRPN_PAD_KEYER		(NRPN_PAD+5) /* {type nrpn title {paddle keyer implementation} values KYRV_KEYER_* default KYRV_KEYER_VK6PH property paddleKeyer} */
-#define KYRV_KEYER_AD5DZ	0 /* {type val label ad5dz title {paddle keyer algorithm by ad5dz} value-of {NRPN_PAD_KEYER} property paddleKeyers}  */
-#define KYRV_KEYER_K1EL		1 /* {type val label k1el title {paddle keyer algorithm by k1el} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
-#define KYRV_KEYER_ND7PA	2 /* {type val label nd7pa title {paddle keyer algorithm by nd7pa} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
-#define KYRV_KEYER_VK6PH	3 /* {type val label vk6ph title {paddle keyer algorithm by vk6ph} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
+#define NRPN_PAD_KEYER		(NRPN_PAD+5) /* {type nrpn title {paddle keyer implementation} values VAL_KEYER_* default VAL_KEYER_VK6PH property paddleKeyer} */
+#define VAL_KEYER_AD5DZ	0 /* {type val label ad5dz title {paddle keyer algorithm by ad5dz} value-of {NRPN_PAD_KEYER} property paddleKeyers}  */
+#define VAL_KEYER_K1EL		1 /* {type val label k1el title {paddle keyer algorithm by k1el} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
+#define VAL_KEYER_ND7PA	2 /* {type val label nd7pa title {paddle keyer algorithm by nd7pa} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
+#define VAL_KEYER_VK6PH	3 /* {type val label vk6ph title {paddle keyer algorithm by vk6ph} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
 
 #define NRPN_MISC		(NRPN_PAD+6) /* {type rel title {base of miscellaneous parameters}} */
 
 #define NRPN_ACTIVE_ST		(NRPN_MISC+0) /* {type nrpn sub info title {note number of active sidetone source} property keyerActiveSidetone} */
-#define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+1) /* {type nrpn title {slew ramp for mixer changes} values KYRV_RAMP_* default KYRV_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+1) /* {type nrpn title {slew ramp for mixer changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
 #define NRPN_MIXER_SLEW_TIME	(NRPN_MISC+2) /* {type nrpn title {slew time for mixer changes} range {0 16383} unit sample property mixerSlewTime} */
-#define NRPN_FREQ_SLEW_RAMP	(NRPN_MISC+3) /* {type nrpn title {slew ramp for frequency changes} values KYRV_RAMP_* default KYRV_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define NRPN_FREQ_SLEW_RAMP	(NRPN_MISC+3) /* {type nrpn title {slew ramp for frequency changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
 #define NRPN_FREQ_SLEW_TIME	(NRPN_MISC+4) /* {type nrpn title {slew time for frquency changes} range {0 16383} unit sample property mixerSlewTime} */
 #define NRPN_MIX_ENABLE		(NRPN_MISC+5) /* {type nrpn sub short label OutMix title {output mixer enable bits, shorthand} range {0 4095} property outputEnable} */
 #define NRPN_MIX_ENABLE_L	(NRPN_MISC+6) /* {type nrpn sub short label OutMixL title {output mixer left enable bits, shorthand} range {0 4095} property outputEnableLeft} */
@@ -607,35 +607,35 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_PADC0_PIN	(NRPN_PADC+0) /* {type nrpn label adc0Pin title {hardware pin for adc0} range {-1 127} property adc0Pin} */
 #define NRPN_PADC0_VAL	(NRPN_PADC+1) /* {type nrpn label adc0Val title {analog value for adc0} range {0 1023} property adc0Val} */
-#define NRPN_PADC0_NRPN	(NRPN_PADC+2) /* {type nrpn label adc0Nrpn title {nrpn connected to adc0} values KYRV_PADC_* property adc0Nrpn} */
+#define NRPN_PADC0_NRPN	(NRPN_PADC+2) /* {type nrpn label adc0Nrpn title {nrpn connected to adc0} values VAL_PADC_* property adc0Nrpn} */
 #define NRPN_PADC1_PIN	(NRPN_PADC0_PIN+3) /* {type nrpn label adc1Pin title {hardware pin for adc1} range {-1 127} property adc1Pin} */
 #define NRPN_PADC1_VAL	(NRPN_PADC0_VAL+3) /* {type nrpn label adc1Val title {analog value for adc1} range {0 1023} property adc1Val} */
-#define NRPN_PADC1_NRPN	(NRPN_PADC0_NRPN+3) /* {type nrpn label adc1Nrpn title {nrpn connected to adc1} values KYRV_PADC_* property adc1Nrpn} */
+#define NRPN_PADC1_NRPN	(NRPN_PADC0_NRPN+3) /* {type nrpn label adc1Nrpn title {nrpn connected to adc1} values VAL_PADC_* property adc1Nrpn} */
 #define NRPN_PADC2_PIN	(NRPN_PADC1_PIN+3) /* {type nrpn label adc2Pin title {hardware pin for adc2} range {-1 127} property adc2Pin} */
 #define NRPN_PADC2_VAL	(NRPN_PADC1_VAL+3) /* {type nrpn label adc2Val title {analog value for adc2} range {0 1023} property adc2Val} */
-#define NRPN_PADC2_NRPN	(NRPN_PADC1_NRPN+3) /* {type nrpn label adc2Nrpn title {nrpn connected to adc2} values KYRV_PADC_* property adc2Nrpn} */
+#define NRPN_PADC2_NRPN	(NRPN_PADC1_NRPN+3) /* {type nrpn label adc2Nrpn title {nrpn connected to adc2} values VAL_PADC_* property adc2Nrpn} */
 #define NRPN_PADC3_PIN	(NRPN_PADC2_PIN+3) /* {type nrpn label adc3Pin title {hardware pin for adc3} range {-1 127} property adc3Pin} */
 #define NRPN_PADC3_VAL	(NRPN_PADC2_VAL+3) /* {type nrpn label adc3Val title {analog value for adc3} range {0 1023} property adc3Val} */
-#define NRPN_PADC3_NRPN	(NRPN_PADC2_NRPN+3) /* {type nrpn label adc3Nrpn title {nrpn connected to adc3} values KYRV_PADC_* property adc3Nrpn} */
+#define NRPN_PADC3_NRPN	(NRPN_PADC2_NRPN+3) /* {type nrpn label adc3Nrpn title {nrpn connected to adc3} values VAL_PADC_* property adc3Nrpn} */
 #define NRPN_PADC4_PIN	(NRPN_PADC3_PIN+3) /* {type nrpn label adc4Pin title {hardware pin for adc4} range {-1 127} property adc4Pin} */
 #define NRPN_PADC4_VAL	(NRPN_PADC3_VAL+3) /* {type nrpn label adc4Val title {analog value for adc4} range {0 1023} property adc4Val} */
-#define NRPN_PADC4_NRPN	(NRPN_PADC3_NRPN+3) /* {type nrpn label adc4Nrpn title {nrpn connected to adc4} values KYRV_PADC_* property adc4Nrpn} */
+#define NRPN_PADC4_NRPN	(NRPN_PADC3_NRPN+3) /* {type nrpn label adc4Nrpn title {nrpn connected to adc4} values VAL_PADC_* property adc4Nrpn} */
 #define NRPN_PADC5_PIN	(NRPN_PADC4_PIN+3) /* {type nrpn label adc5Pin title {hardware pin for adc5} range {-1 127} property adc5Pin} */
 #define NRPN_PADC5_VAL	(NRPN_PADC4_VAL+3) /* {type nrpn label adc5Val title {analog value for adc5} range {0 1023} property adc5Val} */
-#define NRPN_PADC5_NRPN	(NRPN_PADC4_NRPN+3) /* {type nrpn label adc5Nrpn title {nrpn connected to adc5} values KYRV_PADC_* property adc5Nrpn} */
+#define NRPN_PADC5_NRPN	(NRPN_PADC4_NRPN+3) /* {type nrpn label adc5Nrpn title {nrpn connected to adc5} values VAL_PADC_* property adc5Nrpn} */
 #define NRPN_PADC6_PIN	(NRPN_PADC5_PIN+3) /* {type nrpn label adc6Pin title {hardware pin for adc6} range {-1 127} property adc6Pin} */
 #define NRPN_PADC6_VAL	(NRPN_PADC5_VAL+3) /* {type nrpn label adc6Val title {analog value for adc6} range {0 1023} property adc6Val} */
-#define NRPN_PADC6_NRPN	(NRPN_PADC5_NRPN+3) /* {type nrpn label adc6Nrpn title {nrpn connected to adc6} values KYRV_PADC_* property adc6Nrpn} */
+#define NRPN_PADC6_NRPN	(NRPN_PADC5_NRPN+3) /* {type nrpn label adc6Nrpn title {nrpn connected to adc6} values VAL_PADC_* property adc6Nrpn} */
 #define NRPN_PADC7_PIN	(NRPN_PADC6_PIN+3) /* {type nrpn label adc7Pin title {hardware pin for adc7} range {-1 127} property adc7Pin} */
 #define NRPN_PADC7_VAL	(NRPN_PADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
-#define NRPN_PADC7_NRPN	(NRPN_PADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values KYRV_PADC_* property adc7Nrpn} */
+#define NRPN_PADC7_NRPN	(NRPN_PADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values VAL_PADC_* property adc7Nrpn} */
 
 #define NRPN_MORSE	(NRPN_PADC+KYR_N_PADC*3) /* {type rel title {morse code table base}} */
 
 /* 64 morse code translations */
 /* morse table for (7 bit ascii)-33, covers ! through `, with many holes */
 /* lower case alpha are mapped to upper case on input */
-// #define KYRV_MORSE_TABLE "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
+// #define VAL_MORSE_TABLE "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
 
 #define NRPN_MIXER		(NRPN_MORSE+64) /* {type rel title {base of output mixer level block}} */
 
@@ -720,9 +720,9 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_CODEC		(NRPN_MIXER2+24) /* {type rel title {base of codec nrpns}} */
       
 #define NRPN_CODEC_VOLUME	(NRPN_CODEC+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-128 24} property masterVolume} */
-#define NRPN_INPUT_SELECT	(NRPN_CODEC+1) /* {type nrpn label InSel title {input select} values KYRV_INPUT_* property inputSelect} */
-#define KYRV_INPUT_MIC		0	       /* {type val label Mic title {input select microphone} value-of NRPN_INPUT_SELECT property inputSelects} */
-#define KYRV_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of NRPN_INPUT_SELECT property inputSelects} */
+#define NRPN_INPUT_SELECT	(NRPN_CODEC+1) /* {type nrpn label InSel title {input select} values VAL_INPUT_* property inputSelect} */
+#define VAL_INPUT_MIC		0	       /* {type val label Mic title {input select microphone} value-of NRPN_INPUT_SELECT property inputSelects} */
+#define VAL_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of NRPN_INPUT_SELECT property inputSelects} */
 #define NRPN_INPUT_LEVEL	(NRPN_CODEC+2) /* {type nrpn label InLvl title {input level} range {-128 24} unit dB/10 property inputLevel} */
 
 #define NRPN_LAST_SAVED		(NRPN_CODEC+3) /* {type rel title {end of persistent params}} */
@@ -782,21 +782,21 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYR_N_NRPN		(NRPN_LAST)   /* {type def title {number of nrpns defined}} */
 
 /* definitions of ADC targets, these had undefined symbols when placed immediately after NRPN_PADC* */
-#define KYRV_PADC_NOTHING	(NRPN_NOTHING) /* {type val label None title {pot controls nothing} value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_VOLUME	(NRPN_VOLUME) /* {type val label Volume title {pot controls master volume} value-of NRPN_PADC*_NRP property adcControls} */
-#define KYRV_PADC_LEVEL		(NRPN_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_TONE		(NRPN_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_SPEED		(NRPN_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_FARNS		(NRPN_FARNS) /* {type val label Farnsworth title {pot controls keyer Farnsworh speed} value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_COMP		(NRPN_COMP) /* {type val label Comp title {} value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_HEAD_TIME	(NRPN_HEAD_TIME) /* {type val label PTTHead title NRPN_HEAD_TIME value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_TAIL_TIME	(NRPN_TAIL_TIME) /* {type val label PTTTail title NRPN_TAIL_TIME value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_RISE_TIME	(NRPN_RISE_TIME) /* {type val label Rise title NRPN_RISE_TIME value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_FALL_TIME	(NRPN_FALL_TIME) /* {type val label Fall title NRPN_FALL_TIME value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_WEIGHT	(NRPN_WEIGHT) /* {type val label Weight title NRPN_WEIGHT value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_RATIO		(NRPN_RATIO) /* {type val label Ratio title NRPN_RATIO value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_SPEED_FRAC	(NRPN_SPEED_FRAC) /* {type val label Frac title NRPN_SPEED_FRAC value-of NRPN_PADC*_NRPN property adcControls} */
-#define KYRV_PADC_CODEC_VOLUME	(NRPN_CODEC_VOLUME) /* {type val label Frac title NRPN_CODEC_VOLUME value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_NOTHING	(NRPN_NOTHING) /* {type val label None title {pot controls nothing} value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_VOLUME	(NRPN_VOLUME) /* {type val label Volume title {pot controls master volume} value-of NRPN_PADC*_NRP property adcControls} */
+#define VAL_PADC_LEVEL		(NRPN_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_TONE		(NRPN_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_SPEED		(NRPN_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_FARNS		(NRPN_FARNS) /* {type val label Farnsworth title {pot controls keyer Farnsworh speed} value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_COMP		(NRPN_COMP) /* {type val label Comp title {} value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_HEAD_TIME	(NRPN_HEAD_TIME) /* {type val label PTTHead title NRPN_HEAD_TIME value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_TAIL_TIME	(NRPN_TAIL_TIME) /* {type val label PTTTail title NRPN_TAIL_TIME value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_RISE_TIME	(NRPN_RISE_TIME) /* {type val label Rise title NRPN_RISE_TIME value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_FALL_TIME	(NRPN_FALL_TIME) /* {type val label Fall title NRPN_FALL_TIME value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_WEIGHT	(NRPN_WEIGHT) /* {type val label Weight title NRPN_WEIGHT value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_RATIO		(NRPN_RATIO) /* {type val label Ratio title NRPN_RATIO value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_SPEED_FRAC	(NRPN_SPEED_FRAC) /* {type val label Frac title NRPN_SPEED_FRAC value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_CODEC_VOLUME	(NRPN_CODEC_VOLUME) /* {type val label Frac title NRPN_CODEC_VOLUME value-of NRPN_PADC*_NRPN property adcControls} */e
 
 /* end of defined nrpns */
 /* end of config.h */

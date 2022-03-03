@@ -41,7 +41,7 @@ static void cwroute_sidetone_listener(int note, int _) {
   if (nrpn_get(NRPN_ST_ENABLE)) {
     note_set(NOTE_AU_ST_KEY, note_get(NOTE_KEY_ST));
   // if (nrpn_get(NRPN_MIDI_KEY_ENABLE))
-    note_set(NOTE_MIDI_OUT_ST, note_get(NOTE_KEY_ST) ? KYRV_EXT_NOTE_ON : KYRV_EXT_NOTE_OFF);
+    note_set(NOTE_MIDI_OUT_ST, note_get(NOTE_KEY_ST) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
   }
 }
 
@@ -57,7 +57,7 @@ static void cwroute_key_out_listener(int note, int _) {
     if (nrpn_get(NRPN_IQ_ENABLE))
       note_set(NOTE_AU_IQ_KEY, note_get(NOTE_KEY_OUT));
     // if (nrpn_get(NRPN_MIDI_KEY_ENABLE))
-    note_set(NOTE_MIDI_OUT_KEY, note_get(NOTE_KEY_OUT) ? KYRV_EXT_NOTE_ON : KYRV_EXT_NOTE_OFF);
+    note_set(NOTE_MIDI_OUT_KEY, note_get(NOTE_KEY_OUT) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
     // if (nrpn_get(NRPN_HW_KEY_ENABLE))
     note_set(NOTE_HW_KEY_OUT, note_get(NOTE_KEY_OUT));
     // if (nrpn_get(NRPN_HW_KEY2_ENABLE))
@@ -72,7 +72,7 @@ static void cwroute_ptt_out_listener(int note, int _) {
   */
   if (nrpn_get(NRPN_TX_ENABLE)) {
     // if (nrpn_get(NRPN_MIDI_PTT_ENABLE)) ?
-    note_set(NOTE_MIDI_OUT_PTT, note_get(NOTE_PTT_OUT) ? KYRV_EXT_NOTE_ON : KYRV_EXT_NOTE_OFF);
+    note_set(NOTE_MIDI_OUT_PTT, note_get(NOTE_PTT_OUT) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
     // if (nrpn_get(NRPN_HW_KEY_PTT_ENABLE)) ?
     note_set(NOTE_HW_PTT_OUT, note_get(NOTE_PTT_OUT));
     // if (nrpn_get(NRPN_HW_KEY_PTT2_ENABLE)) ?

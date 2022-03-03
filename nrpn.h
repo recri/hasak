@@ -216,7 +216,7 @@ static int nrpn_echo_index;
 
 static void nrpn_echo_all_step(int _, int  __) {
   if (nrpn_echo_index < NRPN_LAST_SAVED) {
-    if (nrpn_get(nrpn_echo_index) != KYRV_NOT_SET)
+    if (nrpn_get(nrpn_echo_index) != VAL_NOT_SET)
       nrpn_send(nrpn_echo_index, nrpn_get(nrpn_echo_index));
     nrpn_echo_index += 1;
     after_idle(nrpn_echo_all_step);
@@ -270,14 +270,14 @@ static void nrpn_msg_handler(int nrpn, int _) {
     
 static void nrpn_query(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
-  if (nrpn_is_valid(value) && nrpn_get(value) != KYRV_NOT_SET)
+  if (nrpn_is_valid(value) && nrpn_get(value) != VAL_NOT_SET)
     nrpn_send(nrpn, nrpn_get(value));
 }
        
 static void nrpn_unset_listener(int nrpn, int _) {
   const int value = nrpn_get(nrpn);
   if (nrpn_is_valid(value))
-    nrpn_set(nrpn, KYRV_NOT_SET);
+    nrpn_set(nrpn, VAL_NOT_SET);
 }
 
 static void nrpn_id_json(int nrpn, int _) {
@@ -334,22 +334,22 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_HANG_TIME, 0);	/* 0 dits */
   nrpn_set(NRPN_RISE_TIME, ms_to_samples(5));	// 5.0 ms
   nrpn_set(NRPN_FALL_TIME, ms_to_samples(5));	// 5.0 ms
-  nrpn_set(NRPN_RISE_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(NRPN_FALL_RAMP, KYRV_RAMP_HANN);
-  nrpn_set(NRPN_PAD_MODE, KYRV_MODE_A);
+  nrpn_set(NRPN_RISE_RAMP, VAL_RAMP_HANN);
+  nrpn_set(NRPN_FALL_RAMP, VAL_RAMP_HANN);
+  nrpn_set(NRPN_PAD_MODE, VAL_MODE_A);
   nrpn_set(NRPN_PAD_SWAP, 0);
-  nrpn_set(NRPN_PAD_ADAPT, KYRV_ADAPT_NORMAL);
+  nrpn_set(NRPN_PAD_ADAPT, VAL_ADAPT_NORMAL);
   nrpn_set(NRPN_AUTO_ILS, 1);
   nrpn_set(NRPN_AUTO_IWS, 0);
-  nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_VK6PH);
-  // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_AD5DZ);
-  // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_ND7PA);
-  // nrpn_set(NRPN_PAD_KEYER, KYRV_KEYER_K1EL);
+  nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_VK6PH);
+  // nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_AD5DZ);
+  // nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_ND7PA);
+  // nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_K1EL);
 
   nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
-  nrpn_set(NRPN_MIXER_SLEW_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(NRPN_MIXER_SLEW_RAMP, VAL_RAMP_HANN);
   nrpn_set(NRPN_MIXER_SLEW_TIME, 128);
-  nrpn_set(NRPN_FREQ_SLEW_RAMP, KYRV_RAMP_HANN);
+  nrpn_set(NRPN_FREQ_SLEW_RAMP, VAL_RAMP_HANN);
   nrpn_set(NRPN_FREQ_SLEW_TIME,	128);
   nrpn_set(NRPN_PIN_DEBOUNCE, 1000);
   nrpn_set(NRPN_POUT_LOGIC, 1);
@@ -376,13 +376,13 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_POUT7_PIN, 127);
 
   nrpn_set(NRPN_PADC0_PIN, KYR_VOLUME_POT);
-  nrpn_set(NRPN_PADC0_NRPN, KYRV_PADC_VOLUME);
+  nrpn_set(NRPN_PADC0_NRPN, VAL_PADC_VOLUME);
   nrpn_set(NRPN_PADC1_PIN, KYR_ST_VOL_POT);
-  nrpn_set(NRPN_PADC1_NRPN, KYRV_PADC_LEVEL);
+  nrpn_set(NRPN_PADC1_NRPN, VAL_PADC_LEVEL);
   nrpn_set(NRPN_PADC2_PIN, KYR_ST_FREQ_POT);
-  nrpn_set(NRPN_PADC2_NRPN, KYRV_PADC_TONE);
+  nrpn_set(NRPN_PADC2_NRPN, VAL_PADC_TONE);
   nrpn_set(NRPN_PADC3_PIN, KYR_SPEED_POT);
-  nrpn_set(NRPN_PADC3_NRPN, KYRV_PADC_SPEED);
+  nrpn_set(NRPN_PADC3_NRPN, VAL_PADC_SPEED);
   nrpn_set(NRPN_PADC4_PIN, 127);
   nrpn_set(NRPN_PADC4_NRPN, -1);
   nrpn_set(NRPN_PADC5_PIN, 1);
