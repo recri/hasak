@@ -456,7 +456,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_FIRST		0 /* {type rel title {base of nrpns}} */
 
 #define NRPN_NOTHING		(NRPN_FIRST+0) /* {type nrpn title {nothng parameter value, zero is not a valid parameter} property nothing} */
-#define NRPN_ID_DEVICE           (NRPN_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer} */
+#define NRPN_ID_DEVICE          (NRPN_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer} */
 #define NRPN_ID_VERSION		(NRPN_FIRST+2) /* {type nrpn title {identify this keyer version for the correspondent} property idVersion} */
 #define NRPN_ID_JSON		(NRPN_FIRST+3) /* {type nrpn sub cmd title {send the JSON string which describes the keyer} property idJSON} */
 #define NRPN_STRING_START	(NRPN_FIRST+4) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */

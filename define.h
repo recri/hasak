@@ -145,7 +145,9 @@ static void define_define(void) {
     }
   for (int nrpn = 0; nrpn < KYR_N_NRPN; nrpn += 1)
     switch (nrpn) {		//          nrpn, v, i, o, e, ro
-    case NRPN_NOTHING:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_NOTHING:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : nada
+    case NRPN_ID_DEVICE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_ID_VERSION:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
     case NRPN_ID_JSON:		nrpn_define(nrpn, 0, 1, 1, 0, 1); break; // in, out, no echo, no write : cmd
     case NRPN_STRING_START:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
     case NRPN_STRING_END:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
