@@ -294,6 +294,9 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_INPUT_ENABLE, 0);	// disable input
   nrpn_set(NRPN_OUTPUT_ENABLE, 0);	// disable output 
   
+  nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
+  nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
+
   nrpn_set(NRPN_CHANNEL, KYR_CHANNEL);
   nrpn_set(NRPN_INPUT_ENABLE, 1);
   nrpn_set(NRPN_OUTPUT_ENABLE, 1);
