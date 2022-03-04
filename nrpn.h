@@ -289,7 +289,11 @@ static void nrpn_id_json(int nrpn, int _) {
 */
 
 static void nrpn_set_default(void) {
-
+  const int current_input_enable = nrpn_get(NRPN_INPUT_ENABLE);
+  const int current_output_enable = nrpn_get(NRPN_OUTPUT_ENABLE);
+  nrpn_set(NRPN_INPUT_ENABLE, 0);	// disable input
+  nrpn_set(NRPN_OUTPUT_ENABLE, 0);	// disable output 
+  
   nrpn_set(NRPN_CHANNEL, KYR_CHANNEL);
   nrpn_set(NRPN_INPUT_ENABLE, 1);
   nrpn_set(NRPN_OUTPUT_ENABLE, 1);
@@ -410,6 +414,9 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_VOLUME, 0);
   nrpn_set(NRPN_INPUT_SELECT, 0);
   nrpn_set(NRPN_INPUT_LEVEL, 0);
+
+  nrpn_set(NRPN_OUTPUT_ENABLE, current_output_enable);	// restore output enable
+  nrpn_set(NRPN_INPUT_ENABLE, current_input_enable);	// restore input enable
 
 }
 

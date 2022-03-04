@@ -1,4 +1,23 @@
 * Todo list as of 2022-02-24
+[ ] add a NRPN_ABBREV_ENABLE which specifies that
+	the host can receive messages where CTRL_NRPN_MSB,
+	CTRL_NRPN_LSB, and CTRL_DATA_MSB which set the same
+	value as last sent may be elided.
+	Allows NRPN messages to be abbreviated to only 
+	the bytes which change.
+	Most importantly, it allows sequences of 
+	NRPN_STRING_BYTE messages to the same endpoint
+	to be only CTRL_DATA_LSB messages.
+	message sequences to least necessary messages.
+	But some interfaces may not interpret them
+	correctly, they may be enforcing some kind of 
+	sequence protocol on NRPN's, so make it an option 
+	that the host can set and test and reset if necessary. 
+	This is a src/midi.h option.
+	This is sort of like running status, but less aggressive.
+	I don't see how to make the Teensy usb_midi.h do running
+	status.
+[x] disable midi input and output during default value reset.
 [ ] move the indivdual mixer levels into ephemeral NRPNs
 	compute them from enable bits and named level
 	and balance controls.
