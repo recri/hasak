@@ -152,18 +152,18 @@ static void define_define(void) {
     case NRPN_STRING_START:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
     case NRPN_STRING_END:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
     case NRPN_STRING_BYTE:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
-    case NRPN_MIDI_INPUTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_MIDI_OUTPUTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_MIDI_ECHOES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_MIDI_SENDS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_MIDI_NOTES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_MIDI_CTRLS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_MIDI_NRPNS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_LISTENER_NODES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_LISTENER_LISTS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_LISTENER_CALLS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_LISTENER_FIRES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
-    case NRPN_LISTENER_LOOPS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_INPUTS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_OUTPUTS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_ECHOES:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_SENDS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_NOTES:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_CTRLS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_MIDI_NRPNS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_NODES:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_LISTS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_CALLS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_FIRES:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
+    case NRPN_LISTENER_LOOPS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // in, out, echo, no write : stats
     case NRPN_STATS_RESET:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : command
     case NRPN_CHANNEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_INPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write

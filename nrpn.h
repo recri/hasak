@@ -292,9 +292,6 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_INPUT_ENABLE, 0);	// disable input
   nrpn_set(NRPN_OUTPUT_ENABLE, 0);	// disable output 
 
-  nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
-  nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
-
   nrpn_set(NRPN_CHANNEL, KYR_CHANNEL);
   // nrpn_set(NRPN_INPUT_ENABLE, 1); moved to end
   // nrpn_set(NRPN_OUTPUT_ENABLE, 1); moved to end
@@ -358,7 +355,7 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_FREQ_SLEW_TIME,	128);
   nrpn_set(NRPN_PIN_DEBOUNCE, 1000);
   nrpn_set(NRPN_POUT_LOGIC, 1);
-  nrpn_set(NRPN_PADC_RATE, 64);
+  nrpn_set(NRPN_PADC_RATE, 32);
   xnrpn_set(NRPN_XIQ_FREQ, 600);
   nrpn_set(NRPN_IQ_USB, 1);
 
@@ -419,7 +416,7 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_OUTPUT_ENABLE, 1);	// enable output
   nrpn_set(NRPN_INPUT_ENABLE, 1);	// enable input
 
-  Serial.printf("nrpn_set_default ID_DEVICE %d ID_VERSION %d\n", nrpn_get(NRPN_ID_DEVICE), nrpn_get(NRPN_ID_VERSION));
+  // Serial.printf("nrpn_set_default ID_DEVICE %d ID_VERSION %d\n", nrpn_get(NRPN_ID_DEVICE), nrpn_get(NRPN_ID_VERSION));
 }
 
 static void nrpn_set_default_shim(int nrpn, int _) {
@@ -455,10 +452,12 @@ static void nrpn_setup(void) {
   nrpn_listen(NRPN_MSG_READ, nrpn_msg_handler);
 
   /* information set in the nrpn array so it will be echoed */
-  nrpn_set(NRPN_NRPN_SIZE, KYR_NRPN_SIZE);
-  nrpn_set(NRPN_MSG_SIZE, KYR_MSG_SIZE);
-  nrpn_set(NRPN_SAMPLE_RATE, KYR_SAMPLE_RATE);
-  nrpn_set(NRPN_EEPROM_LENGTH, KYR_EEPROM_LENGTH);;
+  nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
+  nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
+  nrpn_set(NRPN_NRPN_SIZE, KYR_NRPN_SIZE); // obsolete, in the JSON
+  nrpn_set(NRPN_MSG_SIZE, KYR_MSG_SIZE);   // obsolete, in the JSON
+  nrpn_set(NRPN_SAMPLE_RATE, KYR_SAMPLE_RATE); // obsolete, in the JSON
+  nrpn_set(NRPN_EEPROM_LENGTH, KYR_EEPROM_LENGTH);; // obsolete, in the JSON
   nrpn_set(NRPN_ID_CPU, KYR_ID_CPU);
   nrpn_set(NRPN_ID_CODEC, codec_identify());
 }

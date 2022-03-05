@@ -1,4 +1,8 @@
 * Todo list as of 2022-02-24
+[ ] add a coin cell to enable RTC on 4.0, 4.1, 3.2, 3.5, 3.6
+	put it on a dongle. The 3.2 needs a 32.768 crystal
+	added.
+[ ] add nrpns for RTC access.	
 [x] moved the timer counts to ephemera and disabled sending
 	again there might be reason to echo, but never output
 [x] raised the padc rate to 64ms
