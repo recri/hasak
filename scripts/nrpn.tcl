@@ -184,21 +184,38 @@ proc main {argv} {
     set globs {}
     foreach line [split [string trim $data] \n] {
 	dict set lines [dict size $lines] $line
-	if { ! [regexp {^#define[ \t]+(NOTE|CTRL|NRPN|VAL|KYR[A-Z]?)(_[A-Z0-9_]*)[ \t]+([^ \t]*)([ \t]+(.*))?$} $line all prefix suffix value rest1 rest]} {
-	    # puts "mismatch: $line"
-	    continue
+	if { ! [regexp {^#define[ \t]+([A-Z0-9_]+)[ \t]+([-(A-Za-z_0-9*+)]*)[ \t]*/\*[ \t]*{(.*)}[ \t]*\*/[ \t]*$} $line all name value comment]} {
+	    switch -regexp $line {
+		^$ continue
+		{^[ \t]*$} continue
+		{^/\*.*\*/$} continue
+		{^/\* *$} continue
+		{^ *\*/$} continue
+		{^ \*.*$} continue
+		{^\*\*.*$} continue
+		{^#(ifdef|ifndef|if|else|elif|endif|error).*$} continue
+		{^#define config_h_$} continue
+		{^#define TEENSY.*$} continue
+		{^#define EEPROM.*$} continue
+		{^#define VAL_SIGN.*$} continue
+		{^static.*$} continue
+		{^//.*$} continue
+		default {
+		    puts "mismatch: $line"
+		    continue
+		}
+	    }
 	}
-	set name $prefix$suffix
 	set vwid [expr {max($vwid, [string length $name])}]
 	# dict set values $name name $name
 	if {[catch {dict set values $name value [evaluate $value $values]} error]} {
 	    error "evaluating line $line: $::errorInfo"
 	}
 	dict set values $name orig-value $value 
-	if { ! [regexp {/\*\s*{(.*)}\s*\*/} $rest all comment]} {
-	    puts "missing comment1 {$line}"
-	    continue
-	}
+	#if { ! [regexp {/\*\s*{(.*)}\s*\*/} $rest all comment]} {
+	#    puts "missing comment1 {$line}"
+	#    continue
+	#}
 	if {[catch {
 	    if {([llength $comment]%2) == 0} {
 		foreach {key val} $comment {

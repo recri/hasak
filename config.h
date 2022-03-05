@@ -61,7 +61,7 @@
 //#define KYR_ENABLE_HDW_IN 1 /* {type def title {Should we enable a hardware input input channel}} */
 
 /* enable winkey emulator, but don't, it doesn't work */
-#define KYR_ENABLEx_WINKEY 1  /* {type def title {Should we enable the winkey emulator}} */
+#define KYR_ENABLE_WINKEY 1  /* {type def title {Should we enable the winkey emulator}} */
 
 /* numbers of configurable modules that are implemented */
 /* *** don't change these unless you're prepared to modify all the code that's wired to their values *** */
@@ -476,14 +476,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_LISTENER_FIRES	(NRPN_FIRST+17) /* {type nrpn sub info title {number of listener lists called} listen 0} */
 #define NRPN_LISTENER_LOOPS	(NRPN_FIRST+18) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
 #define NRPN_STATS_RESET	(NRPN_FIRST+19) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
-#define NRPN_LOOP		(NRPN_FIRST+20) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
-#define NRPN_SAMPLE		(NRPN_FIRST+21) /* {type nrpn sub info title {sample counter, 48000Hz}} */
-#define NRPN_UPDATE		(NRPN_FIRST+22) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
-#define NRPN_MILLI		(NRPN_FIRST+23) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
-#define NRPN_10MILLI		(NRPN_FIRST+24) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
-#define NRPN_100MILLI		(NRPN_FIRST+25) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
 
-#define NRPN_SAVED		(NRPN_FIRST+26) /* {type rel title {base of saved NRPN parameters}} */
+#define NRPN_SAVED		(NRPN_FIRST+20) /* {type rel title {base of saved NRPN parameters}} */
 
 #define NRPN_SECOND		(NRPN_SAVED) /* {type rel title {base of persistent midi.h parameters}} */
 
@@ -503,7 +497,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_IQ_ENABLE		(NRPN_ENABLE+5) /* {type nrpn label IQ title {enable IQ generation} range {0 1} property iqEnable} */
 #define NRPN_PTT_REQUIRE	(NRPN_ENABLE+6) /* {type nrpn label PTTReq title {require EXT_PTT to transmit} range {0 1} ignore 1 property externalPTTRequire} */
 #define NRPN_RKEY_ENABLE	(NRPN_ENABLE+7) /* {type nrpn label Rem title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
-#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type ctrl label CWPtt title {enable auto-PTT from CW keyer}} */ /* should always generate, but where does it go? */
+#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type ctrl label CWPtt title {enable auto-PTT from CW keyer} note {should always generate, but where does it go?}} */
 #define NRPN_RX_MUTE		(NRPN_ENABLE+9) /* {type ctrl label RX title {enable muting of RX audio during CW PTT}} */ 
 #define NRPN_MIC_HWPTT		(NRPN_ENABLE+10) /* {type ctrl label MIC_HWPTT title {enable that MICIN triggers the hardware PTT output}} */
 #define NRPN_CW_HWPTT		(NRPN_ENABLE+11) /* {type ctrl label CW_HWPTT title {enable that CWPTT triggers the hardware PTT output}} */
@@ -727,6 +721,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_LAST_SAVED		(NRPN_CODEC+3) /* {type rel title {end of persistent params}} */
 
+#define NRPN_EPHEMERA		(NRPN_LAST_SAVED) /* {type rel title {base of ephemeral nrpns}} */
+
 #define NRPN_WM8960		(NRPN_CODEC+3) /* {type rel title {base of WM8960 commands}} */
 
 #define NRPN_WM8960_ENABLE            (NRPN_WM8960+11-11) /* {type cmd title {WM8960 operation}} */
@@ -777,7 +773,14 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_XPER_ILS		(NRPN_SCRATCH+6) /* {type nrpn sub ext title {samples per inter letter space}} */
 #define NRPN_XPER_IWS		(NRPN_SCRATCH+8) /* {type nrpn sub ext title {samples per inter word space}} */
 
-#define NRPN_LAST		(NRPN_SCRATCH+10) /* {type rel title {end of all nrpns}} */
+#define NRPN_LOOP		(NRPN_SCRATCH+10) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
+#define NRPN_SAMPLE		(NRPN_SCRATCH+11) /* {type nrpn sub info title {sample counter, 48000Hz}} */
+#define NRPN_UPDATE		(NRPN_SCRATCH+12) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
+#define NRPN_MILLI		(NRPN_SCRATCH+13) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
+#define NRPN_10MILLI		(NRPN_SCRATCH+14) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
+#define NRPN_100MILLI		(NRPN_SCRATCH+15) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
+
+#define NRPN_LAST		(NRPN_SCRATCH+16) /* {type rel title {end of all nrpns}} */
 
 #define KYR_N_NRPN		(NRPN_LAST)   /* {type def title {number of nrpns defined}} */
 
@@ -796,7 +799,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define VAL_PADC_WEIGHT	(NRPN_WEIGHT) /* {type val label Weight title NRPN_WEIGHT value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_RATIO		(NRPN_RATIO) /* {type val label Ratio title NRPN_RATIO value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_SPEED_FRAC	(NRPN_SPEED_FRAC) /* {type val label Frac title NRPN_SPEED_FRAC value-of NRPN_PADC*_NRPN property adcControls} */
-#define VAL_PADC_CODEC_VOLUME	(NRPN_CODEC_VOLUME) /* {type val label Frac title NRPN_CODEC_VOLUME value-of NRPN_PADC*_NRPN property adcControls} */e
+#define VAL_PADC_CODEC_VOLUME	(NRPN_CODEC_VOLUME) /* {type val label Frac title NRPN_CODEC_VOLUME value-of NRPN_PADC*_NRPN property adcControls} */
 
 /* end of defined nrpns */
 /* end of config.h */

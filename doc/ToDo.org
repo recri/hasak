@@ -1,4 +1,17 @@
 * Todo list as of 2022-02-24
+[x] raised the padc rate to 64ms
+[ ] interesting, hearing clicks in the sidetone volume, maybe to
+	do with the increased padc rate?
+[ ] decide why initial probe is not seeing ID_DEVICE and VERSION.
+[x] increase the sample rate for analog pins to 64ms
+[x] do not output analog sample raw values
+[ ] there's an argument for letting analog samples be read which
+	would require splitting the ENABLE_OUTPUT into two cases,
+	or changing ENABLE_ECHO so that it can echo even if output 
+	is blocked.
+	That last seems reasonable, OUTPUT means direct output
+	when the value is changed within the keyer, echo means
+	output when the value is probed from the host.
 [ ] add a NRPN_ABBREV_ENABLE which specifies that
 	the host can receive messages where CTRL_NRPN_MSB,
 	CTRL_NRPN_LSB, and CTRL_DATA_MSB which set the same
@@ -17,6 +30,7 @@
 	This is sort of like running status, but less aggressive.
 	I don't see how to make the Teensy usb_midi.h do running
 	status.
+[x] MIDI through loops back your output to your input.
 [x] disable midi input and output during default value reset.
 [ ] move the indivdual mixer levels into ephemeral NRPNs
 	compute them from enable bits and named level

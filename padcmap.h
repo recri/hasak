@@ -41,51 +41,53 @@
 #define KYR_PADC_RATIO_MIN 25
 #define KYR_PADC_RATIO_MAX 75
 
+static elapsedMillis padcmap_burn_in;
+
 static void padcmap_value(int nrpn, int _) {
-  int min, max;
-  int nrpn2 = nrpn_get(nrpn+1);
-  switch (nrpn2) {
-  case NRPN_NOTHING: return;
-  case NRPN_VOLUME:
-  case NRPN_LEVEL:
-  case NRPN_IQ_LEVEL:
-  case NRPN_I2S_LEVEL:
-  case NRPN_HDW_LEVEL:
-  case NRPN_CODEC_VOLUME:
-    min = KYR_PADC_VOLUME_MIN; max = KYR_PADC_VOLUME_MAX; break;
-  case NRPN_TONE:
-    min = KYR_PADC_TONE_MIN; max = KYR_PADC_TONE_MAX; break;
-  case NRPN_SPEED:
-  case NRPN_FARNS:
-    min = KYR_PADC_SPEED_MIN; max = KYR_PADC_SPEED_MAX; break;
-  case NRPN_SPEED_FRAC:
-    min = KYR_PADC_FRAC_MIN; max = KYR_PADC_FRAC_MAX; break;
-  case NRPN_ST_BALANCE:
-  case NRPN_IQ_BALANCE:
-  case NRPN_COMP:
-    min = KYR_PADC_BAL_MIN; max = KYR_PADC_BAL_MAX; break;
-  case NRPN_HEAD_TIME:
-  case NRPN_TAIL_TIME:
-  case NRPN_RISE_TIME:
-  case NRPN_FALL_TIME:
-  case NRPN_MIXER_SLEW_TIME:
-  case NRPN_FREQ_SLEW_TIME:
-    min = KYR_PADC_TIME_MIN; max = KYR_PADC_TIME_MAX; break;
-  case NRPN_WEIGHT:
-  case NRPN_RATIO:
-    min = KYR_PADC_RATIO_MIN; max = KYR_PADC_RATIO_MAX; break;
-  default: return;
+  if (nrpn_get(NRPN_PADC_ENABLE)) {
+    int min, max;
+    int nrpn2 = nrpn_get(nrpn+1);
+    switch (nrpn2) {
+    case NRPN_NOTHING: return;
+    case NRPN_VOLUME:
+    case NRPN_LEVEL:
+    case NRPN_IQ_LEVEL:
+    case NRPN_I2S_LEVEL:
+    case NRPN_HDW_LEVEL:
+    case NRPN_CODEC_VOLUME:
+      min = KYR_PADC_VOLUME_MIN; max = KYR_PADC_VOLUME_MAX; break;
+    case NRPN_TONE:
+      min = KYR_PADC_TONE_MIN; max = KYR_PADC_TONE_MAX; break;
+    case NRPN_SPEED:
+    case NRPN_FARNS:
+      min = KYR_PADC_SPEED_MIN; max = KYR_PADC_SPEED_MAX; break;
+    case NRPN_SPEED_FRAC:
+      min = KYR_PADC_FRAC_MIN; max = KYR_PADC_FRAC_MAX; break;
+    case NRPN_ST_BALANCE:
+    case NRPN_IQ_BALANCE:
+    case NRPN_COMP:
+      min = KYR_PADC_BAL_MIN; max = KYR_PADC_BAL_MAX; break;
+    case NRPN_HEAD_TIME:
+    case NRPN_TAIL_TIME:
+    case NRPN_RISE_TIME:
+    case NRPN_FALL_TIME:
+    case NRPN_MIXER_SLEW_TIME:
+    case NRPN_FREQ_SLEW_TIME:
+      min = KYR_PADC_TIME_MIN; max = KYR_PADC_TIME_MAX; break;
+    case NRPN_WEIGHT:
+    case NRPN_RATIO:
+      min = KYR_PADC_RATIO_MIN; max = KYR_PADC_RATIO_MAX; break;
+    default: return;
+    }
+    int p = nrpn_get(nrpn);		/* fetch adc reading */
+    int n = ((1024-p)*min + p*max)>>10;	/* compute new value for nrpn2 */
+    if (n == nrpn_get(nrpn2)) return;	/* value is unchanged */
+    // Serial.printf("adc %d map %d -> %d\n", p, n, nrpn2);
+    nrpn_set(nrpn2, n);			/* set the new value */
   }
-  int p = nrpn_get(nrpn);		/* fetch adc reading */
-  int n = ((1024-p)*min + p*max)>>10;	/* compute new value for nrpn2 */
-  if (n == nrpn_get(nrpn2)) return;	/* value is unchanged */
-  // Serial.printf("adc %d map %d -> %d\n", p, n, nrpn2);
-  nrpn_set(nrpn2, n);			/* set the new value */
 }
-  
+
 static void padcmap_setup(void) {
   for (int i = 0; i < KYR_N_PADC; i += 1)
     nrpn_listen(NRPN_PADC0_VAL+i*(NRPN_PADC1_VAL-NRPN_PADC0_VAL), padcmap_value);
 }
-
-// static void adcmap_loop(void) {}

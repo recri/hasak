@@ -110,9 +110,9 @@ private:
   // increment a value
   void _incr(int type, int tindex, int value) {
     switch (type) {
-    case NOTE: notes[tindex] += value; notes[tindex] &= 0x7f; break;
-    case CTRL: ctrls[tindex] += value; ctrls[tindex] &= 0x7f; break;
-    case NRPN: nrpns[tindex] += value; nrpns[tindex] &= 0x3fff; break;
+    case NOTE: notes[tindex] = (notes[tindex]+value) & 0x7f; break;
+    case CTRL: ctrls[tindex] = (ctrls[tindex]+value) & 0x7f; break;
+    case NRPN: nrpns[tindex] = (nrpns[tindex]+value) & 0x3fff; break;
     default: Serial.printf("midi._incr(%d, %d, %d) invalid type %d\n", type, tindex, value, type); break;
     }
   }
@@ -136,14 +136,12 @@ private:
     }
   }
   // get the flags on a value
-  int _flags_get(int type, int tindex) { 
-    return flags[_hoist(type,tindex)];
-  }
+  int _flags_get(int type, int tindex) { return flags[_hoist(type,tindex)]; }
+
   // set the flags on a value
   void _flags_set(int type, int tindex, int value) { 
     const int index = _hoist(type,tindex);
-    flags[index] &= ~(INPUT_ENABLE|OUTPUT_ENABLE|ECHO_ENABLE|READ_ONLY);
-    flags[index] |= value & (INPUT_ENABLE|OUTPUT_ENABLE|ECHO_ENABLE|READ_ONLY);
+    flags[index] = (flags[index] & ~(INPUT_ENABLE|OUTPUT_ENABLE|ECHO_ENABLE|READ_ONLY)) | (value & (INPUT_ENABLE|OUTPUT_ENABLE|ECHO_ENABLE|READ_ONLY));
   }
 
   //
@@ -216,8 +214,8 @@ private:
       _set(type, tindex, value);
     if (nrpn_get(NRPN_LISTENER_ENABLE))
       invoke_listeners(type, tindex, oldvalue);
-    if (nrpn_get(NRPN_OUTPUT_ENABLE) && nrpn_get(NRPN_ECHO_ENABLE) && echo_enabled(type,tindex))
-      _send(type, tindex, _get(type, tindex));
+    if (nrpn_get(NRPN_ECHO_ENABLE) && echo_enabled(type,tindex))
+      send(type, tindex, _get(type, tindex));
   }
   // send from device origin
   void send(int type, int tindex, int value) {

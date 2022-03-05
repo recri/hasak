@@ -28,18 +28,20 @@
 static ResponsiveAnalogRead *padc_adc[KYR_N_PADC];
 
 static void padc_milli(int nrpn, int _) {
-  static uint16_t count = 0;
-  if ( ! nrpn_get(NRPN_PADC_ENABLE)) return;
-  count += 1;
-  for (int i = 0; i <= KYR_N_PADC; i += 1) {
-    if (padc_adc[i] != NULL) {
-      if ((count % KYR_N_PADC) == i) 
-	padc_adc[i]->update();
-      if ((count % nrpn_get(NRPN_PADC_RATE)) == i) {
-	int16_t raw_value = padc_adc[i]->getValue();
-	int val_nrpn = NRPN_PADC0_VAL+i*(NRPN_PADC1_VAL-NRPN_PADC0_VAL);
-	if (raw_value != nrpn_get(val_nrpn))
-	  nrpn_set(val_nrpn, raw_value);
+  if (nrpn_get(NRPN_PADC_ENABLE)) {
+    static uint16_t count = 0;
+    count += 1;
+    for (int i = 0; i <= KYR_N_PADC; i += 1) {
+      if (padc_adc[i] != NULL) {
+	if ((count % KYR_N_PADC) == i) 
+	  padc_adc[i]->update();
+	if ((count % nrpn_get(NRPN_PADC_RATE)) == i) {
+	  int16_t raw_value = padc_adc[i]->getValue();
+	  int val_nrpn = NRPN_PADC0_VAL+i*(NRPN_PADC1_VAL-NRPN_PADC0_VAL);
+	  if (raw_value != nrpn_get(val_nrpn)) {
+	    nrpn_set(val_nrpn, raw_value);
+	  }
+	}
       }
     }
   }
@@ -48,19 +50,20 @@ static void padc_milli(int nrpn, int _) {
 static void padc_pin_listener(int nrpn, int _) {
   const int pin = nrpn_get(nrpn);
   if ( ! pin_valid(pin) || ! pin_analog(pin) || pin_i2s(pin) || pin_i2c(pin)) {
-    nrpn_set(nrpn, 127); // this should trigger a loop detection in HasakMidi
-    return;
+    if (pin != 127)
+      nrpn_set(nrpn, 127); // this should trigger a loop detection in HasakMidi
+  } else {
+    // Serial.printf("padc_pin_listener(%d)\n", nrpn);
+    const int i = (nrpn-NRPN_PADC0_PIN)/(NRPN_PADC1_PIN-NRPN_PADC0_PIN);
+    if (padc_adc[i] != NULL) {
+      delete padc_adc[i];
+      padc_adc[i] = NULL;
+    }
+    padc_adc[i] = new ResponsiveAnalogRead(pin, true, 0.001f);
+    padc_adc[i]->setActivityThreshold(8.0f);
+    padc_adc[i]->enableEdgeSnap();
+    padc_adc[i]->update();
   }
-  // Serial.printf("padc_pin_listener(%d)\n", nrpn);
-  const int i = (nrpn-NRPN_PADC0_PIN)/(NRPN_PADC1_PIN-NRPN_PADC0_PIN);
-  if (padc_adc[i] != NULL) {
-    delete padc_adc[i];
-    padc_adc[i] = NULL;
-  }
-  padc_adc[i] = new ResponsiveAnalogRead(pin, true, 0.001f);
-  padc_adc[i]->setActivityThreshold(8.0f);
-  padc_adc[i]->enableEdgeSnap();
-  padc_adc[i]->update();
 }
 
 static void padc_setup(void) {

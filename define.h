@@ -258,28 +258,28 @@ static void define_define(void) {
     case NRPN_POUT7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
 
     case NRPN_PADC0_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC0_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC0_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC0_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC1_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC1_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC1_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC1_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC2_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC2_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC2_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC2_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC3_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC3_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC3_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC3_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC4_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC4_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC4_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC4_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC5_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC5_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC5_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC5_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC6_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC6_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC6_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC6_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_PADC7_VAL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_PADC7_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC7_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
       /* morse code block */
@@ -369,18 +369,18 @@ static void define_define(void) {
     case NRPN_READ_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
     case NRPN_SET_DEFAULT:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
     case NRPN_ECHO_ALL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_SEND_TEXT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case NRPN_SEND_TEXT2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case NRPN_MSG_INDEX:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case NRPN_MSG_WRITE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
-    case NRPN_MSG_READ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint
+    case NRPN_SEND_TEXT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint : obs
+    case NRPN_SEND_TEXT2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint : obs
+    case NRPN_MSG_INDEX:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint : obs
+    case NRPN_MSG_WRITE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint : obs
+    case NRPN_MSG_READ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // string endpoint : obs
 
-    case NRPN_NRPN_SIZE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case NRPN_MSG_SIZE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case NRPN_SAMPLE_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case NRPN_EEPROM_LENGTH:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case NRPN_ID_CPU:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
-    case NRPN_ID_CODEC:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_NRPN_SIZE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_MSG_SIZE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_SAMPLE_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_EEPROM_LENGTH:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_ID_CPU:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_ID_CODEC:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
 
     case NRPN_XPER_DIT:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
     case NRPN_XPER_DIT+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained

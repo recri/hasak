@@ -50,7 +50,35 @@
 //   return code;
 // }
 //
-
+//
+// A map of the implemented morse code
+// The symbols on the left are implemented
+// if their position on the right contains +
+//
+//          2 3 4 5 6 7          2 3 4 5 6 7
+//        -------------        -------------
+//       0:   0 @ P ` p       0: + + + +   +
+//       1: ! 1 A Q a q       1:   + + + + +
+//       2: " 2 B R b r       2: + + + + + +
+//       3: # 3 C S c s       3:   + + + + +
+//       4: $ 4 D T d t       4:   + + + + +
+//       5: % 5 E U e u       5:   + + + + +
+//       6: & 6 F V f v       6:   + + + + +
+//       7: ' 7 G W g w       7: + + + + + +
+//       8: ( 8 H X h x       8: + + + + + +
+//       9: ) 9 I Y i y       9: + + + + + +
+//       A: * : J Z j z       A:   + + + + +
+//       B: + ; K [ k {       B: +   +   + {
+//       C: , < L \ l |       C: +   +   + |
+//       D: - = M ] m }       D: + + +   + }
+//       E: . > N ^ n ~       E: +   +   + ~
+//       F: / ? O _ o DEL     F: + + +   + DEL
+//
+// other combinations can be coded as prosigns
+// using the ESC character, \033, or the backslash
+// character, \. hasak allows multiple escapes, so
+// \\imi generates ?.
+//
 #ifdef __cplusplus
 extern "C" {
 #endif
