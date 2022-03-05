@@ -165,12 +165,6 @@ static void define_define(void) {
     case NRPN_LISTENER_FIRES:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
     case NRPN_LISTENER_LOOPS:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : stats
     case NRPN_STATS_RESET:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : command
-    case NRPN_LOOP:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters FIX.ME move these to keyer ephemera
-    case NRPN_SAMPLE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case NRPN_UPDATE:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case NRPN_MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case NRPN_10MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
-    case NRPN_100MILLI:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : counters
     case NRPN_CHANNEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_INPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_OUTPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
@@ -393,11 +387,15 @@ static void define_define(void) {
     case NRPN_XPER_IWS:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
     case NRPN_XPER_IWS+1:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // internally maintained
 
+    case NRPN_LOOP:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters : invisible
+    case NRPN_SAMPLE:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
+    case NRPN_UPDATE:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
+    case NRPN_MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
+    case NRPN_10MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
+    case NRPN_100MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
     default: 
       Serial.printf("default_setup: overlooked nrpn %d\n", nrpn); break;
     }
 }
 
 static void define_setup(void) { define_define(); }
-
-//static void define_loop(void) {}

@@ -1,7 +1,11 @@
 * Todo list as of 2022-02-24
+[x] moved the timer counts to ephemera and disabled sending
+	again there might be reason to echo, but never output
 [x] raised the padc rate to 64ms
 [ ] interesting, hearing clicks in the sidetone volume, maybe to
-	do with the increased padc rate?
+	do with the increased padc rate?  Or maybe the mixer
+	ramp time is too short.  or maybe there are too many
+	short ramps under PADC control.
 [ ] decide why initial probe is not seeing ID_DEVICE and VERSION.
 [x] increase the sample rate for analog pins to 64ms
 [x] do not output analog sample raw values
