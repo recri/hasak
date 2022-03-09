@@ -122,7 +122,7 @@ void setup(void) {
 
   /*  interval timer to latch inputs into the audio update loop. */
   static IntervalTimer timer;
-  timer.priority(96);
+  // timer.priority(96);
   timer.begin(interrupt, 1e6/AUDIO_SAMPLE_RATE_EXACT);
 }
 

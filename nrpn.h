@@ -27,7 +27,6 @@
 //#endif
 
 #include "EEPROM.h"
-#include "json.h"
 
 #define KYR_NRPN_SIZE		(KYR_N_NRPN*sizeof(int16_t))
 #define KYR_MSG_SIZE		(EEPROM_BYTES-KYR_NRPN_SIZE-6*sizeof(int16_t))
@@ -280,10 +279,6 @@ static void nrpn_unset_listener(int nrpn, int _) {
     nrpn_set(nrpn, VAL_NOT_SET);
 }
 
-static void nrpn_id_json(int nrpn, int _) {
-  string_id_json(json_string, sizeof(json_string)-1);
-}
-
 /*
 ** this where we initialize the keyer nrpns
 */
@@ -297,6 +292,7 @@ static void nrpn_set_default(void) {
   // nrpn_set(NRPN_OUTPUT_ENABLE, 1); moved to end
   nrpn_set(NRPN_ECHO_ENABLE, 1);
   nrpn_set(NRPN_LISTENER_ENABLE, 1);
+  nrpn_set(NRPN_STRING_THROTTLE, 300);
   
   nrpn_set(NRPN_PIN_ENABLE, 1);
   nrpn_set(NRPN_POUT_ENABLE, 1);
@@ -425,7 +421,6 @@ static void nrpn_set_default_shim(int nrpn, int _) {
 
 static void nrpn_setup(void) {
   /* bootstrap controller */
-  nrpn_listen(NRPN_ID_JSON, nrpn_id_json);
 
   /* morse timing update, listen for changes */
   nrpn_listen(NRPN_SPEED, nrpn_recompute_morse);

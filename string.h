@@ -70,83 +70,98 @@ length of the session.
 **  some are local sinks of bytes
 **	a stream sink, like the text keyers
 **	a dynamic string, like a saved message
+** 
 */
 typedef struct {
-  int open, id, target, length, sent, rcvd, last, stalled;
+  int open, source, id, length, sent, rcvd, last, stalled;
   const char *string;
 } string_endpoint_t;
 
-#define STRING_N_ENDPOINT 1
-static string_endpoint_t string_endpoint[STRING_N_ENDPOINT];
+static string_endpoint_t string_endpoint[KYR_N_ENDP];
 
-static void string_after_idle(int nrpn, int _) {
-  int nopen = 0;
-  for (int i = 0; i < STRING_N_ENDPOINT; i += 1) {
+static elapsedMicros string_timeout;;
+
+static void string_sample(int nrpn, int _) {
+  if ((int)string_timeout < 0) return;
+  string_timeout = -nrpn_get(NRPN_STRING_THROTTLE);
+  for (int i = 0; i < KYR_N_ENDP; i += 1) {
     string_endpoint_t *p = &string_endpoint[i];
-    if (p->open) {				        // endpoint active
-      nopen += 1;
-      if (p->sent == p->length) {			// all sent
-	if (p->rcvd == p->length) {			// all rcvd
-	  nrpn_send(NRPN_STRING_END, (p->id<<7)|p->target);	// end string
-	  p->open = 0;					// close endpoint
-	  nopen -= 1;					// note close
+    if ( ! p->open)
+      continue;				// endpoint active
+    if (i == ENDP_JSON_TO_HOST) {
+      if (p->sent == p->length) {		// all sent
+	nrpn_send(NRPN_STRING_END, (p->id<<9)); // end string
+	p->open = 0;				// close endpoint
+	// nrpn_set(NRPN_PADC_ENABLE, string_adc_enable_save);
+      } else {					// more to send
+	if ((p->last&0xff) > 0) {		// last ack said go
+	  // midi_flush();
+	  if (p->string[p->sent] & 0x80) Serial.printf("8 bit character at index %d\n", p->sent);
+	  nrpn_send(NRPN_STRING_BYTE, (p->id << 9) | (p->string[p->sent++]&0xFF));
+	  // midi_flush();
 	}
-      } else if (p->sent == 0 ||			// nothing sent or
-		 (p->rcvd > 0 && (p->last&0x7f) > 1)) {	// last ack has space
-	nrpn_send(NRPN_STRING_BYTE, (p->id << 7) | p->string[p->sent++]);
-      } else {						// we're stalled
-	p->stalled += 1;
+			 			// waiting for xon
       }
+    } else {
+      Serial.printf("string endpoint %d not implemented\n", i);
     }
   }
-  if (nopen > 0)
-    after_idle(string_after_idle);
 }
+
+#include "json.h"
 
 static void string_start(string_endpoint_t *p) {
-  p->open = 1;
-  nrpn_send(NRPN_STRING_START, (p->id << 7) | p->target);
-  after_idle(string_after_idle);
+  int i = p-&string_endpoint[0];
+  if (i == ENDP_JSON_TO_HOST) {
+    if ( ! p->open) {
+      p->open = 1;
+      p->id = 0;			// json end point
+      p->length = sizeof(json_string)-1; // string bytes
+      p->string = json_string;	// string length
+      p->sent = 0;		// number sent
+      p->last = 1;		// last acknowledgement
+      nrpn_send(NRPN_STRING_START, (p->id << 9));
+      Serial.printf("string_start JSON %d bytes\n", p->length);
+      //string_adc_enable_save = nrpn_get(NRPN_PADC_ENABLE);
+      //nrpn_set(NRPN_PADC_ENABLE, 0);
+    }
+  } else {
+    Serial.printf("string_start %d not implemented\n", i);
+  }
 }
 
-static void string_byte(const int payload) {
-  int id = payload>>7;
-  if (id >= 0 || id < STRING_N_ENDPOINT) {
-    string_endpoint_t *p = &string_endpoint[id];
-    p->rcvd += 1;
-    p->last = payload;
+static void string_byte(string_endpoint_t *p, const int payload) {
+  int id = payload>>9;
+  if (id == ENDP_JSON_TO_HOST) {
+    string_endpoint[0].last = payload;
   }
 }	
 
-static void string_id_json(const char *string, int length) {
-  string_endpoint_t *p = &string_endpoint[0];
-  p->open = 0;
-  p->id = 0;			// json end point
-  p->target = 0;		// json target
-  p->length = length;		// string length
-  p->string = string;		// string bytes
-  p->sent = 0;			// number sent
-  p->rcvd = 0;			// number acknowledged
-  p->last = 0;			// last acknowledgement
-  p->stalled = 0;		// stalled waiting for acknowledgement
-  nrpn_send(NRPN_ID_JSON, (p->id << 7) | p->target);
-  string_start(p);
+static void string_end(string_endpoint_t *p) {
 }
 
 static void string_start_listener(int nrpn, int _) {
+  int e = nrpn_get(nrpn);
+  if (e >= 0 && e < KYR_N_ENDP)
+    string_start(&string_endpoint[e]);
 }
 
 static void string_end_listener(int nrpn, int _) {
+  int e = nrpn_get(nrpn);
+  if (e >= 0 && e < KYR_N_ENDP)
+    string_end(&string_endpoint[e]);
 }
 
 static void string_byte_listener(int nrpn, int _) {
-  string_byte(nrpn_get(nrpn));
+  int b = nrpn_get(nrpn);
+  int e = b >> 9;
+  if (e >= 0 && e < KYR_N_ENDP) 
+    string_byte(&string_endpoint[e], b);
 }
 
 static void string_setup(void) {
   nrpn_listen(NRPN_STRING_START, string_start_listener);
   nrpn_listen(NRPN_STRING_END, string_end_listener);
   nrpn_listen(NRPN_STRING_BYTE, string_byte_listener);
+  nrpn_listen(NRPN_SAMPLE, string_sample);
 }
-
-// static void cwstptt_loop(void) {}

@@ -36,6 +36,8 @@ static int midi_flags_encode(const int input_enable, const int output_enable, co
   return midi.flags_encode(input_enable, output_enable, echo_enable, read_only);
 }
 
+static void midi_flush(void) { midi.flush(); }
+
 /*
 ** Notes
 */

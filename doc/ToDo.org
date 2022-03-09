@@ -1,4 +1,7 @@
 * Todo list as of 2022-02-24
+[ ] move the morse code table into flash.
+[ ] add a table of prosigns used and use them when
+	pure morse translation fails.
 [ ] add a coin cell to enable RTC on 4.0, 4.1, 3.2, 3.5, 3.6
 	put it on a dongle. The 3.2 needs a 32.768 crystal
 	added.

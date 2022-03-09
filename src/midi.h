@@ -310,6 +310,10 @@ private:
       (echo_enable ? ECHO_ENABLE : 0) | (read_only ? READ_ONLY : 0);
   }
 
+  // flush usbMIDI buffer
+
+  void flush(void) { usbMIDI.send_now(); }
+  
   // setup, verify expectations
 
   void setup(void) {

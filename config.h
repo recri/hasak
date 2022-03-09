@@ -36,22 +36,16 @@
 ** VAL_* are parameter values, V is for Value
 */
 
-/* Identifier of hasak */
-#define KYR_IDENT   0x0ad5 /* {type def title {identifier of the hasak keyer}} */
+#define KYR_IDENT   0x0ad5 /* {type def title {identifier of the device}} */
 
-/* Version of hasak */
-#define KYR_VERSION 110	/* {type def title {version number of the NRPN set implemented}} */
+#define KYR_VERSION 110	/* {type def title {version number of the device}} */
 
-/* Magic number to identify valid eeprom contents */
 #define KYR_MAGIC   0xad5d /* {type def title {magic number to identify valid EEPROM contents}} */
 
-/* start hot */
 #define KYR_ENABLE_TX	1 /* {type def title {Should we start with TX_ENABLE true}} */
 
-/* and whistling */
 #define KYR_ENABLE_ST	1 /* {type def title {Should we start with ST_ENABLE true}} */
 
-/* potentiometer input */
 #define KYR_ENABLE_POTS 1 /* {type def title {Should we start with potentiometers for volume, pitch, and speed enabled}} */
 
 /* enable hardware output - FIX.ME hdw_out should be pointer */
@@ -60,8 +54,7 @@
 /* enable hardware input - FIX.ME adc_in should be pointer */
 //#define KYR_ENABLE_HDW_IN 1 /* {type def title {Should we enable a hardware input input channel}} */
 
-/* enable winkey emulator, but don't, it doesn't work */
-#define KYR_ENABLE_WINKEY 1  /* {type def title {Should we enable the winkey emulator}} */
+#define KYR_ENABLE_WINKEY 1  /* {type def title {Should we start with the winkey emulator enabled}} */
 
 /* numbers of configurable modules that are implemented */
 /* *** don't change these unless you're prepared to modify all the code that's wired to their values *** */
@@ -458,36 +451,45 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_NOTHING		(NRPN_FIRST+0) /* {type nrpn title {nothng parameter value, zero is not a valid parameter} property nothing} */
 #define NRPN_ID_DEVICE          (NRPN_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer} */
 #define NRPN_ID_VERSION		(NRPN_FIRST+2) /* {type nrpn title {identify this keyer version for the correspondent} property idVersion} */
-#define NRPN_ID_JSON		(NRPN_FIRST+3) /* {type nrpn sub cmd title {send the JSON string which describes the keyer} property idJSON} */
-#define NRPN_STRING_START	(NRPN_FIRST+4) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
-#define NRPN_STRING_END		(NRPN_FIRST+5) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
-#define NRPN_STRING_BYTE	(NRPN_FIRST+6) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define NRPN_STRING_START	(NRPN_FIRST+3) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
+#define NRPN_STRING_END		(NRPN_FIRST+4) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
+#define NRPN_STRING_BYTE	(NRPN_FIRST+5) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define ENDP_JSON_TO_HOST	0	       /* {type endp title {transfer JSON string to host from device}} */
+#define ENDP_NRPNS_TO_DEV	1	       /* {type endp title {transfer NRPN settings to device from host}} */
+#define ENDP_NRPNS_TO_HOST	2	       /* {type endp title {transfer NRPN settings to host from device}} */
+#define ENDP_MESGS_TO_DEV	3	       /* {type endp title {transfer saved messages to device from host}} */
+#define ENDP_MESGS_TO_HOST	4	       /* {type endp title {transfer saved messages to host from device}} */
+#define ENDP_TEXT_TO_DEV	5	       /* {type endp title {transfer text to device from host}} */
+#define ENDP_TEXT_TO_HOST	6	       /* {type endp title {transfer text to host from device}} */
+#define KYR_N_ENDP		7	       /* {type def title {number of defined endpoints}} */
+#define VAL_BYTE_STOP		0x100	       /* {type val title {STRING_BYTE acknowlegement xoff value that signals stop sending}}*/
+#define VAL_BYTE_START		0x101	       /* {type val title {STRING_BYTE acknowlegement xon value that signals start sending}} */
+#define NRPN_MIDI_INPUTS	(NRPN_FIRST+6) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
+#define NRPN_MIDI_OUTPUTS	(NRPN_FIRST+7) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
+#define NRPN_MIDI_ECHOES	(NRPN_FIRST+8) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
+#define NRPN_MIDI_SENDS		(NRPN_FIRST+9) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
+#define NRPN_MIDI_NOTES		(NRPN_FIRST+10) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_MIDI_CTRLS		(NRPN_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_MIDI_NRPNS		(NRPN_FIRST+12) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_LISTENER_NODES     (NRPN_FIRST+13) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
+#define NRPN_LISTENER_LISTS	(NRPN_FIRST+14) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
+#define NRPN_LISTENER_CALLS	(NRPN_FIRST+15) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
+#define NRPN_LISTENER_FIRES	(NRPN_FIRST+16) /* {type nrpn sub info title {number of listener lists called} listen 0} */
+#define NRPN_LISTENER_LOOPS	(NRPN_FIRST+17) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
+#define NRPN_STATS_RESET	(NRPN_FIRST+18) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
 
-#define NRPN_MIDI_INPUTS	(NRPN_FIRST+7) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
-#define NRPN_MIDI_OUTPUTS	(NRPN_FIRST+8) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
-#define NRPN_MIDI_ECHOES	(NRPN_FIRST+9) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
-#define NRPN_MIDI_SENDS		(NRPN_FIRST+10) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
-#define NRPN_MIDI_NOTES		(NRPN_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_MIDI_CTRLS		(NRPN_FIRST+12) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_MIDI_NRPNS		(NRPN_FIRST+13) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_LISTENER_NODES     (NRPN_FIRST+14) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
-#define NRPN_LISTENER_LISTS	(NRPN_FIRST+15) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
-#define NRPN_LISTENER_CALLS	(NRPN_FIRST+16) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
-#define NRPN_LISTENER_FIRES	(NRPN_FIRST+17) /* {type nrpn sub info title {number of listener lists called} listen 0} */
-#define NRPN_LISTENER_LOOPS	(NRPN_FIRST+18) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
-#define NRPN_STATS_RESET	(NRPN_FIRST+19) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
-
-#define NRPN_SAVED		(NRPN_FIRST+20) /* {type rel title {base of saved NRPN parameters}} */
+#define NRPN_SAVED		(NRPN_FIRST+19) /* {type rel title {base of saved NRPN parameters}} */
 
 #define NRPN_SECOND		(NRPN_SAVED) /* {type rel title {base of persistent midi.h parameters}} */
 
 #define NRPN_CHANNEL		(NRPN_SECOND+0) /* {type nrpn label Channel title {the MIDI channel} property midiChannel} */
-#define NRPN_INPUT_ENABLE	(NRPN_SECOND+1) /* {type ctrl label Input title {enable input from the MIDI channel} property midiInput} */ 
-#define NRPN_OUTPUT_ENABLE	(NRPN_SECOND+2) /* {type ctrl label Output title {enable output to the MIDI channel} property midiOutput} */ 
-#define NRPN_ECHO_ENABLE	(NRPN_SECOND+3) /* {type ctrl label Echo title {enable echo to the MIDI channel} property midiEcho}} */ 
-#define NRPN_LISTENER_ENABLE	(NRPN_SECOND+4) /* {type ctrl label Listen title {enable listening to note, ctrl, and nrpn values} property midiListen}} */
+#define NRPN_INPUT_ENABLE	(NRPN_SECOND+1) /* {type nrpn label Input title {enable input from the MIDI channel} property midiInput} */ 
+#define NRPN_OUTPUT_ENABLE	(NRPN_SECOND+2) /* {type nrpn label Output title {enable output to the MIDI channel} property midiOutput} */ 
+#define NRPN_ECHO_ENABLE	(NRPN_SECOND+3) /* {type nrpn label Echo title {enable echo to the MIDI channel} property midiEcho}} */ 
+#define NRPN_LISTENER_ENABLE	(NRPN_SECOND+4) /* {type nrpn label Listen title {enable listening to note, ctrl, and nrpn values} property midiListen}} */
+#define NRPN_STRING_THROTTLE	(NRPN_SECOND+5) /* {type nrpn label Throttle title {pause between bytes of a string} unit us range {0 16383} property stringThrottle} */
 
-#define NRPN_ENABLE		(NRPN_SECOND+5) /* {type rel title {base of keyer enable nrpns}} */
+#define NRPN_ENABLE		(NRPN_SECOND+6) /* {type rel title {base of keyer enable nrpns}} */
 
 #define NRPN_PIN_ENABLE		(NRPN_ENABLE+0) /* {type ctrl label Input title {enable input pin processing} property keyerInput} */ 
 #define NRPN_POUT_ENABLE	(NRPN_ENABLE+1) /* {type ctrl label Output title {enable output pin processing} property keyerOutput} */ 
@@ -497,7 +499,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_IQ_ENABLE		(NRPN_ENABLE+5) /* {type nrpn label IQ title {enable IQ generation} range {0 1} property iqEnable} */
 #define NRPN_PTT_REQUIRE	(NRPN_ENABLE+6) /* {type nrpn label PTTReq title {require EXT_PTT to transmit} range {0 1} ignore 1 property externalPTTRequire} */
 #define NRPN_RKEY_ENABLE	(NRPN_ENABLE+7) /* {type nrpn label Rem title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
-#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type ctrl label CWPtt title {enable auto-PTT from CW keyer} note {should always generate, but where does it go?}} */
+#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type ctrl label CWPtt title {enable auto-PTT from CW keyer, (should always generate, but where does it go?}} */
 #define NRPN_RX_MUTE		(NRPN_ENABLE+9) /* {type ctrl label RX title {enable muting of RX audio during CW PTT}} */ 
 #define NRPN_MIC_HWPTT		(NRPN_ENABLE+10) /* {type ctrl label MIC_HWPTT title {enable that MICIN triggers the hardware PTT output}} */
 #define NRPN_CW_HWPTT		(NRPN_ENABLE+11) /* {type ctrl label CW_HWPTT title {enable that CWPTT triggers the hardware PTT output}} */
@@ -532,10 +534,10 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_RAMP		(NRPN_PTT+3) /* {type rel title {base of the keyer ramp parameters}} */
 
-#define NRPN_RISE_TIME		(NRPN_RAMP+0) /* {type nrpn title {key rise ramp length} range {0 16383} unit sample property keyerRiseTime} */
-#define NRPN_FALL_TIME		(NRPN_RAMP+1) /* {type nrpn title {key fall ramp length} range {0 16383} unit sample property keyerFallTime} */
-#define NRPN_RISE_RAMP		(NRPN_RAMP+2) /* {type nrpn title {key rise ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerRiseRamp valuesProperty keyerRamps} */
-#define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn title {key fall ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
+#define NRPN_RISE_TIME		(NRPN_RAMP+0) /* {type nrpn label riseTime title {key rise ramp length} range {0 16383} unit sample property keyerRiseTime} */
+#define NRPN_FALL_TIME		(NRPN_RAMP+1) /* {type nrpn label fallTime title {key fall ramp length} range {0 16383} unit sample property keyerFallTime} */
+#define NRPN_RISE_RAMP		(NRPN_RAMP+2) /* {type nrpn label riseRamp title {key rise ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerRiseRamp valuesProperty keyerRamps} */
+#define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn label fallRamp title {key fall ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
 #define VAL_RAMP_HANN		0 /* {type val label Hann title {ramp from Hann window function, raised cosine} value-of {NRPN_*_RAMP} property keyerRamps} */
 #define VAL_RAMP_BLACKMAN_HARRIS 1 /* {type val label {Blackman Harris} title {ramp from Blackman Harris window function} value-of {NRPN_*_RAMP} property keyerRamps} */
 #define VAL_RAMP_LINEAR	2 /* {type val label Linear title {linear ramp, for comparison} value-of {NRPN_*_RAMP} property keyerRamps} */
@@ -572,7 +574,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_PIN_DEBOUNCE	(NRPN_MISC+8) /* {type nrpn label Deb title {debounce period} range {0 16383} unit samples property pinDebounce} */
 #define NRPN_POUT_LOGIC		(NRPN_MISC+9) /* {type nrpn label OutLog title {output pin logic} range {0 1} property pinLogic} */
 #define NRPN_PADC_RATE		(NRPN_MISC+10) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit ms property adc2Control valuesProperty adcControls} */
-#define NRPN_XIQ_FREQ		(NRPN_MISC+11) /* {type nrpn sub ext title {IQ frequency} units hz/10 range {-480000 480000}} */
+#define NRPN_XIQ_FREQ		(NRPN_MISC+11) /* {type nrpn sub ext title {IQ frequency} unit hz/10 range {-480000 480000}} */
 #define NRPN_IQ_USB		(NRPN_MISC+13) /* {type nrpn title {IQ upper sideband} range {0 1}} */
 
 #define NRPN_PIN		(NRPN_MISC+14) /* {type rel title {base of hardware digital input pin common  block}} */
