@@ -231,6 +231,10 @@ static void define_define(void) {
     case NRPN_XTONE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_XTONE+1:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
+    case NRPN_CODEC_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+
     case NRPN_PIN0_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PIN1_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PIN2_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
@@ -273,60 +277,6 @@ static void define_define(void) {
     case NRPN_PADC7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC7_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC7_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-
-    case NRPN_MIX_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_MIX_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-
-    case NRPN_MIX_EN_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_MIX_EN_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-
-    case NRPN_CODEC_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
     case NRPN_WM8960_ENABLE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
     case NRPN_WM8960_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
@@ -381,6 +331,58 @@ static void define_define(void) {
     case NRPN_100MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
 
     case NRPN_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 0, 1, 1); break; // in, out, echo, no write
+    case NRPN_XPTT_TAIL_TIME:	nrpn_define(nrpn, 0, 1, 0, 1, 1); break; // in, out, echo, no write
+    case NRPN_XPTT_TAIL_TIME+1:	nrpn_define(nrpn, 0, 1, 0, 1, 1); break; // in, out, echo, no write
+
+    case NRPN_MIX_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_MIX_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+
+    case NRPN_MIX_EN_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_USB_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_I2S_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_L3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_MIX_EN_HDW_R3:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
 
     default: 
       Serial.printf("default_setup: overlooked nrpn %d\n", nrpn); break;

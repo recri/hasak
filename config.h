@@ -560,7 +560,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define VAL_KEYER_ND7PA	2 /* {type val label nd7pa title {paddle keyer algorithm by nd7pa} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
 #define VAL_KEYER_VK6PH	3 /* {type val label vk6ph title {paddle keyer algorithm by vk6ph} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
 
-#define NRPN_MISC		(NRPN_PAD+6) /* {type rel title {base of miscellaneous parameters}} */
+#define NRPN_MISC	(NRPN_PAD+6) /* {type rel title {base of miscellaneous parameters}} */
 
 #define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+0) /* {type nrpn title {slew ramp for mixer changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
 #define NRPN_MIXER_SLEW_TIME	(NRPN_MISC+1) /* {type nrpn title {slew time for mixer changes} range {0 16383} unit sample property mixerSlewTime} */
@@ -573,8 +573,17 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_POUT_LOGIC		(NRPN_MISC+8) /* {type nrpn label OutLog title {output pin logic} range {0 1} property pinLogic} */
 #define NRPN_PADC_RATE		(NRPN_MISC+9) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit ms property adc2Control valuesProperty adcControls} */
 #define NRPN_XTONE		(NRPN_MISC+10) /* {type nrpn sub ext title {extended tone} unit hz/1000 range {-134217728 134217727}} */
+				/* xnrpn */
 
-#define NRPN_PIN		(NRPN_MISC+12) /* {type rel title {base of hardware digital input pin common  block}} */
+#define NRPN_CODEC	(NRPN_MISC+12) /* {type rel title {base of codec nrpns}} */
+      
+#define NRPN_CODEC_VOLUME	(NRPN_CODEC+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-128 24} property masterVolume} */
+#define NRPN_INPUT_SELECT	(NRPN_CODEC+1) /* {type nrpn label InSel title {input select} values VAL_INPUT_* property inputSelect} */
+#define VAL_INPUT_MIC		0	       /* {type val label Mic title {input select microphone} value-of NRPN_INPUT_SELECT property inputSelects} */
+#define VAL_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of NRPN_INPUT_SELECT property inputSelects} */
+#define NRPN_INPUT_LEVEL	(NRPN_CODEC+2) /* {type nrpn label InLvl title {input level} range {-128 24} unit dB/10 property inputLevel} */
+
+#define NRPN_PIN	(NRPN_CODEC+3) /* {type rel title {base of hardware digital input pin common  block}} */
 
 #define NRPN_PIN0_PIN	(NRPN_PIN+0)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
 #define NRPN_PIN1_PIN	(NRPN_PIN+1)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
@@ -623,9 +632,79 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_PADC7_VAL	(NRPN_PADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
 #define NRPN_PADC7_NRPN	(NRPN_PADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values VAL_PADC_* property adc7Nrpn} */
 
-#define NRPN_MIXER		(NRPN_PADC+KYR_N_PADC*3) /* {type rel title {base of output mixer level block}} */
+#define NRPN_LAST_SAVED		(NRPN_PADC+KYR_N_PADC*3) /* {type rel title {end of persistent params}} */
 
-/* 24 output mixer levels */
+#define NRPN_EPHEMERA		(NRPN_LAST_SAVED) /* {type rel title {base of ephemeral nrpns}} */
+
+#define NRPN_WM8960		(NRPN_EPHEMERA) /* {type rel title {base of WM8960 commands}} */
+
+#define NRPN_WM8960_ENABLE            (NRPN_WM8960+11-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_INPUT_LEVEL       (NRPN_WM8960+12-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_INPUT_SELECT      (NRPN_WM8960+13-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_VOLUME            (NRPN_WM8960+14-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_HEADPHONE_VOLUME  (NRPN_WM8960+15-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_HEADPHONE_POWER   (NRPN_WM8960+16-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_SPEAKER_VOLUME    (NRPN_WM8960+17-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_SPEAKER_POWER     (NRPN_WM8960+18-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_DISABLE_ADCHPF    (NRPN_WM8960+19-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_ENABLE_MICBIAS    (NRPN_WM8960+20-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_ENABLE_ALC        (NRPN_WM8960+21-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_MIC_POWER         (NRPN_WM8960+22-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_LINEIN_POWER      (NRPN_WM8960+23-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_RAW_MASK          (NRPN_WM8960+24-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_RAW_DATA          (NRPN_WM8960+25-11) /* {type cmd title {WM8960 operation}} */
+#define NRPN_WM8960_RAW_WRITE         (NRPN_WM8960+26-11) /* {type cmd title {WM8960 operation}} */
+
+/* relocate the exec and info blocks to contiguous */
+#define NRPN_EXEC	(NRPN_WM8960+16) /* {type rel title {base of command nrpns}} */
+
+#define NRPN_WRITE_EEPROM	(NRPN_EXEC+0) /* {type nrpn sub cmd label {Write EEPROM} title {write nrpn+msgs to eeprom} property writeEEPROM} */
+#define NRPN_READ_EEPROM	(NRPN_EXEC+1) /* {type nrpn sub cmd label {Read EEPROM} title {read nrpn+msgs from eeprom} property loadEEPROM} */
+#define NRPN_SET_DEFAULT	(NRPN_EXEC+2) /* {type nrpn sub cmd label {Reset to default} title {load nrpn with default values} property loadDefaults} */
+#define NRPN_ECHO_ALL		(NRPN_EXEC+3) /* {type nrpn sub cmd label {Echo all} title {echo all set nrpns to midi} property echoAll} */
+#define NRPN_SEND_TEXT		(NRPN_EXEC+4) /* {type nrpn sub cmd label {Send to Text} title {send character value to primary text keyer} property sendText} */
+#define NRPN_SEND_TEXT2		(NRPN_EXEC+5) /* {type nrpn sub cmd label {Send to Text2} title {send character value to secondary text keyer} property sendText2} */
+#define NRPN_MSG_INDEX		(NRPN_EXEC+6) /* {type nrpn sub cmd label {Message byte index} title {set index into msgs} property messageIndex} */
+#define NRPN_MSG_WRITE		(NRPN_EXEC+7) /* {type nrpn sub cmd label {Message write byte} title {set msgs[index++] to value} property messageWrite} */
+#define NRPN_MSG_READ		(NRPN_EXEC+8) /* {type nrpn sub cmd label {Message reqd byte} title {read msgs[index++] and echo the value} property messageRead} */
+
+#define NRPN_INFO	(NRPN_EXEC+9) /* {type rel title {base of information nrpns}} */
+
+#define NRPN_NRPN_SIZE		(NRPN_INFO+0) /* {type nrpn sub info title {size of nrpn array} property nrpnSize} */
+#define NRPN_MSG_SIZE		(NRPN_INFO+1) /* {type nrpn sub info title {send the size of msgs array} property messageSize} */
+#define NRPN_SAMPLE_RATE	(NRPN_INFO+2) /* {type nrpn sub info title {sample rate of audio library} unit sps/100 property sampleRate} */
+#define NRPN_EEPROM_LENGTH	(NRPN_INFO+3) /* {type nrpn sub info title {result of EEPROM.length()} unit bytes property eepromSize} */
+#define NRPN_ID_CPU		(NRPN_INFO+4) /* {type nrpn sub info title {which teensy microprocessor are we running} property identifyCPU} */
+#define NRPN_ID_CODEC		(NRPN_INFO+5) /* {type nrpn sub info title {which codec are we running} property identifyCodec} */
+
+#define NRPN_SCRATCH	(NRPN_INFO+6) /* {type rel title {base of scratch nrpns}} */
+
+/* xnrpns, two word values */
+
+#define NRPN_XPER_DIT		(NRPN_SCRATCH+0) /* {type nrpn sub ext title {samples per dit}} */
+				/* xnrpn */
+#define NRPN_XPER_DAH		(NRPN_SCRATCH+2) /* {type nrpn sub ext title {samples per dah}} */
+				/* xnrpn */
+#define NRPN_XPER_IES		(NRPN_SCRATCH+4) /* {type nrpn sub ext title {samples per inter element space}} */
+				/* xnrpn */
+#define NRPN_XPER_ILS		(NRPN_SCRATCH+6) /* {type nrpn sub ext title {samples per inter letter space}} */
+				/* xnrpn */
+#define NRPN_XPER_IWS		(NRPN_SCRATCH+8) /* {type nrpn sub ext title {samples per inter word space}} */
+				/* xnrpn */
+
+#define NRPN_LOOP		(NRPN_SCRATCH+10) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
+#define NRPN_SAMPLE		(NRPN_SCRATCH+11) /* {type nrpn sub info title {sample counter, 48000Hz}} */
+#define NRPN_UPDATE		(NRPN_SCRATCH+12) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
+#define NRPN_MILLI		(NRPN_SCRATCH+13) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
+#define NRPN_10MILLI		(NRPN_SCRATCH+14) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
+#define NRPN_100MILLI		(NRPN_SCRATCH+15) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
+
+#define NRPN_ACTIVE_ST		(NRPN_SCRATCH+16) /* {type nrpn sub info title {note number of active sidetone source} property keyerActiveSidetone} */
+#define NRPN_XPTT_TAIL_TIME	(NRPN_SCRATCH+17) /* {type nrpn sub info title {max of TAIL_TIME and HANG_TIME in samples} property keyerPTTTailTime} */
+				/* xnrpn */
+#define NRPN_MIXER	(NRPN_SCRATCH+19) /* {type rel title {base of output mixer level block}} */
+
+/* 24 output mixer target levels */
 /* left and right channel mixers for four channels for each of usb_out, i2s_out, and mqs_out */
 /* also left and right channel enables for the same channels */
 /*
@@ -703,79 +782,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_MIX_EN_HDW_R2	(NRPN_MIXER2+22) /* {type nrpn title {enable IQ right to hdw_out right} range {0 1}} */
 #define NRPN_MIX_EN_HDW_R3	(NRPN_MIXER2+23) /* {type nrpn title {enable i2s_in right to hdw_out right} range {0 1}} */
 
-#define NRPN_CODEC		(NRPN_MIXER2+24) /* {type rel title {base of codec nrpns}} */
-      
-#define NRPN_CODEC_VOLUME	(NRPN_CODEC+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-128 24} property masterVolume} */
-#define NRPN_INPUT_SELECT	(NRPN_CODEC+1) /* {type nrpn label InSel title {input select} values VAL_INPUT_* property inputSelect} */
-#define VAL_INPUT_MIC		0	       /* {type val label Mic title {input select microphone} value-of NRPN_INPUT_SELECT property inputSelects} */
-#define VAL_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of NRPN_INPUT_SELECT property inputSelects} */
-#define NRPN_INPUT_LEVEL	(NRPN_CODEC+2) /* {type nrpn label InLvl title {input level} range {-128 24} unit dB/10 property inputLevel} */
-
-#define NRPN_LAST_SAVED		(NRPN_CODEC+3) /* {type rel title {end of persistent params}} */
-
-#define NRPN_EPHEMERA		(NRPN_LAST_SAVED) /* {type rel title {base of ephemeral nrpns}} */
-
-#define NRPN_WM8960		(NRPN_CODEC+3) /* {type rel title {base of WM8960 commands}} */
-
-#define NRPN_WM8960_ENABLE            (NRPN_WM8960+11-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_INPUT_LEVEL       (NRPN_WM8960+12-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_INPUT_SELECT      (NRPN_WM8960+13-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_VOLUME            (NRPN_WM8960+14-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_HEADPHONE_VOLUME  (NRPN_WM8960+15-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_HEADPHONE_POWER   (NRPN_WM8960+16-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_SPEAKER_VOLUME    (NRPN_WM8960+17-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_SPEAKER_POWER     (NRPN_WM8960+18-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_DISABLE_ADCHPF    (NRPN_WM8960+19-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_ENABLE_MICBIAS    (NRPN_WM8960+20-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_ENABLE_ALC        (NRPN_WM8960+21-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_MIC_POWER         (NRPN_WM8960+22-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_LINEIN_POWER      (NRPN_WM8960+23-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_MASK          (NRPN_WM8960+24-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_DATA          (NRPN_WM8960+25-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_WRITE         (NRPN_WM8960+26-11) /* {type cmd title {WM8960 operation}} */
-
-/* relocate the exec and info blocks to contiguous */
-#define NRPN_EXEC		(NRPN_WM8960+16) /* {type rel title {base of command nrpns}} */
-
-#define NRPN_WRITE_EEPROM	(NRPN_EXEC+0) /* {type nrpn sub cmd label {Write EEPROM} title {write nrpn+msgs to eeprom} property writeEEPROM} */
-#define NRPN_READ_EEPROM	(NRPN_EXEC+1) /* {type nrpn sub cmd label {Read EEPROM} title {read nrpn+msgs from eeprom} property loadEEPROM} */
-#define NRPN_SET_DEFAULT	(NRPN_EXEC+2) /* {type nrpn sub cmd label {Reset to default} title {load nrpn with default values} property loadDefaults} */
-#define NRPN_ECHO_ALL		(NRPN_EXEC+3) /* {type nrpn sub cmd label {Echo all} title {echo all set nrpns to midi} property echoAll} */
-#define NRPN_SEND_TEXT		(NRPN_EXEC+4) /* {type nrpn sub cmd label {Send to Text} title {send character value to primary text keyer} property sendText} */
-#define NRPN_SEND_TEXT2		(NRPN_EXEC+5) /* {type nrpn sub cmd label {Send to Text2} title {send character value to secondary text keyer} property sendText2} */
-#define NRPN_MSG_INDEX		(NRPN_EXEC+6) /* {type nrpn sub cmd label {Message byte index} title {set index into msgs} property messageIndex} */
-#define NRPN_MSG_WRITE		(NRPN_EXEC+7) /* {type nrpn sub cmd label {Message write byte} title {set msgs[index++] to value} property messageWrite} */
-#define NRPN_MSG_READ		(NRPN_EXEC+8) /* {type nrpn sub cmd label {Message reqd byte} title {read msgs[index++] and echo the value} property messageRead} */
-
-#define NRPN_INFO		(NRPN_EXEC+9) /* {type rel title {base of information nrpns}} */
-
-#define NRPN_NRPN_SIZE		(NRPN_INFO+0) /* {type nrpn sub info title {size of nrpn array} property nrpnSize} */
-#define NRPN_MSG_SIZE		(NRPN_INFO+1) /* {type nrpn sub info title {send the size of msgs array} property messageSize} */
-#define NRPN_SAMPLE_RATE	(NRPN_INFO+2) /* {type nrpn sub info title {sample rate of audio library} unit sps/100 property sampleRate} */
-#define NRPN_EEPROM_LENGTH	(NRPN_INFO+3) /* {type nrpn sub info title {result of EEPROM.length()} unit bytes property eepromSize} */
-#define NRPN_ID_CPU		(NRPN_INFO+4) /* {type nrpn sub info title {which teensy microprocessor are we running} property identifyCPU} */
-#define NRPN_ID_CODEC		(NRPN_INFO+5) /* {type nrpn sub info title {which codec are we running} property identifyCodec} */
-
-#define NRPN_SCRATCH		(NRPN_INFO+6) /* {type rel title {base of scratch nrpns}} */
-
-/* xnrpns, two word values */
-
-#define NRPN_XPER_DIT		(NRPN_SCRATCH+0) /* {type nrpn sub ext title {samples per dit}} */
-#define NRPN_XPER_DAH		(NRPN_SCRATCH+2) /* {type nrpn sub ext title {samples per dah}} */
-#define NRPN_XPER_IES		(NRPN_SCRATCH+4) /* {type nrpn sub ext title {samples per inter element space}} */
-#define NRPN_XPER_ILS		(NRPN_SCRATCH+6) /* {type nrpn sub ext title {samples per inter letter space}} */
-#define NRPN_XPER_IWS		(NRPN_SCRATCH+8) /* {type nrpn sub ext title {samples per inter word space}} */
-
-#define NRPN_LOOP		(NRPN_SCRATCH+10) /* {type nrpn sub info title {loop counter, ?1.5MHz}} */
-#define NRPN_SAMPLE		(NRPN_SCRATCH+11) /* {type nrpn sub info title {sample counter, 48000Hz}} */
-#define NRPN_UPDATE		(NRPN_SCRATCH+12) /* {type nrpn sub info title {buffer update counter, 1500Hz }} */
-#define NRPN_MILLI		(NRPN_SCRATCH+13) /* {type nrpn sub info title {millisecond counter, 1000Hz}} */
-#define NRPN_10MILLI		(NRPN_SCRATCH+14) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
-#define NRPN_100MILLI		(NRPN_SCRATCH+15) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
-
-#define NRPN_ACTIVE_ST		(NRPN_SCRATCH+16) /* {type nrpn sub info title {note number of active sidetone source} property keyerActiveSidetone} */
-
-#define NRPN_LAST		(NRPN_SCRATCH+17) /* {type rel title {end of all nrpns}} */
+#define NRPN_LAST		(NRPN_MIXER2+24) /* {type rel title {end of all nrpns}} */
 
 #define KYR_N_NRPN		(NRPN_LAST)   /* {type def title {number of nrpns defined}} */
 

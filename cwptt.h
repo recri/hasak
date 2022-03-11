@@ -30,11 +30,9 @@
 
 static elapsedSamples cwptt_tail_counter; /* count down the time */
 static RingBuffer<uint32_t,256> cwptt_delay_line;
-static unsigned long cwptt_tail_time;
-static byte cwptt_tail_time_is_stale = 1; /* flag for initial computation */
 
 static void cwptt_nrpn_listener(int nrpn, int _) {
-  cwptt_tail_time_is_stale = 1;	/* flag for recompute */
+  xnrpn_set(NRPN_XPTT_TAIL_TIME, max(nrpn_get(NRPN_TAIL_TIME), nrpn_get(NRPN_HANG_TIME)*xnrpn_get(NRPN_XPER_DIT)));
 }
 
 static void cwptt_sidetone_listener(int note, int _) {
@@ -53,13 +51,9 @@ static void cwptt_key_out_listener(int note, int _) {
 }
 
 static void cwptt_sample(int nrpn, int _) {
-  if (cwptt_tail_time_is_stale) {
-    cwptt_tail_time_is_stale = 0;
-    cwptt_tail_time = max(nrpn_get(NRPN_TAIL_TIME), nrpn_get(NRPN_HANG_TIME)*xnrpn_get(NRPN_XPER_DIT));
-  }
   if (note_get(NOTE_PTT_OUT) &&		      /* ptt tx is on */
       note_get(NOTE_KEY_OUT) == 0 &&	      /* key tx is off */
-      cwptt_tail_counter > cwptt_tail_time) { /* tail has expired */
+      cwptt_tail_counter > xnrpn_get(NRPN_XPTT_TAIL_TIME)) { /* tail has expired */
     note_toggle(NOTE_PTT_OUT);		      /* ptt off */
   }
   if (cwptt_delay_line.can_get() &&	      /* something is queued */ 
@@ -70,13 +64,12 @@ static void cwptt_sample(int nrpn, int _) {
 }
 
 static void cwptt_setup(void) {
-  cwptt_tail_time_is_stale = 1;			    // flag for recompute
-  nrpn_listen(NRPN_TAIL_TIME, cwptt_nrpn_listener); // and reflag when necessary
-  nrpn_listen(NRPN_HANG_TIME, cwptt_nrpn_listener); // and reflag when necessary
-  nrpn_listen(NRPN_XPER_DIT+1, cwptt_nrpn_listener); // and reflag when necessary
+
+  nrpn_listen(NRPN_TAIL_TIME, cwptt_nrpn_listener); // recompute tail
+  nrpn_listen(NRPN_HANG_TIME, cwptt_nrpn_listener); // recompute tail
+  nrpn_listen(NRPN_XPER_DIT+1, cwptt_nrpn_listener);// recompute tail
+
   note_listen(NOTE_KEY_ST, cwptt_sidetone_listener);
   note_listen(NOTE_KEY_OUT, cwptt_key_out_listener);
   nrpn_listen(NRPN_SAMPLE, cwptt_sample);
 }
-
-// static void cwptt_loop(void) {}

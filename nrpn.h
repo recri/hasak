@@ -145,17 +145,13 @@ static void nrpn_recompute_mixer_enables(int nrpn, int _) {
     const int l = (i%4)+(i/4)*8;
     const int r = l+4;
     const int v = (value & (1<<(11-i))) != 0;
-    if (nrpn == NRPN_MIX_ENABLE) {
-      nrpn_set(NRPN_MIXER2+l, v);
-      nrpn_set(NRPN_MIXER2+r, v);
-    } else if (nrpn == NRPN_MIX_ENABLE_L) {
-      nrpn_set(NRPN_MIXER2+l, v);
-    } else if (nrpn == NRPN_MIX_ENABLE_R) {
-      nrpn_set(NRPN_MIXER2+r, v);
-    } else {
-      Serial.printf("bad nrpn %d in nrpn_recompute_mixer_enables\n");
-    }
+    if (nrpn == NRPN_MIX_ENABLE || nrpn == NRPN_MIX_ENABLE_L) nrpn_set(NRPN_MIXER2+l, v);
+    if (nrpn == NRPN_MIX_ENABLE || nrpn == NRPN_MIX_ENABLE_R) nrpn_set(NRPN_MIXER2+r, v);
   }
+}
+
+/* compute mixer targets from levels and balance controls */
+static void nrpn_recompute_mixer_targets(int nrpn, int _) {
 }
 
 /* 
