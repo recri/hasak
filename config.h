@@ -517,7 +517,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_KEYER		(NRPN_LVL+7) /* {type rel title {base of vox specialized keyer parameters}} */
 
-#define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn title {sidetone and IQ oscillator frequency} range {0 16383} unit Hz/10 property keyerTone} */
+#define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn title {sidetone and IQ oscillator frequency} range {-8192 8191} unit Hz property keyerTone} */
 #define NRPN_SPEED		(NRPN_KEYER+1) /* {type nrpn title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
 #define NRPN_WEIGHT		(NRPN_KEYER+2) /* {type nrpn title {keyer mark/space weight} range {25 75} unit % default 50 property keyerWeight} */
 #define NRPN_RATIO		(NRPN_KEYER+3) /* {type nrpn title {keyer dit/dah ratio} range {25 75} unit % default 50 property keyerRatio} */
@@ -562,21 +562,19 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_MISC		(NRPN_PAD+6) /* {type rel title {base of miscellaneous parameters}} */
 
-#define NRPN_ACTIVE_ST		(NRPN_MISC+0) /* {type nrpn sub info title {note number of active sidetone source} property keyerActiveSidetone} */
-#define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+1) /* {type nrpn title {slew ramp for mixer changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
-#define NRPN_MIXER_SLEW_TIME	(NRPN_MISC+2) /* {type nrpn title {slew time for mixer changes} range {0 16383} unit sample property mixerSlewTime} */
-#define NRPN_FREQ_SLEW_RAMP	(NRPN_MISC+3) /* {type nrpn title {slew ramp for frequency changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
-#define NRPN_FREQ_SLEW_TIME	(NRPN_MISC+4) /* {type nrpn title {slew time for frquency changes} range {0 16383} unit sample property mixerSlewTime} */
-#define NRPN_MIX_ENABLE		(NRPN_MISC+5) /* {type nrpn sub short label OutMix title {output mixer enable bits, shorthand} range {0 4095} property outputEnable} */
-#define NRPN_MIX_ENABLE_L	(NRPN_MISC+6) /* {type nrpn sub short label OutMixL title {output mixer left enable bits, shorthand} range {0 4095} property outputEnableLeft} */
-#define NRPN_MIX_ENABLE_R	(NRPN_MISC+7) /* {type nrpn sub short label OutMixR title {output mixer right enable bits, shorthand} range {0 4095} property outputEnableRight} */
-#define NRPN_PIN_DEBOUNCE	(NRPN_MISC+8) /* {type nrpn label Deb title {debounce period} range {0 16383} unit samples property pinDebounce} */
-#define NRPN_POUT_LOGIC		(NRPN_MISC+9) /* {type nrpn label OutLog title {output pin logic} range {0 1} property pinLogic} */
-#define NRPN_PADC_RATE		(NRPN_MISC+10) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit ms property adc2Control valuesProperty adcControls} */
-#define NRPN_XIQ_FREQ		(NRPN_MISC+11) /* {type nrpn sub ext title {IQ frequency} unit hz/10 range {-480000 480000}} */
-#define NRPN_IQ_USB		(NRPN_MISC+13) /* {type nrpn title {IQ upper sideband} range {0 1}} */
+#define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+0) /* {type nrpn title {slew ramp for mixer changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define NRPN_MIXER_SLEW_TIME	(NRPN_MISC+1) /* {type nrpn title {slew time for mixer changes} range {0 16383} unit sample property mixerSlewTime} */
+#define NRPN_FREQ_SLEW_RAMP	(NRPN_MISC+2) /* {type nrpn title {slew ramp for frequency changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define NRPN_FREQ_SLEW_TIME	(NRPN_MISC+3) /* {type nrpn title {slew time for frquency changes} range {0 16383} unit sample property mixerSlewTime} */
+#define NRPN_MIX_ENABLE		(NRPN_MISC+4) /* {type nrpn sub short label OutMix title {output mixer enable bits, shorthand} range {0 4095} property outputEnable} */
+#define NRPN_MIX_ENABLE_L	(NRPN_MISC+5) /* {type nrpn sub short label OutMixL title {output mixer left enable bits, shorthand} range {0 4095} property outputEnableLeft} */
+#define NRPN_MIX_ENABLE_R	(NRPN_MISC+6) /* {type nrpn sub short label OutMixR title {output mixer right enable bits, shorthand} range {0 4095} property outputEnableRight} */
+#define NRPN_PIN_DEBOUNCE	(NRPN_MISC+7) /* {type nrpn label Deb title {debounce period} range {0 16383} unit samples property pinDebounce} */
+#define NRPN_POUT_LOGIC		(NRPN_MISC+8) /* {type nrpn label OutLog title {output pin logic} range {0 1} property pinLogic} */
+#define NRPN_PADC_RATE		(NRPN_MISC+9) /* {type nrpn label AdcRate title {sample rate for analog sampling} range {0 16383} unit ms property adc2Control valuesProperty adcControls} */
+#define NRPN_XTONE		(NRPN_MISC+10) /* {type nrpn sub ext title {extended tone} unit hz/1000 range {-134217728 134217727}} */
 
-#define NRPN_PIN		(NRPN_MISC+14) /* {type rel title {base of hardware digital input pin common  block}} */
+#define NRPN_PIN		(NRPN_MISC+12) /* {type rel title {base of hardware digital input pin common  block}} */
 
 #define NRPN_PIN0_PIN	(NRPN_PIN+0)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
 #define NRPN_PIN1_PIN	(NRPN_PIN+1)  /* {type nrpn label Pin title {input hardware pin to read} range {-1 127} property inpinPin} */
@@ -761,6 +759,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_SCRATCH		(NRPN_INFO+6) /* {type rel title {base of scratch nrpns}} */
 
 /* xnrpns, two word values */
+
 #define NRPN_XPER_DIT		(NRPN_SCRATCH+0) /* {type nrpn sub ext title {samples per dit}} */
 #define NRPN_XPER_DAH		(NRPN_SCRATCH+2) /* {type nrpn sub ext title {samples per dah}} */
 #define NRPN_XPER_IES		(NRPN_SCRATCH+4) /* {type nrpn sub ext title {samples per inter element space}} */
@@ -774,13 +773,15 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_10MILLI		(NRPN_SCRATCH+14) /* {type nrpn sub info title {10 millisecond counter, 100Hz}} */
 #define NRPN_100MILLI		(NRPN_SCRATCH+15) /* {type nrpn sub info title {100 millisecond counter, 10Hz}} */
 
-#define NRPN_LAST		(NRPN_SCRATCH+16) /* {type rel title {end of all nrpns}} */
+#define NRPN_ACTIVE_ST		(NRPN_SCRATCH+16) /* {type nrpn sub info title {note number of active sidetone source} property keyerActiveSidetone} */
+
+#define NRPN_LAST		(NRPN_SCRATCH+17) /* {type rel title {end of all nrpns}} */
 
 #define KYR_N_NRPN		(NRPN_LAST)   /* {type def title {number of nrpns defined}} */
 
 /* definitions of ADC targets, these had undefined symbols when placed immediately after NRPN_PADC* */
 #define VAL_PADC_NOTHING	(NRPN_NOTHING) /* {type val label None title {pot controls nothing} value-of NRPN_PADC*_NRPN property adcControls} */
-#define VAL_PADC_VOLUME	(NRPN_VOLUME) /* {type val label Volume title {pot controls master volume} value-of NRPN_PADC*_NRP property adcControls} */
+#define VAL_PADC_VOLUME		(NRPN_VOLUME) /* {type val label Volume title {pot controls master volume} value-of NRPN_PADC*_NRP property adcControls} */
 #define VAL_PADC_LEVEL		(NRPN_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_TONE		(NRPN_TONE) /* {type val label Tone title {pot controls sidetone pitch} value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_SPEED		(NRPN_SPEED) /* {type val label Speed title {pot controls keyer speed} value-of NRPN_PADC*_NRPN property adcControls} */
@@ -790,7 +791,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define VAL_PADC_TAIL_TIME	(NRPN_TAIL_TIME) /* {type val label PTTTail title NRPN_TAIL_TIME value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_RISE_TIME	(NRPN_RISE_TIME) /* {type val label Rise title NRPN_RISE_TIME value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_FALL_TIME	(NRPN_FALL_TIME) /* {type val label Fall title NRPN_FALL_TIME value-of NRPN_PADC*_NRPN property adcControls} */
-#define VAL_PADC_WEIGHT	(NRPN_WEIGHT) /* {type val label Weight title NRPN_WEIGHT value-of NRPN_PADC*_NRPN property adcControls} */
+#define VAL_PADC_WEIGHT		(NRPN_WEIGHT) /* {type val label Weight title NRPN_WEIGHT value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_RATIO		(NRPN_RATIO) /* {type val label Ratio title NRPN_RATIO value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_SPEED_FRAC	(NRPN_SPEED_FRAC) /* {type val label Frac title NRPN_SPEED_FRAC value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_CODEC_VOLUME	(NRPN_CODEC_VOLUME) /* {type val label Frac title NRPN_CODEC_VOLUME value-of NRPN_PADC*_NRPN property adcControls} */

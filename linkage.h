@@ -43,6 +43,7 @@ static inline float samples_to_tenth_ms(const int32_t samples) { return samples 
 static inline float tenth_ms_to_ms(const int16_t tenthms) { return tenthms*0.1f; }
 static inline float int_to_127ths(const int16_t val) { return val*0.007874f; }
 static inline int16_t signed_value(const int16_t val) { return ((int16_t)(val<<2))>>2; }
+static inline int32_t signed_xvalue(const int32_t val) { return ((int32_t)(val<<4))>>4; }
 static inline float tenthdbtolinear(const int16_t val) { return min(2,powf(10.0f, val/(10.0*20.0))); } // tenthdb == dB/10
 static inline float qtrdbtolinear(const int16_t val) { return min(2,powf(10.0f, val/(4.0*20.0))); } // qtrdb == db/4
 

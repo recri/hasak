@@ -58,6 +58,13 @@ static hasak_t hasak = {
 };
 
 /*
+** mirror settings to NRPN_TONE into NRPN_XTONE
+*/
+static void nrpn_mirror_xtone(int nrpn, int _) {
+  xnrpn_set(NRPN_XTONE, signed_value(nrpn_get(NRPN_TONE))*1000); // Hz to Hz/1000
+}
+
+/*
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
@@ -343,7 +350,6 @@ static void nrpn_set_default(void) {
   // nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_ND7PA);
   // nrpn_set(NRPN_PAD_KEYER, VAL_KEYER_K1EL);
 
-  nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
   nrpn_set(NRPN_MIXER_SLEW_RAMP, VAL_RAMP_HANN);
   nrpn_set(NRPN_MIXER_SLEW_TIME, 128);
   nrpn_set(NRPN_FREQ_SLEW_RAMP, VAL_RAMP_HANN);
@@ -351,8 +357,6 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_PIN_DEBOUNCE, 1000);
   nrpn_set(NRPN_POUT_LOGIC, 1);
   nrpn_set(NRPN_PADC_RATE, 32);
-  xnrpn_set(NRPN_XIQ_FREQ, 600);
-  nrpn_set(NRPN_IQ_USB, 1);
 
   nrpn_set(NRPN_PIN0_PIN, KYR_L_PAD_PIN);  // left paddle pin
   nrpn_set(NRPN_PIN1_PIN, KYR_R_PAD_PIN);  // right paddle pin
@@ -389,6 +393,8 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_PADC7_PIN, 127);
   nrpn_set(NRPN_PADC7_NRPN, -1);
 
+  nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
+
   /* output mixers */
   for (int i = NRPN_MIXER; i < NRPN_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
 
@@ -417,6 +423,9 @@ static void nrpn_set_default_shim(int nrpn, int _) {
 static void nrpn_setup(void) {
   /* bootstrap controller */
 
+  /* sidetone, mirror TONE to XTONE */
+  nrpn_listen(NRPN_TONE, nrpn_mirror_xtone);
+  
   /* morse timing update, listen for changes */
   nrpn_listen(NRPN_SPEED, nrpn_recompute_morse);
   nrpn_listen(NRPN_SPEED_FRAC, nrpn_recompute_morse);

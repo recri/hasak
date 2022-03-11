@@ -218,7 +218,6 @@ static void define_define(void) {
     case NRPN_AUTO_IWS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
     case NRPN_PAD_KEYER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case NRPN_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 0, 1, 1); break; // in, out, echo, no write
     case NRPN_MIXER_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_MIXER_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_FREQ_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
@@ -229,9 +228,8 @@ static void define_define(void) {
     case NRPN_PIN_DEBOUNCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_POUT_LOGIC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
     case NRPN_PADC_RATE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_XIQ_FREQ:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_XIQ_FREQ+1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_IQ_USB:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_XTONE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_XTONE+1:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
     case NRPN_PIN0_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PIN1_PIN:		nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
@@ -381,6 +379,9 @@ static void define_define(void) {
     case NRPN_MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
     case NRPN_10MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
     case NRPN_100MILLI:		nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, no write : counters
+
+    case NRPN_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 0, 1, 1); break; // in, out, echo, no write
+
     default: 
       Serial.printf("default_setup: overlooked nrpn %d\n", nrpn); break;
     }

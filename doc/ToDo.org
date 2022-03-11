@@ -1,9 +1,10 @@
 * Todo list as of 2022-02-24
-[ ] define NRPN_QUERY so it can read out notes, ctrls, and nrpns.
+[ ] define NRPN_QUERY so it can read out notes, ctrls, nrpns, and flags.
 	index = note || ctrl+N_NOTE || nrpn+N_NOTE+N_CTRL ||
 		flag+N_NOTE+N_CTRL+N_NRPN
-[ ] move NRPN_ACTIVE_ST into the attic.
-[ ] remove NRPN_IQ_USB, change TONE to -8192 .. 8191 Hz
+[x] move NRPN_ACTIVE_ST into the attic.
+[x] remove NRPN_IQ_USB, change TONE to -8192 .. 8191 Hz, make XIQ_FREQ into XTONE
+	XTONE set from TONE 
 [x] move the morse code table into flash.
 [ ] add a table of prosigns used and use them when
 	pure morse translation fails.

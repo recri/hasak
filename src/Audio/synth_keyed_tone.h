@@ -67,6 +67,8 @@ class AudioSynthKeyedTone : public AudioStream
 public:
   AudioSynthKeyedTone(int channels=1) : AudioStream(1, inputQueueArray), channels(channels) {
     position = 0;
+    phase_I = +45.0 * (4294967296.0 / 360.0);
+    phase_Q = (360-45.0) * (4294967296.0 / 360.0);
   }
   // fetch the current parameters for the rise ramp, and fall ramp
   // oscillatar may vary
@@ -75,12 +77,6 @@ public:
     fall_rate = 0xFFFFFFFFu / get_nrpn(NRPN_FALL_TIME); // ramp fall time in samples
     table = get_table(get_nrpn(NRPN_RISE_RAMP));
     fall_table = get_table(get_nrpn(NRPN_FALL_RAMP));
-    phase_I = +45.0 * (4294967296.0 / 360.0);
-    phase_Q = (360-45.0) * (4294967296.0 / 360.0);
-    if (get_nrpn(NRPN_IQ_USB)) {
-      phase_I = (360-45.0) * (4294967296.0 / 360.0);
-      phase_Q = +45.0 * (4294967296.0 / 360.0); 
-    }
   }
   // fetch the current parameters for the fall ramp
   void start_fall() {
@@ -128,7 +124,8 @@ public:
     return tenthdbtolinear127(signed_value(get_nrpn(NRPN_LEVEL)))*((val1+val2)>>7); // 7 bit level applied to 31 bit fractions
   }
   uint32_t phase_increment(void) {
-    return get_nrpn(NRPN_TONE) * 0.1f * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT); // convert from tenths of hertz to hertz
+    // this can be simplified to an integer multiply
+    return signed_xvalue(get_xnrpn(NRPN_XTONE)) * 0.001f * (4294967296.0f / AUDIO_SAMPLE_RATE_EXACT); // convert from thousandths of hertz to hertz
   }
   virtual void update(void);
 private:

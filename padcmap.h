@@ -28,8 +28,8 @@
 */
 #define KYR_PADC_VOLUME_MAX -320 /* -32dB */
 #define KYR_PADC_VOLUME_MIN 0	/*  0dB */
-#define KYR_PADC_TONE_MAX 2500	/*  250.0Hz */
-#define KYR_PADC_TONE_MIN 12500	/* 1250.0Hz */
+#define KYR_PADC_TONE_MAX 250	/*  250Hz */
+#define KYR_PADC_TONE_MIN 1250	/* 1250Hz */
 #define KYR_PADC_SPEED_MAX 5	/* 5 wpm */
 #define KYR_PADC_SPEED_MIN 55	/* 55 wpm */
 #define KYR_PADC_FRAC_MAX 0	/* 0/128th */

@@ -317,7 +317,6 @@ static struct { short nrpn; const char*name; } diag_nrpn[] = {
   NRPN_PAD_KEYER, "_KEYER",
 
   -1, "MISC",
-  NRPN_ACTIVE_ST, "ACTIVE_ST",
   NRPN_MIXER_SLEW_RAMP, "L_SLEW_RMP",
   NRPN_MIXER_SLEW_TIME, "L_SLEW",
   NRPN_FREQ_SLEW_RAMP, "F_SLEW_RMP",
@@ -330,11 +329,9 @@ static struct { short nrpn; const char*name; } diag_nrpn[] = {
   NRPN_PIN_DEBOUNCE, "PIN_DEB",
   NRPN_POUT_LOGIC, "POUT_LOG",
   NRPN_PADC_RATE, "ADC_RATE",
-  NRPN_XIQ_FREQ, "XIQ_FREQ",
-  NRPN_XIQ_FREQ+1, "",
+  NRPN_XTONE, "XTONE",
+  NRPN_XTONE+1, "",
   
-  NRPN_IQ_USB, "IQ_USB",
-
   -1, "PIN",
   NRPN_PIN0_PIN, "P0",
   NRPN_PIN1_PIN, "P1",
