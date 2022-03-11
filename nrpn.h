@@ -292,7 +292,7 @@ static void nrpn_set_default(void) {
   // nrpn_set(NRPN_OUTPUT_ENABLE, 1); moved to end
   nrpn_set(NRPN_ECHO_ENABLE, 1);
   nrpn_set(NRPN_LISTENER_ENABLE, 1);
-  nrpn_set(NRPN_STRING_THROTTLE, 300);
+  nrpn_set(NRPN_STRING_THROTTLE, 3000);
   
   nrpn_set(NRPN_PIN_ENABLE, 1);
   nrpn_set(NRPN_POUT_ENABLE, 1);

@@ -1,4 +1,6 @@
 * Todo list as of 2022-02-24
+[ ] define NRPN_QUERY so it can read out notes, ctrls, and nrpns.
+[ ] move NRPN_ACTIVE_ST into the attic.
 [ ] move the morse code table into flash.
 [ ] add a table of prosigns used and use them when
 	pure morse translation fails.

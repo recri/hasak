@@ -218,7 +218,7 @@ static void define_define(void) {
     case NRPN_AUTO_IWS:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
     case NRPN_PAD_KEYER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-    case NRPN_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write
+    case NRPN_ACTIVE_ST:	nrpn_define(nrpn, 0, 1, 0, 1, 1); break; // in, out, echo, no write
     case NRPN_MIXER_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_MIXER_SLEW_TIME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_FREQ_SLEW_RAMP:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
