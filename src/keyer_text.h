@@ -30,6 +30,7 @@
 #include "../config.h"
 #include "../linkage.h"
 #include "../timers.h"
+// #include "../cwmorse.h"
 
 #include "keyer_timing_generic.h"
 #include "ring_buffer.h"
@@ -68,7 +69,7 @@ public:
   int sounding(void) { return st_note == nrpn_get(NRPN_ACTIVE_ST); }
 
   uint8_t map_text(uint8_t value) {
-    if (value-33 >= 0 && value-33 < 64 && nrpn_get(NRPN_MORSE+value-33) != 1)
+    if (value-33 >= 0 && value-33 < 64 && cwmorse[value-33] != 1)
       return value;
     if ('a' <= value && value <= 'z') // a-z => A-Z
       return value-32;
@@ -123,7 +124,7 @@ public:
 	} else if (value == '\e') { // prosign together the next two characters
 	  prosign += 1;
 	} else {
-	  code = nrpn_get(NRPN_MORSE+value-33);
+	  code = cwmorse[value-33];
 	  if (code > 1)
 	    timing_element = key_ies;
 	}

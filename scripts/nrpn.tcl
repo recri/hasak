@@ -151,7 +151,43 @@ proc jsformat {values} {
 // do not edit, regenerated from .../hasak/config.h by .../hasak/doc/nrpn.tcl output js
 export const hasakProperties = {\n    [join [jsformat-all $values] $d]\n};"
 }
-
+proc json-minimize {values} {
+    set min [dict create]
+    set minnrpn [dict get $values NRPN_CHANNEL value]
+    set maxnrpn [dict get $values NRPN_PIN value]
+    dict for {key table} $values {
+	dict with table {
+	    switch -regexp $key {
+		^KYR_VERSION$ { dict set min $key $table }
+		^KYR_N_(NOTE|CTRL|NRPN)$ { dict set min $key $table }
+		^KYR_.*$ continue
+		^NOTE_MIDI_.*$ { dict set min $key $table }
+		^NOTE_.*$ continue
+		^CTRL_.*$ { dict set min $key $table }
+		^NRPN_CODEC_VOLUME$ { dict set min $key $table }
+		^NRPN_INPUT_SELECT$ { dict set min $key $table }
+		^NRPN_SET_DEFAULT$ { dict set min $key $table }
+		^NRPN_ECHO_ALL$ { dict set min $key $table }
+		^NRPN_ID_DEVICE$  { dict set min $key $table }
+		^NRPN_ID_VERSION$ { dict set min $key $table }
+		^NRPN_STRING_.*$ { dict set min $key $table }
+		^NRPN_SPEED_FRAC$ continue
+		^NRPN_.*$ {
+		    if {$type eq {rel}} continue
+		    if {$value >= $minnrpn && $value < $maxnrpn} { dict set min $key $table }
+		}
+		^VAL_PADC_.*$ continue
+		^VAL_.*$ { dict set min $key $table }
+		^ENDP_JSON_TO_HOST$ { dict set min $key $table }
+		^ENDP_.*$ continue
+		default {
+		    puts stderr "not matching \"$key\" in jsformat-all"
+		}
+	    }
+	}
+    }
+    return $min
+}
 proc jsonformat {values} {
     set ::jsquoted 1
     set d ",\n    "
@@ -310,6 +346,7 @@ proc main {argv} {
 	}
 	{js} { puts [jsformat $values] }
 	{json-in-c} { puts [jsoninc $values] }
+	{min-json-in-c} { puts [jsoninc [json-minimize $values]] }
 	{json} { puts [jsonformat $values] }
 	all {
 	    dict for {name table} $values {

@@ -1,23 +1,30 @@
 * Todo list as of 2022-02-24
 [ ] define NRPN_QUERY so it can read out notes, ctrls, and nrpns.
+	index = note || ctrl+N_NOTE || nrpn+N_NOTE+N_CTRL ||
+		flag+N_NOTE+N_CTRL+N_NRPN
 [ ] move NRPN_ACTIVE_ST into the attic.
-[ ] move the morse code table into flash.
+[ ] remove NRPN_IQ_USB, change TONE to -8192 .. 8191 Hz
+[x] move the morse code table into flash.
 [ ] add a table of prosigns used and use them when
 	pure morse translation fails.
 [ ] add a coin cell to enable RTC on 4.0, 4.1, 3.2, 3.5, 3.6
 	put it on a dongle. The 3.2 needs a 32.768 crystal
 	added.
 [ ] add nrpns for RTC access.	
+[ ] disabled ouput for NRPN_ACTIVE_ST
 [x] moved the timer counts to ephemera and disabled sending
 	again there might be reason to echo, but never output
 [x] raised the padc rate to 64ms
+[x] raised the string_throttle to 3000, still losing
 [ ] interesting, hearing clicks in the sidetone volume, maybe to
 	do with the increased padc rate?  Or maybe the mixer
 	ramp time is too short.  or maybe there are too many
 	short ramps under PADC control.
-[ ] decide why initial probe is not seeing ID_DEVICE and VERSION.
+[x] decide why initial probe is not seeing ID_DEVICE and VERSION.
 [x] increase the sample rate for analog pins to 64ms
 [x] do not output analog sample raw values
+[ ] redo string byte to send 2 characters per NRPN
+[ ] redo string byte to use NRPN register for third character per NRPN
 [ ] there's an argument for letting analog samples be read which
 	would require splitting the ENABLE_OUTPUT into two cases,
 	or changing ENABLE_ECHO so that it can echo even if output 

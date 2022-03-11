@@ -36,13 +36,13 @@ static void define_define(void) {
   for (int note = 0; note < KYR_N_NOTE; note += 1)
     switch (note) {		//          note, v, i, o, e, ro
     case NOTE_MIDI_OUT_KEY:	note_define(note, 0, 0, 1, 0, 0); break; // output
-    case NOTE_MIDI_OUT_PTT:	note_define(note, 0, 0, 0, 0, 0); break;
+    case NOTE_MIDI_OUT_PTT:	note_define(note, 0, 0, 1, 0, 0); break;
     case NOTE_MIDI_IN_TUNE:	note_define(note, 0, 1, 0, 0, 0); break; // input
-    case NOTE_MIDI_OUT_ST:	note_define(note, 0, 0, 0, 0, 0); break;
-    case NOTE_MIDI_VOL:		note_define(note, 0, 1, 1, 1, 0); break;
-    case NOTE_MIDI_ST_VOL:	note_define(note, 0, 1, 1, 1, 0); break;
-    case NOTE_MIDI_ST_FREQ:	note_define(note, 0, 1, 1, 1, 0); break;
-    case NOTE_MIDI_SPEED:	note_define(note, 0, 1, 1, 1, 0); break;
+    case NOTE_MIDI_OUT_ST:	note_define(note, 0, 0, 1, 0, 0); break;
+    case NOTE_MIDI_VOL:		note_define(note, 0, 1, 1, 0, 0); break;
+    case NOTE_MIDI_ST_VOL:	note_define(note, 0, 1, 1, 0, 0); break;
+    case NOTE_MIDI_ST_FREQ:	note_define(note, 0, 1, 1, 0, 0); break;
+    case NOTE_MIDI_SPEED:	note_define(note, 0, 1, 1, 0, 0); break;
     case NOTE_PIN0:		note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_PIN1:		note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_PIN2:		note_define(note, 0, 0, 0, 0, 0); break;
@@ -276,18 +276,6 @@ static void define_define(void) {
     case NRPN_PADC7_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC7_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
-      /* morse code block */
-#define M(N) (NRPN_MORSE+(N))
-    case M( 0+0): case M( 0+1): case M( 0+2): case M( 0+3): case M( 0+4): case M( 0+5): case M( 0+6): case M( 0+7):
-    case M( 8+0): case M( 8+1): case M( 8+2): case M( 8+3): case M( 8+4): case M( 8+5): case M( 8+6): case M( 8+7):
-    case M(16+0): case M(16+1): case M(16+2): case M(16+3): case M(16+4): case M(16+5): case M(16+6): case M(16+7):
-    case M(24+0): case M(24+1): case M(24+2): case M(24+3): case M(24+4): case M(24+5): case M(24+6): case M(24+7):
-    case M(32+0): case M(32+1): case M(32+2): case M(32+3): case M(32+4): case M(32+5): case M(32+6): case M(32+7):
-    case M(40+0): case M(40+1): case M(40+2): case M(40+3): case M(40+4): case M(40+5): case M(40+6): case M(40+7):
-    case M(48+0): case M(48+1): case M(48+2): case M(48+3): case M(48+4): case M(48+5): case M(48+6): case M(48+7):
-    case M(56+0): case M(56+1): case M(56+2): case M(56+3): case M(56+4): case M(56+5): case M(56+6): case M(56+7):
-#undef M
-				nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_MIX_USB_L0:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_MIX_USB_L1:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_MIX_USB_L2:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write

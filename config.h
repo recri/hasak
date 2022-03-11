@@ -428,11 +428,10 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 ** NRPN_PTT - ptt timing
 ** NRPN_RAMP - keying ramps
 ** NRPN_PAD - paddle keyer
-** NRPN_MISC -
+** NRPN_MISC - leftovers
 ** NRPN_PIN - digital inputs
 ** NRPN_POUT - digital outputs
 ** NRPN_ADC - analog inputs
-** NRPN_MORSE - morse code table
 ** NRPN_MIXER -  24 output mixer levels
 ** NRPN_MIXER2 - 24 output mixer enables
 ** end of saved parameters
@@ -626,14 +625,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_PADC7_VAL	(NRPN_PADC6_VAL+3) /* {type nrpn label adc7Val title {analog value for adc7} range {0 1023} property adc7Val} */
 #define NRPN_PADC7_NRPN	(NRPN_PADC6_NRPN+3) /* {type nrpn label adc7Nrpn title {nrpn connected to adc7} values VAL_PADC_* property adc7Nrpn} */
 
-#define NRPN_MORSE	(NRPN_PADC+KYR_N_PADC*3) /* {type rel title {morse code table base}} */
-
-/* 64 morse code translations */
-/* morse table for (7 bit ascii)-33, covers ! through `, with many holes */
-/* lower case alpha are mapped to upper case on input */
-// #define VAL_MORSE_TABLE "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
-
-#define NRPN_MIXER		(NRPN_MORSE+64) /* {type rel title {base of output mixer level block}} */
+#define NRPN_MIXER		(NRPN_PADC+KYR_N_PADC*3) /* {type rel title {base of output mixer level block}} */
 
 /* 24 output mixer levels */
 /* left and right channel mixers for four channels for each of usb_out, i2s_out, and mqs_out */

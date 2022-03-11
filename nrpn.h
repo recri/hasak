@@ -292,7 +292,7 @@ static void nrpn_set_default(void) {
   // nrpn_set(NRPN_OUTPUT_ENABLE, 1); moved to end
   nrpn_set(NRPN_ECHO_ENABLE, 1);
   nrpn_set(NRPN_LISTENER_ENABLE, 1);
-  nrpn_set(NRPN_STRING_THROTTLE, 3000);
+  nrpn_set(NRPN_STRING_THROTTLE, 3500);
   
   nrpn_set(NRPN_PIN_ENABLE, 1);
   nrpn_set(NRPN_POUT_ENABLE, 1);
@@ -303,7 +303,6 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_PTT_REQUIRE, 0);
   nrpn_set(NRPN_RKEY_ENABLE, 1);
   nrpn_set(NRPN_CW_AUTOPTT, 1);
-  nrpn_set(NRPN_ECHO_ENABLE, 1);
   nrpn_set(NRPN_RX_MUTE, 0);
   nrpn_set(NRPN_MIC_HWPTT, 0);
   nrpn_set(NRPN_CW_HWPTT, 1);
@@ -389,10 +388,6 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_PADC6_NRPN, -1);
   nrpn_set(NRPN_PADC7_PIN, 127);
   nrpn_set(NRPN_PADC7_NRPN, -1);
-
-  /* morse code table */
-  /* change this to NOTSET, pull NOTSET values from morse[i-NRPN_MORSE] */
-  for (int i = 0; i < 64; i += 1) nrpn_set(NRPN_MORSE+i, cwmorse[i]);
 
   /* output mixers */
   for (int i = NRPN_MIXER; i < NRPN_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
