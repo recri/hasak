@@ -2,28 +2,16 @@
 [ ] define NRPN_QUERY so it can read out notes, ctrls, nrpns, and flags.
 	index = note || ctrl+N_NOTE || nrpn+N_NOTE+N_CTRL ||
 		flag+N_NOTE+N_CTRL+N_NRPN
-[x] move NRPN_ACTIVE_ST into the attic.
-[x] remove NRPN_IQ_USB, change TONE to -8192 .. 8191 Hz, make XIQ_FREQ into XTONE
-	XTONE set from TONE 
-[x] move the morse code table into flash.
 [ ] add a table of prosigns used and use them when
 	pure morse translation fails.
 [ ] add a coin cell to enable RTC on 4.0, 4.1, 3.2, 3.5, 3.6
 	put it on a dongle. The 3.2 needs a 32.768 crystal
 	added.
 [ ] add nrpns for RTC access.	
-[ ] disabled ouput for NRPN_ACTIVE_ST
-[x] moved the timer counts to ephemera and disabled sending
-	again there might be reason to echo, but never output
-[x] raised the padc rate to 64ms
-[x] raised the string_throttle to 3000, still losing
 [ ] interesting, hearing clicks in the sidetone volume, maybe to
 	do with the increased padc rate?  Or maybe the mixer
 	ramp time is too short.  or maybe there are too many
 	short ramps under PADC control.
-[x] decide why initial probe is not seeing ID_DEVICE and VERSION.
-[x] increase the sample rate for analog pins to 64ms
-[x] do not output analog sample raw values
 [ ] redo string byte to send 2 characters per NRPN
 [ ] redo string byte to use NRPN register for third character per NRPN
 [ ] there's an argument for letting analog samples be read which
@@ -51,21 +39,12 @@
 	This is sort of like running status, but less aggressive.
 	I don't see how to make the Teensy usb_midi.h do running
 	status.
-[x] MIDI through loops back your output to your input.
-[x] disable midi input and output during default value reset.
 [ ] move the indivdual mixer levels into ephemeral NRPNs
 	compute them from enable bits and named level
 	and balance controls.
 [ ] keep a separate array of current levels and current targets
 	and current points in ramps.
 [ ] make the enable_lr bits the primary enable record
-[?] make the mixer audio class accept raw mixer multipliers
-	in addition to float gains?
-[x] rename KYRP_* to NRPN_*, KYRN_* to NOTE_*, KYRC_* to CTRL_*
-[x] rename KYRV_* to VAL_*
-[?] note_listen_all(my_listener) listens to all notes
-[?] ctrl_listen_all(my_listener) listens to all ctrls
-[?] nrpn_listen_all(my_listener) listens to all nrpns
 [ ] omit ephemeral NPRPs from JSON
 [ ] timer is an add on, explains how to implement millis
 	leaves the rest to the user
@@ -82,18 +61,8 @@
 	inter-letter space, two ' ' in a row make an
 	inter-word space.
 [ ] listener heads move into listener.h, a byte token
-[ ] write the string mechanism.
-[ ] test the json transfer mechanism.
 [ ] get a makefile build to escape from the Arduino nonsense.
-[ ] move the time counters out of the src/midi.h block
-	someone might want different periods, or none.
-[ ] need additional ptt modules?
-[ ] need commands for adding and removing note routing
-	reimplement cwroute.h as programmed
 [ ] should midi.h include the after_idle handling?  midi_loop2()?
-[ ] need the oldvalue in the listener sometimes, changes
-	the signatures of all the callback functions, though I
-	think that -fpermissive allows it.
 [ ] DEBOUNCE should be % of dit
 [ ] or should there be another control which controls
 	the paddle's DITDAH perception, the Winkey PaddlePoint
@@ -114,16 +83,48 @@
 	can use the ramp code.
 [ ] move the ramp code into src from src/Audio.
 [ ] use the ramp code for keyed oscillator.
-[ ] make the keyed oscillator handle negative frequencies.
 [ ] make a "boolean" flag to mark note, ctrl, and nrpn values
 	as boolean values.  Might store them more efficiently.
+[x] move NRPN_ACTIVE_ST into the attic.
+[x] remove NRPN_IQ_USB, change TONE to -8192 .. 8191 Hz, make XIQ_FREQ into XTONE
+	XTONE set from TONE 
+[x] move the morse code table into flash.
+[x] disabled output for NRPN_ACTIVE_ST
+[x] moved the timer counts to ephemera and disabled sending
+	again there might be reason to echo, but never output
+[x] raised the padc rate to 64ms
+[x] raised the string_throttle to 3000, still losing
+[x] decide why initial probe is not seeing ID_DEVICE and VERSION.
+[x] increase the sample rate for analog pins to 64ms
+[x] do not output analog sample raw values
+[x] MIDI through loops back your output to your input.
+[x] disable midi input and output during default value reset.
+[?] make the mixer audio class accept raw mixer multipliers
+	in addition to float gains?
+[x] rename KYRP_* to NRPN_*, KYRN_* to NOTE_*, KYRC_* to CTRL_*
+[x] rename KYRV_* to VAL_*
+[?] note_listen_all(my_listener) listens to all notes
+[?] ctrl_listen_all(my_listener) listens to all ctrls
+[?] nrpn_listen_all(my_listener) listens to all nrpns
+[x] write the string mechanism.
+[x] test the json transfer mechanism.
+[x] move the time counters out of the src/midi.h block
+	someone might want different periods, or none.
+[x] need additional ptt modules?
+[x] need commands for adding and removing note routing
+	reimplement cwroute.h as programmed
+[x] need the oldvalue in the listener sometimes, changes
+	the signatures of all the callback functions, though I
+	think that -fpermissive allows it.
+[x] make the keyed oscillator handle negative frequencies.
 [x] rewrite src/midi.h to eliminate the hoist() interface.
 [x] make a high range of nrpns for internal use, not saved,
 	but potentially observable to watch the operation.
 	move xper_dit etc there.
-[ ] move the midi.h modulating nrpns into the front and have midi.h
+[x] move the midi.h modulating nrpns into the front and have midi.h
 	use them directly. KYRP_CHANNEL, KYRP_ECHO_ENABLE.
 [-] move the nrpn echo index into the ephemeral nrpns?
+	not sure what this meant
 [x] need an unlisten() api for switching listener targets
 [x] add unlisten to src/midi.h
 [x] add listen_remove to listeners.h
