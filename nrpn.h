@@ -124,36 +124,6 @@ static void nrpn_recompute_morse(int nrpn, int _) {
   after_idle(nrpn_update_keyer_timing);
 }
 
-/*
-** expand mixer shorthand bits to individual mixer channel nrpns
-** nrpn == NRPN_MIX_ENABLE then set left and right according to bits
-** nrpn == NRPN_MIX_ENABLE_L then set left according to bits
-** nrpn == NRPN_MIX_ENABLE_R then set right according to bits
-** in each case the mask has 12 bits and ranges from 0 to 4095
-** in each case we have 4 bits for usb, i2s, and hdw out mixers
-** the order of the mixers and enables is:
-** usb: L0 L1 L2 L3 R0 R1 R2 R3
-** i2s: L0 L1 L2 L3 R0 R1 R2 R3
-** hdw: L0 L1 L2 L3 R0 R1 R2 R3
-** so, bit i, counting from 0 at the msb end of the value, 
-** addresses left mixer channel (i%4)+(i/4)*8
-** and addresses right mixer channel (i%4)+(i/4)*8+4
-*/
-static void nrpn_recompute_mixer_enables(int nrpn, int _) {
-  const int value = nrpn_get(nrpn);
-  for (int i = 0; i < 12; i += 1) {
-    const int l = (i%4)+(i/4)*8;
-    const int r = l+4;
-    const int v = (value & (1<<(11-i))) != 0;
-    if (nrpn == NRPN_MIX_ENABLE || nrpn == NRPN_MIX_ENABLE_L) nrpn_set(NRPN_MIXER2+l, v);
-    if (nrpn == NRPN_MIX_ENABLE || nrpn == NRPN_MIX_ENABLE_R) nrpn_set(NRPN_MIXER2+r, v);
-  }
-}
-
-/* compute mixer targets from levels and balance controls */
-static void nrpn_recompute_mixer_targets(int nrpn, int _) {
-}
-
 /* 
 ** EEPROM functions.  Disabled.
 */
@@ -295,7 +265,7 @@ static void nrpn_set_default(void) {
   // nrpn_set(NRPN_OUTPUT_ENABLE, 1); moved to end
   nrpn_set(NRPN_ECHO_ENABLE, 1);
   nrpn_set(NRPN_LISTENER_ENABLE, 1);
-  nrpn_set(NRPN_STRING_THROTTLE, 3500);
+  nrpn_set(NRPN_STRING_THROTTLE, 3750);
   
   nrpn_set(NRPN_PIN_ENABLE, 1);
   nrpn_set(NRPN_POUT_ENABLE, 1);
@@ -314,11 +284,11 @@ static void nrpn_set_default(void) {
 
   nrpn_set(NRPN_VOLUME, 0);
   nrpn_set(NRPN_LEVEL, 0);	/* dB/10, centiBel */
-  nrpn_set(NRPN_IQ_LEVEL, 0);
+  nrpn_set(NRPN_USB_LEVEL, 0);
   nrpn_set(NRPN_I2S_LEVEL, 0);
   nrpn_set(NRPN_HDW_LEVEL, 0);
   nrpn_set(NRPN_ST_BALANCE, 0);
-  nrpn_set(NRPN_IQ_BALANCE, 0);
+  nrpn_set(NRPN_RX_PTT_LEVEL, 0);
 
   /* keyer defaults */
   nrpn_set(NRPN_TONE, 600);	/* Hz */
@@ -391,13 +361,13 @@ static void nrpn_set_default(void) {
 
   nrpn_set(NRPN_ACTIVE_ST, NOTE_ST_NONE);
 
-  /* output mixers */
+  /* output mixer level */
   for (int i = NRPN_MIXER; i < NRPN_MIXER+24; i += 1) nrpn_set(i, 0); /* 0 dB */
 
-  /* output mixers enable */
+  /* output mixer enable */
   for (int i = NRPN_MIXER2; i < NRPN_MIXER2+24; i += 1) nrpn_set(i, 0); /* muted */
 
-  nrpn_set(NRPN_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits.IQ to usb, usb+sidetone to i2s and hdw
+  // nrpn_set(NRPN_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits: IQ to usb, usb+sidetone to i2s and hdw
   nrpn_set(NRPN_MIX_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
   nrpn_set(NRPN_MIX_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
 
@@ -430,11 +400,6 @@ static void nrpn_setup(void) {
   nrpn_listen(NRPN_COMP, nrpn_recompute_morse);
   nrpn_listen(NRPN_FARNS, nrpn_recompute_morse);
 
-  /* mixer enable update, listen for changes */
-  nrpn_listen(NRPN_MIX_ENABLE, nrpn_recompute_mixer_enables);
-  nrpn_listen(NRPN_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
-  nrpn_listen(NRPN_MIX_ENABLE_L, nrpn_recompute_mixer_enables);
-
   /* commands */
   nrpn_listen(NRPN_WRITE_EEPROM, nrpn_write_eeprom);
   nrpn_listen(NRPN_READ_EEPROM, nrpn_read_eeprom);
@@ -456,9 +421,3 @@ static void nrpn_setup(void) {
   nrpn_set(NRPN_ID_CPU, KYR_ID_CPU);
   nrpn_set(NRPN_ID_CODEC, codec_identify());
 }
-
-//static void nrpn_loop(void) {}
-
-//#ifdef __cplusplus
-//}
-//#endif

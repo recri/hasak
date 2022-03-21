@@ -33,8 +33,11 @@
 **        the AudioStream::update
 **        the hasak sample interrupt()
 **        the loop()
-**    so we can present percent cpu for all,
-**    and normalize the cpu cycles per audio element, too.
+**    so we can present percent cpu for all.
+**    The audio library also keeps cycle counts 
+**    for each audio component running independently,
+**    so we can normalize the cpu cycles per audio element,
+**    too.
 **
 ** keep track of cycles during each sample buffer time
 ** used to normalize the cycle usage from the audio library
@@ -43,32 +46,30 @@
 ** also provide various elapsedCounter classes
 ** in addition to the Teensy elapsedMillis and elapsedMicros
 */
-static uint32_t timing_loopCounter = 0; /* count trips through the loop() function */
-static uint32_t timing_audio_stream_cycles_total = 0; /* copy of AudioStream::cpu_cycles_total */
-static uint32_t timing_updateCounter = 0;	      /* count AudioStream::update's */
+static uint32_t timing_loopCounter = 0;			/* count trips through the loop() function */
 
-static uint32_t timing_cpuCyclesRaw;
-static uint32_t timing_cpuCyclesPerAudioBuffer;
-static uint32_t timing_cpuCyclesPerAudioBufferMax;
+static uint32_t timing_sampleCounter = 0;		/* updated by sample interrupt */
 
-static uint32_t timing_sampleCounter = 0;	      /* updated by sample interrupt */
-static uint32_t timing_isrCpuCyclesRaw;
-static uint32_t timing_isrCyclesPerAudioBuffer;
-static uint32_t timing_isrCyclesPerAudioBufferMax;
+static uint32_t timing_updateCounter = 0;		/* count AudioStream::update's */
+
+static uint32_t timing_cpuCyclesRaw;			/* */ 
+static uint32_t timing_isrCpuCyclesRaw;			/* */ 
+
+static uint16_t timing_cpuCyclesPerAudioBuffer;
+static uint16_t timing_cpuCyclesPerAudioBufferMax;
+
+static uint16_t timing_isrCyclesPerAudioBuffer;
+static uint16_t timing_isrCyclesPerAudioBufferMax;
 
 static void timing_setup(void) {}
 
 static void timing_loop(void) {
+  
   timing_loopCounter += 1;		/* one trip through the loop */
   
-  /* 
-  ** detect the bump in AudioStream::cpu_cycles_total
-  ** that happens when AudioStream::update runs
-  ** that bump never happens reliably.
-  */
-  if (au_st_key.update_counter-timing_updateCounter != 0) {
-    timing_updateCounter = au_st_key.update_counter;		/* one buffer update completed */
-    timing_audio_stream_cycles_total = AudioStream::cpu_cycles_total; /* reset to detect next update */
+  /* read the update counter in the au_st_key component */
+  if (audio_update_counter()-timing_updateCounter != 0) {
+    timing_updateCounter = audio_update_counter();
 
     /* cpu cycle count executed in loop() since last update */
     timing_cpuCyclesPerAudioBuffer = (ARM_DWT_CYCCNT - timing_cpuCyclesRaw) >> 6;
@@ -82,9 +83,15 @@ static void timing_loop(void) {
     timing_cpuCyclesPerAudioBufferMax = max(timing_cpuCyclesPerAudioBufferMax, timing_cpuCyclesPerAudioBuffer);
     timing_isrCyclesPerAudioBufferMax = max(timing_isrCyclesPerAudioBuffer, timing_isrCyclesPerAudioBufferMax);
 
-    /* this discards an early transient observed when the audio library initializes */
+    /* discards an early transient observed when the audio library initializes */
     if (timing_cpuCyclesPerAudioBufferMax > 100000) timing_cpuCyclesPerAudioBufferMax = timing_cpuCyclesPerAudioBuffer;
   }
+}
+
+static void timing_reset(void) {
+  timing_cpuCyclesPerAudioBufferMax = timing_cpuCyclesPerAudioBuffer;
+  timing_isrCyclesPerAudioBufferMax = timing_isrCyclesPerAudioBuffer;
+  audio_timing_reset();
 }
 
 static float timing_percent(uint32_t cpuCycles) {

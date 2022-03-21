@@ -61,8 +61,8 @@ static void diag_treport(const char *p) {
 }
 
 /* generic audio module report and reset */
-static void diag_mreport(const char *tag, AudioStream& str) {
-  diag_report(tag, str.cpu_cycles, str.cpu_cycles_max);
+static void diag_mreport(const char *tag, AudioStream *str) {
+  if (str) diag_report(tag, str->cpu_cycles, str->cpu_cycles_max);
 }
 
 /* long report */
@@ -71,61 +71,10 @@ static void diag_Sreport(void) {
   // report("denom", cpuCyclesPerAudioBuffer, cpuCyclesPerAudioBufferMax, 0, 0, 0, 0);
   diag_sreport();
   Serial.printf("Extended summary:\n");
-  diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in); 
-#if KYR_ENABLE_HDW_IN > 0
-  diag_mreport("hdw_in", hdw_in);
-#endif
-   Serial.println();
-
-  diag_mreport("i2s_in", i2s_in);       diag_mreport("usb_in", usb_in);       Serial.println();
-  diag_mreport("i2s_out", i2s_out);     diag_mreport("usb_out", usb_out);
-#if KYR_ENABLE_HDW_OUT > 0
-#if 0
-  diag_mreport("hdw_out", hdw_out); 
-#endif
-#endif
-  Serial.println();
-
-  diag_mreport("tone_ramp", tone_ramp); diag_mreport("key_ramp", key_ramp);   Serial.println();
-  diag_mreport("l_i2s_out", l_i2s_out); diag_mreport("r_i2s_out", r_i2s_out); Serial.println();
-  diag_mreport("l_usb_out", l_usb_out); diag_mreport("r_usb_out", r_usb_out); Serial.println();
-  diag_mreport("l_hdw_out", l_hdw_out); diag_mreport("r_hdw_out", r_hdw_out); Serial.println();
-}
-
-/* summary reset */
-static void diag_mreset(AudioStream &str) {
-  str.processorUsageMaxReset();
-}
-
-static void diag_sreset(void) {
-  timing_cpuCyclesPerAudioBufferMax = timing_cpuCyclesPerAudioBuffer;
-  timing_isrCyclesPerAudioBufferMax = timing_isrCyclesPerAudioBuffer;
-  AudioProcessorUsageMaxReset();
-  AudioMemoryUsageMaxReset();
-}
-
-static void diag_Sreset(void) {
-  diag_sreset();
-  diag_mreset(i2s_in);
-  diag_mreset(usb_in);
-#if defined(KYR_ENABLE_HDW_IN)
-  diag_mreset(hdw_in);
-#endif
-  diag_mreset(tone_ramp);
-  diag_mreset(key_ramp);
-  diag_mreset(l_i2s_out);
-  diag_mreset(r_i2s_out);
-  diag_mreset(l_usb_out);
-  diag_mreset(r_usb_out);
-  diag_mreset(l_hdw_out);
-  diag_mreset(r_hdw_out);
-  diag_mreset(i2s_out);
-  diag_mreset(usb_out);
-}
-
-/* debounce details */
-static void diag_dreport(void) {
-  Serial.printf("debounce: %.3f ms, %d samples\n", samples_to_ms(nrpn_get(NRPN_PIN_DEBOUNCE)), nrpn_get(NRPN_PIN_DEBOUNCE));
+  for (int i = 0; i < KYR_N_AUDIO; i += 1) {
+    diag_mreport(audio_comp_name(i), audio_comp(i));
+    if ((i%4) == 3) Serial.println();
+  }
 }
 
 static const char *diag_lorem = 
@@ -155,6 +104,7 @@ static void diag_mixer3_set(const char *dev, RAudioMixer4& m, const char *p) {
     }
   }
 }
+
 static void diag_mixer2_set(const char *dev, RAudioMixer4& l, RAudioMixer4& r, const char *p) {
   Serial.printf("recognized device %s\n", dev);
   switch (*p) {
@@ -172,6 +122,7 @@ static void diag_mixer2_set(const char *dev, RAudioMixer4& l, RAudioMixer4& r, c
   default: Serial.printf("unrecognized mixer string \"%s\"\n", p); return;
   }
 }
+
 static void diag_mixer_set(const char *p) {
   Serial.printf("mixer_set(\"%s\")\n", p);
   switch (*p) {
@@ -196,6 +147,7 @@ static void diag_mixer_dump(void) {
   diag_mixer_dump_one("l_hdw_out", l_hdw_out, NRPN_MIX_HDW_L0,NRPN_MIX_EN_HDW_L0);
   diag_mixer_dump_one("r_hdw_out", r_hdw_out, NRPN_MIX_HDW_R0,NRPN_MIX_EN_HDW_R0);
 }
+
 static char diag_random_char(void) {
   char c;
   do c = random(0,128); while ( ! cwkey_text.valid_text(c)); 
@@ -282,11 +234,11 @@ static struct { short nrpn; const char*name; } diag_nrpn[] = {
   -1, "LEVELS",
   NRPN_VOLUME, "MAIN",
   NRPN_LEVEL, "ST",
-  NRPN_IQ_LEVEL, "IQ",
+  NRPN_USB_LEVEL, "SUB",
   NRPN_I2S_LEVEL, "I2S",
   NRPN_HDW_LEVEL, "HDW",
   NRPN_ST_BALANCE, "ST_BAL",
-  NRPN_IQ_BALANCE, "IQ_BAL",
+  NRPN_RX_PTT_LEVEL, "RX_PTT_LVL",
 
   -1, "KEY",
   NRPN_TONE, "TON",
@@ -528,7 +480,6 @@ void diagnostics_loop() {
 		    " t ... -> timestamp + ... to Serial\n"
 		    " r -> reset usage counts\n"
 		    " R -> reset detailed usage counts\n"
-		    " d -> debounce diagnostics\n"
 		    " l -> logging toggle\n"
 		    " w... -> send ... up to newline to text keyer\n"
 		    " W -> send lorem ipsum to text keyer\n"
@@ -548,9 +499,8 @@ void diagnostics_loop() {
     case 's': diag_sreport(); break; /* short summary */
     case 'S': diag_Sreport(); break; /* long summary */
     case 't': diag_treport(p+1); break; /* timestamp */
-    case 'r': diag_sreset(); break;	/* short reset */ 
-    case 'R': diag_Sreset(); break;	/* long reset */
-    case 'd': diag_dreport(); break; /* debounce stats */
+    case 'r': timing_reset(); break;	/* short reset */ 
+    case 'R': timing_reset(); break;	/* long reset */
     case 'E': elapsed_test ^= 1; timer1 = -10; timer2 = 0; break;
     case 'l': diag_logging ^= 1; Serial.printf("logging %s\n", diag_logging?"on":"off"); break;
     case 'w': diag_text_send_ptr = p+1; break;

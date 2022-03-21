@@ -51,7 +51,7 @@ static void padcmap_value(int nrpn, int _) {
     case NRPN_NOTHING: return;
     case NRPN_VOLUME:
     case NRPN_LEVEL:
-    case NRPN_IQ_LEVEL:
+    case NRPN_USB_LEVEL:
     case NRPN_I2S_LEVEL:
     case NRPN_HDW_LEVEL:
     case NRPN_CODEC_VOLUME:
@@ -64,7 +64,6 @@ static void padcmap_value(int nrpn, int _) {
     case NRPN_SPEED_FRAC:
       min = KYR_PADC_FRAC_MIN; max = KYR_PADC_FRAC_MAX; break;
     case NRPN_ST_BALANCE:
-    case NRPN_IQ_BALANCE:
     case NRPN_COMP:
       min = KYR_PADC_BAL_MIN; max = KYR_PADC_BAL_MAX; break;
     case NRPN_HEAD_TIME:

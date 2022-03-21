@@ -1,7 +1,7 @@
 /* -*- mode: c++; tab-width: 8 -*- */
 /*
  * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
- * Copyright (c) 2021 by Roger Critchlow, Charlestown, MA, USA
+ * Copyright (c) 2021, 2022 by Roger Critchlow, Charlestown, MA, USA
  * ad5dz, rec@elf.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,25 +25,28 @@
 
 #include <Arduino.h>
 
-//these are defined in config.h now, near the cpu detect code
-//static int pin_valid(int pin) { return PIN_VALID(pin); }
-//static int pin_analog(int pin) { return PIN_ANALOG(pin); }
-//static int pin_i2s(int pin) { return PIN_I2S(pin); }
-//static int pin_i2c(int pin) { return PIN_I2C(pin); }
-//static int pin_nothing(void) { return 127; }
-
 #include "config.h"		// configuration
-#include "cwmorse.h"		// morse code table
 #include "linkage.h"		// forward references, linkage, and conversions
-#include "listener.h"		// linked lists of functions, after_idle listener
-#include "audio.h"		// audio graph
-#undef READ_ONLY		// trash from the audio library includes
+
+static unsigned audio_update_counter(void); // forward for timing.h
+static void audio_timing_reset(void);	    // forward for timing.h
+
 #include "timing.h"		// timing counters
+#include "listener.h"		// linked lists of functions, after_idle listener
 #include "midi.h"		// midi interface
 #include "define.h"		// define MIDI note, ctrl, and nrpn flags FIX.ME rename midi_defs.h
-#include "codec.h"		// handle the audio hardware
-#include "string.h"		// string handler
+
+static int codec_identify(void); // forward for nprn.h
+
 #include "nrpn.h"		// default values and listeners for nrpns
+#include "string.h"		// string handler
+
+#include "audio.h"		// audio graph
+#undef READ_ONLY		// trash from the audio library includes
+#include "codec.h"		// handle the audio hardware
+#include "levels.h"		// level computations
+
+#include "cwmorse.h"		// morse code table
 #include "cwdecode.h"		// decode cw element stream -> ascii
 #include "cwdetime.h"		// detime cw key line -> element stream
 #include "cwroute.h"		// route notes into and out of the keyer
@@ -53,10 +56,12 @@
 #include "cwkey_straight.h"	// hardware switch -> straight key sidetone
 #include "cwkey_paddle.h"	// hardare paddle -> iambic keyed sidetone
 #include "cwkey_text.h"		// ascii characters -> mechanically keyed sidetone
+
 #include "padc.h"		// input adc states -> input adc nrpns
 #include "padcmap.h"		// input adc nrpns -> keyer parameter nrpns
 #include "pin.h"		// input pin states -> input pin notes rename
 #include "pout.h"		// output pin notes -> output pins
+
 // #include "cwinkey.h"		// FIX.ME - make it work
 #include "diagnostics.h"
 
@@ -86,15 +91,17 @@ void setup(void) {
   listener_setup();		// set up listener free list
   midi_setup();			// initialize the midi interface
   define_setup();		// define our notes ctrls and nrpns
+  nrpn_setup();			// set up nrpn handlers
+  string_setup();		// set up string handlers
+  audio_setup();		// set up audio handlers
   codec_setup();		// let the code install handlers
   codec_enable();		// enable the codec
-  string_setup();		// set up string handlers
-  nrpn_setup();			// set up nrpn handlers
   timing_setup();		// start your timers
   padc_setup();			// nrpn/note handlers for analog pins
   padcmap_setup();		// mapping adc values into parameters
   pin_setup();			// nrpn/note handlers for digital inputs
   pout_setup();			// nrpn/note handlers for digital outputs
+  levels_setup();		// nrpn/note handlers for level setting
   cwkey_straight_setup();	// straight key keyer(s)
   cwkey_paddle_setup();		// paddle keyer(s)
   cwkey_text_setup();		// nrpn/note handlers for text keyers
@@ -111,8 +118,8 @@ void setup(void) {
   // now start
   // before this point setting parameters with nrpn_set()
   // might not work correctly, because they might not trigger
-  // the handler.  The *_setup functions set a lot of listeners
-  // to implement parameters.
+  // the correct handlers.  
+  // The *_setup functions set a lot of listeners to implement parameters.
   //
 
   nrpn_set_default();		// set the default parameters
@@ -133,50 +140,25 @@ void setup(void) {
 void loop(void) {
   timing_loop();		// accumulate counts
   midi_loop();			// drain midi input
-  // codec_loop();
-  // define_loop();
-  // nrpn_loop();
-  // pout_loop();
-  // pin_loop();
-  // padc_loop();
-  // padcmap_loop();
-  // cwkey_straight_loop();
-  // cwkey_paddle_loop();
-  // cwkey_text_loop();
-  // cwarbiter_loop();		// arbitration of keyer events
-  // cwstptt_loop();			// probably
-  // cwptt_loop();			// key generated ptt
-  // cwroute_loop();
-  // cwdetime_loop();
-  // cwdecode_loop();
-  // cwwinkey_loop();		// winkey
 
-  // counter update
+  // counter updates
   
-  { nrpn_incr(NRPN_LOOP);	// update loop counter
-  }
+  nrpn_incr(NRPN_LOOP);		   // update loop counter
+
   { static elapsedSamples counter; // update sample counter
-    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_SAMPLE);
-      // cwkey_paddle_sample();
-      // cwkey_text_sample();
-      // cwarbiter_sample();
-      // cwstptt_sample();
-      // cwptt_sample();
-    }
-  }
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_SAMPLE); } }
 
   { static elapsedUpdates counter; // update buffer update counter
-    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_UPDATE); }
-  }
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_UPDATE); } }
+
   { static elapsedMillis counter; // update millisecond counter
-    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_MILLI); }
-  }
+    if ((int)counter >= 0) { counter = -1; nrpn_incr(NRPN_MILLI); } }
+
   { static elapsedMillis counter; // update 10 millisecond counter
-    if ((int)counter >= 0) { counter = -10; nrpn_incr(NRPN_10MILLI); }
-  }
+    if ((int)counter >= 0) { counter = -10; nrpn_incr(NRPN_10MILLI); } }
+
   { static elapsedMillis counter; // update 100 millisecond counter
-    if ((int)counter >= 0) { counter = -100; nrpn_incr(NRPN_100MILLI); }
-  }
+    if ((int)counter >= 0) { counter = -100; nrpn_incr(NRPN_100MILLI); } }
 
   listener_loop();		// after idle dispatch
   diagnostics_loop();		// console

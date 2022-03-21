@@ -188,11 +188,11 @@ static void define_define(void) {
 
     case NRPN_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_IQ_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_USB_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_I2S_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_HDW_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_ST_BALANCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-    case NRPN_IQ_BALANCE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
+    case NRPN_RX_PTT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
 
     case NRPN_TONE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_SPEED:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write

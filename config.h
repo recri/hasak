@@ -48,16 +48,14 @@
 
 #define KYR_ENABLE_POTS 1 /* {type def title {Should we start with potentiometers for volume, pitch, and speed enabled}} */
 
-/* enable hardware output - FIX.ME hdw_out should be pointer */
-//#define KYR_ENABLE_HDW_OUT 1 /* {type def title {Should we enable the hardware audio out channel}} */
+#define KYR_ENABLE_HDW_OUT 0 /* {type def title {Should we start with the hardware audio out channel enabled}} */
 
-/* enable hardware input - FIX.ME adc_in should be pointer */
-//#define KYR_ENABLE_HDW_IN 1 /* {type def title {Should we enable a hardware input input channel}} */
+#define KYR_ENABLE_HDW_IN 0 /* {type def title {Should we start with the hardware input channel enabled}} */
 
-#define KYR_ENABLE_WINKEY 1  /* {type def title {Should we start with the winkey emulator enabled}} */
+#define KYR_ENABLE_WINKEY 0  /* {type def title {Should we start with the winkey emulator enabled}} */
 
 /* numbers of configurable modules that are implemented */
-/* *** don't change these unless you're prepared to modify all the code that's wired to their values *** */
+/* *** don't change these unless you're prepared to modify all the code that assumes these values *** */
 #define KYR_N_PIN	8 /* {type def title {number of digital input pins that can be configured}} */
 #define KYR_N_PADC	8 /* {type def title {number of analog input pins that can be configured}} */
 #define KYR_N_POUT	8 /* {type def title {number of digital output pins that can be configured}} */
@@ -208,8 +206,10 @@ static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 27) || ((pin) 
 #endif
 static int pin_i2s(int p) { return ((p)==KYR_DIN||(p)==KYR_DOUT||(p)==KYR_MCLK||(p)==KYR_BCLK||(p)==KYR_LRCLK); }
 static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
+
 /* 
 ** pin allocations for standard input switches and output latches
+** FIX.ME these should be allocated and connected like the rest.
 */
 #define KYR_R_PAD_PIN	0	/* {type pin title {right paddle input pin}} */
 #define KYR_L_PAD_PIN	1	/* {type pin title {left paddle input pin}} */
@@ -220,11 +220,34 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /*
 ** pin allocations for CWKeyer shield input pots
+** These are soft wired.
 */
 #define KYR_VOLUME_POT	15	/* {type pin title {volume pot input pin} analog A1} */
 #define KYR_ST_VOL_POT	16	/* {type pin title {sidetone volume pot input pin} analog A2} */
 #define KYR_ST_FREQ_POT	17	/* {type pin title {sidetone frequency pot input pin} analog A3} */
 #define KYR_SPEED_POT	22	/* {type pin title {keyer speed pot input pin} analog A8} */
+
+/*
+** audio component indexes
+*/
+#define AUDIO_USB_IN 0		/* {type audio title {audio in from usb}} */
+#define AUDIO_I2S_IN 1		/* {type audio title {audio in from i2s}} */
+#define AUDIO_HDW_IN 2		/* {type audio title {audio in from analog pin}} */
+#define AUDIO_ST_KEY 3		/* {type audio title {sidetone key logic signal}} */
+#define AUDIO_KEY_OUT 4		/* {type audio title {transmitter key logic signal}} */
+#define AUDIO_ST_OSC 5		/* {type audio title {sidetone oscillator}} */
+#define AUDIO_IQ_OSC 6		/* {type audio title {IQ oscillator}} */
+#define AUDIO_L_USB_OUT 7	/* {type audio title {left channel mixer for usb output}} */
+#define AUDIO_R_USB_OUT 8	/* {type audio title {right channel mixer for usb output}} */
+#define AUDIO_L_I2S_OUT 9	/* {type audio title {left channel mixer for i2s output}} */
+#define AUDIO_R_I2S_OUT 10	/* {type audio title {right channel mixer for i2s output}} */
+#define AUDIO_L_HDW_OUT 11	/* {type audio title {left channel mixer for hardware mqs output}} */
+#define AUDIO_R_HDW_OUT 12	/* {type audio title {right channel mixer for hardware mqs output}} */
+#define AUDIO_USB_OUT 13	/* {type audio title {audio out to usb}} */
+#define AUDIO_I2S_OUT 14	/* {type audio title {audio out to i2s}} */
+#define AUDIO_HDW_OUT 15	/* {type audio title {audio out to hardware mqs}} */
+
+#define KYR_N_AUDIO 16		/* {type def title {number of audio components}} */
 
 /* 
 ** MIDI usage
@@ -242,7 +265,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 ** NOTE_*_ST are the keyed sidetone and sidetone ptt.
 ** NOTE_*_OUT are the transmitted key and transmitted ptt.
 ** NOTE_TXT_* are notes with a velocity value that is a 7 bit ascii character.
-** NOTE_ELT_* are notes with velocity values chosen from ".- \t".
+** NOTE_ELT_* are notes with velocity values chosen from ".- \t" for dit dah ils iws.
 **
 ** all the notes which simply signal on/off have velocity 1 or 0 internally.
 ** externally they use velocity 127 and 0 for on and off, VAL_EXT_NOTE_*
@@ -345,7 +368,6 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NOTE_ELT_DEC		53 /* {type note title {note containing 7 bit ascii element decoded from sidetone}} */
 #define NOTE_TXT_DEC		54 /* {type note title {note containing 7 bit ascii text decoded from sidetone}} */
 
-
 #define KYR_N_NOTE		55 /* {type def title {number of note states maintained in the keyer}} */
 
 /* The external values of MIDI NoteOn/NoteOff, internally 0 is off and 1 is on. */
@@ -432,13 +454,17 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 ** NRPN_PIN - digital inputs
 ** NRPN_POUT - digital outputs
 ** NRPN_ADC - analog inputs
-** NRPN_MIXER -  24 output mixer levels
-** NRPN_MIXER2 - 24 output mixer enables
 ** end of saved parameters
 ** NRPN_CODEC - general codec commands
 ** NRPN_WM8960 - WM8960 codec specific commands
 ** NRPN_EXEC - commands
 ** NRPN_INFO - information
+** begin scratch parameters
+** NRPN_XPER - morse timing
+** NRPN_LOOP, et al. - counters for periodic execution
+** NRPN_ACTIVE_ST, et al. - miscellaneous
+** NRPN_MIXER -  24 output mixer set levels
+** NRPN_MIXER2 - 24 output mixer enables
 */
 #define VAL_NOT_SET -1		/* {type val title {16 bit not set value}} */
 #define VAL_MASK    0x3fff	/* {type val title {14 bit mask}} */
@@ -507,15 +533,15 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_LVL		(NRPN_ENABLE+14) /* {type rel title {base of keyer level setting nrpns}} */
 
-#define NRPN_VOLUME		(NRPN_LVL+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-128 24} property masterVolume} */
-#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn title {STlvl} title {sidetone volume} range {-128 24} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_IQ_LEVEL		(NRPN_LVL+2) /* {type nrpn title {IQlvl} title {IQ volume} range {-128 24} default 0 unit dB/10 property iqLevel} */
-#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn title I2Slvl} title {I2S level} range {-128 24} default 0 unit dB/10 property i2sLevel} */
-#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn title HdwLVL} title {HDW level} range {-128 24} default 0 unit dB/10 property hdwLevel} */
-#define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 ignore 1 property sidetonePan} */
-#define NRPN_IQ_BALANCE		(NRPN_LVL+6) /* {type nrpn label IQBal title {adjustment to IQ balance} range {-8192 8191} unit pp8191 ignore 1 property iqBalance} */
+#define NRPN_VOLUME		(NRPN_LVL+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-320 60} property masterVolume} */
+#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn title {STlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
+#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn title {USBlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
+#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn title I2Slvl} title {I2S level} range {-320 60} default 0 unit dB/10 property i2sLevel} */
+#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn title HdwLVL} title {HDW level} range {-320 60} default 0 unit dB/10 property hdwLevel} */
+#define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 property sidetonePan} */
+#define NRPN_RX_PTT_LEVEL	(NRPN_LVL+6) /* {type nrpn label RXMute title {RX mute level during keying} range {-320 60} unit dB/10 property sidetonePan} */
 
-#define NRPN_KEYER		(NRPN_LVL+7) /* {type rel title {base of vox specialized keyer parameters}} */
+#define NRPN_KEYER		(NRPN_LVL+7) /* {type rel title {base of keyer parameters}} */
 
 #define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn title {sidetone and IQ oscillator frequency} range {-8192 8191} unit Hz property keyerTone} */
 #define NRPN_SPEED		(NRPN_KEYER+1) /* {type nrpn title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
@@ -539,7 +565,9 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn label fallRamp title {key fall ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
 #define VAL_RAMP_HANN		0 /* {type val label Hann title {ramp from Hann window function, raised cosine} value-of {NRPN_*_RAMP} property keyerRamps} */
 #define VAL_RAMP_BLACKMAN_HARRIS 1 /* {type val label {Blackman Harris} title {ramp from Blackman Harris window function} value-of {NRPN_*_RAMP} property keyerRamps} */
-#define VAL_RAMP_LINEAR	2 /* {type val label Linear title {linear ramp, for comparison} value-of {NRPN_*_RAMP} property keyerRamps} */
+#define VAL_RAMP_LINEAR		2 /* {type val label Linear title {linear ramp, for clicks} value-of {NRPN_*_RAMP} property keyerRamps} */
+//#define VAL_RAMP_EXPO		3 /* {type val label Exponential title {exponential ramp, for chirps} value-of {NRPN_*_RAMP} property keyerRamps} */
+//#define VAL_RAMP_GAUSS	4 /* {type val label Gaussian title {gaussian ramp} value-of {NRPN_*_RAMP} property keyerRamps} */
 
 #define NRPN_PAD		(NRPN_RAMP+4) /* {type rel title {base of paddle keyer parameters}} */
 
@@ -577,11 +605,11 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_CODEC	(NRPN_MISC+12) /* {type rel title {base of codec nrpns}} */
       
-#define NRPN_CODEC_VOLUME	(NRPN_CODEC+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-128 24} property masterVolume} */
+#define NRPN_CODEC_VOLUME	(NRPN_CODEC+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-320 60} property masterVolume} */
 #define NRPN_INPUT_SELECT	(NRPN_CODEC+1) /* {type nrpn label InSel title {input select} values VAL_INPUT_* property inputSelect} */
 #define VAL_INPUT_MIC		0	       /* {type val label Mic title {input select microphone} value-of NRPN_INPUT_SELECT property inputSelects} */
 #define VAL_INPUT_LINE		1	       /* {type val label LineIn title {input select line in} value-of NRPN_INPUT_SELECT property inputSelects} */
-#define NRPN_INPUT_LEVEL	(NRPN_CODEC+2) /* {type nrpn label InLvl title {input level} range {-128 24} unit dB/10 property inputLevel} */
+#define NRPN_INPUT_LEVEL	(NRPN_CODEC+2) /* {type nrpn label InLvl title {input level} range {-320 60} unit dB/10 property inputLevel} */
 
 #define NRPN_PIN	(NRPN_CODEC+3) /* {type rel title {base of hardware digital input pin common  block}} */
 
@@ -720,35 +748,35 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 **   SDR: IQ -> i2s_out, i2s_in x IQ -> mqs out
 */
 
-#define NRPN_MIX_USB_L0		(NRPN_MIXER+0)	/* {type nrpn title {i2s_in left to usb_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_USB_L1		(NRPN_MIXER+1)	/* {type nrpn title {sidetone left to usb_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_USB_L2		(NRPN_MIXER+2)	/* {type nrpn title {IQ left to usb_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_USB_L3		(NRPN_MIXER+3)  /* {type nrpn title {usb_in left to usb_out left} range {-128 24} unit dB/10} */
+#define NRPN_MIX_USB_L0		(NRPN_MIXER+0)	/* {type nrpn title {i2s_in left to usb_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_USB_L1		(NRPN_MIXER+1)	/* {type nrpn title {sidetone left to usb_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_USB_L2		(NRPN_MIXER+2)	/* {type nrpn title {IQ left to usb_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_USB_L3		(NRPN_MIXER+3)  /* {type nrpn title {usb_in left to usb_out left} range {-320 60} unit dB/10} */
 
-#define NRPN_MIX_USB_R0		(NRPN_MIXER+4)	/* {type nrpn title {i2s_in right to usb_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_USB_R1		(NRPN_MIXER+5)	/* {type nrpn title {sidetone right to usb_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_USB_R2		(NRPN_MIXER+6)	/* {type nrpn title {IQ right to usb_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_USB_R3		(NRPN_MIXER+7)  /* {type nrpn title {usb_in right to usb_out right} range {-128 24} unit dB/10} */
+#define NRPN_MIX_USB_R0		(NRPN_MIXER+4)	/* {type nrpn title {i2s_in right to usb_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_USB_R1		(NRPN_MIXER+5)	/* {type nrpn title {sidetone right to usb_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_USB_R2		(NRPN_MIXER+6)	/* {type nrpn title {IQ right to usb_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_USB_R3		(NRPN_MIXER+7)  /* {type nrpn title {usb_in right to usb_out right} range {-320 60} unit dB/10} */
 
-#define NRPN_MIX_I2S_L0		(NRPN_MIXER+8)  /* {type nrpn title {usb_in left to i2s_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_I2S_L1		(NRPN_MIXER+9)  /* {type nrpn title {sidetone left to i2s_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_I2S_L2		(NRPN_MIXER+10) /* {type nrpn title {IQ left to i2s_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_I2S_L3		(NRPN_MIXER+11) /* {type nrpn title {i2s_in right to i2s_out right} range {-128 24} unit dB/10} */
+#define NRPN_MIX_I2S_L0		(NRPN_MIXER+8)  /* {type nrpn title {usb_in left to i2s_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_I2S_L1		(NRPN_MIXER+9)  /* {type nrpn title {sidetone left to i2s_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_I2S_L2		(NRPN_MIXER+10) /* {type nrpn title {IQ left to i2s_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_I2S_L3		(NRPN_MIXER+11) /* {type nrpn title {i2s_in right to i2s_out right} range {-320 60} unit dB/10} */
 
-#define NRPN_MIX_I2S_R0		(NRPN_MIXER+12)	/* {type nrpn title {usb_in right to i2s_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_I2S_R1		(NRPN_MIXER+13)	/* {type nrpn title {sidetone right to i2s_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_I2S_R2		(NRPN_MIXER+14) /* {type nrpn title {IQ right to i2s_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_I2S_R3		(NRPN_MIXER+15) /* {type nrpn title {i2s_in right to i2s_out right} range {-128 24} unit dB/10} */
+#define NRPN_MIX_I2S_R0		(NRPN_MIXER+12)	/* {type nrpn title {usb_in right to i2s_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_I2S_R1		(NRPN_MIXER+13)	/* {type nrpn title {sidetone right to i2s_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_I2S_R2		(NRPN_MIXER+14) /* {type nrpn title {IQ right to i2s_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_I2S_R3		(NRPN_MIXER+15) /* {type nrpn title {i2s_in right to i2s_out right} range {-320 60} unit dB/10} */
 
-#define NRPN_MIX_HDW_L0		(NRPN_MIXER+16) /* {type nrpn title {usb_in left to hdw_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_HDW_L1		(NRPN_MIXER+17) /* {type nrpn title {sidetone left to hdw_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_HDW_L2		(NRPN_MIXER+18) /* {type nrpn title {IQ left to hdw_out left} range {-128 24} unit dB/10} */
-#define NRPN_MIX_HDW_L3		(NRPN_MIXER+19) /* {type nrpn title {i2s_in left to hdw_out left} range {-128 24} unit dB/10} */
+#define NRPN_MIX_HDW_L0		(NRPN_MIXER+16) /* {type nrpn title {usb_in left to hdw_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_HDW_L1		(NRPN_MIXER+17) /* {type nrpn title {sidetone left to hdw_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_HDW_L2		(NRPN_MIXER+18) /* {type nrpn title {IQ left to hdw_out left} range {-320 60} unit dB/10} */
+#define NRPN_MIX_HDW_L3		(NRPN_MIXER+19) /* {type nrpn title {i2s_in left to hdw_out left} range {-320 60} unit dB/10} */
 
-#define NRPN_MIX_HDW_R0		(NRPN_MIXER+20) /* {type nrpn title {usb_in right to hdw_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_HDW_R1		(NRPN_MIXER+21) /* {type nrpn title {sidetone right to hdw_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_HDW_R2		(NRPN_MIXER+22) /* {type nrpn title {IQ right to hdw_out right} range {-128 24} unit dB/10} */
-#define NRPN_MIX_HDW_R3		(NRPN_MIXER+23) /* {type nrpn title {i2s_in right to hdw_out right} range {-128 24} unit dB/10} */
+#define NRPN_MIX_HDW_R0		(NRPN_MIXER+20) /* {type nrpn title {usb_in right to hdw_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_HDW_R1		(NRPN_MIXER+21) /* {type nrpn title {sidetone right to hdw_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_HDW_R2		(NRPN_MIXER+22) /* {type nrpn title {IQ right to hdw_out right} range {-320 60} unit dB/10} */
+#define NRPN_MIX_HDW_R3		(NRPN_MIXER+23) /* {type nrpn title {i2s_in right to hdw_out right} range {-320 60} unit dB/10} */
 
 #define NRPN_MIXER2		(NRPN_MIXER+24) /* {type rel title {base of output mixer enable block}} */
 
@@ -804,5 +832,18 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define VAL_PADC_CODEC_VOLUME	(NRPN_CODEC_VOLUME) /* {type val label Frac title NRPN_CODEC_VOLUME value-of NRPN_PADC*_NRPN property adcControls} */
 
 /* end of defined nrpns */
+
+#define SYS_EX		0xF0	/* {type sysex title {MIDI system exclusive}} */
+#define SYS_EX_ID	0x7D	/* {type sysex title {non-commercial reserved SYS_EX identifier}} */
+#define SYS_EX_HASAK	'H'	/* {type sysex title {hasak sub-id}} */
+#define SYS_EX_INST	0	/* {type sysex title {hasak instance sub-sub-id, assigned by NRPN if necessary}} */
+#define SYS_EX_STRING_CHUNK 'C'	/* {type sysex title {hasak string chunk}} */
+#define SYS_EX_STRING_CHACK 'A'	/* {type sysex title {hasak string chunk acknowlege}} */
+#define SYS_EX_END	0xF7	/* {type sysex title {MIDI system exclusive end of sys_ex}} */
+
+/* system exclusive = [SYS_EX SYS_EX_ID SYS_EX_HASAK SYS_EX_INST ... SYS_EX_END] */
+/* string chunk, ... = [ index length-1 ... ] */
+/* string ack, ... = [ index length-1 crc32 ] */
+
 /* end of config.h */
 #endif
