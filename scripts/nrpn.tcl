@@ -104,7 +104,8 @@ proc jsformat-all {values} {
 	    }
 	}
     }
-    return [concat $kyrp $prop $nrpn]
+    # return [concat $kyrp $prop $nrpn]
+    return $kyrp
 }
 proc jsformat {values} {
     set ::jsquoted 0
