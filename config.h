@@ -833,13 +833,13 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /* end of defined nrpns */
 
-#define SYS_EX		0xF0	/* {type sysex title {MIDI system exclusive}} */
-#define SYS_EX_ID	0x7D	/* {type sysex title {non-commercial reserved SYS_EX identifier}} */
-#define SYS_EX_HASAK	'H'	/* {type sysex title {hasak sub-id}} */
-#define SYS_EX_INST	0	/* {type sysex title {hasak instance sub-sub-id, assigned by NRPN if necessary}} */
-#define SYS_EX_STRING_CHUNK 'C'	/* {type sysex title {hasak string chunk}} */
-#define SYS_EX_STRING_CHACK 'A'	/* {type sysex title {hasak string chunk acknowlege}} */
-#define SYS_EX_END	0xF7	/* {type sysex title {MIDI system exclusive end of sys_ex}} */
+//#define SYS_EX		0xF0	/* {type sysex title {MIDI system exclusive}} */
+//#define SYS_EX_ID	0x7D	/* {type sysex title {non-commercial reserved SYS_EX identifier}} */
+//#define SYS_EX_HASAK	'H'	/* {type sysex title {hasak sub-id}} */
+//#define SYS_EX_INST	0	/* {type sysex title {hasak instance sub-sub-id, assigned by NRPN if necessary}} */
+//#define SYS_EX_STRING_CHUNK 'C'	/* {type sysex title {hasak string chunk}} */
+//#define SYS_EX_STRING_CHACK 'A'	/* {type sysex title {hasak string chunk acknowlege}} */
+//#define SYS_EX_END	0xF7	/* {type sysex title {MIDI system exclusive end of sys_ex}} */
 
 /* system exclusive = [SYS_EX SYS_EX_ID SYS_EX_HASAK SYS_EX_INST ... SYS_EX_END] */
 /* string chunk, ... = [ index length-1 ... ] */

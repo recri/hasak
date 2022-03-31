@@ -153,7 +153,7 @@ proc jsformat {values} {
     return "// parameter map for hasak version $v
 // generated with .../hasak/doc/nrpn.tcl from .../hasak/config.h
 // do not edit, regenerated from .../hasak/config.h by .../hasak/doc/nrpn.tcl output js
-export const hasakProperties = {\n    [join [jsformat-all $values] $d]\n};"
+export const hasakProperties$v = {\n    [join [jsformat-all $values] $d]\n};"
 }
 proc json-minimize {values} {
     set min [dict create]
@@ -247,7 +247,7 @@ proc main {argv} {
     set globs {}
     foreach line [split [string trim $data] \n] {
 	dict set lines [dict size $lines] $line
-	if { ! [regexp {^#define[ \t]+([A-Z0-9_]+)[ \t]+([-(A-Za-z_0-9*+)]*)[ \t]*/\*[ \t]*{(.*)}[ \t]*\*/[ \t]*$} $line all name value comment]} {
+	if { ! [regexp {^#define[ \t]+([A-Z0-9_]+)[ \t]+([-('A-Za-z_0-9*+)]*)[ \t]*/\*[ \t]*{(.*)}[ \t]*\*/[ \t]*$} $line all name value comment]} {
 	    switch -regexp $line {
 		^$ continue
 		{^[ \t]*$} continue
