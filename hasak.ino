@@ -87,7 +87,8 @@ static void interrupt() {
 
 void setup(void) {
   Serial.begin(115200);
-  // while ( ! Serial);
+  while ( ! Serial);
+  Serial.printf("hasak.ino setup()\n");
   listener_setup();		// set up listener free list
   midi_setup();			// initialize the midi interface
   define_setup();		// define our notes ctrls and nrpns

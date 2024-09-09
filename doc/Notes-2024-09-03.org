@@ -1,0 +1,18 @@
+* Welcome to the future of the hasak keyer.
+** Checked out the doover (do over) branch from github.com
+** Installed the current Arduino IDE and Teensyduino versions.
+  These don't manage files the way earlier versions did, so the
+  locations teensy/cores and teensy/Audio no longer match the
+  instructions crafted two years ago.
+** However, if I install control_wm8960.cpp and control_wm8960.h
+  from the modified Audio library into ../src/Audio, and include
+  control_wm8960.h in my audio.h, then I can compile, and the
+  resulting object runs.
+** So, I am running with slightly augmented current versions of
+   Arduino/Teensyduino, and the net result is that the audio is
+   at 44100 Hz instead of 48000 Hz, which only matters if you're
+   trying to feed the audio or generated IQ directly to the Hermes
+   Lite 2, but that wasn't the original plan.  If you want the
+   keyer audio/IQ to interface to the HL2, then run a resampler
+   to match the speeds.
+** My basic problem is testing this new version.  

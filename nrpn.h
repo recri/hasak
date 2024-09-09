@@ -386,6 +386,15 @@ static void nrpn_set_default_shim(int nrpn, int _) {
   nrpn_set_default();
 }
 
+static void nrpn_bootstrap_controller(int nrpn, int _) {
+  nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
+  nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
+  nrpn_set(NRPN_VOLUME, nrpn_get(NRPN_VOLUME));
+  nrpn_set(NRPN_LEVEL, nrpn_get(NRPN_LEVEL));
+  nrpn_set(NRPN_TONE, nrpn_get(NRPN_TONE));
+  nrpn_set(NRPN_SPEED, nrpn_get(NRPN_SPEED));
+}
+
 static void nrpn_setup(void) {
   /* bootstrap controller */
 
@@ -411,6 +420,9 @@ static void nrpn_setup(void) {
   nrpn_listen(NRPN_MSG_WRITE, nrpn_msg_handler);
   nrpn_listen(NRPN_MSG_READ, nrpn_msg_handler);
 
+  /* bootstrap controller */
+  nrpn_listen(NRPN_ID_DEVICE, nrpn_bootstrap_controller);
+  
   /* information set in the nrpn array so it will be echoed */
   nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
   nrpn_set(NRPN_ID_VERSION, KYR_VERSION);

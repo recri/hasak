@@ -28,6 +28,14 @@
 /* 
 ** naming conventions for config.h defines
 **
+** relocations are used to locate blocks of related definitions
+** so they can be relocated as a block if necessary.
+**
+** NOTE's are signals that act like MIDI notes turning on and off
+** some of them are exported or imported from USB MIDI by default
+** and all of them are potentially exportable, some of them are
+** potentially importable.
+**
 ** KYR_* are configuration definitions
 ** KYRA_* are audio related definitions, A is for Audio
 ** NOTE_* are MIDI note numbers or note number relocations, N is for Note.
@@ -204,6 +212,7 @@ static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 27) || ((pin) 
 /* Teensy LC DAC 26/A12 */
 
 #endif
+
 static int pin_i2s(int p) { return ((p)==KYR_DIN||(p)==KYR_DOUT||(p)==KYR_MCLK||(p)==KYR_BCLK||(p)==KYR_LRCLK); }
 static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
@@ -733,10 +742,10 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_MIXER	(NRPN_SCRATCH+19) /* {type rel title {base of output mixer level block}} */
 
 /* 24 output mixer target levels */
-/* left and right channel mixers for four channels for each of usb_out, i2s_out, and mqs_out */
+/* left and right channel mixers for four channels for each of usb_out, i2s_out, and hdw_out */
 /* also left and right channel enables for the same channels */
 /*
-**        : usb_out  i2s_out  mqs_out
+**        : usb_out  i2s_out  hdw_out
 **  chan 0: i2s_in   usb_in   usb_in
 **       1: ST       ST       ST
 **       2: IQ       IQ       IQ

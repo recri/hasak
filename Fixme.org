@@ -1,0 +1,35 @@
+* Restarting activity as of 2024-09-03
+* Failed to compile for lack of wm8960
+  copied control_wm8960.* from CWKeyer/libraries/teensy/Audio
+* Failed to install to hardware
+  follow instructions to install udev rules.
+* Build and runs using current Arduino and Teensyduino without
+  hacks.
+* sgtl5000 $3.855 / unit at jlcpcb.com, $4.65 / unit at digikey.com
+* wm8960 $7.2765 / unit at jlcpcb.com, $3.70529 / unit at digikey not in stock
+* ak4558 estimated $20.70 not stocked at jlcpcb.com, $4.98 / unit at digikey.com
+* cs4272 $4.5660 / unit at jlcpcb.com, $11.20000 / unit at best at digikey.com
+* wm8731 $9.1620 12 day lead time, not stocked at jlcpcb.com, $3.54517 / unit at digikey.com, possible per tray of 60
+* cs42448 not stocked at jlcpcb.com, $9.25534 / unit not stocked at digikey.com
+* wm8904 $2.8440 / unit at jlcpcb.com, $7.74 / unit at digikey.com
+* cabling expected
+** paddle in / TRS
+** key/ptt in / TRS
+** key/ptt out / TRS
+** speaker left / TRS (+, -, ground)
+** speaker right / TRS (+, -, ground)
+** headphones out / TRS
+** headset in-out / TRRS
+** microphone in / TRS
+** line in / TRS
+** line out / TRS
+** paddle2 in / TRS
+** key/ptt2 in / TRS
+** key/ptt2 out / TRS
+* Optional dial interface
+** Stack5 Dial5
+** I2C + 5V + PwrGnd
+** Displays speed / frequency / level / time / date
+** Power connector DB2EK 2 Pin
+   DORABO DB2EK-2.54-2P-GN-S is a terminal block that plugs into the power connector
+** I2C connector is a Grove connector, JST connectors type 'HY2.0-4P'.

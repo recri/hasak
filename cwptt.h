@@ -53,7 +53,7 @@ static void cwptt_key_out_listener(int note, int _) {
 static void cwptt_sample(int nrpn, int _) {
   if (note_get(NOTE_PTT_OUT) &&		      /* ptt tx is on */
       note_get(NOTE_KEY_OUT) == 0 &&	      /* key tx is off */
-      cwptt_tail_counter > xnrpn_get(NRPN_XPTT_TAIL_TIME)) { /* tail has expired */
+      cwptt_tail_counter > (elapsedSamples)xnrpn_get(NRPN_XPTT_TAIL_TIME)) { /* tail has expired */
     note_toggle(NOTE_PTT_OUT);		      /* ptt off */
   }
   if (cwptt_delay_line.can_get() &&	      /* something is queued */ 

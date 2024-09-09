@@ -202,8 +202,10 @@ private:
     _set(type, tindex, value);
     if (nrpn_get(NRPN_LISTENER_ENABLE)) 
       invoke_listeners(type, tindex, oldvalue);
-    if (nrpn_get(NRPN_OUTPUT_ENABLE) && output_enabled(type, tindex))
+    if (nrpn_get(NRPN_OUTPUT_ENABLE) && output_enabled(type, tindex)) {
+      // Serial.printf("midi.set(type=%d, tindex=%d, old=%d, new=%d) and sending to midi.\n", type, tindex, oldvalue, value);
       _send(type, tindex, _get(type,tindex));
+    }
   }
   // unset from device origin, not sure if this is useful
   void unset(int type, int tindex) { _set(type, tindex, -1); }
@@ -263,7 +265,10 @@ private:
 
   void ctrl_unset(int ctrl) { if (ctrl_is_valid(ctrl)) unset(CTRL, ctrl); }
 
-  void ctrl_send(int ctrl, int value) { if (ctrl_is_valid(ctrl)) send(CTRL, ctrl, value&0x7f); }
+  void ctrl_send(int ctrl, int value) { 
+    Serial.printf("midi.ctrl_send(%d, %d)\n", ctrl, value);
+    if (ctrl_is_valid(ctrl)) send(CTRL, ctrl, value&0x7f);
+  }
 
   void ctrl_define(int ctrl, int value, int input_enable, int output_enable, int echo_enable, int read_only) {
     if (ctrl_is_valid(ctrl)) define(CTRL, ctrl, value&0x7f, input_enable, output_enable, echo_enable, read_only);
@@ -287,7 +292,10 @@ private:
 
   void nrpn_unset(int nrpn) { if (nrpn_is_valid(nrpn)) unset(NRPN, nrpn); }
 
-  void nrpn_send(int nrpn, int value) { if (nrpn_is_valid(nrpn)) send(NRPN, nrpn, value&0x3fff); }
+  void nrpn_send(int nrpn, int value) { 
+    Serial.printf("midi.nrpn_send(%d, %d)\n", nrpn, value);
+    if (nrpn_is_valid(nrpn)) send(NRPN, nrpn, value&0x3fff);
+ }
 
   void nrpn_incr(int nrpn, int n=1) { if (nrpn_is_valid(nrpn)) nrpn_set(nrpn, nrpn_get(nrpn)+n); }
 

@@ -1,3 +1,12 @@
+* Todo list started on 2024-09-03
+[ ] Only getting audio on left channel of headphone out.
+[ ] Not sending paddle events.
+[ ] Adjust NOTE groups so that all can be enabled for MIDI
+    output or input, separately, by simply specifying a non-127 value
+    as the MIDI note to be sent or received.  Some just default to on.
+[ ] Build Teensy 3 and 4 with Teensy audio adapter, Teensy 4 using the
+    medium quality audio or PWM, and make them all work with hasak and
+    the web app controller.
 * Todo list as of 2022-02-24
 [ ] define NRPN_QUERY so it can read out notes, ctrls, nrpns, and flags.
 	index = note || ctrl+N_NOTE || nrpn+N_NOTE+N_CTRL ||
@@ -39,6 +48,9 @@
 	This is sort of like running status, but less aggressive.
 	I don't see how to make the Teensy usb_midi.h do running
 	status.
+	I suspect this would also break standards compliance, real
+	implementations zero out the RPN/NRPN registers at end of
+	of set.
 [ ] move the indivdual mixer levels into ephemeral NRPNs
 	compute them from enable bits and named level
 	and balance controls.

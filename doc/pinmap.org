@@ -1,0 +1,74 @@
+* Pin allocations for different versions of Teensy
+** Concentrating on the common pinout for the common
+   28 pins.
+** The allocations ignore any extra pins provided
+   except when they provide the hdw_out ports.
+** The hdw_in port, using a hardware ADC, is not
+   allocated.
+** No pwm_out port is allocated.   
+** There is an additional audio input path allocated
+   in the audio library graph, it could be used for
+   a hdw_in device or a second i2s device input, but
+   this would require modifications to the hasak source.
+
+|------------+--------------+--------------+--------+-------------+--------------+-----------------|
+| pin number | Teensy 4.x   | Teensy 3.x   | common | CW Keyer    | hasak        | Misc            |
+|------------+--------------+--------------+--------+-------------+--------------+-----------------|
+|        GND |              |              | x      | x           | x            |                 |
+|          0 |              |              | x      | PaddleRight | PaddleRight  |                 |
+|          1 |              |              | x      | PaddleLeft  | PaddleLeft   |                 |
+|          2 |              |              | x      | StraightKey | StraightKey  |                 |
+|          3 |              |              | x      | PTT_IN      | PTT_IN       |                 |
+|          4 |              |              | x      | PTT_OUT     | PTT_OUT      |                 |
+|          5 |              |              | x      | KEY_OUT     | KEY_OUT      |                 |
+|          6 |              |              | x      |             | free         |                 |
+|          7 | _DIN         |              |        | DIN         | DIN4         |                 |
+|          8 | _DOUT        |              |        | DOUT        | DOUT4        |                 |
+|          9 |              | _BCLK        |        |             | BCLK3        |                 |
+|         10 | _MQSR        |              |        | MQSR        | MQSR4,PWM3   | hdw_out 4.x     |
+|         11 | _MQSL        | _MCLK        |        | MQSL        | MCLK3        | hdw_out 4.x     |
+|         12 |              |              | x      |             | free         |                 |
+|------------+--------------+--------------+--------+-------------+--------------+-----------------|
+|         13 |              | _DOUT        |        |             | DOUT3        | LED             |
+|         14 | _ADC0        | _ADC0        | x      |             | free         |                 |
+|         15 | _ADC1        | _ADC1        | x      | VOLUME      |              |                 |
+|         16 | _ADC2        | _ADC2        | x      | STVOL       |              |                 |
+|         17 | _ADC3        | _ADC3        | x      | STFRQ       |              |                 |
+|         18 | _ADC4,_SDA   | _ADC4,_SDA   | x      | SDA         | SDA          |                 |
+|         19 | _ADC5,_SCL   | _ADC5,_SCL   | x      | SCL         | SCL          |                 |
+|         20 | _ADC6,_LRCLK | _ADC6        |        | LRCLK       | LRCLK4       |                 |
+|         21 | _ADC7,_BCLK  | _ADC7        |        | BCLK        | BCLK4        |                 |
+|         22 | _ADC8        | _ADC8,_DIN   |        | SPEED       | DIN3         |                 |
+|         23 | _ADC9,_MCLK  | _ADC9,_LRCLK |        | MCLK        | MCLK4,LRCLK3 |                 |
+|       3.3V |              |              | x      | x           | x            |                 |
+| Analog GND |              |              | x      | x           | x            |                 |
+|        Vin |              |              | x      | x           | x            |                 |
+|------------+--------------+--------------+--------+-------------+--------------+-----------------|
+|          ? |              | _ADC14/DAC   |        |             |              | hdw_out 3.2     |
+|          ? |              | _ADC21/DAC0  |        |             |              | hdw_out 3.5/3.6 |
+|          ? |              | _ADC22/DAC1  |        |             |              | hdw_out 3.5/3.6 |
+|------------+--------------+--------------+--------+-------------+--------------+-----------------|
+
+* The CW Keyer assignment of ADC8 to the SPEED pot cannot be supported
+  because it conflicts with the I2S assignments on the Teensy 3.x
+  But no one will ever succeed in using a Teensy 3.x in the Cw Keyer
+  board, so we can soft assign pin 22 to SPEED on the CW Keyer board
+* On the hasak board, we can assign everything except the POTs as it is on the 
+  CW Keyer board.  We also route the Teensy 3 I2S signals to the codec. 
+** The signal for pin 23 is MCLK4 but LRCLK3, so it will need to be jumpered when
+   switching between a Teensy 3 and a Teensy 4.
+** The rest of the I2S signals may be okay connected to two pins, one of which is
+   quiescent, or more of them may need to jumpered.  It's 4 additional jumpers, it
+   could be a jumper block of 5x3 headers, or maybe a 5P2T DIP switch.
+** Oh, so the I2C connection is routed to the audio adapter, too,
+** In any case, this assignment leaves me with pins 6, 10, 12, 14, 15, 16, and 17
+   unassigned, so I have pins for a second paddle, second key/ptt in, and second
+   key/ptt out, with one left over.  Or pins 14, 15, 16, and 17 could be optionally
+   assigned to ADC inputs.
+** We end up with a design that has no moving parts other than the springs in the
+   audio jacks, but they're easy to desolder and replace.
+** We have miscellaneous support components to make the audio codec work.
+** We have optical isolators on the key/ptt out lines.
+** We have resistors on the keyed input lines to debounce.
+** We have a level shifter on the Grove connector that routes I2C off board
+

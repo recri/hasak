@@ -28,6 +28,7 @@
 
 #include <Audio.h>
 // custom audio modules
+#include "src/Audio/control_wm8960.h"
 #include "src/Audio/input_byte.h"
 #include "src/Audio/synth_keyed_tone.h"
 #include "src/Audio/output_byte.h"
@@ -200,6 +201,7 @@ static void audio_timing_reset(void) {
       audio_comp(i)->processorUsageMaxReset();
 }
 
+// error diagnostic says this is invalid because AudioInputAnalog has non-virtual members?
 // optional wiring
 // enable or disable hardware input
 // this is a mono audio channel read from analog pin A0
@@ -231,6 +233,7 @@ static void audio_hdw_in_enable(int nrpn, int _) {
   }
 }
 
+// error diagnostic says this is invalid because AudioOutputAnalog has non-virtual members?
 // optional wiring
 // enable or disable hardware output
 // this is a mono or stereo output audio channel
