@@ -56,7 +56,7 @@
 
 #define KYR_ENABLE_POTS 1 /* {type def title {Should we start with potentiometers for volume, pitch, and speed enabled}} */
 
-#define KYR_ENABLE_HDW_OUT 0 /* {type def title {Should we start with the hardware audio out channel enabled}} */
+#define KYR_ENABLE_HDW_OUT 1 /* {type def title {Should we start with the hardware audio out channel enabled}} */
 
 #define KYR_ENABLE_HDW_IN 0 /* {type def title {Should we start with the hardware input channel enabled}} */
 
