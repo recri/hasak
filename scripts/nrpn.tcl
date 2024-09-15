@@ -64,7 +64,7 @@ proc jsformat-rel {name table} {
 	return "[jsq $name]: { [jsq nrpn]: $value, [jsq label]: \"$label\" }"
     }
 }
-array set ::seen {type 1 sub 1 value 1 label 1 title 1 units 1 range 1 values 1 opts 1}
+array set ::seen {type 1 sub 1 value 1 label 1 title 1 units 1 range 1 values 1 opts 1 cwk 1}
 proc jsformat-any {name table} {
     set vals {}
     dict with table {
@@ -155,9 +155,9 @@ proc jsformat {values} {
     set v [dict get $values KYR_VERSION value]
     set d ",\n    "
     return "// parameter map for hasak version $v
-			// generated with .../hasak/doc/nrpn.tcl from .../hasak/config.h
-			// do not edit, regenerated from .../hasak/config.h by .../hasak/doc/nrpn.tcl output js
-			export const hasakProperties$v = {\n    [join [jsformat-all $values] $d]\n};"
+// generated with .../hasak/doc/nrpn.tcl from .../hasak/config.h
+// do not edit, regenerated from .../hasak/config.h by .../hasak/doc/nrpn.tcl output js
+export const hasakProperties$v = {\n    [join [jsformat-all $values] $d]\n};"
 }
 proc json-minimize {values} {
     set min [dict create]

@@ -569,22 +569,22 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_LVL		(NRPN_ENABLE+14) /* {type rel title {base of keyer level setting nrpns}} */
 
 #define NRPN_VOLUME		(NRPN_LVL+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-320 60} property masterVolume} */
-#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn title {STlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn title {USBlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn title I2Slvl} title {I2S level} range {-320 60} default 0 unit dB/10 property i2sLevel} */
-#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn title HdwLVL} title {HDW level} range {-320 60} default 0 unit dB/10 property hdwLevel} */
+#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn label {STlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
+#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn label {USBlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
+#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn label I2Slvl} title {I2S level} range {-320 60} default 0 unit dB/10 property i2sLevel} */
+#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn label HdwLVL} title {HDW level} range {-320 60} default 0 unit dB/10 property hdwLevel} */
 #define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 property sidetonePan} */
 #define NRPN_RX_PTT_LEVEL	(NRPN_LVL+6) /* {type nrpn label RXMute title {RX mute level during keying} range {-320 60} unit dB/10 property sidetonePan} */
 
 #define NRPN_KEYER		(NRPN_LVL+7) /* {type rel title {base of keyer parameters}} */
 
-#define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn title {sidetone and IQ oscillator frequency} range {-8192 8191} unit Hz property keyerTone} */
-#define NRPN_SPEED		(NRPN_KEYER+1) /* {type nrpn title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
-#define NRPN_WEIGHT		(NRPN_KEYER+2) /* {type nrpn title {keyer mark/space weight} range {25 75} unit % default 50 property keyerWeight} */
-#define NRPN_RATIO		(NRPN_KEYER+3) /* {type nrpn title {keyer dit/dah ratio} range {25 75} unit % default 50 property keyerRatio} */
-#define NRPN_FARNS		(NRPN_KEYER+4) /* {type nrpn title {Farnsworth keying speed} range {0 127} default 0 unit WPM property keyerFarnsworth} */
-#define NRPN_COMP		(NRPN_KEYER+5) /* {type nrpn title {keyer compensation} range {-8192 8191} default 0 unit sample property keyerCompensation} */
-#define NRPN_SPEED_FRAC		(NRPN_KEYER+6) /* {type nrpn title {keyer speed fraction} range {0 127} default 0 unit WPM/128 property keyerSpeedFraction} */
+#define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn label Freq title {sidetone and IQ oscillator frequency} range {-8192 8191} unit Hz property keyerTone} */
+#define NRPN_SPEED		(NRPN_KEYER+1) /* {type nrpn label Speed title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
+#define NRPN_WEIGHT		(NRPN_KEYER+2) /* {type nrpn label Weight title {keyer mark/space weight} range {25 75} unit % default 50 property keyerWeight} */
+#define NRPN_RATIO		(NRPN_KEYER+3) /* {type nrpn label Ratio title {keyer dit/dah ratio} range {25 75} unit % default 50 property keyerRatio} */
+#define NRPN_FARNS		(NRPN_KEYER+4) /* {type nrpn label Farns title {Farnsworth keying speed} range {0 127} default 0 unit WPM property keyerFarnsworth} */
+#define NRPN_COMP		(NRPN_KEYER+5) /* {type nrpn label Comp title {keyer compensation} range {-8192 8191} default 0 unit sample property keyerCompensation} */
+#define NRPN_SPEED_FRAC		(NRPN_KEYER+6) /* {type nrpn label Frac title {keyer speed fraction} range {0 127} default 0 unit WPM/128 property keyerSpeedFraction} */
 
 #define NRPN_PTT		(NRPN_KEYER+7) /* {type rel title {PTT timing parameters}} */
 
