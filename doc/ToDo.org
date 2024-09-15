@@ -1,4 +1,49 @@
+* Ideas from reading K16 data sheet
+[ ] Customize tune to 100% or 50% duty cycle
+[ ] Cut numbes for 9 and 0 in serial numbers
+[ ] Contest word spacing
+[ ] Lock
+[ ] paddle spped control
+[ ] key out circuit just a 2N7000
+[ ] command buttons and pot on one adc
+[ ] PN2222 circuit for speaker driving
+[ ] recommend shunt .001uF on paddle inputs suppress RFI
+[ ] paddle sample delay, adjust time after first press before next
+    element can latch
+[ ] merged keying modes
+[ ] serial number generation
+[ ] call sign memories
+[ ] memory inclusion in memory play
+[ ] PTT hang time for paddle keyed, PTT tail time for text keyed
+	hang time = word space + configurable 1-8 dits
+	tail time = 3 dit times + ${n} * 10 ms
+[ ] A for affirmative response, N for negatory, E for enter
 * Todo list started on 2024-09-03
+[ ] some nrpns have signed values, some have unsigned, oops.
+    easy to identify in json, range is "0 16383"
+    there's a signed_value() function.  Should be one for
+    the unsigned value, too, and the difference should be
+    automated somewhere.
+[ ] add NRPN_QUERY - prompt echo of  single nrpn value.
+[ ] add NRPN_ENABLE_NOTE_LEAK - leak MIDI note encoded properties
+[ ] add NRPN_ENABLE_CTRL_LEAK - lean MIDI ctrl encoded properties
+[ ] implement ECHO_ALL by string transfer.
+[ ] implement JSON by string transfer.
+[ ] dB/10 for levels, not completely implemented.
+[?] enable hdw_out by default
+    not exactly done, probably tied up in audio mixer properties
+[ ] all levels handled in audio graph mixer, codec levels handled
+    separately.
+[ ] all levels handled by named sources and sinks, matrix computed
+    by combination.
+[x] enable hdw_in never
+[ ] NRPN_HDW_IN_ENABLE goes away
+[ ] NRPN_HDW_OUT_ENABLE goes away
+[-] compute variance of ADC samples, disable if larger than NRPN_ADC_VAR
+    not clear, disable ADC if not CWKeyerShield
+    disable in hasak-js if receiving nonsense settings
+[x] eliminate warnings from compiler, unused and precision
+    a lot done, some are unused in one place not in another
 [ ] Only getting audio on left channel of headphone out.
 [ ] Not sending paddle events.
 [ ] Adjust NOTE groups so that all can be enabled for MIDI
@@ -620,4 +665,3 @@ https://forum.pjrc.com/threads/66330-Dual-SerialUSB-and-MIDI-config-possible?hig
 	[x] keyer voice specific NRPN's
 [x] Move the IQ_ENABLE and IQ_ADJUST NRPN's to SOFT global block.
 
-	
