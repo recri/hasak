@@ -40,10 +40,10 @@
 static KeyerText cwkey_text(NOTE_TXT_TEXT, NOTE_ST_TEXT);
 static KeyerText cwkey_text2(NOTE_TXT_TEXT2, NOTE_ST_TEXT2);
 
-static void cwkey_text_listen(int note, int _) { cwkey_text.receive(); }
-static void cwkey_text2_listen(int note, int _) { cwkey_text2.receive(); }
+static void cwkey_text_listen(int _, int __, int ___) { cwkey_text.receive(); }
+static void cwkey_text2_listen(int _, int __, int ___) { cwkey_text2.receive(); }
 
-static void cwkey_text_sample(int nrpn, int _) { 
+static void cwkey_text_sample(int _, int __, int ___) { 
   cwkey_text.clock();
   cwkey_text2.clock();
 }

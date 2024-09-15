@@ -28,24 +28,24 @@
 ** final sidetone, key out, and ptt out routing.
 */
 
-static void cwroute_midi_tune_listener(int note, int _) {
+static void cwroute_midi_tune_listener(int _, int __, int in_tune) {
   if (nrpn_get(NRPN_RKEY_ENABLE))
-    note_set(NOTE_ST_TUNE, note_get(NOTE_MIDI_IN_TUNE) != 0);
+    note_set(NOTE_ST_TUNE, in_tune != 0);
 }
 
-static void cwroute_sidetone_listener(int note, int _) {
+static void cwroute_sidetone_listener(int _, int __, int key_st) {
   /* NOTE_KEY_ST can be routed to:
   ** NOTE_AU_ST_KEY to make a tone
   ** NOTE_MIDI_OUT_ST to make a midi note
   */
   if (nrpn_get(NRPN_ST_ENABLE)) {
-    note_set(NOTE_AU_ST_KEY, note_get(NOTE_KEY_ST));
+    note_set(NOTE_AU_ST_KEY, key_st);
   // if (nrpn_get(NRPN_MIDI_KEY_ENABLE))
-    note_set(NOTE_MIDI_OUT_ST, note_get(NOTE_KEY_ST) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
+    note_set(NOTE_MIDI_OUT_ST, key_st ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
   }
 }
 
-static void cwroute_key_out_listener(int note, int _) {
+static void cwroute_key_out_listener(int _, int __, int key_out) {
   /* NOTE_KEY_OUT can be routed to
   ** NOTE_MIDI_OUT_KEY to produce a midi note
   ** NOTE_HW_KEY_OUT to change a pin state
@@ -55,28 +55,28 @@ static void cwroute_key_out_listener(int note, int _) {
   */
   if (nrpn_get(NRPN_TX_ENABLE)) {
     if (nrpn_get(NRPN_IQ_ENABLE))
-      note_set(NOTE_AU_IQ_KEY, note_get(NOTE_KEY_OUT));
+      note_set(NOTE_AU_IQ_KEY, key_out);
     // if (nrpn_get(NRPN_MIDI_KEY_ENABLE))
-    note_set(NOTE_MIDI_OUT_KEY, note_get(NOTE_KEY_OUT) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
+    note_set(NOTE_MIDI_OUT_KEY, key_out ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
     // if (nrpn_get(NRPN_HW_KEY_ENABLE))
-    note_set(NOTE_HW_KEY_OUT, note_get(NOTE_KEY_OUT));
+    note_set(NOTE_HW_KEY_OUT, key_out);
     // if (nrpn_get(NRPN_HW_KEY2_ENABLE))
-    note_set(NOTE_HW_KEY_OUT2, note_get(NOTE_KEY_OUT));
+    note_set(NOTE_HW_KEY_OUT2, key_out);
   }
 }
 
-static void cwroute_ptt_out_listener(int note, int _) {
+static void cwroute_ptt_out_listener(int _, int __, int ptt_out) {
   /* ptt out can be routed to
   ** NOTE_MIDI_OUT_PTT to generate an external midi note
   ** NOTE_HW_PTT_OUT and/or NOTE_HW_PTT_OUT2 to change a pin state
   */
   if (nrpn_get(NRPN_TX_ENABLE)) {
     // if (nrpn_get(NRPN_MIDI_PTT_ENABLE)) ?
-    note_set(NOTE_MIDI_OUT_PTT, note_get(NOTE_PTT_OUT) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
+    note_set(NOTE_MIDI_OUT_PTT, ptt_out ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
     // if (nrpn_get(NRPN_HW_KEY_PTT_ENABLE)) ?
-    note_set(NOTE_HW_PTT_OUT, note_get(NOTE_PTT_OUT));
+    note_set(NOTE_HW_PTT_OUT, ptt_out);
     // if (nrpn_get(NRPN_HW_KEY_PTT2_ENABLE)) ?
-    note_set(NOTE_HW_PTT_OUT2, note_get(NOTE_PTT_OUT));
+    note_set(NOTE_HW_PTT_OUT2, ptt_out);
   }
 }
 

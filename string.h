@@ -81,7 +81,7 @@ static string_endpoint_t string_endpoint[KYR_N_ENDP];
 
 static elapsedMicros string_timeout;;
 
-static void string_sample(int nrpn, int _) {
+static void string_sample(int _, int __, int ___) {
   if ((int)string_timeout < 0) return;
   string_timeout = -nrpn_get(NRPN_STRING_THROTTLE);
   for (int i = 0; i < KYR_N_ENDP; i += 1) {
@@ -140,20 +140,17 @@ static void string_byte(string_endpoint_t *p, const int payload) {
 static void string_end(string_endpoint_t *p) {
 }
 
-static void string_start_listener(int nrpn, int _) {
-  int e = nrpn_get(nrpn);
+static void string_start_listener(int _, int __, int e) {
   if (e >= 0 && e < KYR_N_ENDP)
     string_start(&string_endpoint[e]);
 }
 
-static void string_end_listener(int nrpn, int _) {
-  int e = nrpn_get(nrpn);
+static void string_end_listener(int _, int __, int e) {
   if (e >= 0 && e < KYR_N_ENDP)
     string_end(&string_endpoint[e]);
 }
 
-static void string_byte_listener(int nrpn, int _) {
-  int b = nrpn_get(nrpn);
+static void string_byte_listener(int _, int __, int b) {
   int e = b >> 9;
   if (e >= 0 && e < KYR_N_ENDP) 
     string_byte(&string_endpoint[e], b);

@@ -56,9 +56,9 @@
 
 #define KYR_ENABLE_POTS 1 /* {type def title {Should we start with potentiometers for volume, pitch, and speed enabled}} */
 
-#define KYR_ENABLE_HDW_OUT 0 /* {type def title {Should we start with the hardware audio out channel enabled}} */
+// #define KYR_ENABLE_HDW_OUT 0 /* {type def title {Should we start with the hardware audio out channel enabled}} */
 
-#define KYR_ENABLE_HDW_IN 0 /* {type def title {Should we start with the hardware input channel enabled}} */
+// #define KYR_ENABLE_HDW_IN 0 /* {type def title {Should we start with the hardware input channel enabled}} */
 
 #define KYR_ENABLE_WINKEY 0  /* {type def title {Should we start with the winkey emulator enabled}} */
 
@@ -209,7 +209,8 @@ static int pin_analog(int pin) { return (((pin) >= 14 && (pin) <= 27) || ((pin) 
 #define KYR_DAC1	67	/* {type pin analog A22 title {teens 3.[56] hardware dac pin} ignore 1} */
 #endif
 
-/* Teensy LC DAC 26/A12 */
+//   Teensy LC DAC 26/A12
+//   But Teensy LC cannot run the Teensy Audio library, lacks some DSP instructions used by the library.
 
 #endif
 
@@ -229,7 +230,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /*
 ** pin allocations for CWKeyer shield input pots
-** These are soft wired.
+** These can be rewired.
 */
 #define KYR_VOLUME_POT	15	/* {type pin title {volume pot input pin} analog A1} */
 #define KYR_ST_VOL_POT	16	/* {type pin title {sidetone volume pot input pin} analog A2} */
@@ -266,6 +267,10 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /*
 ** midi note usage
+**
+** the guts of hasak dispatches events in which midi notes are events.
+** Some of the events are actual midi notes which enter and leave by the midi interface.
+** Some of the events are triggered by paddles, keys, and switches. 
 ** Notes are named with NOTE_ prefix and the following addtional conventions
 ** NOTE_MIDI_* are notes that enter or exit via the MIDI interface.
 ** NOTE_HW_* are notes derived from or delivered to hardware switches or latches.
@@ -482,12 +487,17 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 /* NRPN midi block, parameters common to all midi.h based firmware */
 #define NRPN_FIRST		0 /* {type rel title {base of nrpns}} */
 
-#define NRPN_NOTHING		(NRPN_FIRST+0) /* {type nrpn title {nothng parameter value, zero is not a valid parameter} property nothing} */
-#define NRPN_ID_DEVICE          (NRPN_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer} */
-#define NRPN_ID_VERSION		(NRPN_FIRST+2) /* {type nrpn title {identify this keyer version for the correspondent} property idVersion} */
-#define NRPN_STRING_START	(NRPN_FIRST+3) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
-#define NRPN_STRING_END		(NRPN_FIRST+4) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
-#define NRPN_STRING_BYTE	(NRPN_FIRST+5) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define NRPN_NOTHING		(NRPN_FIRST+0) /* {type nrpn title {nothng parameter value, zero is not a valid parameter} property nothing cwk true} */
+#define NRPN_ID_DEVICE          (NRPN_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer cwk true} */
+#define NRPN_ID_VERSION		(NRPN_FIRST+2) /* {type nrpn title {identify this keyer version for the correspondent} property idVersion cwk true} */
+#define NRPN_NNRPN		(NRPN_FIRST+3) /* {type nrpn title {return how many NRPNs are allocated} cwk true}*/
+#define NRPN_NRPN_QUERY		(NRPN_FIRST+4) /* {type nrpn title {take the value as a nrpn number and send that nrpns value, no response if no value set} cwk true} */
+#define NRPN_NRPN_UNSET		(NRPN_FIRST+5) /* {type nrpn title {take the value as a nrpn number and make that nrpn NRPNV_NOTSET} cwk true} */
+#define NRPN_STRING_START	(NRPN_FIRST+6) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
+#define NRPN_STRING_END		(NRPN_FIRST+7) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
+#define NRPN_STRING_BYTE	(NRPN_FIRST+8) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define NRPN_GAP_9		(NRPN_FIRST+9) /* {type nrpn sub gap title {unassigned}} */
+#define NRPN_GAP_10		(NRPN_FIRST+10) /* {type nrpn sub gap title {unassigned}} */
 #define ENDP_JSON_TO_HOST	0	       /* {type endp title {transfer JSON string to host from device}} */
 #define ENDP_NRPNS_TO_DEV	1	       /* {type endp title {transfer NRPN settings to device from host}} */
 #define ENDP_NRPNS_TO_HOST	2	       /* {type endp title {transfer NRPN settings to host from device}} */
@@ -498,67 +508,92 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYR_N_ENDP		7	       /* {type def title {number of defined endpoints}} */
 #define VAL_BYTE_STOP		0x100	       /* {type val title {STRING_BYTE acknowlegement xoff value that signals stop sending}}*/
 #define VAL_BYTE_START		0x101	       /* {type val title {STRING_BYTE acknowlegement xon value that signals start sending}} */
-#define NRPN_MIDI_INPUTS	(NRPN_FIRST+6) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
-#define NRPN_MIDI_OUTPUTS	(NRPN_FIRST+7) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
-#define NRPN_MIDI_ECHOES	(NRPN_FIRST+8) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
-#define NRPN_MIDI_SENDS		(NRPN_FIRST+9) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
-#define NRPN_MIDI_NOTES		(NRPN_FIRST+10) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_MIDI_CTRLS		(NRPN_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_MIDI_NRPNS		(NRPN_FIRST+12) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_LISTENER_NODES     (NRPN_FIRST+13) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
-#define NRPN_LISTENER_LISTS	(NRPN_FIRST+14) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
-#define NRPN_LISTENER_CALLS	(NRPN_FIRST+15) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
-#define NRPN_LISTENER_FIRES	(NRPN_FIRST+16) /* {type nrpn sub info title {number of listener lists called} listen 0} */
-#define NRPN_LISTENER_LOOPS	(NRPN_FIRST+17) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
-#define NRPN_STATS_RESET	(NRPN_FIRST+18) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
 
-#define NRPN_SAVED		(NRPN_FIRST+19) /* {type rel title {base of saved NRPN parameters}} */
+#define NRPN_WM8960		(NRPN_FIRST+11)	       /* {type rel title {base of WM8960 commands}} */
+
+#define NRPN_WM8960_ENABLE            (NRPN_WM8960+0) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_INPUT_LEVEL       (NRPN_WM8960+1) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_INPUT_SELECT      (NRPN_WM8960+2) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_VOLUME            (NRPN_WM8960+3) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_HEADPHONE_VOLUME  (NRPN_WM8960+4) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_HEADPHONE_POWER   (NRPN_WM8960+5) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_SPEAKER_VOLUME    (NRPN_WM8960+6) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_SPEAKER_POWER     (NRPN_WM8960+7) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_DISABLE_ADCHPF    (NRPN_WM8960+8) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_ENABLE_MICBIAS    (NRPN_WM8960+9) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_ENABLE_ALC        (NRPN_WM8960+10) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_MIC_POWER         (NRPN_WM8960+11) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_LINEIN_POWER      (NRPN_WM8960+12) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_RAW_MASK          (NRPN_WM8960+13) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_RAW_DATA          (NRPN_WM8960+14) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+#define NRPN_WM8960_RAW_WRITE         (NRPN_WM8960+15) /* {type nrpn sub cmd title {WM8960 operation} cwk true} */
+
+#define NRPN_KEYDOWN_NOTE             (NRPN_WM8960+16) /* {type nrpn title {specify midi note for key out signal, ala CWKeyerShield} cwk true} */
+#define NRPN_PTT_NOTE                 (NRPN_WM8960+17) /* {type nrpn title {specify midi note for ptt out signal, ala CWKeyerShield} cwk true} */
+
+#define NRPN_STATISTICS		      (NRPN_WM8960+18) /* {type rel title {base of internal statistics}} */
+
+#define NRPN_MIDI_INPUTS	(NRPN_STATISTICS+0) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
+#define NRPN_MIDI_OUTPUTS	(NRPN_STATISTICS+1) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
+#define NRPN_MIDI_ECHOES	(NRPN_STATISTICS+2) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
+#define NRPN_MIDI_SENDS		(NRPN_STATISTICS+3) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
+#define NRPN_MIDI_NOTES		(NRPN_STATISTICS+4) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_MIDI_CTRLS		(NRPN_STATISTICS+5) /* {type nrpn sub info title {number of midi controls} listen 0} */
+#define NRPN_MIDI_NRPNS		(NRPN_STATISTICS+6) /* {type nrpn sub info title {number of midi nrpns} listen 0} */
+#define NRPN_LISTENER_NODES     (NRPN_STATISTICS+7) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
+#define NRPN_LISTENER_LISTS	(NRPN_STATISTICS+8) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
+#define NRPN_LISTENER_CALLS	(NRPN_STATISTICS+9) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
+#define NRPN_LISTENER_FIRES	(NRPN_STATISTICS+10) /* {type nrpn sub info title {number of listener lists called} listen 0} */
+#define NRPN_LISTENER_LOOPS	(NRPN_STATISTICS+11) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
+#define NRPN_STATS_RESET	(NRPN_STATISTICS+12) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
+
+#define NRPN_SAVED		(NRPN_STATISTICS+13) /* {type rel title {base of saved NRPN parameters}} */
 
 #define NRPN_SECOND		(NRPN_SAVED) /* {type rel title {base of persistent midi.h parameters}} */
 
-#define NRPN_CHANNEL		(NRPN_SECOND+0) /* {type nrpn label Channel title {the MIDI channel} property midiChannel} */
-#define NRPN_INPUT_ENABLE	(NRPN_SECOND+1) /* {type nrpn label Input title {enable input from the MIDI channel} property midiInput} */ 
-#define NRPN_OUTPUT_ENABLE	(NRPN_SECOND+2) /* {type nrpn label Output title {enable output to the MIDI channel} property midiOutput} */ 
-#define NRPN_ECHO_ENABLE	(NRPN_SECOND+3) /* {type nrpn label Echo title {enable echo to the MIDI channel} property midiEcho}} */ 
-#define NRPN_LISTENER_ENABLE	(NRPN_SECOND+4) /* {type nrpn label Listen title {enable listening to note, ctrl, and nrpn values} property midiListen}} */
-#define NRPN_STRING_THROTTLE	(NRPN_SECOND+5) /* {type nrpn label Throttle title {pause between bytes of a string} unit us range {0 16383} property stringThrottle} */
+#define NRPN_CHANNEL		(NRPN_SECOND+0) /* {type nrpn label Channel title {the MIDI channel} range {1 16} unit {} property midiChannel} */
+#define NRPN_INPUT_ENABLE	(NRPN_SECOND+1) /* {type nrpn label {MIDI Input} title {enable input from the MIDI channel} property midiInput} */ 
+#define NRPN_OUTPUT_ENABLE	(NRPN_SECOND+2) /* {type nrpn label {MIDI Output} title {enable output to the MIDI channel} property midiOutput} */ 
+#define NRPN_ECHO_ENABLE	(NRPN_SECOND+3) /* {type nrpn label {MIDI Echo} title {enable echo to the MIDI channel} property midiEcho}} */ 
+#define NRPN_LISTENER_ENABLE	(NRPN_SECOND+4) /* {type nrpn label {MIDI Listen} title {enable listening to note, ctrl, and nrpn values} property midiListen}} */
+#define NRPN_STRING_THROTTLE	(NRPN_SECOND+5) /* {type nrpn label {Throttle} title {pause between bytes of a string} unit us range {0 16383} property stringThrottle} */
 
 #define NRPN_ENABLE		(NRPN_SECOND+6) /* {type rel title {base of keyer enable nrpns}} */
 
-#define NRPN_PIN_ENABLE		(NRPN_ENABLE+0) /* {type ctrl label Input title {enable input pin processing} property keyerInput} */ 
-#define NRPN_POUT_ENABLE	(NRPN_ENABLE+1) /* {type ctrl label Output title {enable output pin processing} property keyerOutput} */ 
-#define NRPN_PADC_ENABLE	(NRPN_ENABLE+2) /* {type ctrl label Adc title {enable adc input pin processing} property keyerAdc} */ 
-#define NRPN_ST_ENABLE		(NRPN_ENABLE+3) /* {type nrpn label ST title {enable sidetone generation} range {0 1} property sidetoneEnable} */
-#define NRPN_TX_ENABLE		(NRPN_ENABLE+4) /* {type nrpn label TX title {enable TX ouputs} range {0 1} property txEnable} */
-#define NRPN_IQ_ENABLE		(NRPN_ENABLE+5) /* {type nrpn label IQ title {enable IQ generation} range {0 1} property iqEnable} */
-#define NRPN_PTT_REQUIRE	(NRPN_ENABLE+6) /* {type nrpn label PTTReq title {require EXT_PTT to transmit} range {0 1} ignore 1 property externalPTTRequire} */
-#define NRPN_RKEY_ENABLE	(NRPN_ENABLE+7) /* {type nrpn label Rem title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
-#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type ctrl label CWPtt title {enable auto-PTT from CW keyer, (should always generate, but where does it go?}} */
-#define NRPN_RX_MUTE		(NRPN_ENABLE+9) /* {type ctrl label RX title {enable muting of RX audio during CW PTT}} */ 
-#define NRPN_MIC_HWPTT		(NRPN_ENABLE+10) /* {type ctrl label MIC_HWPTT title {enable that MICIN triggers the hardware PTT output}} */
-#define NRPN_CW_HWPTT		(NRPN_ENABLE+11) /* {type ctrl label CW_HWPTT title {enable that CWPTT triggers the hardware PTT output}} */
-#define NRPN_HDW_IN_ENABLE	(NRPN_ENABLE+12) /* {type nrpn label HdwIn title {enable hardware input audio channel} range {0 1} property hdwInEnable} */
-#define NRPN_HDW_OUT_ENABLE	(NRPN_ENABLE+13) /* {type nrpn label HdwOut title {enable hardware output audio channel} range {0 1} property hdwOutEnable} */
+#define NRPN_PIN_ENABLE		(NRPN_ENABLE+0) /* {type nrpn label {Pin Input} title {enable input pin processing} property keyerInput} */ 
+#define NRPN_POUT_ENABLE	(NRPN_ENABLE+1) /* {type nrpn label {Pin Output} title {enable output pin processing} property keyerOutput} */ 
+#define NRPN_PADC_ENABLE	(NRPN_ENABLE+2) /* {type nrpn label {Adc Input} title {enable adc input pin processing} property keyerAdc} */ 
+#define NRPN_ST_ENABLE		(NRPN_ENABLE+3) /* {type nrpn label {Sidetone} title {enable sidetone generation} range {0 1} property sidetoneEnable} */
+#define NRPN_TX_ENABLE		(NRPN_ENABLE+4) /* {type nrpn label {Transmit} title {enable TX ouputs} range {0 1} property txEnable} */
+#define NRPN_IQ_ENABLE		(NRPN_ENABLE+5) /* {type nrpn label {IQ Audio} title {enable IQ generation} range {0 1} property iqEnable} */
+#define NRPN_PTT_REQUIRE	(NRPN_ENABLE+6) /* {type nrpn label {PTT Require} title {require EXT_PTT to transmit} range {0 1} ignore 1 property externalPTTRequire} */
+#define NRPN_RKEY_ENABLE	(NRPN_ENABLE+7) /* {type nrpn label {Remote Tune} title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
+#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type nrpn label {PTT from CW} title {enable auto-PTT from CW keyer, (should always generate, but where does it go?}} */
+#define NRPN_RX_MUTE		(NRPN_ENABLE+9) /* {type nrpn label {PTT mutes RX} title {enable muting of RX audio during CW PTT}} */ 
+#define NRPN_MIC_HWPTT		(NRPN_ENABLE+10) /* {type nrpn label {PTT out from MIC} title {enable that MICIN triggers the hardware PTT output}} */
+#define NRPN_CW_HWPTT		(NRPN_ENABLE+11) /* {type nrpn label {PTT out from CW} title {enable that CWPTT triggers the hardware PTT output}} */
+#define NRPN_NOTE_LEAK		(NRPN_ENABLE+12) /* {type nrpn label {Note Leak} title {leak keyer state as MIDI notes} range {0 1} property midiNoteLeak} */
+#define NRPN_CTRL_LEAK		(NRPN_ENABLE+13) /* {type nrpn label {Ctrl Leak} title {leak keyer state as MIDI controls} range {0 1} property midiCtrlLeak} */
 
 #define NRPN_LVL		(NRPN_ENABLE+14) /* {type rel title {base of keyer level setting nrpns}} */
 
-#define NRPN_VOLUME		(NRPN_LVL+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-320 60} property masterVolume} */
-#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn title {STlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn title {USBlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn title I2Slvl} title {I2S level} range {-320 60} default 0 unit dB/10 property i2sLevel} */
-#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn title HdwLVL} title {HDW level} range {-320 60} default 0 unit dB/10 property hdwLevel} */
-#define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label STPan title {sidetone pan left or right} range {-8192 8191} unit pp8191 property sidetonePan} */
-#define NRPN_RX_PTT_LEVEL	(NRPN_LVL+6) /* {type nrpn label RXMute title {RX mute level during keying} range {-320 60} unit dB/10 property sidetonePan} */
+#define NRPN_VOLUME		(NRPN_LVL+0) /* {type nrpn label Vol title {output volume} range {-320 60} unit dB/10 property masterVolume} */
+#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn label Tone title {sidetone volume} range {-320 60} unit dB/10 property sidetoneLevel} */
+#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn label USBlvl title {sidetone volume} range {-320 60} unit dB/10 property sidetoneLevel} */
+#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn label I2Slvl title {I2S level} range {-320 60} unit dB/10 property i2sLevel} */
+#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn label HdwLVL title {HDW level} range {-320 60} unit dB/10 property hdwLevel} */
+#define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label STPan title {sidetone pan left or right} unit pp8191 range {-8192 8191} property sidetonePan} */
+#define NRPN_RX_PTT_LEVEL	(NRPN_LVL+6) /* {type nrpn label RXMute title {RX mute level during keying} unit dB/10 range {-320 60} property rcvrMuteOnTx} */
 
 #define NRPN_KEYER		(NRPN_LVL+7) /* {type rel title {base of keyer parameters}} */
 
-#define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn title {sidetone and IQ oscillator frequency} range {-8192 8191} unit Hz property keyerTone} */
-#define NRPN_SPEED		(NRPN_KEYER+1) /* {type nrpn title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
-#define NRPN_WEIGHT		(NRPN_KEYER+2) /* {type nrpn title {keyer mark/space weight} range {25 75} unit % default 50 property keyerWeight} */
-#define NRPN_RATIO		(NRPN_KEYER+3) /* {type nrpn title {keyer dit/dah ratio} range {25 75} unit % default 50 property keyerRatio} */
-#define NRPN_FARNS		(NRPN_KEYER+4) /* {type nrpn title {Farnsworth keying speed} range {0 127} default 0 unit WPM property keyerFarnsworth} */
-#define NRPN_COMP		(NRPN_KEYER+5) /* {type nrpn title {keyer compensation} range {-8192 8191} default 0 unit sample property keyerCompensation} */
-#define NRPN_SPEED_FRAC		(NRPN_KEYER+6) /* {type nrpn title {keyer speed fraction} range {0 127} default 0 unit WPM/128 property keyerSpeedFraction} */
+#define NRPN_TONE		(NRPN_KEYER+0) /* {type nrpn label Freq title {sidetone oscillator frequency} range {300 2000} unit Hz property keyerTone} */
+#define NRPN_SPEED		(NRPN_KEYER+1) /* {type nrpn label Speed title {keyer speed control} range {0 16384} unit WPM property keyerSpeed} */
+#define NRPN_WEIGHT		(NRPN_KEYER+2) /* {type nrpn label Weight title {keyer mark/space weight} range {25 75} unit % property keyerWeight} */
+#define NRPN_RATIO		(NRPN_KEYER+3) /* {type nrpn label Ratio title {keyer dit/dah ratio} range {25 75} unit % property keyerRatio} */
+#define NRPN_FARNS		(NRPN_KEYER+4) /* {type nrpn label Farns title {Farnsworth keying speed} range {0 127} unit WPM property keyerFarnsworth} */
+#define NRPN_COMP		(NRPN_KEYER+5) /* {type nrpn label Comp title {keyer compensation} range {-8192 8191} unit sample property keyerCompensation} */
+#define NRPN_SPEED_FRAC		(NRPN_KEYER+6) /* {type nrpn label Frac title {keyer speed fraction} range {0 127} unit WPM/128 property keyerSpeedFraction} */
 
 #define NRPN_PTT		(NRPN_KEYER+7) /* {type rel title {PTT timing parameters}} */
 
@@ -570,8 +605,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_RISE_TIME		(NRPN_RAMP+0) /* {type nrpn label riseTime title {key rise ramp length} range {0 16383} unit sample property keyerRiseTime} */
 #define NRPN_FALL_TIME		(NRPN_RAMP+1) /* {type nrpn label fallTime title {key fall ramp length} range {0 16383} unit sample property keyerFallTime} */
-#define NRPN_RISE_RAMP		(NRPN_RAMP+2) /* {type nrpn label riseRamp title {key rise ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerRiseRamp valuesProperty keyerRamps} */
-#define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn label fallRamp title {key fall ramp} values VAL_RAMP_* default VAL_RAMP_HANN property keyerFallRamp valuesProperty keyerRamps} */
+#define NRPN_RISE_RAMP		(NRPN_RAMP+2) /* {type nrpn label riseRamp title {key rise ramp} values VAL_RAMP_* property keyerRiseRamp valuesProperty keyerRamps} */
+#define NRPN_FALL_RAMP		(NRPN_RAMP+3) /* {type nrpn label fallRamp title {key fall ramp} values VAL_RAMP_* property keyerFallRamp valuesProperty keyerRamps} */
 #define VAL_RAMP_HANN		0 /* {type val label Hann title {ramp from Hann window function, raised cosine} value-of {NRPN_*_RAMP} property keyerRamps} */
 #define VAL_RAMP_BLACKMAN_HARRIS 1 /* {type val label {Blackman Harris} title {ramp from Blackman Harris window function} value-of {NRPN_*_RAMP} property keyerRamps} */
 #define VAL_RAMP_LINEAR		2 /* {type val label Linear title {linear ramp, for clicks} value-of {NRPN_*_RAMP} property keyerRamps} */
@@ -580,28 +615,28 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_PAD		(NRPN_RAMP+4) /* {type rel title {base of paddle keyer parameters}} */
 
-#define NRPN_PAD_MODE		(NRPN_PAD+0)	/* {type nrpn title {iambic keyer mode A/B/S} values VAL_MODE_* default VAL_MODE_A property paddleMode} */
+#define NRPN_PAD_MODE		(NRPN_PAD+0)	/* {type nrpn title {iambic keyer mode A/B/S} values VAL_MODE_* property paddleMode} */
 #define VAL_MODE_A		0 /* {type val label A title {paddle keyer iambic mode A} value-of {NRPN_PAD_MODE}} */
 #define VAL_MODE_B		1 /* {type val label B title {paddle keyer iambic mode B} value-of {NRPN_PAD_MODE}} */
 #define VAL_MODE_S		2 /* {type val label S title {paddle keyer bug mode} value-of {NRPN_PAD_MODE}} */
-#define NRPN_PAD_SWAP		(NRPN_PAD+1) /* {type nrpn title {swap paddles} range {0 1} default 0 property paddleSwapped} */
-#define NRPN_PAD_ADAPT		(NRPN_PAD+2) /* {type nrpn title {paddle adapter normal/ultimatic/single lever} values VAL_ADAPT_* default VAL_ADAPT_NORMAL property paddleAdapter} */
+#define NRPN_PAD_SWAP		(NRPN_PAD+1) /* {type nrpn title {swap paddles} range {0 1} property paddleSwapped} */
+#define NRPN_PAD_ADAPT		(NRPN_PAD+2) /* {type nrpn title {paddle adapter normal/ultimatic/single lever} values VAL_ADAPT_* property paddleAdapter} */
 #define VAL_ADAPT_NORMAL	0 /* {type val label Normal title {paddle keyer unmodified} value-of {NRPN_PAD_ADAPT}} */
 #define VAL_ADAPT_ULTIMATIC	1 /* {type val label Ultimatic title {paddle keyer modified to produce ultimatic keyer} value-of {NRPN_PAD_ADAPT}} */
 #define VAL_ADAPT_SINGLE	2 /* {type val label Single title {paddle keyer modified to simulate single lever paddle} value-of {NRPN_PAD_ADAPT}} */
-#define NRPN_AUTO_ILS		(NRPN_PAD+3) /* {type nrpn title {automatic letter space timing} range {0 1} default 1 property autoLetterSpace} */
-#define NRPN_AUTO_IWS		(NRPN_PAD+4) /* {type nrpn title {automatic word space timing} range {0 1} default 0 property autoWordSpace} */
-#define NRPN_PAD_KEYER		(NRPN_PAD+5) /* {type nrpn title {paddle keyer implementation} values VAL_KEYER_* default VAL_KEYER_VK6PH property paddleKeyer} */
-#define VAL_KEYER_AD5DZ	0 /* {type val label ad5dz title {paddle keyer algorithm by ad5dz} value-of {NRPN_PAD_KEYER} property paddleKeyers}  */
+#define NRPN_AUTO_ILS		(NRPN_PAD+3) /* {type nrpn title {automatic letter space timing} range {0 1} property autoLetterSpace} */
+#define NRPN_AUTO_IWS		(NRPN_PAD+4) /* {type nrpn title {automatic word space timing} range {0 1} property autoWordSpace} */
+#define NRPN_PAD_KEYER		(NRPN_PAD+5) /* {type nrpn title {paddle keyer implementation} values VAL_KEYER_* property paddleKeyer} */
+#define VAL_KEYER_AD5DZ		0 /* {type val label ad5dz title {paddle keyer algorithm by ad5dz} value-of {NRPN_PAD_KEYER} property paddleKeyers}  */
 #define VAL_KEYER_K1EL		1 /* {type val label k1el title {paddle keyer algorithm by k1el} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
-#define VAL_KEYER_ND7PA	2 /* {type val label nd7pa title {paddle keyer algorithm by nd7pa} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
-#define VAL_KEYER_VK6PH	3 /* {type val label vk6ph title {paddle keyer algorithm by vk6ph} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
+#define VAL_KEYER_ND7PA		2 /* {type val label nd7pa title {paddle keyer algorithm by nd7pa} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
+#define VAL_KEYER_VK6PH		3 /* {type val label vk6ph title {paddle keyer algorithm by vk6ph} value-of {NRPN_PAD_KEYER} property paddleKeyers} */
 
 #define NRPN_MISC	(NRPN_PAD+6) /* {type rel title {base of miscellaneous parameters}} */
 
-#define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+0) /* {type nrpn title {slew ramp for mixer changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define NRPN_MIXER_SLEW_RAMP	(NRPN_MISC+0) /* {type nrpn title {slew ramp for mixer changes} values VAL_RAMP_* property mixerSlewRamp valuesProperty keyerRamps} */
 #define NRPN_MIXER_SLEW_TIME	(NRPN_MISC+1) /* {type nrpn title {slew time for mixer changes} range {0 16383} unit sample property mixerSlewTime} */
-#define NRPN_FREQ_SLEW_RAMP	(NRPN_MISC+2) /* {type nrpn title {slew ramp for frequency changes} values VAL_RAMP_* default VAL_RAMP_HANN property mixerSlewRamp valuesProperty keyerRamps} */
+#define NRPN_FREQ_SLEW_RAMP	(NRPN_MISC+2) /* {type nrpn title {slew ramp for frequency changes} values VAL_RAMP_* property mixerSlewRamp valuesProperty keyerRamps} */
 #define NRPN_FREQ_SLEW_TIME	(NRPN_MISC+3) /* {type nrpn title {slew time for frquency changes} range {0 16383} unit sample property mixerSlewTime} */
 #define NRPN_MIX_ENABLE		(NRPN_MISC+4) /* {type nrpn sub short label OutMix title {output mixer enable bits, shorthand} range {0 4095} property outputEnable} */
 #define NRPN_MIX_ENABLE_L	(NRPN_MISC+5) /* {type nrpn sub short label OutMixL title {output mixer left enable bits, shorthand} range {0 4095} property outputEnableLeft} */
@@ -673,27 +708,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_EPHEMERA		(NRPN_LAST_SAVED) /* {type rel title {base of ephemeral nrpns}} */
 
-#define NRPN_WM8960		(NRPN_EPHEMERA) /* {type rel title {base of WM8960 commands}} */
-
-#define NRPN_WM8960_ENABLE            (NRPN_WM8960+11-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_INPUT_LEVEL       (NRPN_WM8960+12-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_INPUT_SELECT      (NRPN_WM8960+13-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_VOLUME            (NRPN_WM8960+14-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_HEADPHONE_VOLUME  (NRPN_WM8960+15-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_HEADPHONE_POWER   (NRPN_WM8960+16-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_SPEAKER_VOLUME    (NRPN_WM8960+17-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_SPEAKER_POWER     (NRPN_WM8960+18-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_DISABLE_ADCHPF    (NRPN_WM8960+19-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_ENABLE_MICBIAS    (NRPN_WM8960+20-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_ENABLE_ALC        (NRPN_WM8960+21-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_MIC_POWER         (NRPN_WM8960+22-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_LINEIN_POWER      (NRPN_WM8960+23-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_MASK          (NRPN_WM8960+24-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_DATA          (NRPN_WM8960+25-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_WRITE         (NRPN_WM8960+26-11) /* {type cmd title {WM8960 operation}} */
-
 /* relocate the exec and info blocks to contiguous */
-#define NRPN_EXEC	(NRPN_WM8960+16) /* {type rel title {base of command nrpns}} */
+#define NRPN_EXEC		(NRPN_EPHEMERA) /* {type rel title {base of command nrpns}} */
 
 #define NRPN_WRITE_EEPROM	(NRPN_EXEC+0) /* {type nrpn sub cmd label {Write EEPROM} title {write nrpn+msgs to eeprom} property writeEEPROM} */
 #define NRPN_READ_EEPROM	(NRPN_EXEC+1) /* {type nrpn sub cmd label {Read EEPROM} title {read nrpn+msgs from eeprom} property loadEEPROM} */
@@ -823,7 +839,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define KYR_N_NRPN		(NRPN_LAST)   /* {type def title {number of nrpns defined}} */
 
-/* definitions of ADC targets, these had undefined symbols when placed immediately after NRPN_PADC* */
+/* definitions of possible ADC targets, these had undefined symbols when placed immediately after NRPN_PADC* */
 #define VAL_PADC_NOTHING	(NRPN_NOTHING) /* {type val label None title {pot controls nothing} value-of NRPN_PADC*_NRPN property adcControls} */
 #define VAL_PADC_VOLUME		(NRPN_VOLUME) /* {type val label Volume title {pot controls master volume} value-of NRPN_PADC*_NRP property adcControls} */
 #define VAL_PADC_LEVEL		(NRPN_LEVEL) /* {type val label Level title {pot controls sidetone level} value-of NRPN_PADC*_NRPN property adcControls} */

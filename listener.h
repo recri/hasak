@@ -31,7 +31,7 @@
 
 typedef struct listener_t {
   struct listener_t *next;
-  void (*listener)(int,int);
+  void (*listener)(int,int,int);
 } listener_t;
 
 static listener_t listener_pool[LISTENER_POOL];
@@ -43,7 +43,7 @@ static void listener_free(listener_t *p) {
   listener_free_list = p;
 }
 
-static listener_t *listener_new(listener_t *next, void (*listener)(int,int)) {
+static listener_t *listener_new(listener_t *next, void (*listener)(int,int,int)) {
   if (listener_free_list == NULL) {
     Serial.printf("listener_new: no free nodes\n");
     static listener_t node;
@@ -59,38 +59,38 @@ static listener_t *listener_new(listener_t *next, void (*listener)(int,int)) {
   }
 }
 
-static void listener_add(listener_t **head, void (*listener)(int,int)) {
+static void listener_add(listener_t **head, void (*listener)(int,int,int)) {
   listener_t *p = listener_new(*head, listener);
   *head = p;
 }
 
-static int listener_remove(listener_t **head, void (*listener)(int,int)) {
-  while (*head != NULL) {
-    listener_t *p = *head;
-    if (p->listener == listener) {
-      *head = p->next;
-      listener_free(p);
-      return 1;
-    }
-    head = &p->next;
-  }
-  return 0;
-}
+//static int listener_remove(listener_t **head, void (*listener)(int,int,int)) {
+//  while (*head != NULL) {
+//    listener_t *p = *head;
+//    if (p->listener == listener) {
+//      *head = p->next;
+//      listener_free(p);
+//      return 1;
+//    }
+//    head = &p->next;
+//  }
+//  return 0;
+//}
 
-static int listener_invoke(listener_t *p, int arg, int arg2=0) {
+static int listener_invoke(listener_t *p, int arg, int arg2, int arg3) {
   int n = 0;
   while (p != NULL) {
     n += 1;
-    p->listener(arg,arg2);
+    p->listener(arg,arg2,arg3);
     p = p->next;
   }
   return n;
 }
 
-static void listener_invoke_and_free(listener_t *p, int arg, int arg2) {
+static void listener_invoke_and_free(listener_t *p, int arg, int arg2, int arg3) {
   while (p != NULL) {
     listener_t *n = p->next;
-    p->listener(arg,arg2);
+    p->listener(arg,arg2,arg3);
     p->next = listener_free_list;
     listener_free_list = p;
     p = n;
@@ -108,7 +108,7 @@ static void listener_setup(void) {
 ** run a function once at the end of the current loop.
 ** used to avoid listener loops or to defer a computation
 */
-static void after_idle(void (*func)(int,int)) { listener_add(&after_idle_head, func); }
+static void after_idle(void (*func)(int,int,int)) { listener_add(&after_idle_head, func); }
 
 /*
 ** run the after_idle queue
@@ -118,7 +118,7 @@ static void after_idle(void (*func)(int,int)) { listener_add(&after_idle_head, f
 static void listener_loop(void) {
   listener_t *head = after_idle_head;
   after_idle_head = NULL;
-  listener_invoke_and_free(head, -1, -1);
+  listener_invoke_and_free(head, -1, -1, -1);
 }
 
 #endif

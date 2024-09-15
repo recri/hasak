@@ -33,22 +33,22 @@ static KeyerPaddle cwkey_paddle;
 static KeyerPaddle cwkey_paddle2;
 static KeyerPaddle cwkey_paddle3;
 
-static void cwkey_paddle_listen(int note, int _) {
+static void cwkey_paddle_listen(int note, int _, int __) {
   if (note_get(NOTE_ST_PAD) != cwkey_paddle.clock(note_get(NOTE_HW_L_PAD), note_get(NOTE_HW_R_PAD), 0))
     note_toggle(NOTE_ST_PAD);
 }
 
-static void cwkey_paddle2_listen(int note, int _) {
+static void cwkey_paddle2_listen(int note, int _, int __) {
   if (note_get(NOTE_ST_PAD2) != cwkey_paddle2.clock(note_get(NOTE_HW_L_PAD2), note_get(NOTE_HW_R_PAD2), 0))
     note_toggle(NOTE_ST_PAD2);
 }
 
-static void cwkey_paddle3_listen(int note, int _) {
+static void cwkey_paddle3_listen(int note, int _, int __) {
   if (note_get(NOTE_ST_PAD3) != cwkey_paddle3.clock(note_get(NOTE_HW_L_PAD3), note_get(NOTE_HW_R_PAD3), 0))
     note_toggle(NOTE_ST_PAD3);
 }
 
-static void cwkey_paddle_sample(int nrpn, int _) {
+static void cwkey_paddle_sample(int nrpn, int _, int __) {
   if (note_get(NOTE_ST_PAD) != cwkey_paddle.clock(note_get(NOTE_HW_L_PAD), note_get(NOTE_HW_R_PAD), 1))
     note_toggle(NOTE_ST_PAD);
   if (note_get(NOTE_ST_PAD2) != cwkey_paddle2.clock(note_get(NOTE_HW_L_PAD2), note_get(NOTE_HW_R_PAD2), 1))

@@ -42,8 +42,7 @@
 ** addresses left mixer channel (i%4)+(i/4)*8
 ** and addresses right mixer channel (i%4)+(i/4)*8+4
 */
-static void levels_recompute_mixer_enables(int nrpn, int _) {
-  const int value = nrpn_get(nrpn);
+static void levels_recompute_mixer_enables(int nrpn, int _, int value) {
   for (int i = 0; i < 12; i += 1) {
     const int l = (i%4)+(i/4)*8;
     const int r = l+4;
@@ -54,7 +53,7 @@ static void levels_recompute_mixer_enables(int nrpn, int _) {
 }
 
 /* compute mixer targets from levels and balance controls */
-static void levels_recompute_mixer_levels(int nrpn, int _) {
+static void levels_recompute_mixer_levels(int _, int __, int ___) {
   for (int i = 0; i < 24; i += 1) {    
     const int channel = i/8;	/* channel = 0 for usb_out, 1 for i2s_out, 2 for hdw_out */
     const int input = i%4;	/* input = 0 for i2s_in/usb_in, 1 for sidetone, 2 for keyed IQ, 3 for hdw_in */
@@ -80,9 +79,9 @@ static void levels_recompute_mixer_levels(int nrpn, int _) {
   }
 }
 
-static void levels_note_ptt_st_listener(int note, int _) {
+static void levels_note_ptt_st_listener(int _, int __, int ___) {
   if (nrpn_get(NRPN_RX_PTT_LEVEL) != 0)
-    levels_recompute_mixer_levels(-1, -1);
+    levels_recompute_mixer_levels(-1, -1, -1);
 }
 
 static void levels_setup(void) {

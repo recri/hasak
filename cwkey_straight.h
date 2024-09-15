@@ -26,19 +26,19 @@
 /*
  * straight key keyers
  */
-static void cwkey_straight_s_key_listen(int note, int _) {
+static void cwkey_straight_s_key_listen(int _, int __, int ___) {
   if (note_get(NOTE_HW_S_KEY) != note_get(NOTE_ST_S_KEY)) note_toggle(NOTE_ST_S_KEY);
 }
 
-static void cwkey_straight_s_key2_listen(int note, int _) {
+static void cwkey_straight_s_key2_listen(int _, int __, int ___) {
   if (note_get(NOTE_HW_S_KEY2) != note_get(NOTE_ST_S_KEY2)) note_toggle(NOTE_ST_S_KEY2);
 }
 
-static void cwkey_straight_s_key3_listen(int note, int _) {
+static void cwkey_straight_s_key3_listen(int _, int __, int ___) {
   if (note_get(NOTE_HW_S_KEY3) != note_get(NOTE_ST_S_KEY3)) note_toggle(NOTE_ST_S_KEY3);
 }
 
-static void cwkey_straight_tune_listen(int note, int _) {
+static void cwkey_straight_tune_listen(int _, int __, int ___) {
   if (note_get(NOTE_MIDI_IN_TUNE) != note_get(NOTE_ST_TUNE)) note_toggle(NOTE_ST_TUNE);
 }  
 

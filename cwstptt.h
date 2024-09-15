@@ -29,14 +29,14 @@
 
 static elapsedSamples cwstptt_tail_counter; /* count up the tail time */
 
-static void cwstptt_sidetone_listener(int note, int _) {
-  if (note_get(NOTE_KEY_ST) &&	/* sidetone on */
+static void cwstptt_sidetone_listener(int _, int __, int key_st) {
+  if (key_st &&	/* sidetone on */
       ! note_get(NOTE_PTT_ST))  /* sidetone ptt not on */
       note_toggle(NOTE_PTT_ST);	/* start sidetone ptt */
   cwstptt_tail_counter = -xnrpn_get(NRPN_XPER_IWS); /* 7 dit word space tail */	/* reset the element timer */
 }
 
-static void cwstptt_sample(int nrpn, int _) {
+static void cwstptt_sample(int _, int __, int ___) {
   if (note_get(NOTE_PTT_ST) != 0 &&   /* ptt st is on */
       note_get(NOTE_KEY_ST) == 0 &&   /* key st is off */
       (int)cwstptt_tail_counter >= 0) /* tail has expired */

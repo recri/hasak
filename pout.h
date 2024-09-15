@@ -30,14 +30,13 @@
  * so either the note or the nrpn suffice to compute the other
  
  */
-static void pout_note_listener(int note, int _) { 
+static void pout_note_listener(int note, int _, int __) { 
   const int pin = nrpn_get(note-NOTE_POUT0+NRPN_POUT0_PIN);
   if (nrpn_get(NRPN_PIN_ENABLE) && pin_valid(pin))
     digitalWriteFast(pin, 1^nrpn_get(NRPN_POUT_LOGIC)^note_get(note));
 }
 
-static void pout_pin_listener(int nrpn, int _) {
-  const int pin = nrpn_get(nrpn);
+static void pout_pin_listener(int nrpn, int _, int pin) {
   if (pin_valid(pin)) pinMode(pin, OUTPUT);
 }
 

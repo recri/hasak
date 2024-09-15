@@ -27,11 +27,11 @@
 
 static ResponsiveAnalogRead *padc_adc[KYR_N_PADC];
 
-static void padc_milli(int nrpn, int _) {
+static void padc_milli(int nrpn, int _, int __) {
   if (nrpn_get(NRPN_PADC_ENABLE)) {
     static uint16_t count = 0;
     count += 1;
-    for (int i = 0; i <= KYR_N_PADC; i += 1) {
+    for (int i = 0; i < KYR_N_PADC; i += 1) {
       if (padc_adc[i] != NULL) {
 	if ((count % KYR_N_PADC) == i) 
 	  padc_adc[i]->update();
@@ -47,7 +47,7 @@ static void padc_milli(int nrpn, int _) {
   }
 }
 
-static void padc_pin_listener(int nrpn, int _) {
+static void padc_pin_listener(int nrpn, int _, int __) {
   const int pin = nrpn_get(nrpn);
   if ( ! pin_valid(pin) || ! pin_analog(pin) || pin_i2s(pin) || pin_i2c(pin)) {
     if (pin != 127)

@@ -1,0 +1,10 @@
+* jst-xh 2.54 mm pitch
+** the speaker and line connectors on the CWKeyer Shield
+* jst-ph 2.00 mm pitch
+** the speakers I bought from adafruit
+
+* jst-sh 1.00 mm pitch
+** qt stemma / quiic
+* dupont headers 2.54 mm pitch
+* solderless breadboards 2.54 mm pitch
+* header pins and sockets 2.54 mm pitch

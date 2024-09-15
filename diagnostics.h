@@ -228,8 +228,6 @@ static struct { short nrpn; const char*name; } diag_nrpn[] = {
   NRPN_RX_MUTE, "RX_MUTE",
   NRPN_MIC_HWPTT, "MIC_HWPTT",
   NRPN_CW_HWPTT, "CW_HWPTT",
-  NRPN_HDW_IN_ENABLE, "HDW_IN_EN",
-  NRPN_HDW_OUT_ENABLE, "HDW_OUT_EN",
 
   -1, "LEVELS",
   NRPN_VOLUME, "MAIN",

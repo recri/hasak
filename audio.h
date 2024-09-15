@@ -44,8 +44,8 @@
 // inputs
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
-AudioInputAnalog	*hdw_inp; // audio input from analog 0 FIX.ME, allocate on enable
-AudioConnection		*hdw_in_patch[6]; /* audio input connects to output mixers */
+// AudioInputAnalog	*hdw_inp; // audio input from analog 0 FIX.ME, allocate on enable
+// AudioConnection		*hdw_in_patch[6]; /* audio input connects to output mixers */
 AudioInputByte		au_st_key;  // sidetone key line
 AudioInputByte		au_key_out; // transmitter key line
 
@@ -116,16 +116,18 @@ AudioOutputI2S          i2s_out;
 AudioConnection		patchCord11c(l_i2s_out, 0, i2s_out, 0);
 AudioConnection		patchCord11d(r_i2s_out, 0, i2s_out, 1);
 
-
 #if defined(TEENSY31) || defined(TEENSY32)
-AudioOutputAnalog	*hdw_outp;
+AudioOutputAnalog	hdw_out;
+AudioConnection		hdw_out_patch0(l_hdw_out, 0, hdw_out, 0);
 #elif defined(TEENSY35) || defined(TEENSY36)
-AudioOutputAnalogStereo	*hdw_outp;
+AudioOutputAnalogStereo	hdw_out;
+AudioConnection		hdw_out_patch0(l_hdw_out, 0, hdw_out, 0);
+AudioConnection		hdw_out_patch1(r_hdw_out, 0, hdw_out, 1);
 #elif defined(TEENSY40) || defined(TEENSY41)
-AudioOutputMQS		*hdw_outp;
+AudioOutputMQS		hdw_out;
+AudioConnection		hdw_out_patch0(l_hdw_out, 0, hdw_out, 0);
+AudioConnection		hdw_out_patch1(r_hdw_out, 0, hdw_out, 1);
 #endif
-AudioConnection		*hdw_out_patch[2];
-
 
 // codec control
 AudioControlSGTL5000     sgtl5000; // the codec in the teensy audio shield
@@ -138,7 +140,7 @@ static const char *audio_comp_name(int index) {
   switch (index) {
   case AUDIO_USB_IN: return "usb_in";
   case AUDIO_I2S_IN: return "i2s_in";
-  case AUDIO_HDW_IN: return "hdw_in";
+    // case AUDIO_HDW_IN: return "hdw_in";
   case AUDIO_ST_KEY: return "au_st_key";
   case AUDIO_KEY_OUT: return "au_key_out";
   case AUDIO_ST_OSC: return "tone_ramp";
@@ -165,7 +167,7 @@ static AudioStream *audio_comp(int index) {
   switch (index) {
   case AUDIO_USB_IN: return &usb_in;
   case AUDIO_I2S_IN: return &i2s_in;
-  case AUDIO_HDW_IN: return hdw_inp;
+    // case AUDIO_HDW_IN: return hdw_inp;
   case AUDIO_ST_KEY: return &au_st_key;
   case AUDIO_KEY_OUT: return &au_key_out;
   case AUDIO_ST_OSC: return &tone_ramp;
@@ -178,7 +180,7 @@ static AudioStream *audio_comp(int index) {
   case AUDIO_R_HDW_OUT: return &r_hdw_out;
   case AUDIO_USB_OUT: return &usb_out;
   case AUDIO_I2S_OUT: return &i2s_out;
-  case AUDIO_HDW_OUT: return hdw_outp;
+  case AUDIO_HDW_OUT: return &hdw_out;
   default: 
     Serial.printf("audio_comp(%d) invalid index %d\n", index, index);
     return NULL;
@@ -201,81 +203,5 @@ static void audio_timing_reset(void) {
       audio_comp(i)->processorUsageMaxReset();
 }
 
-// error diagnostic says this is invalid because AudioInputAnalog has non-virtual members?
-// optional wiring
-// enable or disable hardware input
-// this is a mono audio channel read from analog pin A0
-static void audio_hdw_in_enable(int nrpn, int _) {
-  if (nrpn_get(nrpn)) {		/* enable hardware in */
-    if (hdw_inp == NULL) {
-      AudioNoInterrupts();
-      hdw_inp = new AudioInputAnalog();
-      hdw_in_patch[0] = new AudioConnection(*hdw_inp, 0, l_usb_out, 3);
-      hdw_in_patch[1] = new AudioConnection(*hdw_inp, 0, r_usb_out, 3);
-      hdw_in_patch[2] = new AudioConnection(*hdw_inp, 0, l_i2s_out, 3);
-      hdw_in_patch[3] = new AudioConnection(*hdw_inp, 0, r_i2s_out, 3);
-      hdw_in_patch[4] = new AudioConnection(*hdw_inp, 0, l_hdw_out, 3);
-      hdw_in_patch[5] = new AudioConnection(*hdw_inp, 0, r_hdw_out, 3);
-      AudioInterrupts();
-    }
-  } else {			/* disable hardware in */
-    if (hdw_inp != NULL) {
-      AudioNoInterrupts();
-      delete hdw_inp; hdw_inp = NULL;
-      delete hdw_in_patch[0]; hdw_in_patch[0] = NULL;
-      delete hdw_in_patch[1]; hdw_in_patch[1] = NULL;
-      delete hdw_in_patch[2]; hdw_in_patch[2] = NULL;
-      delete hdw_in_patch[3]; hdw_in_patch[3] = NULL;
-      delete hdw_in_patch[4]; hdw_in_patch[4] = NULL;
-      delete hdw_in_patch[5]; hdw_in_patch[5] = NULL;
-      AudioInterrupts();
-    }
-  }
-}
-
-// error diagnostic says this is invalid because AudioOutputAnalog has non-virtual members?
-// optional wiring
-// enable or disable hardware output
-// this is a mono or stereo output audio channel
-static void audio_hdw_out_enable(int nrpn, int _) {
-  if (nrpn_get(nrpn)) {
-    if (hdw_outp == NULL) {
-      AudioNoInterrupts();
-#if defined(TEENSY31) || defined(TEENSY32)
-      hdw_outp = new AudioOutputAnalog();
-      hdw_out_patch[0] = new AudioConnection(l_hdw_out, 0, *hdw_outp, 0);
-#elif defined(TEENSY35) || defined(TEENSY36)
-      hdw_outp = new AudioOutputAnalogStereo();
-      hdw_out_patch[0] = new AudioConnection(l_hdw_out, 0, *hdw_outp, 0);
-      hdw_out_patch[1] = new AudioConnection(r_hdw_out, 0, *hdw_outp, 1);
-#elif defined(TEENSY40) || defined(TEENSY41)
-      hdw_outp = new AudioOutputMQS();
-      hdw_out_patch[0] = new AudioConnection(l_hdw_out, 0, *hdw_outp, 0);
-      hdw_out_patch[1] = new AudioConnection(r_hdw_out, 0, *hdw_outp, 1);
-#endif
-      AudioInterrupts();
-    }
-  } else {
-    if (hdw_outp != NULL) {
-      AudioNoInterrupts();
-#if defined(TEENSY31) || defined(TEENSY32)
-      delete hdw_outp; hdw_outp = NULL;
-      delete hdw_out_patch[0]; hdw_out_patch[0] = NULL;
-#elif defined(TEENSY35) || defined(TEENSY36)
-      delete hdw_outp; hdw_outp = NULL;
-      delete hdw_out_patch[0]; hdw_out_patch[0] = NULL;
-      delete hdw_out_patch[1]; hdw_out_patch[1] = NULL;
-#elif defined(TEENSY40) || defined(TEENSY41)
-      delete hdw_outp; hdw_outp = NULL;
-      delete hdw_out_patch[0]; hdw_out_patch[0] = NULL;
-      delete hdw_out_patch[1]; hdw_out_patch[1] = NULL;
-#endif
-      AudioInterrupts();
-    }
-  }
-}
-
 static void audio_setup(void) {
-  nrpn_listen(NRPN_HDW_IN_ENABLE, audio_hdw_in_enable);
-  nrpn_listen(NRPN_HDW_OUT_ENABLE, audio_hdw_out_enable);
 }

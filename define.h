@@ -148,9 +148,36 @@ static void define_define(void) {
     case NRPN_NOTHING:		nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : nada
     case NRPN_ID_DEVICE:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
     case NRPN_ID_VERSION:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : info
+    case NRPN_NNRPN:		nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // gap
+    case NRPN_NRPN_QUERY:	nrpn_define(nrpn, 0, 1, 0, 0, 1); break; // in, no out, no echo, no write : info
+    case NRPN_NRPN_UNSET:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // gap
+
     case NRPN_STRING_START:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
     case NRPN_STRING_END:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
     case NRPN_STRING_BYTE:	nrpn_define(nrpn, 0, 1, 1, 0, 0); break; // in, out, no echo, write : cmd
+    case NRPN_GAP_9:		nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // gap
+    case NRPN_GAP_10:		nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // gap
+
+    case NRPN_WM8960_ENABLE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_HEADPHONE_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_HEADPHONE_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_SPEAKER_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_SPEAKER_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_DISABLE_ADCHPF:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_ENABLE_MICBIAS:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_ENABLE_ALC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_MIC_POWER:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_LINEIN_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_RAW_MASK:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_RAW_DATA:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_WM8960_RAW_WRITE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+
+    case NRPN_KEYDOWN_NOTE:             nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+    case NRPN_PTT_NOTE:                 nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
+
     case NRPN_MIDI_INPUTS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // no in, no out, no echo, no write : stats
     case NRPN_MIDI_OUTPUTS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // no in, no out, no echo, no write : stats
     case NRPN_MIDI_ECHOES:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // no in, no out, no echo, no write : stats
@@ -164,6 +191,7 @@ static void define_define(void) {
     case NRPN_LISTENER_FIRES:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // no in, no out, no echo, no write : stats
     case NRPN_LISTENER_LOOPS:	nrpn_define(nrpn, 0, 0, 0, 0, 1); break; // no in, no out, no echo, no write : stats
     case NRPN_STATS_RESET:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break; // in, out, echo, no write : command
+
     case NRPN_CHANNEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_INPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_OUTPUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
@@ -183,8 +211,8 @@ static void define_define(void) {
     case NRPN_RX_MUTE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
     case NRPN_MIC_HWPTT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
     case NRPN_CW_HWPTT:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_HDW_IN_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
-    case NRPN_HDW_OUT_ENABLE:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_NOTE_LEAK:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
+    case NRPN_CTRL_LEAK:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write, bit
 
     case NRPN_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_LEVEL:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
@@ -277,23 +305,6 @@ static void define_define(void) {
     case NRPN_PADC7_PIN:	nrpn_define(nrpn, 127, 1, 1, 1, 0); break; // in, out, echo, write
     case NRPN_PADC7_VAL:	nrpn_define(nrpn, 0, 0, 0, 0, 0); break; // in, out, echo, write
     case NRPN_PADC7_NRPN:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break; // in, out, echo, write
-
-    case NRPN_WM8960_ENABLE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_INPUT_LEVEL:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_INPUT_SELECT:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_VOLUME:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_HEADPHONE_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_HEADPHONE_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_SPEAKER_VOLUME:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_SPEAKER_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_DISABLE_ADCHPF:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_ENABLE_MICBIAS:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_ENABLE_ALC:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_MIC_POWER:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_LINEIN_POWER:	nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_RAW_MASK:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_RAW_DATA:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
-    case NRPN_WM8960_RAW_WRITE:		nrpn_define(nrpn, 0, 1, 1, 1, 0); break;
 
     case NRPN_WRITE_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;
     case NRPN_READ_EEPROM:	nrpn_define(nrpn, 0, 1, 1, 1, 1); break;

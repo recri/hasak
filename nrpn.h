@@ -60,15 +60,15 @@ static hasak_t hasak = {
 /*
 ** mirror settings to NRPN_TONE into NRPN_XTONE
 */
-static void nrpn_mirror_xtone(int nrpn, int _) {
-  xnrpn_set(NRPN_XTONE, signed_value(nrpn_get(NRPN_TONE))*1000); // Hz to Hz/1000
+static void nrpn_mirror_xtone(int nrpn, int _, int __) {
+  // xnrpn_set(NRPN_XTONE, signed_value(nrpn_get(NRPN_TONE))*1000); // Hz to Hz/1000
 }
 
 /*
 ** Update the keyer timing, specified by speed, weight, ratio, comp, and farnsworth,
 ** and produce the samples per dit, dah, ies, ils, and iws.
 */
-static void nrpn_update_keyer_timing(int numb, int _) {
+static void nrpn_update_keyer_timing(int numb, int _, int __) {
   const int wordDits = 50;
   const int sampleRate = AUDIO_SAMPLE_RATE;
   const float wpm = nrpn_get(NRPN_SPEED)+nrpn_get(NRPN_SPEED_FRAC)*7.8125e-3f;
@@ -119,7 +119,7 @@ static void nrpn_update_keyer_timing(int numb, int _) {
 /*
 ** trigger a morse timing update when any of the required values changes.
 */
-static void nrpn_recompute_morse(int nrpn, int _) {
+static void nrpn_recompute_morse(int nrpn, int _, int __) {
   // Serial.printf("recompute_morse setting handler\n");
   after_idle(nrpn_update_keyer_timing);
 }
@@ -127,7 +127,7 @@ static void nrpn_recompute_morse(int nrpn, int _) {
 /* 
 ** EEPROM functions.  Disabled.
 */
-static void nrpn_write_eeprom(int nrpn, int _) {
+static void nrpn_write_eeprom(int nrpn, int _, int __) {
 #if 0
   hasak_eeprom_image_t data;
   int error = 0;
@@ -158,7 +158,7 @@ static void nrpn_write_eeprom(int nrpn, int _) {
 #endif
 }
 
-static void nrpn_read_eeprom(int nrpn, int _) {
+static void nrpn_read_eeprom(int nrpn, int _, int __) {
 #if 0
   hasak_eeprom_image_t data;
   EEPROM.get(0, data);
@@ -186,7 +186,7 @@ static void nrpn_read_eeprom(int nrpn, int _) {
 */
 static int nrpn_echo_index;
 
-static void nrpn_echo_all_step(int _, int  __) {
+static void nrpn_echo_all_step(int _, int  __, int ___) {
   if (nrpn_echo_index < NRPN_LAST_SAVED) {
     if (nrpn_get(nrpn_echo_index) != VAL_NOT_SET)
       nrpn_send(nrpn_echo_index, nrpn_get(nrpn_echo_index));
@@ -198,7 +198,7 @@ static void nrpn_echo_all_step(int _, int  __) {
   }
 }
 
-static void nrpn_echo_all(int nrpn, int _) {
+static void nrpn_echo_all(int nrpn, int _, int __) {
   nrpn_echo_index = NRPN_SAVED;
   after_idle(nrpn_echo_all_step);
 }
@@ -206,7 +206,7 @@ static void nrpn_echo_all(int nrpn, int _) {
 /*
 ** feed the text keyers
 */
-static void nrpn_send_text(int nrpn, int _) {
+static void nrpn_send_text(int nrpn, int _, int __) {
   const int value = nrpn_get(nrpn);
   if (nrpn == NRPN_SEND_TEXT) {
     note_set(NOTE_TXT_TEXT, value&127);
@@ -223,7 +223,7 @@ static void nrpn_send_text(int nrpn, int _) {
 /*
 ** maintain the message buffers
 */
-static void nrpn_msg_handler(int nrpn, int _) {
+static void nrpn_msg_handler(int nrpn, int _, int __) {
   const int value = nrpn_get(nrpn);
   if (nrpn == NRPN_MSG_INDEX) { 
     hasak.index = value%sizeof(hasak.msgs);
@@ -240,13 +240,15 @@ static void nrpn_msg_handler(int nrpn, int _) {
   }
 }
     
-static void nrpn_query(int nrpn, int _) {
-  const int value = nrpn_get(nrpn);
-  if (nrpn_is_valid(value) && nrpn_get(value) != VAL_NOT_SET)
-    nrpn_send(nrpn, nrpn_get(value));
+static void nrpn_nrpn_query(int _, int __, int query) {
+  if (nrpn_is_valid(query)) {
+    const int value = nrpn_get(query);
+    nrpn_send(query, value);
+    Serial.printf("nrpn_query_query %d sent %d\n", query, value);
+  }
 }
        
-static void nrpn_unset_listener(int nrpn, int _) {
+static void nrpn_unset_listener(int nrpn, int _, int __) {
   const int value = nrpn_get(nrpn);
   if (nrpn_is_valid(value))
     nrpn_set(nrpn, VAL_NOT_SET);
@@ -279,8 +281,6 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_RX_MUTE, 0);
   nrpn_set(NRPN_MIC_HWPTT, 0);
   nrpn_set(NRPN_CW_HWPTT, 1);
-  nrpn_set(NRPN_HDW_IN_ENABLE, 1);
-  nrpn_set(NRPN_HDW_OUT_ENABLE, 1);
 
   nrpn_set(NRPN_VOLUME, 0);
   nrpn_set(NRPN_LEVEL, 0);	/* dB/10, centiBel */
@@ -382,22 +382,12 @@ static void nrpn_set_default(void) {
   // Serial.printf("nrpn_set_default ID_DEVICE %d ID_VERSION %d\n", nrpn_get(NRPN_ID_DEVICE), nrpn_get(NRPN_ID_VERSION));
 }
 
-static void nrpn_set_default_shim(int nrpn, int _) {
+static void nrpn_set_default_shim(int nrpn, int _, int __) {
   nrpn_set_default();
 }
 
-static void nrpn_bootstrap_controller(int nrpn, int _) {
-  nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
-  nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
-  nrpn_set(NRPN_VOLUME, nrpn_get(NRPN_VOLUME));
-  nrpn_set(NRPN_LEVEL, nrpn_get(NRPN_LEVEL));
-  nrpn_set(NRPN_TONE, nrpn_get(NRPN_TONE));
-  nrpn_set(NRPN_SPEED, nrpn_get(NRPN_SPEED));
-}
-
 static void nrpn_setup(void) {
-  /* bootstrap controller */
-
+  
   /* sidetone, mirror TONE to XTONE */
   nrpn_listen(NRPN_TONE, nrpn_mirror_xtone);
   
@@ -421,7 +411,7 @@ static void nrpn_setup(void) {
   nrpn_listen(NRPN_MSG_READ, nrpn_msg_handler);
 
   /* bootstrap controller */
-  nrpn_listen(NRPN_ID_DEVICE, nrpn_bootstrap_controller);
+  nrpn_listen(NRPN_NRPN_QUERY, nrpn_nrpn_query);
   
   /* information set in the nrpn array so it will be echoed */
   nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);

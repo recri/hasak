@@ -32,11 +32,11 @@ static Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN> midi(usbMIDI);
 // extern "C" {
 // #endif
 
-static int midi_flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
-  return midi.flags_encode(input_enable, output_enable, echo_enable, read_only);
-}
+//static int midi_flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
+//  return midi.flags_encode(input_enable, output_enable, echo_enable, read_only);
+//}
 
-static void midi_flush(void) { midi.flush(); }
+//static void midi_flush(void) { midi.flush(); }
 
 /*
 ** Notes
@@ -48,15 +48,15 @@ static int note_invalid(const int note, const char *who) {
 
 static int note_is_valid(int note) { return midi.note_is_valid(note); }
   
-static void note_listen(int note, void (*f)(int,int)) { 
+static void note_listen(int note, void (*f)(int,int,int)) { 
   if (note_is_valid(note)) midi.note_listen(note, f);
   else note_invalid(note, "note_listen");
 }
 
-static void note_unlisten(int note, void (*f)(int,int)) { 
-  if (note_is_valid(note)) midi.note_unlisten(note, f);
-  else note_invalid(note, "note_unlisten");
-}
+//static void note_unlisten(int note, void (*f)(int,int,int)) { 
+//  if (note_is_valid(note)) midi.note_unlisten(note, f);
+//  else note_invalid(note, "note_unlisten");
+//}
 
 static int note_get(int note) { 
   return note_is_valid(note) ? midi.note_get(note) : note_invalid(note, "note_get");
@@ -70,12 +70,12 @@ static void note_set(int note, int value) {
     note_invalid(note, "note_set");
 }
 
-static void note_send(int note, int value) {
-  if (note_is_valid(note))
-    midi.note_send(note, value);
-  else
-    note_invalid(note, "note_send");
-}
+//static void note_send(int note, int value) {
+//  if (note_is_valid(note))
+//    midi.note_send(note, value);
+//  else
+//    note_invalid(note, "note_send");
+//}
 
 /* define a note */
 static void note_define(const int note, const int value, 
@@ -89,7 +89,7 @@ static void note_define(const int note, const int value,
 
 static void note_toggle(const int note) { note_set(note, note_get(note) ^ 1); } 
 
-static void note_on(const int note) { note_set(note, 1); } 
+//static void note_on(const int note) { note_set(note, 1); } 
 
 static void note_off(const int note) { note_set(note, 0); } 
     
@@ -104,33 +104,33 @@ static int ctrl_invalid(const int ctrl, const char *who) {
 
 static int ctrl_is_valid(int ctrl) { return midi.ctrl_is_valid(ctrl); }
   
-static void ctrl_listen(int ctrl, void (*f)(int,int)) {
-  if (ctrl_is_valid(ctrl)) midi.ctrl_listen(ctrl, f);
-  else ctrl_invalid(ctrl, "ctrl_listen");
-}
+//static void ctrl_listen(int ctrl, void (*f)(int,int,int)) {
+//  if (ctrl_is_valid(ctrl)) midi.ctrl_listen(ctrl, f);
+//  else ctrl_invalid(ctrl, "ctrl_listen");
+//}
 
-static void ctrl_unlisten(int ctrl, void (*f)(int,int)) {
-  if (ctrl_is_valid(ctrl)) midi.ctrl_unlisten(ctrl, f);
-  else ctrl_invalid(ctrl, "ctrl_unlisten");
-}
+//static void ctrl_unlisten(int ctrl, void (*f)(int,int,int)) {
+//  if (ctrl_is_valid(ctrl)) midi.ctrl_unlisten(ctrl, f);
+//  else ctrl_invalid(ctrl, "ctrl_unlisten");
+//}
 
 static int ctrl_get(int ctrl) { 
   return ctrl_is_valid(ctrl) ? midi.ctrl_get(ctrl) : ctrl_invalid(ctrl, "ctrl_get");
 }
 
-static void ctrl_set(int ctrl, int value) { 
-  if (ctrl_is_valid(ctrl))
-    midi.ctrl_set(ctrl, value);
-  else
-    ctrl_invalid(ctrl, "ctrl_set");
-}
+//static void ctrl_set(int ctrl, int value) { 
+//  if (ctrl_is_valid(ctrl))
+//    midi.ctrl_set(ctrl, value);
+//  else
+//    ctrl_invalid(ctrl, "ctrl_set");
+//}
 
-static void ctrl_send(int ctrl, int value) { 
-  if (ctrl_is_valid(ctrl))
-    midi.ctrl_send(ctrl, value);
-  else
-    ctrl_invalid(ctrl, "ctrl_send");
-}
+//static void ctrl_send(int ctrl, int value) { 
+//  if (ctrl_is_valid(ctrl))
+//    midi.ctrl_send(ctrl, value);
+//  else
+//    ctrl_invalid(ctrl, "ctrl_send");
+//}
 
 /* define a ctrl */
 static void ctrl_define(const int ctrl, const int value, 
@@ -165,15 +165,15 @@ static int nrpn_is_valid(const int nrpn) {
   return midi.nrpn_is_valid(nrpn);
 }
 
-static void nrpn_listen(int nrpn, void (*f)(int,int)) { 
+static void nrpn_listen(int nrpn, void (*f)(int,int,int)) { 
   if (nrpn_is_valid(nrpn)) midi.nrpn_listen(nrpn, f);
   else nrpn_invalid(nrpn, "nrpn_listen");
 }
 
-static void nrpn_unlisten(int nrpn, void (*f)(int,int)) { 
-  if (nrpn_is_valid(nrpn)) midi.nrpn_unlisten(nrpn, f);
-  else nrpn_invalid(nrpn, "nrpn_unlisten");
-}
+//static void nrpn_unlisten(int nrpn, void (*f)(int,int,int)) { 
+//  if (nrpn_is_valid(nrpn)) midi.nrpn_unlisten(nrpn, f);
+//  else nrpn_invalid(nrpn, "nrpn_unlisten");
+//}
 
 /* fetch a nrpn */
 static int nrpn_get(const int nrpn) { 

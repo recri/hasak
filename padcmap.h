@@ -43,7 +43,7 @@
 
 static elapsedMillis padcmap_burn_in;
 
-static void padcmap_value(int nrpn, int _) {
+static void padcmap_value(int nrpn, int _, int __) {
   if (nrpn_get(NRPN_PADC_ENABLE)) {
     int min, max;
     int nrpn2 = nrpn_get(nrpn+1);

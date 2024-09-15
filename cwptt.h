@@ -31,12 +31,12 @@
 static elapsedSamples cwptt_tail_counter; /* count down the time */
 static RingBuffer<uint32_t,256> cwptt_delay_line;
 
-static void cwptt_nrpn_listener(int nrpn, int _) {
+static void cwptt_nrpn_listener(int nrpn, int _, int __) {
   xnrpn_set(NRPN_XPTT_TAIL_TIME, max(nrpn_get(NRPN_TAIL_TIME), nrpn_get(NRPN_HANG_TIME)*xnrpn_get(NRPN_XPER_DIT)));
 }
 
-static void cwptt_sidetone_listener(int note, int _) {
-  if (note_get(NOTE_KEY_ST))	/* sidetone is on */
+static void cwptt_sidetone_listener(int _, int __, int key_st) {
+  if (key_st)	/* sidetone is on */
     if ( ! note_get(NOTE_PTT_OUT))
       note_toggle(NOTE_PTT_OUT);
   // queue element for possibly later replay
@@ -46,11 +46,11 @@ static void cwptt_sidetone_listener(int note, int _) {
     Serial.printf("cwptt_listener, delay line overflow, reduce speed or ptt head time\n");
 }
 
-static void cwptt_key_out_listener(int note, int _) {
+static void cwptt_key_out_listener(int _, int __, int ___) {
   cwptt_tail_counter = 0;	     /* reset the element timer */
 }
 
-static void cwptt_sample(int nrpn, int _) {
+static void cwptt_sample(int _, int __, int ___) {
   if (note_get(NOTE_PTT_OUT) &&		      /* ptt tx is on */
       note_get(NOTE_KEY_OUT) == 0 &&	      /* key tx is off */
       cwptt_tail_counter > (elapsedSamples)xnrpn_get(NRPN_XPTT_TAIL_TIME)) { /* tail has expired */

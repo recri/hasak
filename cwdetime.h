@@ -69,12 +69,12 @@ static float cwdetime_wpm_to_dit(float wpm) {
   return cwdetime_dit_to_wpm(wpm);
 }
 
-static void cwdetime_listen(int note, int _) {
+static void cwdetime_listen(int _, int __, int velocity) {
   uint32_t this_frame = timing_samples();
   int observation = this_frame-cwdetime_data.frame;
   cwdetime_data.frame = this_frame;
   
-  if (note_get(note)) { 	/* start dit or dah, end of space */
+  if (velocity) { 	/* start dit or dah, end of space */
     const int oIes = observation;	// the observed length as a one dit space
     const int oIls = observation / 3; // the observed length as a three dit space
     const float dIes = oIes - cwdetime_data.estimate; // how far off the 1 dit space assumption is
