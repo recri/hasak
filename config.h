@@ -482,12 +482,17 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 /* NRPN midi block, parameters common to all midi.h based firmware */
 #define NRPN_FIRST		0 /* {type rel title {base of nrpns}} */
 
-#define NRPN_NOTHING		(NRPN_FIRST+0) /* {type nrpn title {nothng parameter value, zero is not a valid parameter} property nothing} */
-#define NRPN_ID_DEVICE          (NRPN_FIRST+1) /* {type nrpn title {identify this keyer for the correspondent} property idKeyer} */
-#define NRPN_ID_VERSION		(NRPN_FIRST+2) /* {type nrpn title {identify this keyer version for the correspondent} property idVersion} */
-#define NRPN_STRING_START	(NRPN_FIRST+3) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
-#define NRPN_STRING_END		(NRPN_FIRST+4) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
-#define NRPN_STRING_BYTE	(NRPN_FIRST+5) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define NRPN_NOTHING		(NRPN_FIRST+0) /* {type nrpn sub cmd title {nothng parameter value, zero is not a valid parameter} property nothing} */
+#define NRPN_ID_DEVICE          (NRPN_FIRST+1) /* {type nrpn sub cmd title {identify this keyer for the correspondent} property idKeyer} */
+#define NRPN_ID_VERSION		(NRPN_FIRST+2) /* {type nrpn sub cmd title {identify this keyer version for the correspondent} property idVersion} */
+#define NRPN_NNRPN		(NRPN_FIRST+3) /* {type nrpn sub cmd title {return how many NRPNs are allocated - obsolete}} */
+#define NRPN_NRPN_QUERY		(NRPN_FIRST+4) /* {type nrpn sub cmd title {take the value as a nrpn number and send that nrpns value}} */
+#define NRPN_NRPN_UNSET		(NRPN_FIRST+5) /* {type nrpn sub cmd title {take the value as a nrpn number and make that nrpn NRPNV_NOTSET - obsolete}} */
+#define NRPN_STRING_START	(NRPN_FIRST+6) /* {type nrpn sub cmd title {start a string transfer} property stringBegin} */
+#define NRPN_STRING_END		(NRPN_FIRST+7) /* {type nrpn sub cmd title {finish a string transfer} property stringEnd} */
+#define NRPN_STRING_BYTE	(NRPN_FIRST+8) /* {type nrpn sub cmd title {transfer a byte for a string} property stringByte} */
+#define NRPN_GAP_9		(NRPN_FIRST+9) /* {type nrpn sub cmd title {gap}} */
+#define NRPN_GAP_10		(NRPN_FIRST+10) /* {type nrpn sub cmd title {gap}} */
 #define ENDP_JSON_TO_HOST	0	       /* {type endp title {transfer JSON string to host from device}} */
 #define ENDP_NRPNS_TO_DEV	1	       /* {type endp title {transfer NRPN settings to device from host}} */
 #define ENDP_NRPNS_TO_HOST	2	       /* {type endp title {transfer NRPN settings to host from device}} */
@@ -498,21 +503,42 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYR_N_ENDP		7	       /* {type def title {number of defined endpoints}} */
 #define VAL_BYTE_STOP		0x100	       /* {type val title {STRING_BYTE acknowlegement xoff value that signals stop sending}}*/
 #define VAL_BYTE_START		0x101	       /* {type val title {STRING_BYTE acknowlegement xon value that signals start sending}} */
-#define NRPN_MIDI_INPUTS	(NRPN_FIRST+6) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
-#define NRPN_MIDI_OUTPUTS	(NRPN_FIRST+7) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
-#define NRPN_MIDI_ECHOES	(NRPN_FIRST+8) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
-#define NRPN_MIDI_SENDS		(NRPN_FIRST+9) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
-#define NRPN_MIDI_NOTES		(NRPN_FIRST+10) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_MIDI_CTRLS		(NRPN_FIRST+11) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_MIDI_NRPNS		(NRPN_FIRST+12) /* {type nrpn sub info title {number of midi notes} listen 0} */
-#define NRPN_LISTENER_NODES     (NRPN_FIRST+13) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
-#define NRPN_LISTENER_LISTS	(NRPN_FIRST+14) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
-#define NRPN_LISTENER_CALLS	(NRPN_FIRST+15) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
-#define NRPN_LISTENER_FIRES	(NRPN_FIRST+16) /* {type nrpn sub info title {number of listener lists called} listen 0} */
-#define NRPN_LISTENER_LOOPS	(NRPN_FIRST+17) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
-#define NRPN_STATS_RESET	(NRPN_FIRST+18) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
 
-#define NRPN_SAVED		(NRPN_FIRST+19) /* {type rel title {base of saved NRPN parameters}} */
+#define NRPN_WM8960_ENABLE		(NRPN_FIRST+11) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_INPUT_LEVEL		(NRPN_FIRST+12) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_INPUT_SELECT	(NRPN_FIRST+13) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_VOLUME		(NRPN_FIRST+14) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_HEADPHONE_VOLUME	(NRPN_FIRST+15) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_HEADPHONE_POWER	(NRPN_FIRST+16) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_SPEAKER_VOLUME	(NRPN_FIRST+17) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_SPEAKER_POWER	(NRPN_FIRST+18) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_DISABLE_ADCHPF	(NRPN_FIRST+19) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_ENABLE_MICBIAS	(NRPN_FIRST+20) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_ENABLE_ALC		(NRPN_FIRST+21) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_MIC_POWER		(NRPN_FIRST+22) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_LINEIN_POWER	(NRPN_FIRST+23) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_RAW_MASK		(NRPN_FIRST+24) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_RAW_DATA		(NRPN_FIRST+25) /* {type nrpn sub cmd title {wm8960 codec command}} */
+#define NRPN_WM8960_RAW_WRITE		(NRPN_FIRST+26) /* {type nrpn sub cmd title {wm8960 codec command}} */
+
+#define NRPN_KEYDOWN_NOTE		(NRPN_FIRST+27) /* {type nrpn sub cmd title {CWKeyer Shield nrpn}} */
+#define NRPN_PTT_NOTE			(NRPN_FIRST+28) /* {type nrpn sub cmd title {CWKeyer Shield nrpn}} */
+
+#define NRPN_MIDI_INPUTS	(NRPN_FIRST+6+23) /* {type nrpn sub info title {number of midi input messages received} listen 0} */
+#define NRPN_MIDI_OUTPUTS	(NRPN_FIRST+7+23) /* {type nrpn sub info title {number of midi output messages sent} listen 0} */
+#define NRPN_MIDI_ECHOES	(NRPN_FIRST+8+23) /* {type nrpn sub info title {number of midi automatic echo messages sent} listen 0} */
+#define NRPN_MIDI_SENDS		(NRPN_FIRST+9+23) /* {type nrpn sub info title {number of midi explicit send messages} listen 0} */
+#define NRPN_MIDI_NOTES		(NRPN_FIRST+10+23) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_MIDI_CTRLS		(NRPN_FIRST+11+23) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_MIDI_NRPNS		(NRPN_FIRST+12+23) /* {type nrpn sub info title {number of midi notes} listen 0} */
+#define NRPN_LISTENER_NODES     (NRPN_FIRST+13+23) /* {type nrpn sub info title {number of listener nodes allocated} listen 0} */
+#define NRPN_LISTENER_LISTS	(NRPN_FIRST+14+23) /* {type nrpn sub info title {number of listener lists allocated} listen 0} */
+#define NRPN_LISTENER_CALLS	(NRPN_FIRST+15+23) /* {type nrpn sub info title {number of listener nodes called} listen 0} */
+#define NRPN_LISTENER_FIRES	(NRPN_FIRST+16+23) /* {type nrpn sub info title {number of listener lists called} listen 0} */
+#define NRPN_LISTENER_LOOPS	(NRPN_FIRST+17+23) /* {type nrpn sub info title {number of listener loops detected} listen 0} */
+#define NRPN_STATS_RESET	(NRPN_FIRST+18+23) /* {type nrpn sub cmd title {reset MIDI and listener counts}} */
+
+#define NRPN_SAVED		(NRPN_FIRST+19+23) /* {type rel title {base of saved NRPN parameters}} */
 
 #define NRPN_SECOND		(NRPN_SAVED) /* {type rel title {base of persistent midi.h parameters}} */
 
@@ -525,18 +551,18 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_ENABLE		(NRPN_SECOND+6) /* {type rel title {base of keyer enable nrpns}} */
 
-#define NRPN_PIN_ENABLE		(NRPN_ENABLE+0) /* {type ctrl label Input title {enable input pin processing} property keyerInput} */ 
-#define NRPN_POUT_ENABLE	(NRPN_ENABLE+1) /* {type ctrl label Output title {enable output pin processing} property keyerOutput} */ 
-#define NRPN_PADC_ENABLE	(NRPN_ENABLE+2) /* {type ctrl label Adc title {enable adc input pin processing} property keyerAdc} */ 
+#define NRPN_PIN_ENABLE		(NRPN_ENABLE+0) /* {type nrpn label Input title {enable input pin processing} property keyerInput} */ 
+#define NRPN_POUT_ENABLE	(NRPN_ENABLE+1) /* {type nrpn label Output title {enable output pin processing} property keyerOutput} */ 
+#define NRPN_PADC_ENABLE	(NRPN_ENABLE+2) /* {type nrpn label Adc title {enable adc input pin processing} property keyerAdc} */ 
 #define NRPN_ST_ENABLE		(NRPN_ENABLE+3) /* {type nrpn label ST title {enable sidetone generation} range {0 1} property sidetoneEnable} */
 #define NRPN_TX_ENABLE		(NRPN_ENABLE+4) /* {type nrpn label TX title {enable TX ouputs} range {0 1} property txEnable} */
 #define NRPN_IQ_ENABLE		(NRPN_ENABLE+5) /* {type nrpn label IQ title {enable IQ generation} range {0 1} property iqEnable} */
 #define NRPN_PTT_REQUIRE	(NRPN_ENABLE+6) /* {type nrpn label PTTReq title {require EXT_PTT to transmit} range {0 1} ignore 1 property externalPTTRequire} */
 #define NRPN_RKEY_ENABLE	(NRPN_ENABLE+7) /* {type nrpn label Rem title {enable direct remote control of tune by midi note} range {0 1} property remoteKey} */
-#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type ctrl label CWPtt title {enable auto-PTT from CW keyer, (should always generate, but where does it go?}} */
-#define NRPN_RX_MUTE		(NRPN_ENABLE+9) /* {type ctrl label RX title {enable muting of RX audio during CW PTT}} */ 
-#define NRPN_MIC_HWPTT		(NRPN_ENABLE+10) /* {type ctrl label MIC_HWPTT title {enable that MICIN triggers the hardware PTT output}} */
-#define NRPN_CW_HWPTT		(NRPN_ENABLE+11) /* {type ctrl label CW_HWPTT title {enable that CWPTT triggers the hardware PTT output}} */
+#define NRPN_CW_AUTOPTT		(NRPN_ENABLE+8) /* {type nrpn label CWPtt title {enable auto-PTT from CW keyer, (should always generate, but where does it go?}} */
+#define NRPN_RX_MUTE		(NRPN_ENABLE+9) /* {type nrpn label RX title {enable muting of RX audio during CW PTT}} */ 
+#define NRPN_MIC_HWPTT		(NRPN_ENABLE+10) /* {type nrpn label MIC_HWPTT title {enable that MICIN triggers the hardware PTT output}} */
+#define NRPN_CW_HWPTT		(NRPN_ENABLE+11) /* {type nrpn label CW_HWPTT title {enable that CWPTT triggers the hardware PTT output}} */
 #define NRPN_HDW_IN_ENABLE	(NRPN_ENABLE+12) /* {type nrpn label HdwIn title {enable hardware input audio channel} range {0 1} property hdwInEnable} */
 #define NRPN_HDW_OUT_ENABLE	(NRPN_ENABLE+13) /* {type nrpn label HdwOut title {enable hardware output audio channel} range {0 1} property hdwOutEnable} */
 
@@ -673,27 +699,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 #define NRPN_EPHEMERA		(NRPN_LAST_SAVED) /* {type rel title {base of ephemeral nrpns}} */
 
-#define NRPN_WM8960		(NRPN_EPHEMERA) /* {type rel title {base of WM8960 commands}} */
-
-#define NRPN_WM8960_ENABLE            (NRPN_WM8960+11-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_INPUT_LEVEL       (NRPN_WM8960+12-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_INPUT_SELECT      (NRPN_WM8960+13-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_VOLUME            (NRPN_WM8960+14-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_HEADPHONE_VOLUME  (NRPN_WM8960+15-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_HEADPHONE_POWER   (NRPN_WM8960+16-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_SPEAKER_VOLUME    (NRPN_WM8960+17-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_SPEAKER_POWER     (NRPN_WM8960+18-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_DISABLE_ADCHPF    (NRPN_WM8960+19-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_ENABLE_MICBIAS    (NRPN_WM8960+20-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_ENABLE_ALC        (NRPN_WM8960+21-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_MIC_POWER         (NRPN_WM8960+22-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_LINEIN_POWER      (NRPN_WM8960+23-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_MASK          (NRPN_WM8960+24-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_DATA          (NRPN_WM8960+25-11) /* {type cmd title {WM8960 operation}} */
-#define NRPN_WM8960_RAW_WRITE         (NRPN_WM8960+26-11) /* {type cmd title {WM8960 operation}} */
-
 /* relocate the exec and info blocks to contiguous */
-#define NRPN_EXEC	(NRPN_WM8960+16) /* {type rel title {base of command nrpns}} */
+#define NRPN_EXEC		(NRPN_EPHEMERA) /* {type rel title {base of command nrpns}} */
 
 #define NRPN_WRITE_EEPROM	(NRPN_EXEC+0) /* {type nrpn sub cmd label {Write EEPROM} title {write nrpn+msgs to eeprom} property writeEEPROM} */
 #define NRPN_READ_EEPROM	(NRPN_EXEC+1) /* {type nrpn sub cmd label {Read EEPROM} title {read nrpn+msgs from eeprom} property loadEEPROM} */

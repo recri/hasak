@@ -240,10 +240,10 @@ static void nrpn_msg_handler(int nrpn, int _) {
   }
 }
     
-static void nrpn_query(int nrpn, int _) {
-  const int value = nrpn_get(nrpn);
-  if (nrpn_is_valid(value) && nrpn_get(value) != VAL_NOT_SET)
-    nrpn_send(nrpn, nrpn_get(value));
+static void nrpn_nrpn_query(int nrpn, int _) {
+  const int query = nrpn_get(nrpn);
+  if (nrpn_is_valid(query))
+    nrpn_send(query, nrpn_get(query));
 }
        
 static void nrpn_unset_listener(int nrpn, int _) {
@@ -386,18 +386,7 @@ static void nrpn_set_default_shim(int nrpn, int _) {
   nrpn_set_default();
 }
 
-static void nrpn_bootstrap_controller(int nrpn, int _) {
-  nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
-  nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
-  nrpn_set(NRPN_VOLUME, nrpn_get(NRPN_VOLUME));
-  nrpn_set(NRPN_LEVEL, nrpn_get(NRPN_LEVEL));
-  nrpn_set(NRPN_TONE, nrpn_get(NRPN_TONE));
-  nrpn_set(NRPN_SPEED, nrpn_get(NRPN_SPEED));
-}
-
 static void nrpn_setup(void) {
-  /* bootstrap controller */
-
   /* sidetone, mirror TONE to XTONE */
   nrpn_listen(NRPN_TONE, nrpn_mirror_xtone);
   
@@ -410,6 +399,7 @@ static void nrpn_setup(void) {
   nrpn_listen(NRPN_FARNS, nrpn_recompute_morse);
 
   /* commands */
+  nrpn_listen(NRPN_NRPN_QUERY, nrpn_nrpn_query);
   nrpn_listen(NRPN_WRITE_EEPROM, nrpn_write_eeprom);
   nrpn_listen(NRPN_READ_EEPROM, nrpn_read_eeprom);
   nrpn_listen(NRPN_SET_DEFAULT, nrpn_set_default_shim);
@@ -420,9 +410,6 @@ static void nrpn_setup(void) {
   nrpn_listen(NRPN_MSG_WRITE, nrpn_msg_handler);
   nrpn_listen(NRPN_MSG_READ, nrpn_msg_handler);
 
-  /* bootstrap controller */
-  nrpn_listen(NRPN_ID_DEVICE, nrpn_bootstrap_controller);
-  
   /* information set in the nrpn array so it will be echoed */
   nrpn_set(NRPN_ID_DEVICE, KYR_IDENT);
   nrpn_set(NRPN_ID_VERSION, KYR_VERSION);
