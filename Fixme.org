@@ -13,9 +13,10 @@
 * cs42448 not stocked at jlcpcb.com, $9.25534 / unit not stocked at digikey.com
 * wm8904 $2.8440 / unit at jlcpcb.com, $7.74 / unit at digikey.com
 * cabling expected
-** paddle in / TRS
-** key/ptt in / TRS
-** key/ptt out / TRS
+** paddle in / TRS - pin 0 is right paddle (white ring), pin 1 is left paddle (red tip)
+** key/ptt in / TRS - pin 2 is key (red tip), pin 3 is ptt (white ring)
+** key/ptt out / TRS - pin 4 is key out (red tip), pin 5 is ptt out (white ring)
+** MQS headphones out / TRS - pin 10 is mqsr (red tip), pin 12 is mqsl (white ring)
 ** speaker left / TRS (+, -, ground)
 ** speaker right / TRS (+, -, ground)
 ** headphones out / TRS
