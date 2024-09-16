@@ -40,18 +40,39 @@ In the USB Type submenu, select "Serial+MIDI+Audio".
 
 * wiring
 
-|--------+-----------------+----------------------|
-| pin 0  | right paddle in | all                  |
-| pin 1  | left paddle in  | all                  |
-| pin 2  | straight key in | all                  |
-| pin 3  | external PTT in | all                  |
-| pin 4  | key out         | all                  |
-| pin 5  | PTT out         | all                  |
-| pin 10 | audio out left  | Teensy 4.X           |
-| pin 12 | audio out right | Teensy 4.X           |
-|        | headphone jack  | Teensy Audio Adapter |
-|        | headphone jack  | CW Keyer Shield      |
-|--------+-----------------+----------------------|
+|--------+------------------------+----------------------|
+| pin 0  | right paddle in        | all                  |
+| pin 1  | left paddle in         | all                  |
+| pin 2  | straight key in        | all                  |
+| pin 3  | external PTT in        | all                  |
+| pin 4  | key out                | all                  |
+| pin 5  | PTT out                | all                  |
+|--------+------------------------+----------------------|
+| pin 10 | MQSR audio out right   | Teensy 4.X           |
+| pin 12 | MQSL audio out left    | Teensy 4.X           |
+|--------+------------------------+----------------------|
+|        | headphone jack         | Teensy Audio Adapter |
+|--------+------------------------+----------------------|
+|        | headphone jack         | CW Keyer Shield      |
+| pin 15 | A1 Volume Pot          | CW Keyer Shield      |
+| pin 16 | A2 ST Vol Pot          | CW Keyer Shield      |
+| pin 17 | A3 ST Freq             | CW Keyer Shield      |
+| pin 18 | A4 Speed               | CW Keyer Shield      |
+|--------+------------------------+----------------------|
+| pin 40 | DAC A14 audio out mono | Teensy 3.1, 3.2      |
+|--------+------------------------+----------------------|
+| pin 66 | DAC0 audio out         | Teensy 3.5, 3.6      |
+| pin 67 | DAC1 audio out         | Teensy 3.5, 3.6      |
+|--------+------------------------+----------------------|
 
+* control
+Open https://hasak.elf.org on the machine connected to your 
+Teensy by USB.
 
+Grant permission to program MIDI devices when prompted.
 
+The web page may need to be reloaded to display the user interface.
+
+(This was intended to work on any device, but it isn't working
+ for me on my android phone, my android tablet, or my chromebook.)
+ 
