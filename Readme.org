@@ -1,4 +1,4 @@
-# hasak cw keyer
+* hasak cw keyer
 
 Hasak is firmware for the CWKeyerShield described in
 https://github.com/softerhardware/CWKeyer.  
@@ -12,7 +12,7 @@ Hasak is designed to combine the Teensy hardware, the Teensy Audio
 library, and the Musical Instrument Device Interface (MIDI) to make 
 a highly configurable cw keyer that allows sample accurate timing.
 
-## building
+* building
 Obtain a Teensy 4.0 or 4.1 from https://www.pjrc.com/store/ or one
 of the suppliers listed there.  (Teensy 3.x will work, but they've
 been discontinued as products, so don't try to buy one.)
@@ -35,16 +35,18 @@ will appear once you've connected your Teensy with a USB cable.
 
 In the USB Type submenu, select "Serial+MIDI+Audio".
 
-## wiring
+* wiring
 
-pin 0 to right paddle in
-pin 1 to left paddle in
-pin 2 to straight key in
-pin 3 to external PTT in
-pin 4 to key out
-pin 5 to PTT out
-pin 10 to audio out left channel (Teensy 4.X)
-pin 12 to audio out right channel (Teensy 4.X)
+|--------+-----------------+------------|
+| pin 0  | right paddle in | all        |
+| pin 1  | left paddle in  | all        |
+| pin 2  | straight key in | all        |
+| pin 3  | external PTT in | all        |
+| pin 4  | key out         | all        |
+| pin 5  | PTT out         | all        |
+| pin 10 | audio out left  | Teensy 4.X |
+| pin 12 | audio out right | Teensy 4.X |
+|--------+-----------------+------------|
 
 
 
