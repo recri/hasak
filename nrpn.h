@@ -269,7 +269,7 @@ static void nrpn_set_default(void) {
   
   nrpn_set(NRPN_PIN_ENABLE, 1);
   nrpn_set(NRPN_POUT_ENABLE, 1);
-  nrpn_set(NRPN_PADC_ENABLE, 1);
+  nrpn_set(NRPN_PADC_ENABLE, 0);
   nrpn_set(NRPN_ST_ENABLE, KYR_ENABLE_ST);
   nrpn_set(NRPN_TX_ENABLE, KYR_ENABLE_TX);
   nrpn_set(NRPN_IQ_ENABLE, 0);
@@ -279,7 +279,7 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_RX_MUTE, 0);
   nrpn_set(NRPN_MIC_HWPTT, 0);
   nrpn_set(NRPN_CW_HWPTT, 1);
-  nrpn_set(NRPN_HDW_IN_ENABLE, 1);
+  nrpn_set(NRPN_HDW_IN_ENABLE, 0);
   nrpn_set(NRPN_HDW_OUT_ENABLE, 1);
 
   nrpn_set(NRPN_VOLUME, 0);
