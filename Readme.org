@@ -14,8 +14,11 @@ a highly configurable cw keyer that allows sample accurate timing.
 
 * building
 Obtain a Teensy 4.0 or 4.1 from https://www.pjrc.com/store/ or one
-of the suppliers listed there.  (Teensy 3.x will work, but they've
-been discontinued as products, so don't try to buy one.)
+of the suppliers listed there. 
+
+Teensy 3.x will work, but they've been discontinued as products, so 
+don't try to buy one new.  And if you have a new one lying around, you
+might want to sell it on ebay.
 
 Install the Teensyduino development environment according to the 
 instructions at https://www.pjrc.com/teensy/td_download.html
@@ -37,16 +40,18 @@ In the USB Type submenu, select "Serial+MIDI+Audio".
 
 * wiring
 
-|--------+-----------------+------------|
-| pin 0  | right paddle in | all        |
-| pin 1  | left paddle in  | all        |
-| pin 2  | straight key in | all        |
-| pin 3  | external PTT in | all        |
-| pin 4  | key out         | all        |
-| pin 5  | PTT out         | all        |
-| pin 10 | audio out left  | Teensy 4.X |
-| pin 12 | audio out right | Teensy 4.X |
-|--------+-----------------+------------|
+|--------+-----------------+----------------------|
+| pin 0  | right paddle in | all                  |
+| pin 1  | left paddle in  | all                  |
+| pin 2  | straight key in | all                  |
+| pin 3  | external PTT in | all                  |
+| pin 4  | key out         | all                  |
+| pin 5  | PTT out         | all                  |
+| pin 10 | audio out left  | Teensy 4.X           |
+| pin 12 | audio out right | Teensy 4.X           |
+|        | headphone jack  | Teensy Audio Adapter |
+|        | headphone jack  | CW Keyer Shield      |
+|--------+-----------------+----------------------|
 
 
 
