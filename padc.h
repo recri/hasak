@@ -31,7 +31,7 @@ static void padc_milli(int nrpn, int _) {
   if (nrpn_get(NRPN_PADC_ENABLE)) {
     static uint16_t count = 0;
     count += 1;
-    for (int i = 0; i <= KYR_N_PADC; i += 1) {
+    for (int i = 0; i < KYR_N_PADC; i += 1) {
       if (padc_adc[i] != NULL) {
 	if ((count % KYR_N_PADC) == i) 
 	  padc_adc[i]->update();
@@ -67,7 +67,7 @@ static void padc_pin_listener(int nrpn, int _) {
 }
 
 static void padc_setup(void) {
-  for (int i = 0; i < KYR_N_POUT; i += 1)
+  for (int i = 0; i < KYR_N_PADC; i += 1)
     nrpn_listen(NRPN_PADC0_PIN+i*(NRPN_PADC1_PIN-NRPN_PADC0_PIN), padc_pin_listener);
   nrpn_listen(NRPN_MILLI, padc_milli);
 }

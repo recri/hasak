@@ -122,7 +122,7 @@ private:
     switch (type) {
     case NOTE: usbMIDI.sendNoteOn(tindex, value, channel); break;
     case CTRL: usbMIDI.sendControlChange(tindex, value, channel); break;
-    case NRPN: usbMIDI.beginNrpn(tindex, channel); usbMIDI.sendNrpnValue(value, channel); break;
+    case NRPN: usbMIDI.beginNrpn(tindex, channel); usbMIDI.sendNrpnValue(value, channel); usbMIDI.endNrpn(channel); break;
     default: Serial.printf("midi._send(%d, %d, %d, %d) invalid type %d\n", type, tindex, value, type); break;
     }
   }
