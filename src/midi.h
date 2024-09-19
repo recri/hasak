@@ -216,8 +216,10 @@ private:
       _set(type, tindex, value);
     if (nrpn_get(NRPN_LISTENER_ENABLE))
       invoke_listeners(type, tindex, oldvalue);
-    if (nrpn_get(NRPN_ECHO_ENABLE) && echo_enabled(type,tindex))
+    if (nrpn_get(NRPN_ECHO_ENABLE) && echo_enabled(type,tindex)) {
+      if (type == NRPN) Serial.printf("midi.nrpn_echo(%d, %d)\n", tindex, _get(type, tindex));
       send(type, tindex, _get(type, tindex));
+    }
   }
   // send from device origin
   void send(int type, int tindex, int value) {
