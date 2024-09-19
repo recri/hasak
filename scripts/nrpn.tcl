@@ -64,7 +64,7 @@ proc jsformat-rel {name table} {
 	return "[jsq $name]: { [jsq nrpn]: $value, [jsq label]: \"$label\" }"
     }
 }
-array set ::seen {type 1 sub 1 value 1 label 1 title 1 units 1 range 1 values 1 opts 1 cwk 1}
+array set ::seen {type 1 sub 1 value 1 label 1 title 1 units 1 range 1 values 1 opts 1 cwk 1 obsolete 1}
 proc jsformat-any {name table} {
     set vals {}
     dict with table {

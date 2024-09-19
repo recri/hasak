@@ -366,8 +366,11 @@ private:
 
 	    if (ctrl == NRPN_VAL_LSB) {
 	      const int nrpn = (ctrl_get(NRPN_CC_MSB)<<7)|ctrl_get(NRPN_CC_LSB);
-	      if (nrpn_is_valid(nrpn) && input_enabled(NRPN, nrpn))
-		set_from_input(NRPN, nrpn, (ctrl_get(NRPN_VAL_MSB)<<7)|ctrl_get(NRPN_VAL_LSB));
+	      if (nrpn_is_valid(nrpn) && input_enabled(NRPN, nrpn)) {
+		const int value = (ctrl_get(NRPN_VAL_MSB)<<7)|ctrl_get(NRPN_VAL_LSB);
+		Serial.printf("midi.nrpn_recv(%d, %d)\n", nrpn, value);
+		set_from_input(NRPN, nrpn, value);
+	      }
 	    }
 	  }
 	}
