@@ -27,6 +27,23 @@
 ** mixer related functions.
 */
 
+static void levels_enable_diagnose(int nrpn, int value) {
+  /* take the setting nrpn, the nrpn value, and construct the result */
+  char *nrpn_name = 
+    (nrpn == NRPN_MIX_ENABLE) ? "NRPN_MIX_ENABLE" :
+    (nrpn == NRPN_MIX_ENABLE_L) ? "NRPN_MIX_ENABLE_L" :
+    (nrpn == NRPN_MIX_ENABLE_R) ? "NRPN_MIX_ENABLE_R" : "nrpn?";
+  char bits[14];
+  for (int i = 0; i < 12; i += 1)
+    bits[i] = (value & (1<<(11-i))) ? '1' : '0';
+  bits[12] = '\0';
+  char enables[26];
+  for (int i = 0; i < 24; i += 1)
+    enables[i] = nrpn_get(NRPN_MIXER2+i) ? '1' : '0';
+  enables[24] = '\0';
+  Serial.printf("nrpn_set(%s(%d), %s) yields %s\n", nrpn_name, nrpn, bits, enables);
+}
+
 /*
 ** expand mixer shorthand bits to individual mixer channel nrpns
 ** nrpn == NRPN_MIX_ENABLE then set left and right according to bits
@@ -51,6 +68,7 @@ static void levels_recompute_mixer_enables(int nrpn, int _) {
     if (nrpn == NRPN_MIX_ENABLE || nrpn == NRPN_MIX_ENABLE_L) nrpn_set(NRPN_MIXER2+l, v);
     if (nrpn == NRPN_MIX_ENABLE || nrpn == NRPN_MIX_ENABLE_R) nrpn_set(NRPN_MIXER2+r, v);
   }
+  // levels_enable_diagnose(nrpn, value);
 }
 
 /* compute mixer targets from levels and balance controls */
@@ -89,7 +107,7 @@ static void levels_setup(void) {
   /* mixer enable update, listen for changes */
   nrpn_listen(NRPN_MIX_ENABLE, levels_recompute_mixer_enables);
   nrpn_listen(NRPN_MIX_ENABLE_L, levels_recompute_mixer_enables);
-  nrpn_listen(NRPN_MIX_ENABLE_L, levels_recompute_mixer_enables);
+  nrpn_listen(NRPN_MIX_ENABLE_R, levels_recompute_mixer_enables);
 
   /* mixer level update, listen for changes */
   note_listen(NOTE_PTT_ST, levels_note_ptt_st_listener);

@@ -367,9 +367,9 @@ static void nrpn_set_default(void) {
   /* output mixer enable */
   for (int i = NRPN_MIXER2; i < NRPN_MIXER2+24; i += 1) nrpn_set(i, 0); /* muted */
 
-  // nrpn_set(NRPN_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits: IQ to usb, usb+sidetone to i2s and hdw
-  nrpn_set(NRPN_MIX_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
-  nrpn_set(NRPN_MIX_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
+  nrpn_set(NRPN_MIX_ENABLE,   0b001011001100); // enables left and right mixers according to 12 bits: IQ to usb, usb+sidetone to i2s and hdw
+  //nrpn_set(NRPN_MIX_ENABLE_L, 0b001011001100); // enables left mixers according to 12 bits.
+  //nrpn_set(NRPN_MIX_ENABLE_R, 0b001011001100); // enables right mixers according to 12 bits.
 
   /* codec */
   nrpn_set(NRPN_VOLUME, 0);

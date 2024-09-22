@@ -10,49 +10,74 @@
    in the audio library graph, it could be used for
    a hdw_in device or a second i2s device input, but
    this would require modifications to the hasak source.
+   [Not sure this is true, but it could certainly be made
+    to be true.]
 
-|------------+--------------+--------------+--------+-------------+--------------+-----------------|
-| pin number | Teensy 4.x   | Teensy 3.x   | common | CW Keyer    | hasak        | Misc            |
-|------------+--------------+--------------+--------+-------------+--------------+-----------------|
-|        GND |              |              | x      | x           | x            |                 |
-|          0 |              |              | x      | PaddleRight | PaddleRight  |                 |
-|          1 |              |              | x      | PaddleLeft  | PaddleLeft   |                 |
-|          2 |              |              | x      | StraightKey | StraightKey  |                 |
-|          3 |              |              | x      | PTT_IN      | PTT_IN       |                 |
-|          4 |              |              | x      | PTT_OUT     | PTT_OUT      |                 |
-|          5 |              |              | x      | KEY_OUT     | KEY_OUT      |                 |
-|          6 |              |              | x      |             | free         |                 |
-|          7 | _DIN         |              |        | DIN         | DIN4         |                 |
-|          8 | _DOUT        |              |        | DOUT        | DOUT4        |                 |
-|          9 |              | _BCLK        |        |             | BCLK3        |                 |
-|         10 | _MQSR        |              |        | MQSR        | MQSR4,PWM3   | hdw_out 4.x     |
-|         11 | _MQSL        | _MCLK        |        | MQSL        | MCLK3        | hdw_out 4.x     |
-|         12 |              |              | x      |             | free         |                 |
-|------------+--------------+--------------+--------+-------------+--------------+-----------------|
-|         13 |              | _DOUT        |        |             | DOUT3        | LED             |
-|         14 | _ADC0        | _ADC0        | x      |             | free         |                 |
-|         15 | _ADC1        | _ADC1        | x      | VOLUME      |              |                 |
-|         16 | _ADC2        | _ADC2        | x      | STVOL       |              |                 |
-|         17 | _ADC3        | _ADC3        | x      | STFRQ       |              |                 |
-|         18 | _ADC4,_SDA   | _ADC4,_SDA   | x      | SDA         | SDA          |                 |
-|         19 | _ADC5,_SCL   | _ADC5,_SCL   | x      | SCL         | SCL          |                 |
-|         20 | _ADC6,_LRCLK | _ADC6        |        | LRCLK       | LRCLK4       |                 |
-|         21 | _ADC7,_BCLK  | _ADC7        |        | BCLK        | BCLK4        |                 |
-|         22 | _ADC8        | _ADC8,_DIN   |        | SPEED       | DIN3         |                 |
-|         23 | _ADC9,_MCLK  | _ADC9,_LRCLK |        | MCLK        | MCLK4,LRCLK3 |                 |
-|       3.3V |              |              | x      | x           | x            |                 |
-| Analog GND |              |              | x      | x           | x            |                 |
-|        Vin |              |              | x      | x           | x            |                 |
-|------------+--------------+--------------+--------+-------------+--------------+-----------------|
-|          ? |              | _ADC14/DAC   |        |             |              | hdw_out 3.2     |
-|          ? |              | _ADC21/DAC0  |        |             |              | hdw_out 3.5/3.6 |
-|          ? |              | _ADC22/DAC1  |        |             |              | hdw_out 3.5/3.6 |
-|------------+--------------+--------------+--------+-------------+--------------+-----------------|
-
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+| pin number | Teensy 4.x | Teensy 3.x | common | CW Keyer    | hasak              | Misc            | Config | 4.x+I2S | 3.x+I2S | 4.x-I2S | 3.x-I2S |
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+|        GND |            |            | x      | x           | x                  |                 | x      | x       | x       | x       | x       |
+|          0 |            |            | x      | PaddleRight | PaddleRight        |                 | p0     | p0      | p0      | p0      | p0      |
+|          1 |            |            | x      | PaddleLeft  | PaddleLeft         |                 | p1     | p1      | p1      | p1      | p1      |
+|          2 |            |            | x      | StraightKey | StraightKey        |                 | p2     | p2      | p2      | p2      | p2      |
+|          3 |            |            | x      | PTT_IN      | PTT_IN             |                 | p3     | p3      | p3      | p3      | p3      |
+|          4 |            |            | x      | PTT_OUT     | PTT_OUT            |                 | p4     | p4      | p4      | p4      | p4      |
+|          5 |            |            | x      | KEY_OUT     | KEY_OUT            |                 | p5     | p5      | p5      | p5      | p5      |
+|          6 |            |            | x      |             | free               |                 | p6     | p6      | p6      | p6      | p6      |
+|          7 | DIN        |            |        | DIN         | DIN@4.x            |                 | x      | x       | p7      | p7      | p7      |
+|          8 | DOUT       |            |        | DOUT        | DOUT@4.x           |                 | x      | x       | p8      | p8      | p8      |
+|          9 |            | BCLK       |        |             | BCLK@3.x           |                 | x      | p9      | x       | p9      | p9      |
+|         10 | MQSR       |            |        | MQSR        | MQSR@4.x           | hdw_out 4.x     | x      | x       | p10     | x       | p10     |
+|         11 |            |            | x      |             | free               |                 | p11    | p11     | p11     | p11     | p11     |
+|         12 | MQSL       | MCLK       |        | MQSL        | MQSL@4.s,MCLK@3.x  | hdw_out 4.x     | x      | x       | x       | x       | p12     |
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+|         13 |            | DOUT       |        |             | DOUT@3.x           | LED             | x      | p13     | x       | x       | x       |
+|         14 | A0         | A0         | x      |             | free               |                 | p14/a  | p14/a   | p14/a   | p14/a   | p14/a   |
+|         15 | A1         | A1         | x      | VOLUME      |                    |                 | p15/a  | p15/a   | p15/a   | p15/a   | p15/a   |
+|         16 | A2         | A2         | x      | STVOL       |                    |                 | p16/a  | p16/a   | p16/a   | p16/a   | p16/a   |
+|         17 | A3         | A3         | x      | STFRQ       |                    |                 | p17/a  | p17/a   | p17/a   | p17/a   | p17/a   |
+|         18 | A4,SDA     | A4,SDA     | x      | SDA         | SDA                |                 | x      | x       | x       | x       | x       |
+|         19 | A5,SCL     | A5,SCL     | x      | SCL         | SCL                |                 | x      | x       | x       | x       | x       |
+|         20 | A6,LRCLK   | A6         |        | LRCLK       | LRCLK@4.x          |                 | x      | x       | p20/a   | p20/a   | p20/a   |
+|         21 | A7,BCLK    | A7         |        | BCLK        | BCLK@4.x           |                 | x      | x       | p21/a   | p21/a   | p21/a   |
+|         22 | A8         | A8,DIN     |        | SPEED       | DIN@3.x            |                 | x      | p22/a   | x       | p22/a   | p22/a   |
+|         23 | A9,MCLK    | A9,LRCLK   |        | MCLK        | MCLK@4.x,LRCLK@3.x |                 | x      | x       | x       | p23/a   | p23/a   |
+|       3.3V |            |            | x      | x           | x                  |                 | x      | x       | x       | x       | x       |
+|        GND |            | Analog GND | x      | x           | x                  |                 | x      | x       | x       | x       | x       |
+|        Vin |            |            | x      | x           | x                  |                 | x      | x       | x       | x       | x       |
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+|       3.3V |            |            |        |             |                    |                 |        |         |         |         |         |
+|         24 | A10        |            |        |             |                    |                 |        |         |         |         |         |
+|         25 | A11        |            |        |             |                    |                 |        |         |         |         |         |
+|         26 | A12        |            |        |             |                    |                 |        |         |         |         |         |
+|         27 | A13        |            |        |             |                    |                 |        |         |         |         |         |
+|         28 |            |            |        |             |                    |                 |        |         |         |         |         |
+|         29 |            |            |        |             |                    |                 |        |         |         |         |         |
+|         30 |            |            |        |             |                    |                 |        |         |         |         |         |
+|         31 |            | A12        |        |             |                    |                 |        |         |         |         |         |
+|         32 |            | A13        |        |             |                    |                 |        |         |         |         |         |
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+|         33 |            | A14/DAC    |        |             |                    | hdw_out 3.1/3.2 |        |         |         |         |         |
+|         34 |            | A15        |        |             |                    |                 |        |         |         |         |         |
+|         35 |            | A16        |        |             |                    |                 |        |         |         |         |         |
+|         36 |            | A17        |        |             |                    |                 |        |         |         |         |         |
+|         37 |            | A18        |        |             |                    |                 |        |         |         |         |         |
+|         38 | A14        | A19        |        |             |                    |                 |        |         |         |         |         |
+|         39 | A15        | A20        |        |             |                    |                 |        |         |         |         |         |
+|         40 | A16        | A21/DAC0   |        |             |                    | hdw_out 3.5/3.6 |        |         |         |         |         |
+|         41 | A17        | A22/DAC1   |        |             |                    | hdw_out 3.5/3.6 |        |         |         |         |         |
+|        GND |            |            |        |             |                    |                 |        |         |         |         |         |
+|------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
+* Note that A14/DAC on the 3.1/3.2 is an end of the board pin, not in the same location as A14 on 3.5/3.6.
 * The CW Keyer assignment of ADC8 to the SPEED pot cannot be supported
   because it conflicts with the I2S assignments on the Teensy 3.x
   But no one will ever succeed in using a Teensy 3.x in the Cw Keyer
   board, so we can soft assign pin 22 to SPEED on the CW Keyer board
+** This makes life confusing, because I can't really figure out how to write
+   the description in a way that makes sense.  I guess we have pins which are
+   always available as digital i/o and/or analog input, and pins which may be
+   made available on the 3.x, or 4.x, or when no i2s audio is installed.
 * On the hasak board, we can assign everything except the POTs as it is on the 
   CW Keyer board.  We also route the Teensy 3 I2S signals to the codec. 
 ** The signal for pin 23 is MCLK4 but LRCLK3, so it will need to be jumpered when
@@ -61,7 +86,7 @@
    quiescent, or more of them may need to jumpered.  It's 4 additional jumpers, it
    could be a jumper block of 5x3 headers, or maybe a 5P2T DIP switch.
 ** Oh, so the I2C connection is routed to the audio adapter, too,
-** In any case, this assignment leaves me with pins 6, 10, 12, 14, 15, 16, and 17
+** In any case, this assignment leaves me with pins 6, 11, 14, 15, 16, and 17
    unassigned, so I have pins for a second paddle, second key/ptt in, and second
    key/ptt out, with one left over.  Or pins 14, 15, 16, and 17 could be optionally
    assigned to ADC inputs.
@@ -71,4 +96,25 @@
 ** We have optical isolators on the key/ptt out lines.
 ** We have resistors on the keyed input lines to debounce.
 ** We have a level shifter on the Grove connector that routes I2C off board
-
+* Rethink the Hasak board
+** Make a solder pad connected to each Teensy header pin pad for customization
+** Make a scratch out connection for each standard connection for customization
+** Wire pins 0, 1, 2, 3, 4, 5 to paddle, key in, ptt in, key out, and ptt out.
+** Digital input pads are just bypassed to ground with a cap  (0.001µF).  We lay 
+   them out so that it's easy to connect TS, TRS, or TRRS cables.  Basically a 
+   row of input pin pads interleaved with ground pads, with the bypass caps 
+   installed between adjacent input pin pads and input ground pads.  The
+   default four input pins, 0-3, are connected to the first four input pin pads,
+   the remainder of the possible input pin pads have solder pads for connection
+   to Teensy digital IO pins.
+** Digital output pads are buffered by series resistor (47K) a FET (2N7000), and
+   bypassed by a cap (0.001µF). Or is it a solid state relay?  Or is it an optical
+   isolator.  The buffer needs substantial current capacity, so small SMD parts aren't
+   possible.
+** Analog input pads are a direct connection to the pot wiper or the tail of a switched
+   resistance ladder.  They're just like input pins but without the bypass capacitor.
+   (Does it care?)
+** So you could do the same for all pins, you'd need a way to insert the series resistor   
+   and FET into the output lines.  That could be easy, need two wire jumpers to bypass
+   the resistor and the FET, put the FET on an angle to the lines, which might not be
+   a line when we get down to it.
