@@ -62,6 +62,8 @@
 
 #define KYR_ENABLE_WINKEY 0  /* {type def title {Should we start with the winkey emulator enabled}} */
 
+#define KYR_ENABLE_SERIAL 1 /* {type def title {Should we start with the serial device enabled}} */
+
 /* numbers of configurable modules that are implemented */
 /* *** don't change these unless you're prepared to modify all the code that assumes these values *** */
 #define KYR_N_PIN	8 /* {type def title {number of digital input pins that can be configured}} */
@@ -569,12 +571,12 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NRPN_LVL		(NRPN_ENABLE+14) /* {type rel title {base of keyer level setting nrpns}} */
 
 #define NRPN_VOLUME		(NRPN_LVL+0) /* {type nrpn label Vol title {output volume} unit dB/10 range {-320 60} property masterVolume} */
-#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn label {STlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn label {USBlvl} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
-#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn label I2Slvl} title {I2S level} range {-320 60} default 0 unit dB/10 property i2sLevel} */
-#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn label HdwLVL} title {HDW level} range {-320 60} default 0 unit dB/10 property hdwLevel} */
-#define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label STPan title {sidetone pan left or right} range {0 100} unit % property sidetonePan} */
-#define NRPN_RX_PTT_LEVEL	(NRPN_LVL+6) /* {type nrpn label RXMute title {RX mute level during keying} range {-320 60} unit dB/10 property rxMuteLevel} */
+#define NRPN_LEVEL		(NRPN_LVL+1) /* {type nrpn label {ST Level} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
+#define NRPN_USB_LEVEL		(NRPN_LVL+2) /* {type nrpn label {USB Level} title {sidetone volume} range {-320 60} default 0 unit dB/10 property sidetoneLevel} */
+#define NRPN_I2S_LEVEL		(NRPN_LVL+3) /* {type nrpn label {I2S Level} title {I2S level} range {-320 60} default 0 unit dB/10 property i2sLevel} */
+#define NRPN_HDW_LEVEL		(NRPN_LVL+4) /* {type nrpn label {Hdw Level} title {HDW level} range {-320 60} default 0 unit dB/10 property hdwLevel} */
+#define NRPN_ST_BALANCE		(NRPN_LVL+5) /* {type nrpn label {ST Pan} title {sidetone pan left or right} range {0 100} unit % property sidetonePan} */
+#define NRPN_RX_PTT_LEVEL	(NRPN_LVL+6) /* {type nrpn label {RX Mute} title {RX mute level during keying} range {-320 60} unit dB/10 property rxMuteLevel} */
 
 #define NRPN_KEYER		(NRPN_LVL+7) /* {type rel title {base of keyer parameters}} */
 

@@ -27,19 +27,20 @@
 	virtual bool inputLevel(float volume) = 0;  // volume 0.0 to 1.0
 	virtual bool inputSelect(int n) = 0;
 #endif
-static bool codec_sgtl5000;
-static bool codec_wm8960;
+static bool codec_sgtl5000 = false;
+static bool codec_wm8960 = false;
+
+static void codec_enable(void) {
+  codec_sgtl5000 = sgtl5000.enable();
+  codec_wm8960 = wm8960.enable();
+  nrpn_set(NRPN_ID_CODEC, codec_identify());
+}
 
 static int codec_identify(void) {
   if (codec_sgtl5000 && codec_wm8960) return 5000+8960;
   if (codec_sgtl5000) return 5000;
   if (codec_wm8960) return 8960;
   return 0;
-}
-
-static void codec_enable(void) {
-  codec_sgtl5000 = sgtl5000.enable();
-  codec_wm8960 = wm8960.enable();
 }
 
 static void codec_sgtl5000_set(const int16_t nrpn, const int16_t value) {
@@ -71,7 +72,7 @@ static void codec_listener(const int nrpn, int _) {
 
 static void codec_setup(void) {
   /* set nrpn listeners for our functions */
-  nrpn_listen(NRPN_VOLUME, codec_listener);
+  nrpn_listen(NRPN_VOLUME, codec_listener); // only if a codec is enabled, otherwise 
   nrpn_listen(NRPN_INPUT_SELECT, codec_listener);
   nrpn_listen(NRPN_INPUT_LEVEL, codec_listener);
 }

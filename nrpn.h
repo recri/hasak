@@ -246,12 +246,6 @@ static void nrpn_nrpn_query(int nrpn, int _) {
     nrpn_send(query, nrpn_get(query));
 }
        
-static void nrpn_unset_listener(int nrpn, int _) {
-  const int value = nrpn_get(nrpn);
-  if (nrpn_is_valid(value))
-    nrpn_set(nrpn, VAL_NOT_SET);
-}
-
 /*
 ** this where we initialize the keyer nrpns
 */
@@ -418,5 +412,4 @@ static void nrpn_setup(void) {
   nrpn_set(NRPN_SAMPLE_RATE, KYR_SAMPLE_RATE); // obsolete, in the JSON
   nrpn_set(NRPN_EEPROM_LENGTH, KYR_EEPROM_LENGTH);; // obsolete, in the JSON
   nrpn_set(NRPN_ID_CPU, KYR_ID_CPU);
-  nrpn_set(NRPN_ID_CODEC, codec_identify());
 }
