@@ -1,0 +1,3 @@
+* Here's the initial posting by Frank DD4WH about fast convolution filtering
+  https://forum.pjrc.com/index.php?threads/fast-convolution-filtering-with-teensy-4-0-and-audio-board.57267/
+  

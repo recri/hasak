@@ -45,7 +45,7 @@
 AudioInputUSB           usb_in;	// usb audio in
 AudioInputI2S           i2s_in;	// i2s audio in
 // AudioInputAnalog	*hdw_inp; // audio input from analog 0 FIX.ME, allocate on enable
-// AudioConnection		*hdw_in_patch[6]; /* audio input connects to output mixers */
+// AudioConnection	*hdw_in_patch[6]; /* audio input connects to output mixers */
 AudioInputByte		au_st_key;  // sidetone key line
 AudioInputByte		au_key_out; // transmitter key line
 

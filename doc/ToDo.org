@@ -1,3 +1,6 @@
+* Todo list started on 2024-09-28
+[ ] Dit paddle becomes unresponsive on prototype
+    needs external pull up?  or what?
 * Ideas from reading K16 data sheet
 [ ] Customize tune to 100% or 50% duty cycle
 [ ] Cut numbes for 9 and 0 in serial numbers

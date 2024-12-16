@@ -1,3 +1,21 @@
+* Restarting activity as of 2024-12-14
+  Several mistakes in the code
+** PTT_OUT is on pin 4, wired to socket ring, white wire on TRS cable
+** KEY_OUT is on pin 5, wired to socket tip, red wire on TRS cable
+** PTT_OUT and KEY_OUT pins are logic active high when driving the
+   opto-isolator, which becomes active low when seen at the HL2 input.
+** So the first hasak shield has the KEY/PTT/OUT pins reversed, but the
+   signals go to the correct pins, 
+** Fix
+*** put PTT_OUT and KEY_OUT on the correct pins for the CWKeyerShield
+*** swap the T and R on the output cable of the initial hasak shield
+*** swap the output wiring on the prototype
+*** installing 2N7000s on proto would allow it to function in same logic
+    as the opto-isolator.
+*** adding 0.001µF bypass caps would short RF to ground
+*** adding 470 ohm resistor
+** Need a page in hasak.elf.org to set all parameters, need to flip the
+   logic of the PTT_OUT and KEY_OUT
 * Restarting activity as of 2024-09-03
 * Failed to compile for lack of wm8960
   copied control_wm8960.* from CWKeyer/libraries/teensy/Audio

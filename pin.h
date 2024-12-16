@@ -25,6 +25,12 @@
 
 /*
  * digital pin input
+ * These functions are responsible for entering pin input events
+ * static void pin_setup(void) is called once to initialize the handlers
+ * static void pin_sample(int nrpn, int _) is called every sample time to 
+ * poll the input pins and update the associated pin notes.
+ * static void pin_pin_listener(int nrpn, int _) is called when the physical
+ * pin associated to the abstract pin is set, it initializes the pin mode.
  */
 
 static void pin_sample(int nrpn, int _) {
@@ -41,6 +47,7 @@ static void pin_sample(int nrpn, int _) {
       if ((int)debounce[i] >= 0) {
 	const int note = NOTE_PIN0+i;
 	debounce[i] = 0;
+	/* this looks funny because pin is active low and note is active high */
 	if (digitalReadFast(pin) == note_get(note)) {
 	  note_toggle(note);
 	  debounce[i] = -nrpn_get(NRPN_PIN_DEBOUNCE);

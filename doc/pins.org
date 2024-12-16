@@ -1,36 +1,36 @@
-* Teensy 4
-  | GND     | GND | o------------o |  5V | VIN       |
-  | R_PAD   |   0 | o------------o | GND | GND       |
-  | L_PAD   |   1 | o------------o | 3V3 | 3V3       |
-  | S_KEY   |   2 | o------------o |  23 | MCLK      |
-  | PTT_SW  |   3 | o------------o |  22 | DUP_LRCLK |
-  | KEY_OUT |   4 | o------------o |  21 | BCLK      |
-  | PTT_OUT |   5 | o------------o |  20 | LRCLK     |
-  | o       |   6 | o------------o |  19 | SCL       |
-  | DIN     |   7 | o------------o |  18 | SDA       |
-  | DOUT    |   8 | o------------o |  17 | o         |
-  | o       |   9 | o------------o |  16 | HEAD_SW   |
-  | MQSR    |  10 | o------------o |  15 | o         |
-  | o       |  11 | o------------o |  14 | o         |
-  | MQSL    |  12 | o------------o |  13 | o         |
-* Teensy 3
-  | GND     | GND | o------------o |  5V | VIN      |
-  | R_PAD   |   0 | o------------o | GND | GND      |
-  | L_PAD   |   1 | o------------o | 3V3 | 3V3      |
-  | S_KEY   |   2 | o------------o |  23 | LRCLK    |
-  | PTT_SW  |   3 | o------------o |  22 | DIN      |
-  | KEY_OUT |   4 | o------------o |  21 | o        |
-  | PTT_OUT |   5 | o------------o |  20 | o        |
-  | o       |   6 | o------------o |  19 | SCL      |
-  | o       |   7 | o------------o |  18 | SDA      |
-  | o       |   8 | o------------o |  17 | o        |
-  | BCLK    |   9 | o------------o |  16 | HEAD_SW  |
-  | o       |  10 | o------------o |  15 | o        |
-  | MCLK    |  11 | o------------o |  14 | o        |
-  | o       |  12 | o------------o |  13 | DOUT     |
-  |         |     |                | A14 | 3.2/aDAC |
-  |         |     |                | A21 | 3.6/DAC0 |
-  |         |     |                | A22 | 3.6/DAC1 |
+ | Teensy 4 |       |                |     |           |
+ | GND      |   GND | o------------o |  5V | VIN       |
+ | R_PAD    |     0 | o------------o | GND | GND       |
+ | L_PAD    |     1 | o------------o | 3V3 | 3V3       |
+ | S_KEY    |     2 | o------------o |  23 | MCLK      |
+ | PTT_SW   |     3 | o------------o |  22 | DUP_LRCLK |
+ | KEY_OUT  |     4 | o------------o |  21 | BCLK      |
+ | PTT_OUT  |     5 | o------------o |  20 | LRCLK     |
+ | o        |     6 | o------------o |  19 | SCL       |
+ | DIN      |     7 | o------------o |  18 | SDA       |
+ | DOUT     |     8 | o------------o |  17 | o         |
+ | o        |     9 | o------------o |  16 | HEAD_SW   |
+ | MQSR     |    10 | o------------o |  15 | o         |
+ | o        |    11 | o------------o |  14 | o         |
+ | MQSL     |    12 | o------------o |  13 | o         |
+ | Teensy 3 |       |                |     |           |
+ | GND      |   GND | o------------o |  5V | VIN       |
+ | R_PAD    |     0 | o------------o | GND | GND       |
+ | L_PAD    |     1 | o------------o | 3V3 | 3V3       |
+ | S_KEY    |     2 | o------------o |  23 | LRCLK     |
+ | PTT_SW   |     3 | o------------o |  22 | DIN       |
+ | KEY_OUT  |     4 | o------------o |  21 | o         |
+ | PTT_OUT  |     5 | o------------o |  20 | o         |
+ | o        |     6 | o------------o |  19 | SCL       |
+ | o        |     7 | o------------o |  18 | SDA       |
+ | o        |     8 | o------------o |  17 | o         |
+ | BCLK     |     9 | o------------o |  16 | HEAD_SW   |
+ | o        |    10 | o------------o |  15 | o         |
+ | MCLK     |    11 | o------------o |  14 | o         |
+ | o        |    12 | o------------o |  13 | DOUT      |
+ |          |       |                | A14 | 3.2/aDAC  |
+ |          |       |                | A21 | 3.6/DAC0  |
+ |          |       |                | A22 | 3.6/DAC1  |
 ** Pins from the audio adapter
 *** Headset
 **** Headphone L and R from the headphone jack pads

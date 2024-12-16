@@ -1,0 +1,63 @@
+* Originally, I was laying out pins in anticipation of supporting
+  Teensy 3.x devices, but they are officially retired and hideously
+  expensive to buy, so forget them.
+* It is extremely tempting to make the entry level hasak hardware
+  be simply a Teensy 4.0 with
+** four input pins for paddle, straight key, and ptt
+** two output pins for key, and ptt
+** two audio outputs for the medium quality sound
+* This can be implemented on a half size breadboard with
+** a Teensy 4.0 with pins
+** four breadboard friendly stereo jacks
+** eight jumpers for signals
+** five jumpers for grounds
+** micro usb cable
+** headphones, paddles, straight key, and cables
+* Using a bigger breadboard the exact same can be done with the Teensy 4.1
+* That with a computer and browser suffices to demonstrate hasak
+** as a sample accurate cw keyer
+** controlled with a browser interface
+** that continues to work without internet access
+* Simple bonus project
+** TL072 low pass filter to improve the MQS output
+* At this level, there is very little pin planning to do
+** The MQS output is on pins 10 and 12
+   10-12 conflict with the primary SPI interface
+*** MQS_R 10
+*** MQS_L 12
+** The 6 GPIO pins could be anywhere else
+   but most usefully on the edge pins of the Teensy 4.0
+   so that people can easily breadboard them.
+   the CW Keyer Shield puts them on 0-5
+   0-1 conflict with the SPI1 interface
+   The SPI2 interface conflicts with the SD interface   
+*** PDL_L ?
+*** PDL_R ?
+*** KEY_IN ?
+*** PTT_IN ?
+*** KEY_OUT ?
+*** PTT_OUT ?
+** Because we anticipate supporting 2 I2S audio devices
+*** I2S_IN1B 6
+*** I2S_OUT1A 7
+*** I2S_IN1A 8
+*** I2S_SCLK 19
+*** I2S_LRCLK 20
+*** I2S_BCLK 21
+*** I2S_MCLK 23
+*** I2S_OUT1B 32 (Bottom pad)
+** Because we anticipate supporting various I2C devices
+*** I2C_SDA 18
+*** I2C_SCL 19
+** The handful of people who have the CWKeyer Shield might
+   care that we preserve these assignments
+*** PDL_R 0
+*** PDL_L 1
+*** KEY_IN 2
+*** PTT_IN 3
+*** KEY_OUT 4
+*** PTT_OUT 5
+*** VOLUME 15 A1
+*** STVOL 16 A2
+*** STFRQ 17 A3
+*** SPEED 22 A8

@@ -53,6 +53,7 @@ static void cwroute_key_out_listener(int note, int _) {
   ** NOTE_AU_IQ_KEY to key an IQ oscillator
   ** the last works best if you also route the IQ oscillator to usb_out and back to the host SDR.
   */
+  // Serial.printf("cwroute_key_out_listener(note=%d, _) val=%d\n", note, get_note(note));
   if (nrpn_get(NRPN_TX_ENABLE)) {
     if (nrpn_get(NRPN_IQ_ENABLE))
       note_set(NOTE_AU_IQ_KEY, note_get(NOTE_KEY_OUT));
@@ -60,6 +61,7 @@ static void cwroute_key_out_listener(int note, int _) {
     note_set(NOTE_MIDI_OUT_KEY, note_get(NOTE_KEY_OUT) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);
     // if (nrpn_get(NRPN_HW_KEY_ENABLE))
     note_set(NOTE_HW_KEY_OUT, note_get(NOTE_KEY_OUT));
+    // Serial.printf("note_set(NOTE_HW_KEY_OUT, val=%d)\n", note_get(NOTE_KEY_OUT));
     // if (nrpn_get(NRPN_HW_KEY2_ENABLE))
     note_set(NOTE_HW_KEY_OUT2, note_get(NOTE_KEY_OUT));
   }
@@ -70,6 +72,7 @@ static void cwroute_ptt_out_listener(int note, int _) {
   ** NOTE_MIDI_OUT_PTT to generate an external midi note
   ** NOTE_HW_PTT_OUT and/or NOTE_HW_PTT_OUT2 to change a pin state
   */
+  // Serial.printf("cwroute_ptt_out_listener(note=%d, _) val=%d\n", note, get_note(note));
   if (nrpn_get(NRPN_TX_ENABLE)) {
     // if (nrpn_get(NRPN_MIDI_PTT_ENABLE)) ?
     note_set(NOTE_MIDI_OUT_PTT, note_get(NOTE_PTT_OUT) ? VAL_EXT_NOTE_ON : VAL_EXT_NOTE_OFF);

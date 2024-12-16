@@ -24,7 +24,14 @@
  */
 
 /*
-** ptt timing shim
+** cwptt is a timing shim for the actual key and ptt output.
+** we listen to the sidetone keying and generate the delayed
+** physical keying and the stretched cw push to talk timing.
+** static void cwptt_setup(void) sets up the handlers
+** static void cwptt_nrpn_listener(int nrpn, int _) listens for
+** changes to ptt timing parameters and implements them
+** static void cwptt_sidetone_listener(int note, int _) listens for
+** sidetone keying events
 */
 #include "src/ring_buffer.h"
 
@@ -57,9 +64,10 @@ static void cwptt_sample(int nrpn, int _) {
     note_toggle(NOTE_PTT_OUT);		      /* ptt off */
   }
   if (cwptt_delay_line.can_get() &&	      /* something is queued */ 
-      cwptt_delay_line.peek()-timing_samples() <= 0) { /* its time has come */
+      (int32_t)(cwptt_delay_line.peek()-timing_samples()) <= 0) { /* its time has come */
     cwptt_delay_line.get();			       /* pull it off the queue */
     note_toggle(NOTE_KEY_OUT);			       /* toggle the output note */
+    // Serial.printf("note_toggle(NOTE_KEY_OUT)\n");
   }
 }
 

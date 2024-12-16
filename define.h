@@ -59,10 +59,10 @@ static void define_define(void) {
     case NOTE_POUT5:		note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_POUT6:		note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_POUT7:		note_define(note, 0, 0, 0, 0, 0); break;
-      //case NOTE_HW_L_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_PIN?
-      //case NOTE_HW_R_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
-      //case NOTE_HW_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break; // ditto
-      //case NOTE_HW_EXT_PTT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
+      //case NOTE_HW_L_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_PIN0
+      //case NOTE_HW_R_PAD:		note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_PIN1
+      //case NOTE_HW_S_KEY:		note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_PIN2
+      //case NOTE_HW_EXT_PTT:		note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_PIN3
     case NOTE_HW_TUNE:		note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_HW_L_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_HW_R_PAD2:	note_define(note, 0, 0, 0, 0, 0); break;
@@ -71,8 +71,8 @@ static void define_define(void) {
     case NOTE_HW_L_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_HW_R_PAD3:	note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_HW_S_KEY3:	note_define(note, 0, 0, 0, 0, 0); break;
-      //case NOTE_HW_KEY_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_POUT?
-      //case NOTE_HW_PTT_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // ditto
+      //case NOTE_HW_KEY_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_POUT0
+      //case NOTE_HW_PTT_OUT:	note_define(note, 0, 0, 0, 0, 0); break; // alias NOTE_POUT1
     case NOTE_HW_KEY_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_HW_PTT_OUT2:	note_define(note, 0, 0, 0, 0, 0); break;
     case NOTE_AU_ST_KEY:	note_define(note, 0, 0, 0, 0, 0); break;

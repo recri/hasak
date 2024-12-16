@@ -1,0 +1,23 @@
+* The hasak keyer is a Teensy application and a Web application
+** The Teensy application provides
+   low latency action,
+   audio synthesis,
+** The Web application provides
+   an adaptive user interface,
+   flexible storage,
+   and connection to other apps.
+** The Teensy application is a
+   Serial-MIDI-Audio composite USB device
+*** The serial interface is used
+    to manage structured information
+    that isn't easily represented as
+    audio streams or MIDI events
+**** Install a serial event loop in the web and teensy.
+**** Transfer strings of known length which parse to
+     commands
+**** The JSON which details the MIDI notes, controls, and nrpns    
+**** The strings of text which are sent and received
+**** Saved blocks of MIDI parameters which distinguish
+     different keyer voices or modes of operation.
+***** so "save keyer" for instance returns a string which is
+     a JSON representation/associative array of nrpn: value pairs

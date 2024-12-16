@@ -1,10 +1,15 @@
 * Pin allocations for different versions of Teensy
-** Concentrating on the common pinout for the common
-   28 pins.
-** The allocations ignore any extra pins provided
-   except when they provide the hdw_out ports.
-** The hdw_in port, using a hardware ADC, is not
-   allocated.
+** Concentrating on the common pinout for the common 28 pins.
+** The allocations ignore any extra pins provided by different
+   Teensy's, except when they provide the hdw_out ports, as on
+   the Teensy 3.x.
+** The hdw_in port, using a hardware ADC, is not allocated.
+   The hdw_in port would be on A2, A3 if enabled, and it might
+   preclude any analog_read() uses.
+** The serial port, for talking to the gps, would be on A1, A0 as
+   RX3, TX3, but only if enabled.
+** If we skip hdw_out and LED, then we can have a SPI interface on
+   10, 11, 12, and 13
 ** No pwm_out port is allocated.   
 ** There is an additional audio input path allocated
    in the audio library graph, it could be used for
@@ -12,7 +17,10 @@
    this would require modifications to the hasak source.
    [Not sure this is true, but it could certainly be made
     to be true.]
-
+** The audio graph should allow for 4 audio input and output paths
+*** USB in/out
+*** HDW in/out ADC and MQS
+*** I2S 1A and 1B channels
 |------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
 | pin number | Teensy 4.x | Teensy 3.x | common | CW Keyer    | hasak              | Misc            | Config | 4.x+I2S | 3.x+I2S | 4.x-I2S | 3.x-I2S |
 |------------+------------+------------+--------+-------------+--------------------+-----------------+--------+---------+---------+---------+---------|
@@ -34,8 +42,8 @@
 |         13 |            | DOUT       |        |             | DOUT@3.x           | LED             | x      | p13     | x       | x       | x       |
 |         14 | A0         | A0         | x      |             | free               |                 | p14/a  | p14/a   | p14/a   | p14/a   | p14/a   |
 |         15 | A1         | A1         | x      | VOLUME      |                    |                 | p15/a  | p15/a   | p15/a   | p15/a   | p15/a   |
-|         16 | A2         | A2         | x      | STVOL       |                    |                 | p16/a  | p16/a   | p16/a   | p16/a   | p16/a   |
-|         17 | A3         | A3         | x      | STFRQ       |                    |                 | p17/a  | p17/a   | p17/a   | p17/a   | p17/a   |
+|         16 | A2         | A2         | x      | STVOL       |                    | hdw_in 4.x      | p16/a  | p16/a   | p16/a   | p16/a   | p16/a   |
+|         17 | A3         | A3         | x      | STFRQ       |                    | hdw_in 4.x      | p17/a  | p17/a   | p17/a   | p17/a   | p17/a   |
 |         18 | A4,SDA     | A4,SDA     | x      | SDA         | SDA                |                 | x      | x       | x       | x       | x       |
 |         19 | A5,SCL     | A5,SCL     | x      | SCL         | SCL                |                 | x      | x       | x       | x       | x       |
 |         20 | A6,LRCLK   | A6         |        | LRCLK       | LRCLK@4.x          |                 | x      | x       | p20/a   | p20/a   | p20/a   |

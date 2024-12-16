@@ -37,7 +37,6 @@
 ** potentially importable.
 **
 ** KYR_* are configuration definitions
-** KYRA_* are audio related definitions, A is for Audio
 ** NOTE_* are MIDI note numbers or note number relocations, N is for Note.
 ** CTRL_* are MIDI control change numbers, or control number relocations, C is for Control Change
 ** NRPN_* are MIDI NRPNs, nonregistered parameter numbers, or nrpn relocations, P is for Parameter
@@ -226,8 +225,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYR_L_PAD_PIN	1	/* {type pin title {left paddle input pin}} */
 #define KYR_S_KEY_PIN	2	/* {type pin title {straight key input pin}} */
 #define KYR_EXT_PTT_PIN	3	/* {type pin title {external PTT switch input pin}} */
-#define KYR_KEY_OUT_PIN	4	/* {type pin title {KEY output pin}} */
-#define KYR_PTT_OUT_PIN	5	/* {type pin title {PTT output pin}} */
+#define KYR_PTT_OUT_PIN	4	/* {type pin title {PTT output pin}} */
+#define KYR_KEY_OUT_PIN	5	/* {type pin title {KEY output pin}} */
 
 /*
 ** pin allocations for CWKeyer shield input pots
@@ -326,8 +325,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define NOTE_HW_R_PAD		NOTE_PIN1 /* {type note title {1st right paddle switch}} */
 #define NOTE_HW_S_KEY		NOTE_PIN2 /* {type note title {1st straight key switch}} */
 #define NOTE_HW_EXT_PTT		NOTE_PIN3 /* {type note title {1st external ptt switch}} */
-#define NOTE_HW_KEY_OUT		NOTE_POUT0 /* {type note title {hardware key out}} */
-#define NOTE_HW_PTT_OUT		NOTE_POUT1 /* {type note title {hardware ptt out}} */
+#define NOTE_HW_PTT_OUT		NOTE_POUT0 /* {type note title {hardware ptt out}} */
+#define NOTE_HW_KEY_OUT		NOTE_POUT1 /* {type note title {hardware key out}} */
 
 /* additional signals */
 #define NOTE_HW_TUNE		24 /* {type note title {tune switch}} */
@@ -383,7 +382,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /* The external values of MIDI NoteOn/NoteOff, internally 0 is off and 1 is on. */
 #define VAL_EXT_NOTE_OFF	0 /* {type val title {external note off velocity}} */
-#define VAL_EXT_NOTE_ON	127 /* {type val title {external note on velocity}} */
+#define VAL_EXT_NOTE_ON		127 /* {type val title {external note on velocity}} */
 
 /*
 ** midi control change usage.
