@@ -32,11 +32,11 @@ static Midi<KYR_N_NOTE,KYR_N_CTRL,KYR_N_NRPN> midi(usbMIDI);
 // extern "C" {
 // #endif
 
-static int midi_flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
+[[maybe_unused]] static int midi_flags_encode(const int input_enable, const int output_enable, const int echo_enable, const int read_only) {
   return midi.flags_encode(input_enable, output_enable, echo_enable, read_only);
 }
 
-static void midi_flush(void) { midi.flush(); }
+[[maybe_unused]] static void midi_flush(void) { midi.flush(); }
 
 /*
 ** Notes
@@ -53,7 +53,7 @@ static void note_listen(int note, void (*f)(int,int)) {
   else note_invalid(note, "note_listen");
 }
 
-static void note_unlisten(int note, void (*f)(int,int)) { 
+[[maybe_unused]] static void note_unlisten(int note, void (*f)(int,int)) { 
   if (note_is_valid(note)) midi.note_unlisten(note, f);
   else note_invalid(note, "note_unlisten");
 }
@@ -70,7 +70,7 @@ static void note_set(int note, int value) {
     note_invalid(note, "note_set");
 }
 
-static void note_send(int note, int value) {
+[[maybe_unused]] static void note_send(int note, int value) {
   if (note_is_valid(note))
     midi.note_send(note, value);
   else
@@ -89,7 +89,7 @@ static void note_define(const int note, const int value,
 
 static void note_toggle(const int note) { note_set(note, note_get(note) ^ 1); } 
 
-static void note_on(const int note) { note_set(note, 1); } 
+[[maybe_unused]] static void note_on(const int note) { note_set(note, 1); } 
 
 static void note_off(const int note) { note_set(note, 0); } 
     
@@ -104,12 +104,12 @@ static int ctrl_invalid(const int ctrl, const char *who) {
 
 static int ctrl_is_valid(int ctrl) { return midi.ctrl_is_valid(ctrl); }
   
-static void ctrl_listen(int ctrl, void (*f)(int,int)) {
+[[maybe_unused]] static void ctrl_listen(int ctrl, void (*f)(int,int)) {
   if (ctrl_is_valid(ctrl)) midi.ctrl_listen(ctrl, f);
   else ctrl_invalid(ctrl, "ctrl_listen");
 }
 
-static void ctrl_unlisten(int ctrl, void (*f)(int,int)) {
+[[maybe_unused]] static void ctrl_unlisten(int ctrl, void (*f)(int,int)) {
   if (ctrl_is_valid(ctrl)) midi.ctrl_unlisten(ctrl, f);
   else ctrl_invalid(ctrl, "ctrl_unlisten");
 }
@@ -118,14 +118,14 @@ static int ctrl_get(int ctrl) {
   return ctrl_is_valid(ctrl) ? midi.ctrl_get(ctrl) : ctrl_invalid(ctrl, "ctrl_get");
 }
 
-static void ctrl_set(int ctrl, int value) { 
+[[maybe_unused]] static void ctrl_set(int ctrl, int value) { 
   if (ctrl_is_valid(ctrl))
     midi.ctrl_set(ctrl, value);
   else
     ctrl_invalid(ctrl, "ctrl_set");
 }
 
-static void ctrl_send(int ctrl, int value) { 
+[[maybe_unused]] static void ctrl_send(int ctrl, int value) { 
   if (ctrl_is_valid(ctrl))
     midi.ctrl_send(ctrl, value);
   else
@@ -170,7 +170,7 @@ static void nrpn_listen(int nrpn, void (*f)(int,int)) {
   else nrpn_invalid(nrpn, "nrpn_listen");
 }
 
-static void nrpn_unlisten(int nrpn, void (*f)(int,int)) { 
+[[maybe_unused]] static void nrpn_unlisten(int nrpn, void (*f)(int,int)) { 
   if (nrpn_is_valid(nrpn)) midi.nrpn_unlisten(nrpn, f);
   else nrpn_invalid(nrpn, "nrpn_unlisten");
 }

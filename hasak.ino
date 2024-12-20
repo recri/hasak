@@ -59,10 +59,14 @@ static int codec_identify(void); // forward for nprn.h
 
 #include "padc.h"		// input adc states -> input adc nrpns
 #include "padcmap.h"		// input adc nrpns -> keyer parameter nrpns
+
 #include "pin.h"		// input pin states -> input pin notes rename
 #include "pout.h"		// output pin notes -> output pins
 
+#include "led.h"		// 
+
 // #include "cwinkey.h"		// FIX.ME - make it work
+
 #include "diagnostics.h"
 
 //
@@ -114,6 +118,7 @@ void setup(void) {
   cwroute_setup();		// note handlers to route cw notes into and out of
   cwdetime_setup();		// incomplete sidetone detimer into elements
   cwdecode_setup();		// very incomplete sidetone element decoder
+  led_setup();
   // cwinkey_setup();		// winkey emulation
   diagnostics_setup();		// diagnostics console
 

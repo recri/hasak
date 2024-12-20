@@ -28,7 +28,7 @@
 ** transcoded into C from the javascript of https://keyer.elf.org
 */
 
-static void cwdecode_sample(void) {}
+[[maybe_unused]] static void cwdecode_sample(void) {}
 
 static void cwdecode_setup(void) {}
 
@@ -36,10 +36,6 @@ static void cwdecode_setup(void) {}
 
 /* the decode part still in javascript, using a different table */
 #if 0
-// Local Variables: 
-// mode: JavaScript
-// js-indent-level: 2
-// End:
 //
 // keyer.js - a progressive web app for morse code
 // Copyright (c) 2020 Roger E Critchlow Jr, Charlestown, MA, USA
@@ -107,8 +103,4 @@ export class KeyerDecode extends KeyerDetime {
     }
   }
 }
-// Local Variables: 
-// mode: JavaScript
-// js-indent-level: 2
-// End:
 #endif

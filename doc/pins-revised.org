@@ -5,7 +5,10 @@
   be simply a Teensy 4.0 with
 ** four input pins for paddle, straight key, and ptt
 ** two output pins for key, and ptt
-** two audio outputs for the medium quality sound
+** two audio outputs for the audio library medium quality sound output
+** two ADC inputs for the audio library hardware stereo input
+** one serial TX pin for the WS2812Serial library to drive LEDs without
+   blocking, 
 * This can be implemented on a half size breadboard with
 ** a Teensy 4.0 with pins
 ** four breadboard friendly stereo jacks
@@ -19,7 +22,7 @@
 ** controlled with a browser interface
 ** that continues to work without internet access
 * Simple bonus project
-** TL072 low pass filter to improve the MQS output
+** RC low pass filter to improve the MQS output
 * At this level, there is very little pin planning to do
 ** The MQS output is on pins 10 and 12
    10-12 conflict with the primary SPI interface
@@ -45,7 +48,7 @@
 *** I2S_LRCLK 20
 *** I2S_BCLK 21
 *** I2S_MCLK 23
-*** I2S_OUT1B 32 (Bottom pad)
+*** I2S_OUT1B 32 (Bottom pad on 4.0y)
 ** Because we anticipate supporting various I2C devices
 *** I2C_SDA 18
 *** I2C_SCL 19
@@ -55,8 +58,12 @@
 *** PDL_L 1
 *** KEY_IN 2
 *** PTT_IN 3
-*** KEY_OUT 4
-*** PTT_OUT 5
+*** KEY_OUT 5
+*** PTT_OUT 4
+** But I doubt these will survive, we use A2,A3 for the hardware
+   stereo audio library input, A0,A1 probably go to a serial interface
+   for talking with a GPS module, or to a serial CAT interface on an
+   older QRP Labs radio.  We use controls on the web app.
 *** VOLUME 15 A1
 *** STVOL 16 A2
 *** STFRQ 17 A3

@@ -2,6 +2,7 @@
 /*
  * hasak (ham and swiss army knife) keyer for Teensy 4.X, 3.X
  * Copyright (c) 2021,2022 by Roger Critchlow, Charlestown, MA, USA
+ * Copyright (c) 2024,2025 by Roger Critchlow, Las Cruces, NM, USA
  * ad5dz, rec@elf.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -61,7 +62,7 @@
 
 #define KYR_ENABLE_WINKEY 0  /* {type def title {Should we start with the winkey emulator enabled}} */
 
-#define KYR_ENABLE_SERIAL 1 /* {type def title {Should we start with the serial device enabled}} */
+#define KYR_ENABLE_SERIAL 1 /* {type def title {Should we start with the usb serial device enabled}} */
 
 /* numbers of configurable modules that are implemented */
 /* *** don't change these unless you're prepared to modify all the code that assumes these values *** */
@@ -227,6 +228,7 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 #define KYR_EXT_PTT_PIN	3	/* {type pin title {external PTT switch input pin}} */
 #define KYR_PTT_OUT_PIN	4	/* {type pin title {PTT output pin}} */
 #define KYR_KEY_OUT_PIN	5	/* {type pin title {KEY output pin}} */
+#define KYR_LED_OUT_PIN 14	/* {type pin title {LED output pin}} */
 
 /*
 ** pin allocations for CWKeyer shield input pots
@@ -239,6 +241,8 @@ static int pin_i2c(int p) { return ((p)==KYR_SCL||(p)==KYR_SDA); }
 
 /*
 ** audio component indexes
+** NB - need to add second I2S interface and mixers for it
+** NB - will increase KYR_N_AUDIO
 */
 #define AUDIO_USB_IN 0		/* {type audio title {audio in from usb}} */
 #define AUDIO_I2S_IN 1		/* {type audio title {audio in from i2s}} */

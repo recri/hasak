@@ -27,9 +27,9 @@
 ** mixer related functions.
 */
 
-static void levels_enable_diagnose(int nrpn, int value) {
+[[maybe_unused]] static void levels_enable_diagnose(int nrpn, int value) {
   /* take the setting nrpn, the nrpn value, and construct the result */
-  char *nrpn_name = 
+  const char *nrpn_name = 
     (nrpn == NRPN_MIX_ENABLE) ? "NRPN_MIX_ENABLE" :
     (nrpn == NRPN_MIX_ENABLE_L) ? "NRPN_MIX_ENABLE_L" :
     (nrpn == NRPN_MIX_ENABLE_R) ? "NRPN_MIX_ENABLE_R" : "nrpn?";

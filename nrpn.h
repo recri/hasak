@@ -315,7 +315,7 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_FREQ_SLEW_RAMP, VAL_RAMP_HANN);
   nrpn_set(NRPN_FREQ_SLEW_TIME,	128);
   nrpn_set(NRPN_PIN_DEBOUNCE, 1000);
-  nrpn_set(NRPN_POUT_LOGIC, 0);
+  nrpn_set(NRPN_POUT_LOGIC, 1);
   nrpn_set(NRPN_PADC_RATE, 32);
 
   nrpn_set(NRPN_PIN0_PIN, KYR_L_PAD_PIN);  // left paddle pin
@@ -327,8 +327,8 @@ static void nrpn_set_default(void) {
   nrpn_set(NRPN_PIN6_PIN, 127);
   nrpn_set(NRPN_PIN7_PIN, 127);
 
-  nrpn_set(NRPN_POUT0_PIN, KYR_KEY_OUT_PIN); // key out, maybe ptt out
-  nrpn_set(NRPN_POUT1_PIN, KYR_PTT_OUT_PIN); // ptt out, maybe key out
+  nrpn_set(NRPN_POUT0_PIN, KYR_PTT_OUT_PIN); // ptt out
+  nrpn_set(NRPN_POUT1_PIN, KYR_KEY_OUT_PIN); // key out
   nrpn_set(NRPN_POUT2_PIN, 127);
   nrpn_set(NRPN_POUT3_PIN, 127);
   nrpn_set(NRPN_POUT4_PIN, 127);

@@ -1,3 +1,20 @@
+* Restarting activity as of 2024-12-19
+** The KEY/PTT_OUT issues should be solved.
+   But I haven't tested the last fix.
+** Adding the LED support
+   put a string of NeoPixels on the top cap to signal status
+   and provide a visual morse depiction.
+   It turns out that Stoffregen has a non-blocking neopixel library,
+   https://github.com/PaulStoffregen/WS2812Serial, but it needs a
+   serial interface to work.  It translates the NeoPixel bitstream
+   into a serial bitstream and transmits the bits with DMA.
+** The footprint of the QRP Labs low pass and band pass filters
+   will fit onto a hasak shield.  So if I can build an SI5351A
+   VFO and Tayloe detector on a hasak shield, then I add a plug-in
+   bandpass filter; and if I can build a CW xmtr on a shield, then I
+   can add a plug-in low pass filter.
+** On the PD interface, there are many micro B plugs that could be
+   tried to inject the usb data lines.
 * Restarting activity as of 2024-12-14
   Several mistakes in the code
 ** PTT_OUT is on pin 4, wired to socket ring, white wire on TRS cable
@@ -8,14 +25,25 @@
    signals go to the correct pins, 
 ** Fix
 *** put PTT_OUT and KEY_OUT on the correct pins for the CWKeyerShield
+    This worked after several reshuffles of various mistakes, I had
+    uncrossed the lines more than once.
 *** swap the T and R on the output cable of the initial hasak shield
+    This is strike 7 against the 1mm pitch connector, just try and unsolder
+    and resolder it, time to retire this hasak shield and put another in service.
+    Except I don't want to resolder all those cables again, so just cut the two
+    wires and butt solder them together.
 *** swap the output wiring on the prototype
+    and see if active low logic is enough to key the HL2.  It is, but it also
+    keys when you unplug the usb interface from hasak.
 *** installing 2N7000s on proto would allow it to function in same logic
     as the opto-isolator.
-*** adding 0.001µF bypass caps would short RF to ground
-*** adding 470 ohm resistor
+*** adding 0.001µF bypass caps would short RF to ground on all digital inputs 
+    and outputs
+*** adding 470 ohm resistor, not sure what its purpose is
 ** Need a page in hasak.elf.org to set all parameters, need to flip the
-   logic of the PTT_OUT and KEY_OUT
+   logic of the PTT_OUT and KEY_OUT depending on whether we're using the
+   barebones hasak shield or the CWKeyerShield.  That along might be enough
+   reason to install the 2N7000's.
 * Restarting activity as of 2024-09-03
 * Failed to compile for lack of wm8960
   copied control_wm8960.* from CWKeyer/libraries/teensy/Audio
